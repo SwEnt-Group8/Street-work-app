@@ -58,9 +58,7 @@ class MainActivityTest : TestCase() {
   @Test
   fun setContentWithNonEmptyContent() {
     composeTestRule.activity.runOnUiThread {
-      composeTestRule.activity.setContent(parent = null) {
-        Text(text = "Non-empty content")
-      }
+      composeTestRule.activity.setContent(parent = null) { Text(text = "Non-empty content") }
     }
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithText("Non-empty content").assertExists()
