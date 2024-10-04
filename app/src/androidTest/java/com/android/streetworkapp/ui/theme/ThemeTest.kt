@@ -81,4 +81,52 @@ class BootcampThemeTest {
       }
     }
   }
+
+  @Test
+  fun dynamicColor_onAndroid11() {
+    composeTestRule.setContent {
+      SampleAppTheme(dynamicColor = true) { Text("Test Dynamic Colors on Android 11") }
+    }
+    composeTestRule.onNodeWithText("Test Dynamic Colors on Android 11").assertExists()
+  }
+
+  @Test
+  fun lightTheme_dynamicColor_onAndroid12() {
+    composeTestRule.setContent {
+      SampleAppTheme(darkTheme = false, dynamicColor = true) {
+        Text("Light Theme with Dynamic Colors on Android 12")
+      }
+    }
+    composeTestRule.onNodeWithText("Light Theme with Dynamic Colors on Android 12").assertExists()
+  }
+
+  @Test
+  fun darkTheme_dynamicColor_onAndroid12() {
+    composeTestRule.setContent {
+      SampleAppTheme(darkTheme = true, dynamicColor = true) {
+        Text("Dark Theme with Dynamic Colors on Android 12")
+      }
+    }
+    composeTestRule.onNodeWithText("Dark Theme with Dynamic Colors on Android 12").assertExists()
+  }
+
+  @Test
+  fun lightTheme_noDynamicColor() {
+    composeTestRule.setContent {
+      SampleAppTheme(darkTheme = false, dynamicColor = false) {
+        Text("Light Theme without Dynamic Colors")
+      }
+    }
+    composeTestRule.onNodeWithText("Light Theme without Dynamic Colors").assertExists()
+  }
+
+  @Test
+  fun darkTheme_noDynamicColor() {
+    composeTestRule.setContent {
+      SampleAppTheme(darkTheme = true, dynamicColor = false) {
+        Text("Dark Theme without Dynamic Colors")
+      }
+    }
+    composeTestRule.onNodeWithText("Dark Theme without Dynamic Colors").assertExists()
+  }
 }
