@@ -4,6 +4,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Rule
 import org.junit.Test
@@ -44,7 +45,37 @@ class BootcampThemeTest {
   @Test
   fun lightTheme_test() {
     composeTestRule.setContent {
-      SampleAppTheme(darkTheme = false) {
+      SampleAppTheme(darkTheme = false, dynamicColor = false) {
+        val currentColorScheme = MaterialTheme.colorScheme
+        assertEquals(LightColorScheme.primary, currentColorScheme.primary)
+      }
+    }
+  }
+
+  @Test
+  fun lightThemedynamic_test() {
+    composeTestRule.setContent {
+      SampleAppTheme(darkTheme = false, dynamicColor = true) {
+        val currentColorScheme = MaterialTheme.colorScheme
+        assertNotEquals(LightColorScheme.primary, currentColorScheme.primary)
+      }
+    }
+  }
+
+  @Test
+  fun darkTheme2_test() {
+    composeTestRule.setContent {
+      SampleAppTheme(darkTheme = true, dynamicColor = false) {
+        val currentColorScheme = MaterialTheme.colorScheme
+        assertEquals(DarkColorScheme.primary, currentColorScheme.primary)
+      }
+    }
+  }
+
+  @Test
+  fun darkThemedynamic_test() {
+    composeTestRule.setContent {
+      SampleAppTheme(darkTheme = true, dynamicColor = true) {
         val currentColorScheme = MaterialTheme.colorScheme
         assertNotEquals(DarkColorScheme.primary, currentColorScheme.primary)
       }
