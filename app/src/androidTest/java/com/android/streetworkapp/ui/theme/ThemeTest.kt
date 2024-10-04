@@ -1,4 +1,4 @@
-package com.android.sample.ui.theme
+package com.android.streetworkapp.ui.theme
 
 import androidx.compose.material3.Text
 import androidx.compose.ui.test.junit4.createComposeRule

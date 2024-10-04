@@ -1,4 +1,4 @@
-package com.android.sample.ui.theme
+package com.android.streetworkapp.ui.theme
 
 import android.app.Activity
 import android.os.Build
