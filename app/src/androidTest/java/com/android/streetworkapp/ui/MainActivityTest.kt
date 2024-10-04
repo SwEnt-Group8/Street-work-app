@@ -1,5 +1,10 @@
 package com.android.streetworkapp.ui
 
+import androidx.activity.compose.setContent
+import androidx.compose.material3.Text
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -42,11 +47,33 @@ class MainActivityTest : TestCase() {
 
   @Test
   fun testActivityLifecycleEvents() {
-    // Simulate lifecycle events
     composeTestRule.activityRule.scenario.moveToState(Lifecycle.State.STARTED)
     composeTestRule.activityRule.scenario.moveToState(Lifecycle.State.RESUMED)
-
-    // Ensure the root node is still valid after lifecycle changes
+    composeTestRule.waitForIdle()
     composeTestRule.onRoot().assertExists()
+    composeTestRule.activityRule.scenario.moveToState(Lifecycle.State.DESTROYED)
+    composeTestRule.onRoot().assertDoesNotExist()
+  }
+
+  @Test
+  fun setContentWithNonEmptyContent() {
+    composeTestRule.activity.runOnUiThread {
+      composeTestRule.activity.setContent(parent = null) {
+        Text(text = "Non-empty content")
+      }
+    }
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithText("Non-empty content").assertExists()
+  }
+
+  @Test
+  fun setContentWithDifferentModifiers() {
+    composeTestRule.activity.runOnUiThread {
+      composeTestRule.activity.setContent(parent = null) {
+        Text(text = "Test with modifier", modifier = Modifier.semantics { testTag = "testTag" })
+      }
+    }
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("testTag").assertExists()
   }
 }
