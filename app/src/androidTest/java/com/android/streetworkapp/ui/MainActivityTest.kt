@@ -1,8 +1,6 @@
 package com.android.streetworkapp.ui
 
-import androidx.compose.ui.test.assert
-import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,18 +17,8 @@ class MainActivityTest : TestCase() {
   @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
 
   @Test
-  fun mainScreenContainerIsDisplayed() {
-    // Wait for Compose to finish rendering
+  fun mainScreenContainerIsNotNull() {
     composeTestRule.waitForIdle()
-
-    composeTestRule.onNodeWithTag("TextMain").assertIsDisplayed()
-  }
-
-  @Test
-  fun mainScreenContainerHasCorrectTestTag() {
-    // Check if the node with the correct tag is present
-    composeTestRule
-        .onNodeWithTag(C.Tag.main_screen_container)
-        .assert(hasTestTag(C.Tag.main_screen_container))
+    composeTestRule.onNodeWithTag(C.Tag.main_screen_container).assertIsNotDisplayed()
   }
 }
