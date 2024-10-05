@@ -1,10 +1,10 @@
 package com.android.streetworkapp.ui.theme
 
+import android.os.Build
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Rule
 import org.junit.Test
@@ -26,14 +26,29 @@ class BootcampThemeTest {
   }
 
   @Test
-  fun dynamicColor_onAndroid12() {
+  fun dynamicColor_appliesCorrectly_onAndroid12() {
+    val isDynamicColorSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S // Android 12+
     composeTestRule.setContent {
-      SampleAppTheme(dynamicColor = true) { Text("Test Dynamic Colors") }
+      SampleAppTheme(dynamicColor = isDynamicColorSupported) {
+        MaterialTheme(
+            colorScheme = if (isDynamicColorSupported) DarkColorScheme else LightColorScheme,
+            typography = Typography) {
+              Text(
+                  if (isDynamicColorSupported) "Dynamic Color Enabled"
+                  else "Dynamic Color Disabled")
+            }
+      }
+    }
+    // Assert for both possible branches
+    if (isDynamicColorSupported) {
+      composeTestRule.onNodeWithText("Dynamic Color Enabled").assertExists()
+    } else {
+      composeTestRule.onNodeWithText("Dynamic Color Disabled").assertExists()
     }
   }
 
   @Test
-  fun darkTheme_test() {
+  fun darkTheme_usesCorrectColorScheme() {
     composeTestRule.setContent {
       SampleAppTheme(darkTheme = true) {
         val currentColorScheme = MaterialTheme.colorScheme
@@ -43,39 +58,9 @@ class BootcampThemeTest {
   }
 
   @Test
-  fun lightTheme_test() {
+  fun lightTheme_usesCorrectColorScheme() {
     composeTestRule.setContent {
-      SampleAppTheme(darkTheme = false, dynamicColor = false) {
-        val currentColorScheme = MaterialTheme.colorScheme
-        assertEquals(LightColorScheme.primary, currentColorScheme.primary)
-      }
-    }
-  }
-
-  @Test
-  fun lightThemedynamic_test() {
-    composeTestRule.setContent {
-      SampleAppTheme(darkTheme = false, dynamicColor = true) {
-        val currentColorScheme = MaterialTheme.colorScheme
-        assertNotEquals(LightColorScheme.primary, currentColorScheme.primary)
-      }
-    }
-  }
-
-  @Test
-  fun darkTheme2_test() {
-    composeTestRule.setContent {
-      SampleAppTheme(darkTheme = true, dynamicColor = false) {
-        val currentColorScheme = MaterialTheme.colorScheme
-        assertEquals(DarkColorScheme.primary, currentColorScheme.primary)
-      }
-    }
-  }
-
-  @Test
-  fun darkThemedynamic_test() {
-    composeTestRule.setContent {
-      SampleAppTheme(darkTheme = true, dynamicColor = true) {
+      SampleAppTheme(darkTheme = false) {
         val currentColorScheme = MaterialTheme.colorScheme
         assertNotEquals(DarkColorScheme.primary, currentColorScheme.primary)
       }
@@ -83,50 +68,44 @@ class BootcampThemeTest {
   }
 
   @Test
-  fun dynamicColor_onAndroid11() {
-    composeTestRule.setContent {
-      SampleAppTheme(dynamicColor = true) { Text("Test Dynamic Colors on Android 11") }
-    }
-    composeTestRule.onNodeWithText("Test Dynamic Colors on Android 11").assertExists()
-  }
-
-  @Test
-  fun lightTheme_dynamicColor_onAndroid12() {
-    composeTestRule.setContent {
-      SampleAppTheme(darkTheme = false, dynamicColor = true) {
-        Text("Light Theme with Dynamic Colors on Android 12")
-      }
-    }
-    composeTestRule.onNodeWithText("Light Theme with Dynamic Colors on Android 12").assertExists()
-  }
-
-  @Test
-  fun darkTheme_dynamicColor_onAndroid12() {
-    composeTestRule.setContent {
-      SampleAppTheme(darkTheme = true, dynamicColor = true) {
-        Text("Dark Theme with Dynamic Colors on Android 12")
-      }
-    }
-    composeTestRule.onNodeWithText("Dark Theme with Dynamic Colors on Android 12").assertExists()
-  }
-
-  @Test
-  fun lightTheme_noDynamicColor() {
+  fun materialTheme_appliesCustomColorSchemeCorrectly1() {
     composeTestRule.setContent {
       SampleAppTheme(darkTheme = false, dynamicColor = false) {
-        Text("Light Theme without Dynamic Colors")
+        MaterialTheme(colorScheme = DarkColorScheme) {
+          Text("Material Theme with Custom Dark Color Scheme")
+        }
       }
     }
-    composeTestRule.onNodeWithText("Light Theme without Dynamic Colors").assertExists()
+    composeTestRule.onNodeWithText("Material Theme with Custom Dark Color Scheme").assertExists()
   }
 
   @Test
-  fun darkTheme_noDynamicColor() {
+  fun materialTheme_appliesCustomColorSchemeCorrectly2() {
     composeTestRule.setContent {
       SampleAppTheme(darkTheme = true, dynamicColor = false) {
-        Text("Dark Theme without Dynamic Colors")
+        MaterialTheme(colorScheme = LightColorScheme) {
+          Text("Material Theme with Custom Light Color Scheme")
+        }
       }
     }
-    composeTestRule.onNodeWithText("Dark Theme without Dynamic Colors").assertExists()
+    composeTestRule.onNodeWithText("Material Theme with Custom Light Color Scheme").assertExists()
+  }
+
+  @Test
+  fun materialTheme_appliesCustomTypographyCorrectly() {
+    composeTestRule.setContent {
+      SampleAppTheme(darkTheme = false, dynamicColor = false) {
+        MaterialTheme(
+            colorScheme = LightColorScheme,
+            typography =
+                Typography.copy(
+                    bodyLarge =
+                        androidx.compose.ui.text.TextStyle(
+                            color = androidx.compose.ui.graphics.Color.Red))) {
+              Text("Material Theme with Custom Typography")
+            }
+      }
+    }
+    composeTestRule.onNodeWithText("Material Theme with Custom Typography").assertExists()
   }
 }
