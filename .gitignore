@@ -1,0 +1,21 @@
+/.idea/
+.DS_Store
+.gradle
+/local.properties
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Config and build files / folders
+.idea/
+.vscode/
+**/build
+local.properties
+keystore.properties
+.gradle
+/app/google-services.json
+/app/release
+upload-keystore.jks
+/scraping/firebase_credentials.json
