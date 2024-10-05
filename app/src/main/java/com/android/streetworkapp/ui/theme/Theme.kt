@@ -1,6 +1,7 @@
 package com.android.streetworkapp.ui.theme
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -37,6 +38,7 @@ fun SampleAppTheme(
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
+  Log.d("SampleAddTheme", "Set the theme")
   val colorScheme =
       when {
         dynamicColor -> {
@@ -46,6 +48,6 @@ fun SampleAppTheme(
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
       }
-
+  Log.d("SampleAddTheme", "MaterialTheme with the colorScheme")
   MaterialTheme(colorScheme = colorScheme, typography = Typography, content = content)
 }
