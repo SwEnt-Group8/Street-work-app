@@ -13,10 +13,14 @@ class ParkLocationViewModel(private val repository: ParkLocationRepository) : Vi
   /**
    * Find Street Workout parks that are close to a given latitude and longitude
    *
-   * @param lat : Latitude (Double)
-   * @param lon : Longitude (Double)
+   * @param lat : Latitude (Double) must be between [-90,90]
+   * @param lon : Longitude (Double) must be between [-180,180]
    */
   fun findNearbyParks(lat: Double, lon: Double) {
+    if (lat > 90 || lat < -90 || lon > 180 || lon < -180) {
+      throw IllegalArgumentException()
+    }
+
     repository.search(lat, lon, { parkLocations -> parksPrivate.value = parkLocations }, {})
   }
 }

@@ -12,8 +12,8 @@ class OverpassParkLocationRepository(private val client: OkHttpClient) : ParkLoc
   /**
    * Find all nearby Street Workout parks, from OpenStreetMap using Overpass API
    *
-   * @param lat : latitude (Double)
-   * @param lon : longitude (Double)
+   * @param lat : latitude (Double) must be between [-90,90]
+   * @param lon : longitude (Double) must be between [-180,180]
    * @param onSuccess : to handle successful cases
    * @param onFailure : to handle unsuccessful cases
    */
@@ -23,6 +23,10 @@ class OverpassParkLocationRepository(private val client: OkHttpClient) : ParkLoc
       onSuccess: (List<ParkLocation>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
+    if (lat > 90 || lat < -90 || lon > 180 || lon < -180) {
+      throw IllegalArgumentException()
+    }
+
     // Based on the Overpass API. More information: https://wiki.openstreetmap.org/wiki/Overpass_API
     val request =
         Request.Builder()
@@ -35,39 +39,35 @@ class OverpassParkLocationRepository(private val client: OkHttpClient) : ParkLoc
         .enqueue(
             object : Callback {
               override fun onFailure(call: Call, e: IOException) {
-                e.printStackTrace()
+                onFailure(e)
               }
 
               override fun onResponse(call: Call, response: Response) {
-                response.use {
-                  if (!response.isSuccessful) {
-                    throw IOException("Unexpected code $response")
-                  }
-                  val listLocation = decodeJson(response.body!!.string())
-                  onSuccess(listLocation)
-                }
+                onSuccess(decodeJson(response.body!!.string()))
               }
             })
   }
 }
 
-private fun decodeJson(json: String): List<ParkLocation> {
+fun decodeJson(json: String): List<ParkLocation> {
   val jsonObject = JSONObject(json)
   val elementsArray = jsonObject.getJSONArray("elements")
 
   val listParkLocation = emptyList<ParkLocation>().toMutableList()
 
   for (i in 0 until elementsArray.length()) {
+
     val element = elementsArray.getJSONObject(i)
     val center = element.getJSONObject("center")
 
     val latitude = center.getDouble("lat")
     val longitude = center.getDouble("lon")
-    val id = element.getString("id")
+    val id = element.getInt("id")
 
-    val parkLocation = ParkLocation(latitude, longitude, id)
+    val parkLocation = ParkLocation(latitude, longitude, id.toString())
 
     listParkLocation += parkLocation
   }
+
   return listParkLocation
 }

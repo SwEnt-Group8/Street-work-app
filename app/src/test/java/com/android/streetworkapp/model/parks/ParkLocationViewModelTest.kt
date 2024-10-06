@@ -20,6 +20,12 @@ class ParkLocationViewModelTest {
   @Test
   fun findNearbyParksCallsRepository() {
     parkLocationViewModel.findNearbyParks(0.0, 0.0)
+    assert(parkLocationViewModel.parks.value.isEmpty())
     verify(parkLocationRepository).search(eq(0.0), eq(0.0), any(), any())
+  }
+
+  @Test(expected = IllegalArgumentException::class)
+  fun findNearbyParksThrowsOnInvalidLatAndLon() {
+    parkLocationViewModel.findNearbyParks(-200.0, -200.0)
   }
 }

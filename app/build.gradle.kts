@@ -69,7 +69,10 @@ android {
         unitTests {
             isIncludeAndroidResources = true
             isReturnDefaultValues = true
+
+
         }
+
     }
 
     // Robolectric needs to be run only in debug. But its tests are placed in the shared source set (test)
@@ -113,6 +116,7 @@ fun DependencyHandlerScope.globalTestImplementation(dep: Any) {
 }
 
 dependencies {
+    testImplementation("org.json:json:20160810")
     implementation(libs.okhttp)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -125,6 +129,7 @@ dependencies {
     testImplementation(libs.mockito.kotlin)
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
+
 
     // ------------- Jetpack Compose ------------------
     val composeBom = platform(libs.compose.bom)
