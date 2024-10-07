@@ -17,9 +17,8 @@ class ParkLocationViewModel(private val repository: ParkLocationRepository) : Vi
    * @param lon : Longitude (Double) must be between [-180,180]
    */
   fun findNearbyParks(lat: Double, lon: Double) {
-    if (lat > 90 || lat < -90 || lon > 180 || lon < -180) {
-      throw IllegalArgumentException()
-    }
+    require(lat < 90 && lat > -90)
+    require(lon < 180 && lon > -180)
 
     repository.search(lat, lon, { parkLocations -> parksPrivate.value = parkLocations }, {})
   }

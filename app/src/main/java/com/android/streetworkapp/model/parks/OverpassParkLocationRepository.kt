@@ -24,9 +24,8 @@ class OverpassParkLocationRepository(private val client: OkHttpClient) : ParkLoc
       onSuccess: (List<ParkLocation>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    if (lat > 90 || lat < -90 || lon > 180 || lon < -180) {
-      throw IllegalArgumentException()
-    }
+    require(lat < 90 && lat > -90)
+    require(lon < 180 && lon > -180)
 
     // Based on the Overpass API. More information: https://wiki.openstreetmap.org/wiki/Overpass_API
 
@@ -57,15 +56,18 @@ class OverpassParkLocationRepository(private val client: OkHttpClient) : ParkLoc
   }
 }
 
+/**
+ * Decodes JSON coming from the Overpass API.
+ *
+ * @param json : A string with the JSON format. It can not be empty.
+ */
 fun decodeJson(json: String): List<ParkLocation> {
-  if (json.isEmpty()) {
-    throw IllegalArgumentException()
-  }
+  require(json.isNotEmpty())
 
   val jsonObject = JSONObject(json)
   val elementsArray = jsonObject.getJSONArray("elements")
 
-  val listParkLocation = emptyList<ParkLocation>().toMutableList()
+  val listParkLocation = mutableListOf<ParkLocation>()
 
   for (i in 0 until elementsArray.length()) {
 
