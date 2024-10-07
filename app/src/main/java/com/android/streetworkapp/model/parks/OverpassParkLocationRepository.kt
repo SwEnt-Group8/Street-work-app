@@ -3,6 +3,7 @@ package com.android.streetworkapp.model.parks
 import java.io.IOException
 import okhttp3.Call
 import okhttp3.Callback
+import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -28,12 +29,19 @@ class OverpassParkLocationRepository(private val client: OkHttpClient) : ParkLoc
     }
 
     // Based on the Overpass API. More information: https://wiki.openstreetmap.org/wiki/Overpass_API
-    val request =
-        Request.Builder()
-            .url(
-                "https://overpass-api.de/api/interpreter?data=[out:json];way[%22leisure%22=%22fitness_station%22](around:30000,$lat,$lon);%20out%20geom%20center;")
-            .header("User-Agent", "test/5.0")
+
+    val url =
+        HttpUrl.Builder()
+            .scheme("https")
+            .host("overpass-api.de")
+            .addPathSegment("api")
+            .addPathSegment("interpreter")
+            .addEncodedQueryParameter(
+                "data",
+                "[out:json];way[\"leisure\"=\"fitness_station\"](around:30000,$lat,$lon);%20out%20geom%20center;")
             .build()
+
+    val request = Request.Builder().url(url).header("User-Agent", "test/5.0").build()
     client
         .newCall(request)
         .enqueue(
@@ -53,6 +61,7 @@ fun decodeJson(json: String): List<ParkLocation> {
   if (json.isEmpty()) {
     throw IllegalArgumentException()
   }
+
   val jsonObject = JSONObject(json)
   val elementsArray = jsonObject.getJSONArray("elements")
 
