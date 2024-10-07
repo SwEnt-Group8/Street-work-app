@@ -14,14 +14,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.streetworkapp.model.event.Event
 
 @Composable
-fun EventItem() {
+fun EventItem(event: Event) {
   ListItem(
-      headlineContent = { Text("Alice started a freestyle contest ", lineHeight = 18.sp) },
-      supportingContent = { Text("Participants 5/7") },
+      headlineContent = { Text(text = event.title, lineHeight = 18.sp) },
+      supportingContent = {
+        Text(
+            "Participants ${event.participants}/${event.maxParticipants}",
+            fontWeight = FontWeight.Light)
+      },
+      overlineContent = { Text("31/10/2024 17:00", fontWeight = FontWeight.Bold) },
       leadingContent = {
         Icon(
             imageVector = Icons.Default.AccountCircle,
@@ -30,7 +37,7 @@ fun EventItem() {
       },
       trailingContent = {
         Button(
-            onClick = {},
+            onClick = { TODO("Go to the event overview") },
             modifier = Modifier.size(width = 80.dp, height = 48.dp),
             colors = ButtonDefaults.buttonColors(),
             shape = RectangleShape,
