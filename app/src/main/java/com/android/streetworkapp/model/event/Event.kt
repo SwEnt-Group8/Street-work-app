@@ -11,3 +11,5 @@ data class Event(
     val date: Timestamp,
     val owner: String,
 )
+
+data class EventList(val events: List<Event>)
