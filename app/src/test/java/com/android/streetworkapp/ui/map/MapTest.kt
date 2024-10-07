@@ -1,9 +1,10 @@
+package com.android.streetworkapp.ui.map
+
 import android.Manifest
 import android.content.Context
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.core.app.ApplicationProvider
-import com.android.streetworkapp.ui.map.Map
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Before
