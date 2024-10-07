@@ -40,6 +40,12 @@ class OverpassParkLocationRepositoryTest {
     assert(test.isEmpty())
   }
 
+  @Test(expected = IllegalArgumentException::class)
+  fun decodeJSONThrowsOnEmptyString() {
+    val string = ""
+    val test = decodeJson(string)
+  }
+
   @Test
   fun searchCallsNewCall() {
     val overpass = OverpassParkLocationRepository(okHttpClient)

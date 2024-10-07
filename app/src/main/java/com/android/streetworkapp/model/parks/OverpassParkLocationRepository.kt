@@ -50,6 +50,9 @@ class OverpassParkLocationRepository(private val client: OkHttpClient) : ParkLoc
 }
 
 fun decodeJson(json: String): List<ParkLocation> {
+  if (json.isEmpty()) {
+    throw IllegalArgumentException()
+  }
   val jsonObject = JSONObject(json)
   val elementsArray = jsonObject.getJSONArray("elements")
 
