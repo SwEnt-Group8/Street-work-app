@@ -21,6 +21,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -82,6 +83,7 @@ fun ParkDetails(park: Park) {
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(start = 16.dp, top = 6.dp, bottom = 2.dp))
     RatingComponent(rating = park.rating.toInt(), park.nbrRating)
+    OccupancyBar(occupancy = park.occupancy)
   }
 }
 
@@ -101,6 +103,20 @@ fun RatingComponent(rating: Int, nbrReview: Int) {
         fontSize = 16.sp,
         fontWeight = FontWeight.Light)
   }
+}
+
+@Composable
+fun OccupancyBar(occupancy: Float) {
+  Row(
+      modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+      verticalAlignment = Alignment.CenterVertically) {
+        LinearProgressIndicator(progress = occupancy / 100, modifier = Modifier.weight(1f))
+        Text(
+            text = "${occupancy.toInt()}% Occupancy",
+            modifier = Modifier.padding(start = 8.dp),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Light)
+      }
 }
 
 @Composable

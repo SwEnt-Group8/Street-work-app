@@ -10,5 +10,6 @@ data class Park(
     val image: Painter,
     val rating: Float,
     val nbrRating: Int,
+    val occupancy: Float,
     val events: EventList
 )
