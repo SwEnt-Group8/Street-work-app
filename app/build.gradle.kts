@@ -78,6 +78,7 @@ android {
             isIncludeAndroidResources = true
             isReturnDefaultValues = true
         }
+
     }
 
     // Robolectric needs to be run only in debug. But its tests are placed in the shared source set (test)
@@ -134,6 +135,7 @@ dependencies {
     testImplementation(libs.mockito.kotlin)
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
+
 
     // ------------- Jetpack Compose ------------------
     val composeBom = platform(libs.compose.bom)
