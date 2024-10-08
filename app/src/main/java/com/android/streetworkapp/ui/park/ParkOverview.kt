@@ -81,13 +81,13 @@ fun ParkDetails(park: Park) {
         fontSize = 24.sp,
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(start = 16.dp, top = 6.dp, bottom = 2.dp))
-    ReviewComponent(rating = park.rating.toInt())
+    RatingComponent(rating = park.rating.toInt(), park.nbrRating)
   }
 }
 
 @Composable
-fun ReviewComponent(rating: Int) {
-  Row(modifier = Modifier.padding(start = 16.dp)) {
+fun RatingComponent(rating: Int, nbrReview: Int) {
+  Row(modifier = Modifier.padding(start = 16.dp), verticalAlignment = Alignment.CenterVertically) {
     for (i in 1..5) {
       Icon(
           imageVector = Icons.Default.Star,
@@ -95,6 +95,11 @@ fun ReviewComponent(rating: Int) {
           tint = if (i <= rating) Color(0xFF6650a4) else Color.Gray,
           modifier = Modifier.size(24.dp))
     }
+    Text(
+        text = "($nbrReview)",
+        modifier = Modifier.padding(start = 8.dp),
+        fontSize = 16.sp,
+        fontWeight = FontWeight.Light)
   }
 }
 

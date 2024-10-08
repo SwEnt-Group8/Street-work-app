@@ -9,5 +9,6 @@ data class Park(
     val location: String, // TODO: Change to ParkLocation
     val image: Painter,
     val rating: Float,
+    val nbrRating: Int,
     val events: EventList
 )
