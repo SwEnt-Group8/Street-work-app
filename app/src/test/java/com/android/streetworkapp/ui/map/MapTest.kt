@@ -1,54 +1,71 @@
 package com.android.streetworkapp.ui.map
 
 import android.Manifest
-import android.content.Context
+import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
-import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.test.core.app.ApplicationProvider
-import io.mockk.mockk
-import io.mockk.verify
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.core.app.ActivityOptionsCompat
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.streetworkapp.MainActivity
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 import org.robolectric.shadows.ShadowApplication
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 class MapTest {
 
-  @get:Rule val composeTestRule = createComposeRule()
+  @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
 
-  private lateinit var context: Context
-  private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+  private lateinit var requestPermissionLauncher: FakeActivityResultLauncher
 
   @Before
   fun setup() {
-    context = ApplicationProvider.getApplicationContext()
-
-    // Mock the ActivityResultLauncher for permission requests
-    requestPermissionLauncher = mockk(relaxed = true)
+    requestPermissionLauncher = FakeActivityResultLauncher()
   }
 
   @Test
-  fun testPermissionRequestTriggered() {
-    ShadowApplication.getInstance().denyPermissions(Manifest.permission.ACCESS_FINE_LOCATION)
+  fun testRequestPermissionWhenNotGranted() {
 
-    composeTestRule.setContent { Map(requestPermissionLauncher = requestPermissionLauncher) }
-
-    // Verify that the permission request was triggered
-    verify { requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION) }
-  }
-
-  @Test
-  fun testPermissionRequestNotTriggered() {
-    ShadowApplication.getInstance().grantPermissions(Manifest.permission.ACCESS_FINE_LOCATION)
-
-    composeTestRule.setContent { Map(requestPermissionLauncher = requestPermissionLauncher) }
-
-    // Verify that the permission request was not triggered
-    verify(exactly = 0) {
-      requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+    composeTestRule.activityRule.scenario.onActivity { activity ->
+      // Simulate that the permission is denied for this test case
+      ShadowApplication.getInstance().denyPermissions(Manifest.permission.ACCESS_FINE_LOCATION)
+      activity.setContent { Map(requestPermissionLauncher = requestPermissionLauncher) }
     }
+    // Assert that the permission request was triggered
+    assertNotNull(requestPermissionLauncher.launchedPermission) {
+      "Expected permission not null but found: ${requestPermissionLauncher.launchedPermission}"
+    }
+  }
+
+  @Test
+  fun testDoNotRequestPermissionWhenGranted() {
+    composeTestRule.activityRule.scenario.onActivity { activity ->
+      // Simulate that the permission is already granted
+      ShadowApplication.getInstance().grantPermissions(Manifest.permission.ACCESS_FINE_LOCATION)
+
+      activity.setContent { Map(requestPermissionLauncher = requestPermissionLauncher) }
+    }
+
+    // Assert that the permission request was not triggered
+    assertNull(requestPermissionLauncher.launchedPermission)
+  }
+}
+
+class FakeActivityResultLauncher : ActivityResultLauncher<String>() {
+  var launchedPermission: String? = null
+
+  override fun launch(input: String?, options: ActivityOptionsCompat?) {
+    launchedPermission = input
+  }
+
+  override fun unregister() {}
+
+  override fun getContract(): ActivityResultContract<String, *> {
+    throw NotImplementedError("Not needed for testing")
   }
 }
