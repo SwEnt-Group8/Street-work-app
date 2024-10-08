@@ -40,11 +40,11 @@ import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.utils.toFormattedString
 
 @Composable
-fun ParkOverviewScreen(park: Park, events: EventList) {
+fun ParkOverviewScreen(park: Park) {
   Column {
     ImageTitle(image = park.image, title = park.name)
     ParkDetails(park = park)
-    EventItemList(eventList = events)
+    EventItemList(eventList = park.events)
   }
 }
 
