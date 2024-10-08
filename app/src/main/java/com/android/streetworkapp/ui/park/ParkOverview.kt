@@ -5,7 +5,9 @@ package com.android.streetworkapp.ui.park
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -14,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -31,7 +34,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.streetworkapp.model.event.Event
+import com.android.streetworkapp.model.event.EventList
+import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.utils.toFormattedString
+
+@Composable
+fun ParkOverviewScreen(park: Park, events: EventList) {
+  Column {
+    ImageTitle(image = park.image, title = park.name)
+    ParkDetails(park = park)
+    EventItemList(eventList = events)
+  }
+}
 
 @Composable
 fun ImageTitle(image: Painter, title: String) {
@@ -60,8 +74,40 @@ fun ImageTitle(image: Painter, title: String) {
 }
 
 @Composable
-fun EventItemList(events: List<Event>) {
-  LazyColumn { items(events) { event -> EventItem(event = event) } }
+fun ParkDetails(park: Park) {
+  Column {
+    Text(
+        text = "Details",
+        fontSize = 24.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(start = 16.dp, top = 6.dp, bottom = 2.dp))
+    ReviewComponent(rating = park.rating.toInt())
+  }
+}
+
+@Composable
+fun ReviewComponent(rating: Int) {
+  Row(modifier = Modifier.padding(start = 16.dp)) {
+    for (i in 1..5) {
+      Icon(
+          imageVector = Icons.Default.Star,
+          contentDescription = "Star",
+          tint = if (i <= rating) Color(0xFF6650a4) else Color.Gray,
+          modifier = Modifier.size(24.dp))
+    }
+  }
+}
+
+@Composable
+fun EventItemList(eventList: EventList) {
+  Column {
+    Text(
+        text = "Events",
+        fontSize = 24.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(start = 16.dp, top = 6.dp, bottom = 2.dp))
+    LazyColumn { items(eventList.events) { event -> EventItem(event = event) } }
+  }
 }
 
 @Composable
@@ -91,6 +137,6 @@ fun EventItem(event: Event) {
               Text("About")
             }
       },
-      modifier = Modifier.padding(8.dp))
+      modifier = Modifier.padding(0.dp))
   HorizontalDivider()
 }
