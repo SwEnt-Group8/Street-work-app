@@ -1,6 +1,13 @@
 package com.android.streetworkapp.ui.park
 
+// Portions of this code were generated with the help of GitHub Copilot.
+
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,11 +21,43 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.utils.toFormattedString
+
+@Composable
+fun ImageTitle(image: Painter, title: String) {
+  Box(modifier = Modifier.fillMaxWidth().height(220.dp)) {
+    Image(
+        painter = image,
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        modifier = Modifier.fillMaxWidth())
+    Box(
+        modifier =
+            Modifier.fillMaxWidth()
+                .height(220.dp)
+                .background(
+                    brush =
+                        Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, Color(0xCC000000)),
+                            startY = 0f,
+                            endY = Float.POSITIVE_INFINITY)))
+    Text(
+        text = title,
+        color = Color.White,
+        fontSize = 24.sp,
+        modifier = Modifier.align(Alignment.BottomStart).padding(16.dp))
+  }
+}
 
 @Composable
 fun EventItemList(events: List<Event>) {
