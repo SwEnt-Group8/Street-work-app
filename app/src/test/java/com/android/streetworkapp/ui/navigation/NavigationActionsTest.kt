@@ -105,7 +105,7 @@ class NavigationActionsTest {
             Route.AUTH,
             Icons.Outlined.AccountBox,
             "Auth") // dummy top lvl dest, it shouldn't exist for the Auth route but we need it for
-                    // the test
+    // the test
 
     navigationActions.navigateTo(authTopLevelDestination)
     verify(navHostController)
