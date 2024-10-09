@@ -21,8 +21,8 @@ fun MapPermission(requestPermissionLauncher: ActivityResultLauncher<String>) {
   val context = LocalContext.current
   val hasLocationPermission by remember {
     mutableStateOf(
-      ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
-              PackageManager.PERMISSION_GRANTED)
+        ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
+            PackageManager.PERMISSION_GRANTED)
   }
 
   // Request location permission if not granted
@@ -32,8 +32,10 @@ fun MapPermission(requestPermissionLauncher: ActivityResultLauncher<String>) {
       requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
     }
   }
-  //Could be remove depends on the map implementation
-  Button(onClick = { requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION) }, modifier = Modifier.testTag("requestPermissionButton")) {
-    Text(text = "Test Permission")
-  }
+  // Could be remove depends on the map implementation
+  Button(
+      onClick = { requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION) },
+      modifier = Modifier.testTag("requestPermissionButton")) {
+        Text(text = "Test Permission")
+      }
 }

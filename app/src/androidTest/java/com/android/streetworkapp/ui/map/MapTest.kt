@@ -49,9 +49,8 @@ class MapTest {
 
     // Assert that clicking the button triggers a permission request
     assertNotNull(
-      "Expected permission not null but found: ${requestPermissionLauncher.launchedPermission}",
-      requestPermissionLauncher.launchedPermission
-    )
+        "Expected permission not null but found: ${requestPermissionLauncher.launchedPermission}",
+        requestPermissionLauncher.launchedPermission)
   }
 
   @Test
