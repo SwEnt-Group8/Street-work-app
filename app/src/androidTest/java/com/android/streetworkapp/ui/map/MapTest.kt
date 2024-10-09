@@ -56,22 +56,4 @@ class MapTest {
     // Verify that the launch method of requestPermissionLauncher was called with the correct
     verify(requestPermissionLauncher, times(1)).launch(Manifest.permission.ACCESS_FINE_LOCATION)
   }
-
-  /*@Test
-  fun testPermissionAlreadyGranted() {
-    // Simulate the permission already granted
-    val context = composeTestRule.activity
-    composeTestRule.activityRule.scenario.onActivity { activity ->
-      ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION).let {
-        PackageManager.PERMISSION_GRANTED
-      }
-
-      activity.setContent { MapPermission(requestPermissionLauncher = requestPermissionLauncher) }
-    }
-
-    // Verify that the requestPermissionLauncher is NOT called automatically
-    verify(requestPermissionLauncher, times(0)).launch(Manifest.permission.ACCESS_FINE_LOCATION)
-    // Verify the button is displayed with "Test Permission"
-    composeTestRule.onNodeWithText("Test Permission").assertIsDisplayed()
-  }*/
 }
