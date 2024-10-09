@@ -1,4 +1,4 @@
-package com.android.streetworkapp.ui.map
+package com.android.streetworkapp
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -16,7 +16,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.core.content.ContextCompat
 
 @Composable
-fun MapPermission(requestPermissionLauncher: ActivityResultLauncher<String>) {
+fun MapManager(requestPermissionLauncher: ActivityResultLauncher<String>) {
   val context = LocalContext.current
   val hasLocationPermission by remember {
     mutableStateOf(

@@ -1,7 +1,6 @@
-package com.android.streetworkapp.ui.map
+package com.android.streetworkapp
 
 import android.Manifest
-import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -31,7 +30,7 @@ class MapManagerTest {
   fun buttonClick() {
     // Set the content of the activity
     composeTestRule.setContent {
-      MapPermission(requestPermissionLauncher = requestPermissionLauncher)
+      MapManager(requestPermissionLauncher = requestPermissionLauncher)
     }
 
     // The first request
@@ -50,7 +49,7 @@ class MapManagerTest {
     verify(requestPermissionLauncher, times(0)).launch(Manifest.permission.ACCESS_FINE_LOCATION)
     // Set the content of the activity
     composeTestRule.setContent {
-      MapPermission(requestPermissionLauncher = requestPermissionLauncher)
+      MapManager(requestPermissionLauncher = requestPermissionLauncher)
     }
 
     // The first request
