@@ -69,6 +69,8 @@ android {
         unitTests {
             isIncludeAndroidResources = true
             isReturnDefaultValues = true
+
+
         }
 
     }
@@ -114,6 +116,9 @@ fun DependencyHandlerScope.globalTestImplementation(dep: Any) {
 }
 
 dependencies {
+    implementation(libs.androidx.navigation.runtime.ktx)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.navigation.testing)
     testImplementation(libs.json)
     implementation(libs.okhttp)
     implementation(libs.androidx.core.ktx)
