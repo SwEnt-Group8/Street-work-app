@@ -1,4 +1,4 @@
-package com.android.streetworkapp
+package com.android.streetworkapp.ui.map
 
 import android.Manifest
 import androidx.activity.result.ActivityResultLauncher
@@ -14,7 +14,7 @@ import org.mockito.Mockito.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 
-class MapManagerTest {
+class MapTest {
 
   @get:Rule val composeTestRule = createComposeRule()
 

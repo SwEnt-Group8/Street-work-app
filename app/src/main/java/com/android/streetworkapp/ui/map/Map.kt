@@ -1,4 +1,4 @@
-package com.android.streetworkapp
+package com.android.streetworkapp.ui.map
 
 import android.Manifest
 import android.content.pm.PackageManager
