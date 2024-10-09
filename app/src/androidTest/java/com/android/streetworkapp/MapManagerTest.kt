@@ -29,9 +29,7 @@ class MapManagerTest {
   @Test
   fun buttonClick() {
     // Set the content of the activity
-    composeTestRule.setContent {
-      MapManager(requestPermissionLauncher = requestPermissionLauncher)
-    }
+    composeTestRule.setContent { MapManager(requestPermissionLauncher = requestPermissionLauncher) }
 
     // The first request
     composeTestRule.onNodeWithTag("requestPermissionButton").assertIsDisplayed()
@@ -48,9 +46,7 @@ class MapManagerTest {
   fun buttonNotClick() {
     verify(requestPermissionLauncher, times(0)).launch(Manifest.permission.ACCESS_FINE_LOCATION)
     // Set the content of the activity
-    composeTestRule.setContent {
-      MapManager(requestPermissionLauncher = requestPermissionLauncher)
-    }
+    composeTestRule.setContent { MapManager(requestPermissionLauncher = requestPermissionLauncher) }
 
     // The first request
     composeTestRule.onNodeWithTag("requestPermissionButton").assertIsDisplayed()
