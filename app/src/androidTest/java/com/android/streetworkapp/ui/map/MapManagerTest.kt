@@ -21,7 +21,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
-class MapTest {
+class MapManagerTest {
 
   @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
 
