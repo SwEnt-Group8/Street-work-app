@@ -1,84 +1,87 @@
-package com.android.streetworkapp.ui.map
-
 import android.Manifest
+import android.content.pm.PackageManager
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.core.app.ActivityOptionsCompat
+import androidx.core.content.ContextCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.rule.GrantPermissionRule
 import com.android.streetworkapp.MainActivity
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
+import com.android.streetworkapp.ui.map.MapPermission
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
 class MapTest {
 
   @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
 
-  // GrantPermissionRule is used to automatically grant permissions
-  @get:Rule
-  val grantPermissionRule: GrantPermissionRule =
-      GrantPermissionRule.grant(Manifest.permission.ACCESS_FINE_LOCATION)
-
-  private lateinit var requestPermissionLauncher: FakeActivityResultLauncher
+  private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
 
   @Before
   fun setup() {
-    requestPermissionLauncher = FakeActivityResultLauncher()
+    // Mock the ActivityResultLauncher using Mockito
+    requestPermissionLauncher = mock()
   }
 
   @Test
   fun buttonClick() {
+    // Set the content of the activity
     composeTestRule.activityRule.scenario.onActivity { activity ->
       activity.setContent { MapPermission(requestPermissionLauncher = requestPermissionLauncher) }
     }
+
+    // The first request
     composeTestRule.onNodeWithTag("requestPermissionButton").assertIsDisplayed()
+    verify(requestPermissionLauncher, times(1)).launch(Manifest.permission.ACCESS_FINE_LOCATION)
+    // The first request second request if pressed
     composeTestRule.onNodeWithTag("requestPermissionButton").performClick()
     composeTestRule.onNodeWithText("Test Permission").assertIsDisplayed()
 
-    // Assert that clicking the button triggers a permission request
-    assertNotNull(
-        "Expected permission not null but found: ${requestPermissionLauncher.launchedPermission}",
-        requestPermissionLauncher.launchedPermission)
+    // Verify that the launch method of requestPermissionLauncher was called with the correct
+    verify(requestPermissionLauncher, times(2)).launch(Manifest.permission.ACCESS_FINE_LOCATION)
   }
 
   @Test
-  fun testDoNotRequestPermissionWhenGranted() {
+  fun buttonNotClick() {
+    verify(requestPermissionLauncher, times(0)).launch(Manifest.permission.ACCESS_FINE_LOCATION)
+    // Set the content of the activity
     composeTestRule.activityRule.scenario.onActivity { activity ->
-      // Grant permission using the InstrumentationRegistry for testing purposes
-      val instrumentation = InstrumentationRegistry.getInstrumentation()
-      val context = instrumentation.targetContext
-      instrumentation.uiAutomation.grantRuntimePermission(
-          context.packageName, Manifest.permission.ACCESS_FINE_LOCATION)
+      activity.setContent { MapPermission(requestPermissionLauncher = requestPermissionLauncher) }
+    }
+
+    // The first request
+    composeTestRule.onNodeWithTag("requestPermissionButton").assertIsDisplayed()
+    verify(requestPermissionLauncher, times(1)).launch(Manifest.permission.ACCESS_FINE_LOCATION)
+    composeTestRule.onNodeWithText("Test Permission").assertIsDisplayed()
+
+    // Verify that the launch method of requestPermissionLauncher was called with the correct
+    verify(requestPermissionLauncher, times(1)).launch(Manifest.permission.ACCESS_FINE_LOCATION)
+  }
+
+  @Test
+  fun testPermissionAlreadyGranted() {
+    // Simulate the permission already granted
+    val context = composeTestRule.activity
+    composeTestRule.activityRule.scenario.onActivity { activity ->
+      ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION).let {
+        PackageManager.PERMISSION_GRANTED
+      }
 
       activity.setContent { MapPermission(requestPermissionLauncher = requestPermissionLauncher) }
     }
-    // Assert that the permission request was not triggered
-    assertNull(requestPermissionLauncher.launchedPermission)
-  }
-}
 
-class FakeActivityResultLauncher : ActivityResultLauncher<String>() {
-  var launchedPermission: String? = null
-
-  override fun launch(input: String?, options: ActivityOptionsCompat?) {
-    launchedPermission = input
-  }
-
-  override fun unregister() {}
-
-  override fun getContract(): ActivityResultContract<String, *> {
-    throw NotImplementedError("Not needed for testing")
+    // Verify that the requestPermissionLauncher is NOT called automatically
+    verify(requestPermissionLauncher, times(0)).launch(Manifest.permission.ACCESS_FINE_LOCATION)
+    // Verify the button is displayed with "Test Permission"
+    composeTestRule.onNodeWithText("Test Permission").assertIsDisplayed()
   }
 }
