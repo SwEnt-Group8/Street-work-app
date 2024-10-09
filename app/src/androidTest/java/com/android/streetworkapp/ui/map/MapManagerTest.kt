@@ -10,17 +10,14 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.core.content.ContextCompat
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.streetworkapp.MainActivity
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 
-@RunWith(AndroidJUnit4::class)
 class MapManagerTest {
 
   @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
