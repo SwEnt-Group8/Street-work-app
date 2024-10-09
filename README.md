@@ -1,7 +1,7 @@
-[![Quality Gate](https://sonarcloud.io/api/badges/gate?key=com.github.SwEnt-Group8:Street-work-app)](https://sonarcloud.io/dashboard?id=com.github.SwEnt-Group8:Street-work-app)
-[![SonarCloud Coverage](https://sonarcloud.io/api/badges/measure?key=com.github.SwEnt-Group8:Street-work-app&metric=coverage)](https://sonarcloud.io/component_measures?id=com.github.SwEnt-Group8:Street-work-app&metric=coverage)
-[![SonarCloud Bugs](https://sonarcloud.io/api/badges/measure?key=com.github.SwEnt-Group8:Street-work-app&metric=bugs)](https://sonarcloud.io/component_measures?id=com.github.SwEnt-Group8:Street-work-app&metric=reliability_rating)
-[![SonarCloud Vulnerabilities](https://sonarcloud.io/api/badges/measure?key=com.github.SwEnt-Group8:Street-work-app&metric=vulnerabilities)](https://sonarcloud.io/component_measures?id=com.github.SwEnt-Group8:Street-work-app&metric=security_rating)
+[![SonarCloud Coverage](https://sonarcloud.io/api/project_badges/measure?project=SwEnt-Group8_Street-work-app&metric=coverage)](https://sonarcloud.io/summary/overall?id=SwEnt-Group8_Street-work-app)
+[![SonarCloud Bugs](https://sonarcloud.io/api/project_badges/measure?project=SwEnt-Group8_Street-work-app&metric=bugs)](https://sonarcloud.io/summary/overall?id=SwEnt-Group8_Street-work-app)
+[![SonarCloud Security](https://sonarcloud.io/api/project_badges/measure?project=SwEnt-Group8_Street-work-app&metric=security_rating)](https://sonarcloud.io/summary/overall?id=SwEnt-Group8_Street-work-app)
+[![SonarCloud Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=SwEnt-Group8_Street-work-app&metric=vulnerabilities)](https://sonarcloud.io/summary/overall?id=SwEnt-Group8_Street-work-app)
 
 # The Street Work’App – Bringing Athletes Together
 
