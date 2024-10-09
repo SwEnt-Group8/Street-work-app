@@ -39,6 +39,11 @@ import com.android.streetworkapp.model.event.EventList
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.utils.toFormattedString
 
+/**
+ * Display the overview of a park, including park details and a list of events.
+ *
+ * @param park The park data to display.
+ */
 @Composable
 fun ParkOverviewScreen(park: Park) {
   Column {
@@ -48,6 +53,12 @@ fun ParkOverviewScreen(park: Park) {
   }
 }
 
+/**
+ * Display an image with a title overlay.
+ *
+ * @param image The image to display.
+ * @param title The title to display.
+ */
 @Composable
 fun ImageTitle(image: Painter, title: String) {
   Box(modifier = Modifier.fillMaxWidth().height(220.dp)) {
@@ -74,6 +85,11 @@ fun ImageTitle(image: Painter, title: String) {
   }
 }
 
+/**
+ * Display the details of a park, including the park's rating and occupancy.
+ *
+ * @param park The park data to display.
+ */
 @Composable
 fun ParkDetails(park: Park) {
   Column {
@@ -87,6 +103,12 @@ fun ParkDetails(park: Park) {
   }
 }
 
+/**
+ * Display a star rating from 1 to 5 and the number of reviews.
+ *
+ * @param rating The rating to display.
+ * @param nbrReview The number of reviews.
+ */
 @Composable
 fun RatingComponent(rating: Int, nbrReview: Int) {
   Row(modifier = Modifier.padding(start = 16.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -105,6 +127,11 @@ fun RatingComponent(rating: Int, nbrReview: Int) {
   }
 }
 
+/**
+ * Display a progress bar showing the park's occupancy.
+ *
+ * @param occupancy The park's occupancy percentage.
+ */
 @Composable
 fun OccupancyBar(occupancy: Float) {
   Row(
@@ -119,6 +146,11 @@ fun OccupancyBar(occupancy: Float) {
       }
 }
 
+/**
+ * Display a list of events.
+ *
+ * @param eventList The list of events to display.
+ */
 @Composable
 fun EventItemList(eventList: EventList) {
   Column {
@@ -131,6 +163,11 @@ fun EventItemList(eventList: EventList) {
   }
 }
 
+/**
+ * Display an event item, including the event title, date, and number of participants.
+ *
+ * @param event The event data to display.
+ */
 @Composable
 fun EventItem(event: Event) {
   ListItem(
