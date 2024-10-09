@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,6 +20,7 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -46,10 +48,21 @@ import com.android.streetworkapp.utils.toFormattedString
  */
 @Composable
 fun ParkOverviewScreen(park: Park) {
-  Column {
-    ImageTitle(image = park.image, title = park.name)
-    ParkDetails(park = park)
-    EventItemList(eventList = park.events)
+  Box(modifier = Modifier.fillMaxSize()) {
+    Column {
+      ImageTitle(image = park.image, title = park.name)
+      ParkDetails(park = park)
+      EventItemList(eventList = park.events)
+    }
+    FloatingActionButton(
+        onClick = { /* TODO: Handle button click */},
+        modifier =
+            Modifier.align(Alignment.BottomCenter)
+                .padding(40.dp)
+                .size(width = 150.dp, height = 40.dp),
+    ) {
+      Text("Create an event")
+    }
   }
 }
 
