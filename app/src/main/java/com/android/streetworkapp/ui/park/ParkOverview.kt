@@ -137,7 +137,10 @@ fun OccupancyBar(occupancy: Float) {
   Row(
       modifier = Modifier.padding(start = 16.dp, end = 16.dp),
       verticalAlignment = Alignment.CenterVertically) {
-        LinearProgressIndicator(progress = occupancy / 100, modifier = Modifier.weight(1f))
+        LinearProgressIndicator(
+            progress = { occupancy / 100 },
+            modifier = Modifier.weight(1f),
+        )
         Text(
             text = "${occupancy.toInt()}% Occupancy",
             modifier = Modifier.padding(start = 8.dp),
