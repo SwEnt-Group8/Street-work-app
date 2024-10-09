@@ -173,6 +173,17 @@ dependencies {
 
 }
 
+configurations.all {
+    resolutionStrategy {
+        eachDependency {
+            if (requested.group == "org.jacoco") {
+                useVersion("0.8.8")
+            }
+        }
+    }
+}
+
+
 tasks.withType<Test> {
     // Configure Jacoco for each tests
     configure<JacocoTaskExtension> {
