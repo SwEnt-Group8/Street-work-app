@@ -20,13 +20,13 @@ import org.mockito.kotlin.eq
 
 class NavigationActionsTest {
 
-  //Mocks
+  // Mocks
   private lateinit var navigationDestination: NavDestination
   private lateinit var navHostController: NavHostController
   private lateinit var navigationActions: NavigationActions
   private lateinit var graph: NavGraph
 
-  //Captors
+  // Captors
   private lateinit var navOptionsBuilderCaptor: KArgumentCaptor<NavOptionsBuilder.() -> Unit>
 
   @Before
@@ -48,7 +48,8 @@ class NavigationActionsTest {
 
   @Test
   fun navigateToCallsControllerWithScreen() {
-    //having a list of screens to update in the testing would be cumbersome, only testing with Screen.Map should be enough unless a big fuckup
+    // having a list of screens to update in the testing would be cumbersome, only testing with
+    // Screen.Map should be enough unless a big fuckup
     navigationActions.navigateTo(Screen.MAP)
     verify(navHostController).navigate(eq(Screen.MAP), eq(null), eq(null))
   }
@@ -67,7 +68,7 @@ class NavigationActionsTest {
       assertThat(navigationActions.currentRoute(), `is`(dst.route))
     }
 
-    //Auth is not a top level dest, so we check the case here
+    // Auth is not a top level dest, so we check the case here
     `when`(navigationDestination.route).thenReturn(Route.AUTH)
     assertThat(navigationActions.currentRoute(), `is`(Route.AUTH))
   }
@@ -103,7 +104,8 @@ class NavigationActionsTest {
         TopLevelDestination(
             Route.AUTH,
             Icons.Outlined.AccountBox,
-            "Auth") // dummy top lvl dest, it shouldn't exist for the Auth route but we need it for the test
+            "Auth") // dummy top lvl dest, it shouldn't exist for the Auth route but we need it for
+                    // the test
 
     navigationActions.navigateTo(authTopLevelDestination)
     verify(navHostController)

@@ -52,10 +52,10 @@ open class NavigationActions(
         inclusive = true
       }
 
-      //don't re-add the destination if we're already there
+      // don't re-add the destination if we're already there
       launchSingleTop = true
 
-      //restore state when reselecting a previously selected item
+      // restore state when reselecting a previously selected item
       if (destination.route != Route.AUTH) restoreState = true
     }
   }
