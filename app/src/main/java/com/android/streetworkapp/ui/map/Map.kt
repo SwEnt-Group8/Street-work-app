@@ -2,6 +2,7 @@ package com.android.streetworkapp.ui.map
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -27,6 +28,7 @@ fun MapManager(requestPermissionLauncher: ActivityResultLauncher<String>) {
   // Request location permission if not granted
   LaunchedEffect(hasLocationPermission) {
     if (!hasLocationPermission) {
+      Log.d("Map", "requestPermissionLauncher.launch")
       requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
     }
   }
