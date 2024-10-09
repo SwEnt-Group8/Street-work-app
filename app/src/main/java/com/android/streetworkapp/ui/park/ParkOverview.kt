@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -48,7 +49,7 @@ import com.android.streetworkapp.utils.toFormattedString
  */
 @Composable
 fun ParkOverviewScreen(park: Park) {
-  Box(modifier = Modifier.fillMaxSize()) {
+  Box(modifier = Modifier.fillMaxSize().testTag("parkOverviewScreen")) {
     Column {
       ImageTitle(image = park.image, title = park.name)
       ParkDetails(park = park)
@@ -59,7 +60,8 @@ fun ParkOverviewScreen(park: Park) {
         modifier =
             Modifier.align(Alignment.BottomCenter)
                 .padding(40.dp)
-                .size(width = 150.dp, height = 40.dp),
+                .size(width = 150.dp, height = 40.dp)
+                .testTag("createEventButton"),
     ) {
       Text("Create an event")
     }
@@ -74,7 +76,7 @@ fun ParkOverviewScreen(park: Park) {
  */
 @Composable
 fun ImageTitle(image: Painter, title: String) {
-  Box(modifier = Modifier.fillMaxWidth().height(220.dp)) {
+  Box(modifier = Modifier.fillMaxWidth().height(220.dp).testTag("imageTitle")) {
     Image(
         painter = image,
         contentDescription = null,
@@ -94,7 +96,7 @@ fun ImageTitle(image: Painter, title: String) {
         text = title,
         color = Color.White,
         fontSize = 24.sp,
-        modifier = Modifier.align(Alignment.BottomStart).padding(16.dp))
+        modifier = Modifier.align(Alignment.BottomStart).padding(16.dp).testTag("title"))
   }
 }
 
@@ -105,7 +107,7 @@ fun ImageTitle(image: Painter, title: String) {
  */
 @Composable
 fun ParkDetails(park: Park) {
-  Column {
+  Column(modifier = Modifier.testTag("parkDetails")) {
     Text(
         text = "Details",
         fontSize = 24.sp,
@@ -124,20 +126,22 @@ fun ParkDetails(park: Park) {
  */
 @Composable
 fun RatingComponent(rating: Int, nbrReview: Int) {
-  Row(modifier = Modifier.padding(start = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-    for (i in 1..5) {
-      Icon(
-          imageVector = Icons.Default.Star,
-          contentDescription = "Star",
-          tint = if (i <= rating) Color(0xFF6650a4) else Color.Gray,
-          modifier = Modifier.size(24.dp))
-    }
-    Text(
-        text = "($nbrReview)",
-        modifier = Modifier.padding(start = 8.dp),
-        fontSize = 16.sp,
-        fontWeight = FontWeight.Light)
-  }
+  Row(
+      modifier = Modifier.padding(start = 16.dp).testTag("ratingComponent"),
+      verticalAlignment = Alignment.CenterVertically) {
+        for (i in 1..5) {
+          Icon(
+              imageVector = Icons.Default.Star,
+              contentDescription = "Star",
+              tint = if (i <= rating) Color(0xFF6650a4) else Color.Gray,
+              modifier = Modifier.size(24.dp))
+        }
+        Text(
+            text = "($nbrReview)",
+            modifier = Modifier.padding(start = 8.dp).testTag("nbrReview"),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Light)
+      }
 }
 
 /**
@@ -148,7 +152,7 @@ fun RatingComponent(rating: Int, nbrReview: Int) {
 @Composable
 fun OccupancyBar(occupancy: Float) {
   Row(
-      modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+      modifier = Modifier.padding(start = 16.dp, end = 16.dp).testTag("occupancyBar"),
       verticalAlignment = Alignment.CenterVertically) {
         LinearProgressIndicator(
             progress = { occupancy / 100 },
@@ -156,7 +160,7 @@ fun OccupancyBar(occupancy: Float) {
         )
         Text(
             text = "${occupancy.toInt()}% Occupancy",
-            modifier = Modifier.padding(start = 8.dp),
+            modifier = Modifier.padding(start = 8.dp).testTag("occupancyText"),
             fontSize = 16.sp,
             fontWeight = FontWeight.Light)
       }
@@ -169,7 +173,7 @@ fun OccupancyBar(occupancy: Float) {
  */
 @Composable
 fun EventItemList(eventList: EventList) {
-  Column {
+  Column(modifier = Modifier.testTag("eventItemList")) {
     Text(
         text = "Events",
         fontSize = 24.sp,
@@ -187,30 +191,34 @@ fun EventItemList(eventList: EventList) {
 @Composable
 fun EventItem(event: Event) {
   ListItem(
+      modifier = Modifier.padding(0.dp).testTag("eventItem"),
       headlineContent = { Text(text = event.title) },
       supportingContent = {
         Text(
             "Participants ${event.participants}/${event.maxParticipants}",
-            fontWeight = FontWeight.Light)
+            fontWeight = FontWeight.Light,
+            modifier = Modifier.testTag("participantsText"))
       },
       overlineContent = {
-        Text(text = event.date.toFormattedString(), fontWeight = FontWeight.Bold)
+        Text(
+            text = event.date.toFormattedString(),
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.testTag("dateText"))
       },
       leadingContent = {
         Icon(
             imageVector = Icons.Default.AccountCircle,
             contentDescription = "Profile Icon",
-            modifier = Modifier.size(56.dp))
+            modifier = Modifier.size(56.dp).testTag("profileIcon"))
       },
       trailingContent = {
         Button(
             onClick = { TODO("Go to the event overview") },
-            modifier = Modifier.size(width = 80.dp, height = 48.dp),
+            modifier = Modifier.size(width = 80.dp, height = 48.dp).testTag("eventButton"),
             colors = ButtonDefaults.buttonColors(),
             contentPadding = PaddingValues(0.dp)) {
-              Text("About")
+              Text("About", modifier = Modifier.testTag("eventButtonText"))
             }
-      },
-      modifier = Modifier.padding(0.dp))
+      })
   HorizontalDivider()
 }
