@@ -20,6 +20,13 @@ object Screen {
   const val UNK = "TBD Screen" // TODO: not yet defined
 }
 
+/**
+ * Represents a top-level destination in the app's navigation.
+ *
+ * @property route The route associated with this destination.
+ * @property icon The icon to display for this destination.
+ * @property textId an identifier for this destination.
+ */
 data class TopLevelDestination(val route: String, val icon: ImageVector, val textId: String)
 
 // all data classes here are reachable through user actions (i.e not auth)
@@ -45,18 +52,23 @@ open class NavigationActions(
   open fun navigateTo(
       destination: TopLevelDestination
   ) { // https://developer.android.com/guide/navigation/backstack
+    try {
+      navController.navigate(destination.route) {
+        popUpTo(navController.graph.startDestinationId) {
+          saveState = true
+          inclusive = true
+        }
 
-    navController.navigate(destination.route) {
-      popUpTo(navController.graph.startDestinationId) {
-        saveState = true
-        inclusive = true
+        // don't re-add the destination if we're already there
+        launchSingleTop = true
+
+        // restore state when reselecting a previously selected item
+        if (destination.route != Route.AUTH) restoreState = true
       }
-
-      // don't re-add the destination if we're already there
-      launchSingleTop = true
-
-      // restore state when reselecting a previously selected item
-      if (destination.route != Route.AUTH) restoreState = true
+    } catch (
+        e: IllegalArgumentException) { // we're here if we get an invalid route as param (one not
+      // registered in our navigation)
+      this.navigateTo(TopLevelDestinations.MAP) // fallback to default Route
     }
   }
 
