@@ -167,7 +167,7 @@ fun OccupancyBar(occupancy: Float) {
 }
 
 /**
- * Display a list of events.
+ * Display a list of events or a message if no there is no events.
  *
  * @param eventList The list of events to display.
  */
@@ -179,7 +179,18 @@ fun EventItemList(eventList: EventList) {
         fontSize = 24.sp,
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(start = 16.dp, top = 6.dp, bottom = 2.dp))
-    LazyColumn { items(eventList.events) { event -> EventItem(event = event) } }
+    if (eventList.events.isEmpty()) {
+      Box(modifier = Modifier.fillMaxSize()) {
+        Text(
+            text = "No events is planned yet",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Light,
+            modifier =
+                Modifier.align(Alignment.Center).padding(bottom = 40.dp).testTag("noEventText"))
+      }
+    } else {
+      LazyColumn { items(eventList.events) { event -> EventItem(event = event) } }
+    }
   }
 }
 
