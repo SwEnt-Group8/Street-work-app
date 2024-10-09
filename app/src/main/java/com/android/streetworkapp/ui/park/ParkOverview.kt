@@ -34,9 +34,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.sample.R
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventList
 import com.android.streetworkapp.model.park.Park
@@ -75,10 +77,10 @@ fun ParkOverviewScreen(park: Park) {
  * @param title The title to display.
  */
 @Composable
-fun ImageTitle(image: Painter, title: String) {
+fun ImageTitle(image: Painter?, title: String) {
   Box(modifier = Modifier.fillMaxWidth().height(220.dp).testTag("imageTitle")) {
     Image(
-        painter = image,
+        painter = image ?: painterResource(id = R.drawable.park_default),
         contentDescription = null,
         contentScale = ContentScale.Crop,
         modifier = Modifier.fillMaxWidth())

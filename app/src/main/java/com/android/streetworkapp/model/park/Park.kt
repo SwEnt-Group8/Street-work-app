@@ -19,7 +19,7 @@ data class Park(
     val pid: String,
     val name: String,
     val location: String, // TODO: Change to ParkLocation
-    val image: Painter,
+    val image: Painter?,
     val rating: Float,
     val nbrRating: Int,
     val occupancy: Float,
