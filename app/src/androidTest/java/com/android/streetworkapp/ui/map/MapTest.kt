@@ -1,3 +1,5 @@
+package com.android.streetworkapp.ui.map
+
 import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.setContent
@@ -10,7 +12,6 @@ import androidx.compose.ui.test.performClick
 import androidx.core.content.ContextCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.streetworkapp.MainActivity
-import com.android.streetworkapp.ui.map.MapPermission
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
