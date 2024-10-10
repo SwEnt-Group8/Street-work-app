@@ -1,3 +1,8 @@
+[![SonarCloud Coverage](https://sonarcloud.io/api/project_badges/measure?project=SwEnt-Group8_Street-work-app&metric=coverage)](https://sonarcloud.io/summary/overall?id=SwEnt-Group8_Street-work-app)
+[![SonarCloud Bugs](https://sonarcloud.io/api/project_badges/measure?project=SwEnt-Group8_Street-work-app&metric=bugs)](https://sonarcloud.io/summary/overall?id=SwEnt-Group8_Street-work-app)
+[![SonarCloud Security](https://sonarcloud.io/api/project_badges/measure?project=SwEnt-Group8_Street-work-app&metric=security_rating)](https://sonarcloud.io/summary/overall?id=SwEnt-Group8_Street-work-app)
+[![SonarCloud Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=SwEnt-Group8_Street-work-app&metric=vulnerabilities)](https://sonarcloud.io/summary/overall?id=SwEnt-Group8_Street-work-app)
+
 # The Street Work’App – Bringing Athletes Together
 
 ## Overview
