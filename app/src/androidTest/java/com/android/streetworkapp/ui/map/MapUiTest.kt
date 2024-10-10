@@ -14,7 +14,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 
 @RunWith(AndroidJUnit4::class)
-class MapTest {
+class MapUiTest {
   private lateinit var parkLocationRepository: ParkLocationRepository
   private lateinit var parkLocationViewModel: ParkLocationViewModel
   private lateinit var navigationActions: NavigationActions
