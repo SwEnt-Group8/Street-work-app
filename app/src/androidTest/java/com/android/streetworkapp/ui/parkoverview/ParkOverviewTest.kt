@@ -114,8 +114,17 @@ class ParkOverviewTest {
   }
 
   @Test
+  fun displayCorrectParkDetails() {
+    composeTestRule.setContent { ParkOverviewScreen(park) }
+    composeTestRule.onNodeWithTag("title").assertTextEquals("EPFL Esplanade")
+    composeTestRule.onNodeWithTag("nbrReview").assertTextEquals("(102)")
+    composeTestRule.onNodeWithTag("occupancyText").assertTextEquals("80% Occupancy")
+  }
+
+  @Test
   fun displayCorrectEvent() {
     composeTestRule.setContent { ParkOverviewScreen(park) }
+    composeTestRule.onNodeWithTag("createEventButton").assertTextEquals("Create an event")
     composeTestRule.onNodeWithTag("eventItem").assertTextContains("Group workout")
     composeTestRule
         .onNodeWithTag("participantsText", useUnmergedTree = true)
