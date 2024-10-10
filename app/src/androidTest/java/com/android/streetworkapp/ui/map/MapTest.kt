@@ -14,6 +14,8 @@ import org.mockito.Mockito.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 
+private const val PERMISSION_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION
+
 class MapTest {
 
   @get:Rule val composeTestRule = createComposeRule()
@@ -24,36 +26,33 @@ class MapTest {
   fun setup() {
     // Mock the ActivityResultLauncher using Mockito
     requestPermissionLauncher = mock()
+
+    verify(requestPermissionLauncher, times(0)).launch(PERMISSION_LOCATION)
+    // Set the content of the activity
+    composeTestRule.setContent { MapManager(requestPermissionLauncher = requestPermissionLauncher) }
   }
 
   @Test
   fun buttonClick() {
-    // Set the content of the activity
-    composeTestRule.setContent { MapManager(requestPermissionLauncher = requestPermissionLauncher) }
-
     // The first request
     composeTestRule.onNodeWithTag("requestPermissionButton").assertIsDisplayed()
-    verify(requestPermissionLauncher, times(1)).launch(Manifest.permission.ACCESS_FINE_LOCATION)
+    verify(requestPermissionLauncher, times(1)).launch(PERMISSION_LOCATION)
     // The first request second request if pressed
     composeTestRule.onNodeWithTag("requestPermissionButton").performClick()
     composeTestRule.onNodeWithText("Test Permission").assertIsDisplayed()
 
     // Verify that the launch method of requestPermissionLauncher was called with the correct
-    verify(requestPermissionLauncher, times(2)).launch(Manifest.permission.ACCESS_FINE_LOCATION)
+    verify(requestPermissionLauncher, times(2)).launch(PERMISSION_LOCATION)
   }
 
   @Test
   fun buttonNotClick() {
-    verify(requestPermissionLauncher, times(0)).launch(Manifest.permission.ACCESS_FINE_LOCATION)
-    // Set the content of the activity
-    composeTestRule.setContent { MapManager(requestPermissionLauncher = requestPermissionLauncher) }
-
     // The first request
     composeTestRule.onNodeWithTag("requestPermissionButton").assertIsDisplayed()
-    verify(requestPermissionLauncher, times(1)).launch(Manifest.permission.ACCESS_FINE_LOCATION)
+    verify(requestPermissionLauncher, times(1)).launch(PERMISSION_LOCATION)
     composeTestRule.onNodeWithText("Test Permission").assertIsDisplayed()
 
     // Verify that the launch method of requestPermissionLauncher was called with the correct
-    verify(requestPermissionLauncher, times(1)).launch(Manifest.permission.ACCESS_FINE_LOCATION)
+    verify(requestPermissionLauncher, times(1)).launch(PERMISSION_LOCATION)
   }
 }
