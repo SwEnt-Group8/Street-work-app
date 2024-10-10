@@ -25,9 +25,17 @@ playServicesMaps = "19.0.0"
 mapsCompose = "4.3.3"
 mapsComposeUtils = "4.3.0"
 
+mockk = "1.13.7"
 mockitoCore = "3.12.4"
 mockitoInline = "3.12.4"
 mockitoKotlin = "5.4.0"
+mockitoAndroid = "5.13.0"
+navigationCompose = "2.8.2"
+navigationTesting = "2.8.2"
+navigationRuntimeKtx = "2.8.2"
+
+mockkAgent = "1.13.7"
+mockkAndroid = "1.13.7"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -63,7 +71,13 @@ robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectr
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
 mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockitoInline" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin" , version.ref="mockitoKotlin"}
-
+mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockitoAndroid" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+androidx-navigation-testing = { group = "androidx.navigation", name = "navigation-testing", version.ref = "navigationTesting" }
+androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+mockk-agent = { module = "io.mockk:mockk-agent", version.ref = "mockkAgent" }
+mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockkAndroid" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
