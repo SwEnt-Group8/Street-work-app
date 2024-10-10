@@ -25,10 +25,9 @@ class ProfileScreenTest : TestCase() {
   @Before
   fun setUp() {
     navigationActions = mock(NavigationActions::class.java)
-    // Mock the current route to be the add todo screen
+    // Mock the current route to be the add profile screen
     `when`(navigationActions.currentRoute()).thenReturn(Screen.PROFILE)
   }
-
 
   @Test
   fun hasRequiredComponents() {

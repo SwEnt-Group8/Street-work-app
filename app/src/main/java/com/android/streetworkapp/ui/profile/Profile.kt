@@ -33,10 +33,10 @@ fun ProfileScreen(navigationActions: NavigationActions) {
   Scaffold(
       modifier = Modifier.testTag("ProfileScreen"),
       bottomBar = {
-          BottomNavigationMenu(
-              onTabSelect = { route -> navigationActions.navigateTo(route) },
-              tabList = LIST_TOP_LEVEL_DESTINATION,
-              selectedItem = navigationActions.currentRoute())
+        BottomNavigationMenu(
+            onTabSelect = { route -> navigationActions.navigateTo(route) },
+            tabList = LIST_TOP_LEVEL_DESTINATION,
+            selectedItem = navigationActions.currentRoute())
       },
       content = { padding ->
         Column(
@@ -64,6 +64,7 @@ fun ProfileScreen(navigationActions: NavigationActions) {
                     contentDescription = "qr code",
                     modifier = Modifier.size(260.dp))
               }
+              // button to add a new friend
               Row() {
                 Button(
                     onClick = {},
@@ -71,6 +72,7 @@ fun ProfileScreen(navigationActions: NavigationActions) {
                       Text(text = "Add a new friend", fontSize = 17.sp)
                     }
               }
+              // button to train with a friend
               Row() {
                 Button(
                     onClick = {},
