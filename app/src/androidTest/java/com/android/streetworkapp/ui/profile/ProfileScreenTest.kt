@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.streetworkapp.ui.navigation.NavigationActions
@@ -33,6 +34,9 @@ class ProfileScreenTest : TestCase() {
   @Test
   fun hasRequiredComponents() {
     composeTestRule.waitForIdle() // Wait for rendering
+    composeTestRule.waitUntil(timeoutMillis = 5000) {
+      composeTestRule.onAllNodesWithTag("ProfileScreen").fetchSemanticsNodes().isNotEmpty()
+    }
     composeTestRule.onNodeWithTag("ProfileScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("ProfileColumn").assertIsDisplayed()
     composeTestRule.onNodeWithTag("profileScore").assertIsDisplayed()
