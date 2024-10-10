@@ -26,7 +26,7 @@ class GoogleAuthServiceTest {
   }
 
   @Test
-  fun `test signOut calls FirebaseAuth signOut`() {
+  fun testSignOutCallsFirebaseAuthSignOut() {
     // Act
     googleAuthService.signOut()
 
@@ -35,7 +35,7 @@ class GoogleAuthServiceTest {
   }
 
   @Test
-  fun `test getCurrentUser returns current user`() {
+  fun testGetCurrentUserReturnsCurrentUser() {
     // Arrange
     `when`(mockAuth.currentUser).thenReturn(mockUser)
 
@@ -47,7 +47,7 @@ class GoogleAuthServiceTest {
   }
 
   @Test
-  fun `test getCurrentUser returns null when no user is signed in`() {
+  fun testGetCurrentUserReturnsNullWhenNuserIsSignedIn() {
     // Arrange
     `when`(mockAuth.currentUser).thenReturn(null)
 
