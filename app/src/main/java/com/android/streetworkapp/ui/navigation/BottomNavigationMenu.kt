@@ -25,7 +25,8 @@ fun BottomNavigationMenu(
       NavigationBarItem(
           modifier = Modifier.testTag("bottomNavigationItem"),
           icon = {
-            Icon(topLevelDestination.icon, contentDescription = topLevelDestination.textId)
+            Icon(
+                topLevelDestination.icon, contentDescription = topLevelDestination.textId)
           },
           selected = false,
           onClick = { onTabSelect(topLevelDestination) })

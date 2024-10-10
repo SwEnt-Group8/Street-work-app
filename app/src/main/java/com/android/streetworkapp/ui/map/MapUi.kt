@@ -1,5 +1,6 @@
 package com.android.streetworkapp.ui.map
 
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -7,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import com.android.streetworkapp.model.parks.ParkLocationViewModel
+import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenu
 import com.android.streetworkapp.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.streetworkapp.ui.navigation.NavigationActions
@@ -50,14 +51,15 @@ fun MapScreen(parkLocationViewModel: ParkLocationViewModel, navigationActions: N
         // Display the Google Map
         GoogleMap(
             modifier = Modifier.fillMaxSize().padding(innerPadding).testTag("googleMap"),
-            cameraPositionState = cameraPositionState,
-        ) {
-          parks.forEach { park ->
-            Marker(
-                state = MarkerState(position = LatLng(park.lat, park.lon)),
-                /** onClick = { navigationActions.navigateTo(Screen.UNK) true } */
-            )
-          }
-        }
+            cameraPositionState = cameraPositionState) {
+              parks.forEach { park ->
+                Log.d("MapScreen", "hello there!!!!")
+                Marker(
+                    contentDescription = "Marker",
+                    state = MarkerState(position = LatLng(park.lat, park.lon)),
+                    /** onClick = { navigationActions.navigateTo(Screen.UNK) true } */
+                )
+              }
+            }
       }
 }
