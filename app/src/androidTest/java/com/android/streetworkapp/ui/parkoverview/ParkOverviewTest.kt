@@ -12,6 +12,7 @@ import com.android.streetworkapp.model.event.EventList
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.ui.park.ParkOverviewScreen
 import com.google.firebase.Timestamp
+import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -21,6 +22,8 @@ import org.junit.runner.RunWith
 class ParkOverviewTest {
   private lateinit var noEventPark: Park
   private lateinit var park: Park
+  private lateinit var invalidRatingPark: Park
+  private lateinit var invalidOccupancyPark: Park
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -62,6 +65,30 @@ class ParkOverviewTest {
             rating = 4.5f,
             nbrRating = 102,
             occupancy = 0.8f,
+            events = eventList)
+
+    // Park with invalid rating
+    invalidRatingPark =
+        Park(
+            pid = "3",
+            name = "EPFL Esplanade",
+            location = "EPFL",
+            image = null,
+            rating = 6.0f,
+            nbrRating = 102,
+            occupancy = 0.8f,
+            events = eventList)
+
+    // Park with invalid occupancy
+    invalidOccupancyPark =
+        Park(
+            pid = "4",
+            name = "EPFL Esplanade",
+            location = "EPFL",
+            image = null,
+            rating = 4.5f,
+            nbrRating = 102,
+            occupancy = 1.2f,
             events = eventList)
   }
 
@@ -113,5 +140,19 @@ class ParkOverviewTest {
     composeTestRule.setContent { ParkOverviewScreen(park) }
     composeTestRule.onNodeWithTag("eventButton").performClick()
     composeTestRule.onNodeWithTag("createEventButton").performClick()
+  }
+
+  @Test
+  fun invalidRatingTriggersException() {
+    assertThrows(IllegalArgumentException::class.java) {
+      composeTestRule.setContent { ParkOverviewScreen(invalidRatingPark) }
+    }
+  }
+
+  @Test
+  fun invalidOccupancyTriggersException() {
+    assertThrows(IllegalArgumentException::class.java) {
+      composeTestRule.setContent { ParkOverviewScreen(invalidOccupancyPark) }
+    }
   }
 }
