@@ -1,6 +1,5 @@
 package com.android.streetworkapp.ui.map
 
-import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -53,7 +52,6 @@ fun MapScreen(parkLocationViewModel: ParkLocationViewModel, navigationActions: N
             modifier = Modifier.fillMaxSize().padding(innerPadding).testTag("googleMap"),
             cameraPositionState = cameraPositionState) {
               parks.forEach { park ->
-                Log.d("MapScreen", "hello there!!!!")
                 Marker(
                     contentDescription = "Marker",
                     state = MarkerState(position = LatLng(park.lat, park.lon)),

@@ -66,6 +66,23 @@ class MapUiTest {
   }
 
   @Test
+  fun mapIsInteractive() {
+    `when`(navigationActions.currentRoute()).thenReturn(Screen.MAP)
+
+    composeTestRule.setContent { MapScreen(parkLocationViewModel, navigationActions) }
+
+    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("googleMap").assertIsDisplayed().performClick()
+
+    for (i in LIST_TOP_LEVEL_DESTINATION.indices) {
+      composeTestRule
+          .onAllNodesWithTag("bottomNavigationItem")[i]
+          .assertIsDisplayed()
+          .performClick()
+    }
+  }
+
+  @Test
   fun routeChangesWhenBottomNavigationItemIsClicked() {
     `when`(navigationActions.currentRoute()).thenReturn(Screen.MAP)
 
@@ -89,5 +106,6 @@ class MapUiTest {
     composeTestRule.onNodeWithTag("mapScreen").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("googleMap").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsNotDisplayed()
+    composeTestRule.onAllNodesWithTag("bottomNavigationItem").assertCountEquals(0)
   }
 }
