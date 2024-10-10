@@ -44,13 +44,13 @@ class MapUiTest {
   }
 
   @Test
-    fun componentsAreNotDisplayedOnOtherRoutes() {
-        `when`(navigationActions.currentRoute()).thenReturn(Screen.AUTH)
+  fun componentsAreNotDisplayedOnOtherRoutes() {
+    `when`(navigationActions.currentRoute()).thenReturn(Screen.AUTH)
 
-        composeTestRule.setContent { StreetWorkAppMain() }
+    composeTestRule.setContent { StreetWorkAppMain() }
 
-        composeTestRule.onNodeWithTag("mapScreen").assertIsNotDisplayed()
-        composeTestRule.onNodeWithTag("googleMap").assertIsNotDisplayed()
-        composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsNotDisplayed()
-    }
+    composeTestRule.onNodeWithTag("mapScreen").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("googleMap").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsNotDisplayed()
+  }
 }

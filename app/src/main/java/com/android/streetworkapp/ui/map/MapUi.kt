@@ -11,7 +11,6 @@ import com.android.streetworkapp.model.parks.ParkLocationViewModel
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenu
 import com.android.streetworkapp.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.streetworkapp.ui.navigation.NavigationActions
-import com.android.streetworkapp.ui.navigation.Screen
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -56,10 +55,8 @@ fun MapScreen(parkLocationViewModel: ParkLocationViewModel, navigationActions: N
           parks.forEach { park ->
             Marker(
                 state = MarkerState(position = LatLng(park.lat, park.lon)),
-                /**onClick = {
-                  navigationActions.navigateTo(Screen.UNK)
-                  true
-                }*/)
+                /** onClick = { navigationActions.navigateTo(Screen.UNK) true } */
+            )
           }
         }
       }
