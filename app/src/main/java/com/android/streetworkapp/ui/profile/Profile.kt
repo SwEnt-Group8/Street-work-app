@@ -23,13 +23,21 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
+import com.android.streetworkapp.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.github.se.bootcamp.ui.navigation.BottomNavigationMenu
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ProfileScreen(navigationActions: NavigationActions) {
   Scaffold(
       modifier = Modifier.testTag("ProfileScreen"),
+      bottomBar = {
+          BottomNavigationMenu(
+              onTabSelect = { route -> navigationActions.navigateTo(route) },
+              tabList = LIST_TOP_LEVEL_DESTINATION,
+              selectedItem = navigationActions.currentRoute())
+      },
       content = { padding ->
         Column(
             modifier = Modifier.fillMaxSize().padding(padding).testTag("ProfileColumn"),
