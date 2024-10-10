@@ -167,7 +167,7 @@ fun OccupancyBar(occupancy: Float) {
             modifier = Modifier.weight(1f),
         )
         Text(
-            text = "${occupancy.toInt()}% Occupancy",
+            text = "${(occupancy * 100).toInt()}% Occupancy",
             modifier = Modifier.padding(start = 8.dp).testTag("occupancyText"),
             fontSize = 16.sp,
             fontWeight = FontWeight.Light)
