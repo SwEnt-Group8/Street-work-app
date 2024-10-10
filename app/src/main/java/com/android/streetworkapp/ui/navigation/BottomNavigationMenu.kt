@@ -24,20 +24,15 @@ fun BottomNavigationMenu(
     onTabSelect: (TopLevelDestination) -> Unit,
     tabList: List<TopLevelDestination>
 ) {
-  val navController = rememberNavController()
 
   NavigationBar(modifier = Modifier.testTag("bottomNavigationMenu"), containerColor = Color.Gray) {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
     tabList.forEach { topLevelDestination ->
       NavigationBarItem(
           modifier = Modifier.testTag("bottomNavigationItem"),
           icon = {
             Icon(topLevelDestination.icon, contentDescription = topLevelDestination.textId)
           },
-          label = { Text(topLevelDestination.textId) },
-          selected =
-              currentDestination?.hierarchy?.any { it.route == topLevelDestination.route } == true,
+          selected = false,
           onClick = { onTabSelect(topLevelDestination) })
     }
   }

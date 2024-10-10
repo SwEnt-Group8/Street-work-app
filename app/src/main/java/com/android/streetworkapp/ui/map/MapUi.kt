@@ -56,11 +56,10 @@ fun MapScreen(parkLocationViewModel: ParkLocationViewModel, navigationActions: N
           parks.forEach { park ->
             Marker(
                 state = MarkerState(position = LatLng(park.lat, park.lon)),
-                title = park.id,
-                onClick = {
+                /**onClick = {
                   navigationActions.navigateTo(Screen.UNK)
                   true
-                })
+                }*/)
           }
         }
       }

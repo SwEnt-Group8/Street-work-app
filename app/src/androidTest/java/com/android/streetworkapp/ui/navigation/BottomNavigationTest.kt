@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.test.assertAll
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -37,5 +38,9 @@ class BottomNavigationTest {
     composeTestRule
         .onAllNodesWithTag("bottomNavigationItem")
         .assertCountEquals(LIST_TOP_LEVEL_DESTINATION.size)
+
+      for(i in LIST_TOP_LEVEL_DESTINATION.indices) {
+          composeTestRule.onAllNodesWithTag("bottomNavigationItem")[i].assertIsDisplayed()
+      }
   }
 }
