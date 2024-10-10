@@ -23,5 +23,5 @@ data class Park(
     var rating: Float,
     var nbrRating: Int,
     var occupancy: Float,
-    val events: EventList
+    var events: EventList
 )
