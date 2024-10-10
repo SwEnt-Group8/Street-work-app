@@ -7,7 +7,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.streetworkapp.ui.navigation.NavigationActions
-import com.android.streetworkapp.ui.navigation.Screen
+import com.android.streetworkapp.ui.navigation.Route
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import org.junit.Before
 import org.junit.Rule
@@ -26,7 +26,7 @@ class ProfileScreenTest : TestCase() {
   fun setUp() {
     navigationActions = mock(NavigationActions::class.java)
     // Mock the current route to be the add profile screen
-    `when`(navigationActions.currentRoute()).thenReturn(Screen.PROFILE)
+    `when`(navigationActions.currentRoute()).thenReturn(Route.PROFILE)
     composeTestRule.setContent { ProfileScreen(navigationActions) }
   }
 
