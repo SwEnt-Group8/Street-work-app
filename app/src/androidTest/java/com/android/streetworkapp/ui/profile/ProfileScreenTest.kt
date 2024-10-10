@@ -27,12 +27,11 @@ class ProfileScreenTest : TestCase() {
     navigationActions = mock(NavigationActions::class.java)
     // Mock the current route to be the add profile screen
     `when`(navigationActions.currentRoute()).thenReturn(Screen.PROFILE)
+    composeTestRule.setContent { ProfileScreen(navigationActions) }
   }
 
   @Test
   fun hasRequiredComponents() {
-    composeTestRule.setContent { ProfileScreen(navigationActions) }
-
     composeTestRule.onNodeWithTag("ProfileScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("ProfileColumn").assertIsDisplayed()
     composeTestRule.onNodeWithTag("profileScore").assertIsDisplayed()
@@ -43,8 +42,6 @@ class ProfileScreenTest : TestCase() {
 
   @Test
   fun textCorrectlyDisplayed() {
-    composeTestRule.setContent { ProfileScreen(navigationActions) }
-
     composeTestRule.onNodeWithTag("profileScore").assertTextEquals("Score: 42’424")
     composeTestRule.onNodeWithTag("profileAddButton").assertTextEquals("Add a new friend")
     composeTestRule.onNodeWithTag("profileTrainButton").assertTextEquals("Train with a friend")
@@ -52,8 +49,6 @@ class ProfileScreenTest : TestCase() {
 
   @Test
   fun buttonWork() {
-    composeTestRule.setContent { ProfileScreen(navigationActions) }
-
     composeTestRule.onNodeWithTag("profileAddButton").assertHasClickAction()
     composeTestRule.onNodeWithTag("profileTrainButton").assertHasClickAction()
   }
