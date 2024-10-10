@@ -2,4 +2,5 @@
     <string name="app_name">SampleApp</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_second">SecondActivity</string>
+    <string name="default_web_client_id">949532445294-2cvshtbsgubvrn54cg9301rrs2pe8dth.apps.googleusercontent.com</string>
 </resources>
