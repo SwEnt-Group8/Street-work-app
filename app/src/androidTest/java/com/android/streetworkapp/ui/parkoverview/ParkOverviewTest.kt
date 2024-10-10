@@ -1,9 +1,11 @@
 package com.android.streetworkapp.ui.parkoverview
 
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventList
@@ -35,7 +37,7 @@ class ParkOverviewTest {
                         description = "A fun group workout session to train new skills",
                         participants = 3,
                         maxParticipants = 5,
-                        date = Timestamp(1730377800, 0), // 31/10/2025 12:30
+                        date = Timestamp(1730377800, 0), // 31/10/2024 13:30
                         owner = "user123")))
 
     // Park without events
@@ -85,9 +87,31 @@ class ParkOverviewTest {
   }
 
   @Test
+  fun displayCorrectEvent() {
+    composeTestRule.setContent { ParkOverviewScreen(park) }
+    composeTestRule.onNodeWithTag("eventItem").assertTextContains("Group workout")
+    composeTestRule
+        .onNodeWithTag("participantsText", useUnmergedTree = true)
+        .assertTextContains("Participants 3/5")
+    composeTestRule
+        .onNodeWithTag("dateText", useUnmergedTree = true)
+        .assertTextContains("31/10/2024 13:30")
+    composeTestRule
+        .onNodeWithTag("eventButtonText", useUnmergedTree = true)
+        .assertTextContains("About")
+  }
+
+  @Test
   fun displayTextWhenNoEvent() {
     composeTestRule.setContent { ParkOverviewScreen(noEventPark) }
     composeTestRule.onNodeWithTag("noEventText").isDisplayed()
     composeTestRule.onNodeWithTag("noEventText").assertTextEquals("No events is planned yet")
+  }
+
+  @Test
+  fun buttonAreClickable() {
+    composeTestRule.setContent { ParkOverviewScreen(park) }
+    composeTestRule.onNodeWithTag("eventButton").performClick()
+    composeTestRule.onNodeWithTag("createEventButton").performClick()
   }
 }

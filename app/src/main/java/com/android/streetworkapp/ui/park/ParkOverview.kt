@@ -227,7 +227,7 @@ fun EventItem(event: Event) {
       },
       trailingContent = {
         Button(
-            onClick = { TODO("Go to the event overview") },
+            onClick = { /* TODO: Handle button click */},
             modifier = Modifier.size(width = 80.dp, height = 48.dp).testTag("eventButton"),
             colors = ButtonDefaults.buttonColors(),
             contentPadding = PaddingValues(0.dp)) {
