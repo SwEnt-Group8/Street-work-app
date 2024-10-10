@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.android.streetworkapp.ui.authentication.SignInScreen
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.ui.navigation.Screen
@@ -35,7 +36,7 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
             startDestination = Screen.AUTH,
             route = Route.AUTH,
         ) {
-          composable(Screen.AUTH) {}
+          composable(Screen.AUTH) { SignInScreen(navigationActions) }
         }
 
         navigation(
