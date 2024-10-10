@@ -1,4 +1,4 @@
-package com.android.streetworkapp.model.parks
+package com.android.streetworkapp.model.parklocation
 
 import org.junit.Before
 import org.junit.Test

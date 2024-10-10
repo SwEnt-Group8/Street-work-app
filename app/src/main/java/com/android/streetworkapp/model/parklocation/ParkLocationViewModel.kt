@@ -1,4 +1,4 @@
-package com.android.streetworkapp.model.parks
+package com.android.streetworkapp.model.parklocation
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,7 +11,7 @@ class ParkLocationViewModel(private val repository: ParkLocationRepository) : Vi
   val parks: StateFlow<List<ParkLocation>> = parksPrivate.asStateFlow()
 
   /**
-   * Find Street Workout parks that are close to a given latitude and longitude
+   * Find Street Workout parklocation that are close to a given latitude and longitude
    *
    * @param lat : Latitude (Double) must be between [-90,90]
    * @param lon : Longitude (Double) must be between [-180,180]
