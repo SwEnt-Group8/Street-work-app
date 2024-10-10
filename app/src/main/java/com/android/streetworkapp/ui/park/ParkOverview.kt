@@ -52,6 +52,7 @@ import com.android.streetworkapp.utils.toFormattedString
  */
 @Composable
 fun ParkOverviewScreen(park: Park) {
+  requireNotNull(park) { "Park must not be null" }
   Box(modifier = Modifier.fillMaxSize().testTag("parkOverviewScreen")) {
     Column {
       ImageTitle(image = park.image, title = park.name)
@@ -81,6 +82,7 @@ fun ParkOverviewScreen(park: Park) {
  */
 @Composable
 fun ImageTitle(image: Painter?, title: String) {
+  requireNotNull(title) { "Title must not be null" }
   Box(modifier = Modifier.fillMaxWidth().height(220.dp).testTag("imageTitle")) {
     Image(
         // If no image is provided, use the default park image.
@@ -113,6 +115,7 @@ fun ImageTitle(image: Painter?, title: String) {
  */
 @Composable
 fun ParkDetails(park: Park) {
+  requireNotNull(park) { "Park must not be null" }
   Column(modifier = Modifier.testTag("parkDetails")) {
     Text(
         text = "Details",
@@ -132,6 +135,7 @@ fun ParkDetails(park: Park) {
  */
 @Composable
 fun RatingComponent(rating: Int, nbrReview: Int) {
+  requireNotNull(rating) { "Rating must not be null" }
   require(rating in 1..5) { "Rating must be between 1 and 5" }
   Row(
       modifier = Modifier.padding(start = 16.dp).testTag("ratingComponent"),
@@ -158,6 +162,7 @@ fun RatingComponent(rating: Int, nbrReview: Int) {
  */
 @Composable
 fun OccupancyBar(occupancy: Float) {
+  requireNotNull(occupancy) { "Occupancy must not be null" }
   require(occupancy in 0f..1f) { "Occupancy must be between 0 and 1" }
   Row(
       modifier = Modifier.padding(start = 16.dp, end = 16.dp).testTag("occupancyBar"),
@@ -181,6 +186,7 @@ fun OccupancyBar(occupancy: Float) {
  */
 @Composable
 fun EventItemList(eventList: EventList) {
+  requireNotNull(eventList) { "EventList must not be null" }
   Column(modifier = Modifier.testTag("eventItemList")) {
     Text(
         text = "Events",
@@ -209,6 +215,7 @@ fun EventItemList(eventList: EventList) {
  */
 @Composable
 fun EventItem(event: Event) {
+  requireNotNull(event) { "Event must not be null" }
   ListItem(
       modifier = Modifier.padding(0.dp).testTag("eventItem"),
       headlineContent = { Text(text = event.title) },
