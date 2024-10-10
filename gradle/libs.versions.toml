@@ -21,6 +21,10 @@ robolectric = "4.13"
 sonar = "4.4.1.3373"
 okhttp = "4.12.0"
 
+navigationRuntimeKtx = "2.8.2"
+navigationCompose = "2.8.2"
+navigationTesting = "2.8.2"
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 json = { module = "org.json:json", version.ref = "json" }
@@ -51,6 +55,10 @@ kaspresso-compose = { group = "com.kaspersky.android-components", name = "kaspre
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref="mockitoKotlin" }
 mockito-inline = { module = "org.mockito:mockito-inline", version.ref="mockitoInline" }
+
+androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+androidx-navigation-testing = { group = "androidx.navigation", name = "navigation-testing", version.ref = "navigationTesting" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
