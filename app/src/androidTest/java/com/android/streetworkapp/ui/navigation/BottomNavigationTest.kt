@@ -22,8 +22,7 @@ class BottomNavigationTest {
   fun BottomNavigationTest() {
     Scaffold(
         bottomBar = {
-          BottomNavigationMenu(
-              onTabSelect = {}, selectedItem = "", tabList = LIST_TOP_LEVEL_DESTINATION)
+          BottomNavigationMenu(onTabSelect = {}, tabList = LIST_TOP_LEVEL_DESTINATION)
         }) {
           Text("test")
         }
