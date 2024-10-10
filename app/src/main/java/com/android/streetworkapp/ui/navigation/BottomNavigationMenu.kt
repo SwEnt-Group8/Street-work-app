@@ -1,7 +1,4 @@
-package com.github.se.bootcamp.ui.navigation
-
-//noinspection UsingMaterialAndMaterial3Libraries
-//noinspection UsingMaterialAndMaterial3Libraries
+package com.android.streetworkapp.ui.navigation
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.android.streetworkapp.ui.navigation.TopLevelDestination
 
 @Composable
 fun BottomNavigationMenu(
