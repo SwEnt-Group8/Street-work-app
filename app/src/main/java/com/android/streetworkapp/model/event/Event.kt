@@ -15,12 +15,12 @@ import com.google.firebase.Timestamp
  */
 data class Event(
     val eid: String,
-    val title: String,
-    val description: String,
-    val participants: Int,
-    val maxParticipants: Int,
-    val date: Timestamp,
-    val owner: String,
+    var title: String,
+    var description: String,
+    var participants: Int,
+    var maxParticipants: Int,
+    var date: Timestamp,
+    var owner: String,
 )
 
 /**
