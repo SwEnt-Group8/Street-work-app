@@ -136,8 +136,6 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(platform(libs.compose.bom))
-    implementation(libs.firebase.auth.ktx)
-    implementation(libs.androidx.espresso.intents)
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.inline)

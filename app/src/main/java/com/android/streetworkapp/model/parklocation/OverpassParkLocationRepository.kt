@@ -1,4 +1,4 @@
-package com.android.streetworkapp.model.parks
+package com.android.streetworkapp.model.parklocation
 
 import java.io.IOException
 import okhttp3.Call
@@ -11,7 +11,7 @@ import org.json.JSONObject
 
 class OverpassParkLocationRepository(private val client: OkHttpClient) : ParkLocationRepository {
   /**
-   * Find all nearby Street Workout parks, from OpenStreetMap using Overpass API
+   * Find all nearby Street Workout parklocation, from OpenStreetMap using Overpass API
    *
    * @param lat : latitude (Double) must be between [-90,90]
    * @param lon : longitude (Double) must be between [-180,180]
