@@ -80,8 +80,9 @@ fun ParkOverviewScreen(park: Park) {
 fun ImageTitle(image: Painter?, title: String) {
   Box(modifier = Modifier.fillMaxWidth().height(220.dp).testTag("imageTitle")) {
     Image(
+        // If no image is provided, use the default park image.
         painter = image ?: painterResource(id = R.drawable.park_default),
-        contentDescription = null,
+        contentDescription = "Park Image",
         contentScale = ContentScale.Crop,
         modifier = Modifier.fillMaxWidth())
     Box(
@@ -115,7 +116,7 @@ fun ParkDetails(park: Park) {
         fontSize = 24.sp,
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(start = 16.dp, top = 6.dp, bottom = 2.dp))
-    RatingComponent(rating = park.rating.toInt(), park.nbrRating)
+    RatingComponent(rating = park.rating.toInt(), park.nbrRating) // Round the rating
     OccupancyBar(occupancy = park.occupancy)
   }
 }
