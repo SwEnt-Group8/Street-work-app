@@ -2,6 +2,7 @@ package com.android.streetworkapp.ui.park
 
 // Portions of this code were generated with the help of GitHub Copilot.
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -58,7 +59,9 @@ fun ParkOverviewScreen(park: Park) {
       EventItemList(eventList = park.events)
     }
     FloatingActionButton(
-        onClick = { /* TODO: Handle button click */},
+        onClick = {
+          Log.d("ParkOverviewScreen", "Create event button clicked") // TODO: Handle button click
+        },
         modifier =
             Modifier.align(Alignment.BottomCenter)
                 .padding(40.dp)
@@ -229,7 +232,9 @@ fun EventItem(event: Event) {
       },
       trailingContent = {
         Button(
-            onClick = { /* TODO: Handle button click */},
+            onClick = {
+              Log.d("EventItem", "About event button clicked") // TODO: Handle button click
+            },
             modifier = Modifier.size(width = 80.dp, height = 48.dp).testTag("eventButton"),
             colors = ButtonDefaults.buttonColors(),
             contentPadding = PaddingValues(0.dp)) {
