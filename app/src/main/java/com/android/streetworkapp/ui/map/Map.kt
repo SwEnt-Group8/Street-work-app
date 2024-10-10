@@ -12,7 +12,6 @@ import com.android.streetworkapp.ui.navigation.BottomNavigationMenu
 import com.android.streetworkapp.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
-import com.android.streetworkapp.ui.navigation.TopLevelDestinations
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -20,9 +19,16 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 
+/**
+ * The MapScreen composable displays a Google Map with markers for nearby parks.
+ *
+ * @param parkLocationViewModel The view model for park locations.
+ * @param navigationActions The navigation actions to navigate to other screens.
+ */
 @Composable
 fun MapScreen(parkLocationViewModel: ParkLocationViewModel, navigationActions: NavigationActions) {
 
+  // hardcoded initial location values are used instead of the user's current location for now
   val initialLatLng = LatLng(46.518659400000004, 6.566561505148001)
 
   val parks = parkLocationViewModel.parks.collectAsState().value
@@ -34,8 +40,7 @@ fun MapScreen(parkLocationViewModel: ParkLocationViewModel, navigationActions: N
       bottomBar = {
         BottomNavigationMenu(
             onTabSelect = { destination -> navigationActions.navigateTo(destination) },
-            tabList = LIST_TOP_LEVEL_DESTINATION,
-            selectedItem = TopLevelDestinations.MAP.textId)
+            tabList = LIST_TOP_LEVEL_DESTINATION)
       }) { innerPadding ->
 
         // Create a CameraPositionState to control the camera position

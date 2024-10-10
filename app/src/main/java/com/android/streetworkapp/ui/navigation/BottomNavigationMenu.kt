@@ -13,11 +13,16 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 
+/**
+ * Bottom navigation menu for the app
+ *
+ * @param onTabSelect callback to be called when an icon is selected
+ * @param tabList list of top level destinations to be displayed
+ */
 @Composable
 fun BottomNavigationMenu(
     onTabSelect: (TopLevelDestination) -> Unit,
-    tabList: List<TopLevelDestination>,
-    selectedItem: String
+    tabList: List<TopLevelDestination>
 ) {
   val navController = rememberNavController()
 
