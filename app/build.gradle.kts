@@ -65,12 +65,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
 
     packaging {
@@ -195,6 +195,14 @@ dependencies {
 
     // ----------       Robolectric     ------------
     testImplementation(libs.robolectric)
+    // Testing Unit
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+
+    androidTestImplementation(libs.mockito.core)
+    androidTestImplementation(libs.mockito.kotlin)
+    androidTestImplementation (libs.mockito.android)
+
 }
 
 tasks.withType<Test> {
@@ -233,4 +241,11 @@ tasks.register("jacocoTestReport", JacocoReport::class) {
         include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
         include("outputs/code_coverage/debugAndroidTest/connected/*/coverage.ec")
     })
+    doLast {
+        val reportFile = reports.xml.outputLocation.asFile.get()
+        val newContent = reportFile.readText().replace("<line[^>]+nr=\"65535\"[^>]*>".toRegex(), "")
+        reportFile.writeText(newContent)
+
+        logger.quiet("Wrote summarized jacoco test coverage report xml to $reportFile.absolutePath}")
+    }
 }
