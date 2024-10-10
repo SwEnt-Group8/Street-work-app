@@ -1,6 +1,5 @@
 package com.android.streetworkapp.ui.authentication
 
-import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -39,13 +38,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
+import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.utils.GoogleAuthService
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
-@SuppressLint("RememberReturnType")
 @Composable
-fun SignInScreen() {
+fun SignInScreen(navigationActions: NavigationActions) {
 
   // This part of the code handles google sign-in :
   var user by remember { mutableStateOf(Firebase.auth.currentUser) }
@@ -63,6 +63,7 @@ fun SignInScreen() {
             user = result.user
             Log.d("SignInScreen", "Sign-in successful user : $user")
             Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
+            navigationActions.navigateTo(Screen.MAP)
           },
           onAuthError = { user = null })
 
