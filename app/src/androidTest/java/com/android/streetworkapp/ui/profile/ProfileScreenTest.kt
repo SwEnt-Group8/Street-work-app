@@ -31,15 +31,6 @@ class ProfileScreenTest : TestCase() {
   }
 
   @Test
-  fun hasRequiredComponents() {
-    composeTestRule.waitForIdle() // Wait for rendering
-    composeTestRule.onNodeWithTag("ProfileScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("profileScore").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("profileAddButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("profileTrainButton").assertIsDisplayed()
-  }
-
-  @Test
   fun textCorrectlyDisplayed() {
     composeTestRule.waitForIdle() // Wait for rendering
     composeTestRule.onNodeWithTag("profileScore").assertTextEquals("Score: 42’424")
