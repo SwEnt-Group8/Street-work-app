@@ -10,7 +10,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventList
 import com.android.streetworkapp.model.park.Park
+import com.android.streetworkapp.ui.park.OccupancyBar
 import com.android.streetworkapp.ui.park.ParkOverviewScreen
+import com.android.streetworkapp.ui.park.RatingComponent
 import com.google.firebase.Timestamp
 import org.junit.Assert.assertThrows
 import org.junit.Before
@@ -29,7 +31,6 @@ class ParkOverviewTest {
 
   @Before
   fun setUp() {
-    val emptyEventList = EventList(events = emptyList())
     val eventList =
         EventList(
             events =
@@ -43,8 +44,8 @@ class ParkOverviewTest {
                         date = Timestamp(0, 0), // 01/01/1970 00:00
                         owner = "user123")))
 
-    // Park without events
-    noEventPark =
+    // Park with events
+    park =
         Park(
             pid = "1",
             name = "EPFL Esplanade",
@@ -53,43 +54,16 @@ class ParkOverviewTest {
             rating = 4.5f,
             nbrRating = 102,
             occupancy = 0.8f,
-            events = emptyEventList)
-
-    // Park with events
-    park =
-        Park(
-            pid = "2",
-            name = "EPFL Esplanade",
-            location = "EPFL",
-            image = null,
-            rating = 4.5f,
-            nbrRating = 102,
-            occupancy = 0.8f,
             events = eventList)
+
+    // Park with no events
+    noEventPark = park.copy(events = EventList(emptyList()))
 
     // Park with invalid rating
-    invalidRatingPark =
-        Park(
-            pid = "3",
-            name = "EPFL Esplanade",
-            location = "EPFL",
-            image = null,
-            rating = 6.0f,
-            nbrRating = 102,
-            occupancy = 0.8f,
-            events = eventList)
+    invalidRatingPark = park.copy(rating = 6.0f)
 
     // Park with invalid occupancy
-    invalidOccupancyPark =
-        Park(
-            pid = "4",
-            name = "EPFL Esplanade",
-            location = "EPFL",
-            image = null,
-            rating = 4.5f,
-            nbrRating = 102,
-            occupancy = 1.2f,
-            events = eventList)
+    invalidOccupancyPark = park.copy(occupancy = 1.1f)
   }
 
   @Test
@@ -163,5 +137,33 @@ class ParkOverviewTest {
     assertThrows(IllegalArgumentException::class.java) {
       composeTestRule.setContent { ParkOverviewScreen(invalidOccupancyPark) }
     }
+  }
+
+  @Test
+  fun ratingComponentWithMinRating() {
+    composeTestRule.setContent { RatingComponent(rating = 1, nbrReview = 10) }
+    composeTestRule.onNodeWithTag("ratingComponent").isDisplayed()
+    composeTestRule.onNodeWithTag("nbrReview").assertTextEquals("(10)")
+  }
+
+  @Test
+  fun ratingComponentWithMaxRating() {
+    composeTestRule.setContent { RatingComponent(rating = 5, nbrReview = 20) }
+    composeTestRule.onNodeWithTag("ratingComponent").isDisplayed()
+    composeTestRule.onNodeWithTag("nbrReview").assertTextEquals("(20)")
+  }
+
+  @Test
+  fun occupancyBarWithMinOccupancy() {
+    composeTestRule.setContent { OccupancyBar(occupancy = 0.0f) }
+    composeTestRule.onNodeWithTag("occupancyBar").isDisplayed()
+    composeTestRule.onNodeWithTag("occupancyText").assertTextEquals("0% Occupancy")
+  }
+
+  @Test
+  fun occupancyBarWithMaxOccupancy() {
+    composeTestRule.setContent { OccupancyBar(occupancy = 1.0f) }
+    composeTestRule.onNodeWithTag("occupancyBar").isDisplayed()
+    composeTestRule.onNodeWithTag("occupancyText").assertTextEquals("100% Occupancy")
   }
 }
