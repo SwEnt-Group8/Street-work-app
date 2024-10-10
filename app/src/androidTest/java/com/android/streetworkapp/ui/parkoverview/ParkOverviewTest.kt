@@ -37,7 +37,7 @@ class ParkOverviewTest {
                         description = "A fun group workout session to train new skills",
                         participants = 3,
                         maxParticipants = 5,
-                        date = Timestamp(1730377800, 0), // 31/10/2024 13:30
+                        date = Timestamp(0, 0), // 01/01/1970 00:00
                         owner = "user123")))
 
     // Park without events
@@ -95,7 +95,7 @@ class ParkOverviewTest {
         .assertTextContains("Participants 3/5")
     composeTestRule
         .onNodeWithTag("dateText", useUnmergedTree = true)
-        .assertTextContains("31/10/2024 13:30")
+        .assertTextContains("01/01/1970 00:00")
     composeTestRule
         .onNodeWithTag("eventButtonText", useUnmergedTree = true)
         .assertTextContains("About")
