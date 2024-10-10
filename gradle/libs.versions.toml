@@ -18,6 +18,7 @@ robolectric = "4.11.1"
 sonar = "4.4.1.3373"
 okhttp = "4.12.0"
 
+mockitoVersion = "5.13.0"
 mockitoCore = "3.12.4"
 mockitoInline = "3.12.4"
 mockitoKotlin = "5.4.0"
@@ -52,6 +53,9 @@ kaspresso-compose = { group = "com.kaspersky.android-components", name = "kaspre
 
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 
+
+
+mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockitoVersion" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
 mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockitoInline" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin" , version.ref="mockitoKotlin"}
