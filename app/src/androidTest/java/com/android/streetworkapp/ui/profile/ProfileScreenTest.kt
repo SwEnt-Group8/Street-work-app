@@ -6,18 +6,33 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.navigation.Screen
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
 
 @RunWith(AndroidJUnit4::class)
 class ProfileScreenTest : TestCase() {
+  private lateinit var navigationActions: NavigationActions
+
   @get:Rule val composeTestRule = createComposeRule()
+
+  @Before
+  fun setUp() {
+    navigationActions = mock(NavigationActions::class.java)
+    // Mock the current route to be the add todo screen
+    `when`(navigationActions.currentRoute()).thenReturn(Screen.PROFILE)
+  }
+
 
   @Test
   fun hasRequiredComponents() {
-    composeTestRule.setContent { ProfileScreen() }
+    composeTestRule.setContent { ProfileScreen(navigationActions) }
 
     composeTestRule.onNodeWithTag("ProfileScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("ProfileColumn").assertIsDisplayed()
@@ -28,7 +43,7 @@ class ProfileScreenTest : TestCase() {
 
   @Test
   fun textCorrectlyDisplayed() {
-    composeTestRule.setContent { ProfileScreen() }
+    composeTestRule.setContent { ProfileScreen(navigationActions) }
 
     composeTestRule.onNodeWithTag("profileScore").assertTextEquals("Score: 42’424")
     composeTestRule.onNodeWithTag("profileAddButton").assertTextEquals("Add a new friend")
@@ -37,7 +52,7 @@ class ProfileScreenTest : TestCase() {
 
   @Test
   fun buttonWork() {
-    composeTestRule.setContent { ProfileScreen() }
+    composeTestRule.setContent { ProfileScreen(navigationActions) }
 
     composeTestRule.onNodeWithTag("profileAddButton").assertHasClickAction()
     composeTestRule.onNodeWithTag("profileTrainButton").assertHasClickAction()
