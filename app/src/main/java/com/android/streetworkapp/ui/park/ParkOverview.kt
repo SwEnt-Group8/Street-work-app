@@ -124,11 +124,12 @@ fun ParkDetails(park: Park) {
 /**
  * Display a star rating from 1 to 5 and the number of reviews.
  *
- * @param rating The rating to display.
- * @param nbrReview The number of reviews.
+ * @param rating The rating to display from 1 to 5.
+ * @param nbrReview The positive number of reviews.
  */
 @Composable
 fun RatingComponent(rating: Int, nbrReview: Int) {
+  require(rating in 1..5) { "Rating must be between 1 and 5" }
   Row(
       modifier = Modifier.padding(start = 16.dp).testTag("ratingComponent"),
       verticalAlignment = Alignment.CenterVertically) {
@@ -150,15 +151,16 @@ fun RatingComponent(rating: Int, nbrReview: Int) {
 /**
  * Display a progress bar showing the park's occupancy.
  *
- * @param occupancy The park's occupancy percentage.
+ * @param occupancy The park's occupancy percentage from 0 to 1.
  */
 @Composable
 fun OccupancyBar(occupancy: Float) {
+  require(occupancy in 0f..1f) { "Occupancy must be between 0 and 1" }
   Row(
       modifier = Modifier.padding(start = 16.dp, end = 16.dp).testTag("occupancyBar"),
       verticalAlignment = Alignment.CenterVertically) {
         LinearProgressIndicator(
-            progress = { occupancy / 100 },
+            progress = occupancy,
             modifier = Modifier.weight(1f),
         )
         Text(
