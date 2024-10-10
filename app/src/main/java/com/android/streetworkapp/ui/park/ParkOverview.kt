@@ -163,7 +163,7 @@ fun OccupancyBar(occupancy: Float) {
       modifier = Modifier.padding(start = 16.dp, end = 16.dp).testTag("occupancyBar"),
       verticalAlignment = Alignment.CenterVertically) {
         LinearProgressIndicator(
-            progress = occupancy,
+            progress = { occupancy },
             modifier = Modifier.weight(1f),
         )
         Text(
