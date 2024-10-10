@@ -115,7 +115,7 @@ class ParkOverviewTest {
   fun displayTextWhenNoEvent() {
     composeTestRule.setContent { ParkOverviewScreen(noEventPark) }
     composeTestRule.onNodeWithTag("noEventText").isDisplayed()
-    composeTestRule.onNodeWithTag("noEventText").assertTextEquals("No events is planned yet")
+    composeTestRule.onNodeWithTag("noEventText").assertTextEquals("No event is planned yet")
   }
 
   @Test

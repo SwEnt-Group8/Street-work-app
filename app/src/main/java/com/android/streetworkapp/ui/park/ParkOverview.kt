@@ -191,7 +191,7 @@ fun EventItemList(eventList: EventList) {
     if (eventList.events.isEmpty()) {
       Box(modifier = Modifier.fillMaxSize()) {
         Text(
-            text = "No events is planned yet",
+            text = "No event is planned yet",
             fontSize = 16.sp,
             fontWeight = FontWeight.Light,
             modifier =
