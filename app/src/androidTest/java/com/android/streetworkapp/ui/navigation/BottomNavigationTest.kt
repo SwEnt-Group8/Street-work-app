@@ -9,6 +9,8 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.printToLog
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Rule
 import org.junit.Test
@@ -28,18 +30,42 @@ class BottomNavigationTest {
         }
   }
 
+  @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+  @Composable
+  fun EmptyBottomNavigationTest() {
+    Scaffold(bottomBar = { BottomNavigationMenu(onTabSelect = {}, tabList = listOf()) }) {
+      Text("test")
+    }
+  }
+
   @get:Rule val composeTestRule = createComposeRule()
+
+  @Test
+  fun printComposeHierarchy() {
+    composeTestRule.setContent { BottomNavigationTest() }
+    composeTestRule.onRoot().printToLog("BottomNavigationTest")
+  }
 
   @Test
   fun displayAllComponents() {
     composeTestRule.setContent { BottomNavigationTest() }
-    composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("bottomNavigationMenu").assertExists().assertIsDisplayed()
     composeTestRule
         .onAllNodesWithTag("bottomNavigationItem")
         .assertCountEquals(LIST_TOP_LEVEL_DESTINATION.size)
 
+    val navItems = composeTestRule.onAllNodesWithTag("bottomNavigationItem")
+
     for (i in LIST_TOP_LEVEL_DESTINATION.indices) {
-      composeTestRule.onAllNodesWithTag("bottomNavigationItem")[i].assertIsDisplayed()
+      navItems[i].assertIsDisplayed()
     }
+  }
+
+  @Test
+  fun displayNoComponents() {
+    composeTestRule.setContent { EmptyBottomNavigationTest() }
+    composeTestRule.onNodeWithTag("bottomNavigationMenu").assertExists().assertIsDisplayed()
+    composeTestRule.onAllNodesWithTag("bottomNavigationItem").assertCountEquals(0)
+    composeTestRule.onAllNodesWithTag("bottomNavIcon").assertCountEquals(0)
   }
 }
