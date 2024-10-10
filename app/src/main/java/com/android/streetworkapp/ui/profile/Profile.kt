@@ -23,10 +23,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
+import com.android.streetworkapp.ui.navigation.NavigationActions
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(navigationActions: NavigationActions) {
   Scaffold(
       modifier = Modifier.testTag("ProfileScreen"),
       content = { padding ->
@@ -38,7 +39,8 @@ fun ProfileScreen() {
               Row() {
                 Image(
                     painter = painterResource(id = R.drawable.profile),
-                    contentDescription = "App Logo")
+                    contentDescription = "profile picture",
+                    modifier = Modifier.size(200.dp))
               }
               // score placeholder
               Row() {
@@ -51,7 +53,7 @@ fun ProfileScreen() {
               Row() {
                 Image(
                     painter = painterResource(id = R.drawable.qrcode),
-                    contentDescription = "App Logo",
+                    contentDescription = "qr code",
                     modifier = Modifier.size(260.dp))
               }
               Row() {
