@@ -46,7 +46,7 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
   NavHost(
       navController = navController,
       startDestination =
-          Route.AUTH) { // TODO: change startDestination to Route.AUTH for final version
+          Route.MAP) { // TODO: change startDestination to Route.AUTH for final version
         navigation(
             startDestination = Screen.AUTH,
             route = Route.AUTH,
