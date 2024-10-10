@@ -38,6 +38,7 @@ class ProfileScreenTest : TestCase() {
     composeTestRule.onNodeWithTag("profileScore").assertIsDisplayed()
     composeTestRule.onNodeWithTag("profileAddButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("profileTrainButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsDisplayed()
   }
 
   @Test
