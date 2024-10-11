@@ -13,13 +13,12 @@ import androidx.compose.ui.test.onRoot
 import androidx.lifecycle.Lifecycle
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.streetworkapp.MainActivity
+import com.android.streetworkapp.Streetworkapp
 import com.android.streetworkapp.resources.C
 import junit.framework.TestCase
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import com.android.streetworkapp.Streetworkapp
-
 
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest : TestCase() {
@@ -104,5 +103,4 @@ class MainActivityTest : TestCase() {
     // Assert that the log or relevant content is displayed
     composeTestRule.onRoot().assertExists() // Replace this with specific assertions
   }
-
 }

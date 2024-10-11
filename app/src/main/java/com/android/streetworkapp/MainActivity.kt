@@ -59,10 +59,10 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
 
 @Composable
 fun Streetworkapp(testing: Boolean) {
-    Log.d("Empty composable", "This should be completed")
-    if (testing) {
-        Log.d("Empty composable", "Context is null")
-    } else {
-        Log.d("Empty composable", "Context is not null")
-    }
+  Log.d("Empty composable", "This should be completed")
+  if (testing) {
+    Log.d("Empty composable", "Context is null")
+  } else {
+    Log.d("Empty composable", "Context is not null")
+  }
 }
