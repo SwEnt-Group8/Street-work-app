@@ -32,9 +32,9 @@ class LoginTest : TestCase() {
     // otherwise will not be accessible for the test using testTags.
 
     // For Box, Text, Image, Buttons, List : check if displayed :
-    composeTestRule.onNodeWithTag("loginScreenBoxContainer").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("loginTitle").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("loginButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("loginScreenBoxContainer").assertExists().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("loginTitle").assertExists().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("loginButton").assertExists().assertIsDisplayed()
     composeTestRule
         .onNodeWithTag("loginButtonIcon", useUnmergedTree = true)
         .assertExists()
