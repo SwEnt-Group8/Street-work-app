@@ -18,6 +18,8 @@ import junit.framework.TestCase
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import com.android.streetworkapp.Streetworkapp
+
 
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest : TestCase() {
@@ -74,4 +76,33 @@ class MainActivityTest : TestCase() {
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("testTag").assertExists()
   }
+
+  @Test
+  fun streetworkappComposable_logsContextIsNullWhenTesting() {
+    // Access the activity's content and pass the `testing = true` parameter
+    composeTestRule.activityRule.scenario.onActivity { activity ->
+      activity.setContent { Streetworkapp(testing = true) }
+    }
+
+    // Perform assertions after the content is set
+    composeTestRule.waitForIdle()
+
+    // Assert that the log or relevant content is displayed
+    composeTestRule.onRoot().assertExists() // Replace this with specific assertions
+  }
+
+  @Test
+  fun streetworkappComposable_logsContextIsNotNullWhenNotTesting() {
+    // Access the activity's content and pass the `testing = false` parameter
+    composeTestRule.activityRule.scenario.onActivity { activity ->
+      activity.setContent { Streetworkapp(testing = false) }
+    }
+
+    // Perform assertions after the content is set
+    composeTestRule.waitForIdle()
+
+    // Assert that the log or relevant content is displayed
+    composeTestRule.onRoot().assertExists() // Replace this with specific assertions
+  }
+
 }

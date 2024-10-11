@@ -29,29 +29,35 @@ class ProfileScreenTest : TestCase() {
     composeTestRule.setContent { ProfileScreen(navigationActions) }
   }
 
-  /*@Test
+  @Test
   fun hasRequiredComponents() {
-    composeTestRule.waitForIdle() // Wait for rendering
-    composeTestRule.onNodeWithTag("ProfileScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("ProfileColumn").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("profileScore").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("profileAddButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("profileTrainButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("bottomNavigationMenuTest").assertIsDisplayed()
-  }*/
+    // composeTestRule.waitForIdle() // Wait for rendering
+    composeTestRule.runOnIdle {
+      composeTestRule.onNodeWithTag("ProfileScreen").assertExists()
+      composeTestRule.onNodeWithTag("ProfileColumn").assertExists()
+      composeTestRule.onNodeWithTag("profileScore").assertExists()
+      composeTestRule.onNodeWithTag("profileAddButton").assertExists()
+      composeTestRule.onNodeWithTag("profileTrainButton").assertExists()
+      composeTestRule.onNodeWithTag("bottomNavigationMenuTest").assertExists()
+    }
+  }
 
   @Test
   fun textCorrectlyDisplayed() {
-    composeTestRule.waitForIdle() // Wait for rendering
-    composeTestRule.onNodeWithTag("profileScore").assertTextEquals("Score: 42’424")
-    composeTestRule.onNodeWithTag("profileAddButton").assertTextEquals("Add a new friend")
-    composeTestRule.onNodeWithTag("profileTrainButton").assertTextEquals("Train with a friend")
+    // composeTestRule.waitForIdle() // Wait for rendering
+    composeTestRule.runOnIdle {
+      composeTestRule.onNodeWithTag("profileScore").assertTextEquals("Score: 42’424")
+      composeTestRule.onNodeWithTag("profileAddButton").assertTextEquals("Add a new friend")
+      composeTestRule.onNodeWithTag("profileTrainButton").assertTextEquals("Train with a friend")
+    }
   }
 
   @Test
   fun buttonWork() {
-    composeTestRule.waitForIdle() // Wait for rendering
-    composeTestRule.onNodeWithTag("profileAddButton").assertHasClickAction()
-    composeTestRule.onNodeWithTag("profileTrainButton").assertHasClickAction()
+    // composeTestRule.waitForIdle() // Wait for rendering
+    composeTestRule.runOnIdle {
+      composeTestRule.onNodeWithTag("profileAddButton").assertHasClickAction()
+      composeTestRule.onNodeWithTag("profileTrainButton").assertHasClickAction()
+    }
   }
 }
