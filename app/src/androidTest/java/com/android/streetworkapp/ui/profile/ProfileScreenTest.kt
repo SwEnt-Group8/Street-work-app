@@ -3,6 +3,7 @@ package com.android.streetworkapp.ui.profile
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -40,12 +41,12 @@ class ProfileScreenTest : TestCase() {
     composeTestRule.onNodeWithTag("profileTrainButton").assertExists()
     composeTestRule.onNodeWithTag("bottomNavigationMenuTest").assertExists()
 
-    composeTestRule.onNodeWithTag("ProfileScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("ProfileColumn").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("profileScore").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("profileAddButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("profileTrainButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("bottomNavigationMenuTest").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("ProfileScreen").isDisplayed()
+    composeTestRule.onNodeWithTag("ProfileColumn").isDisplayed()
+    composeTestRule.onNodeWithTag("profileScore").isDisplayed()
+    composeTestRule.onNodeWithTag("profileAddButton").isDisplayed()
+    composeTestRule.onNodeWithTag("profileTrainButton").isDisplayed()
+    composeTestRule.onNodeWithTag("bottomNavigationMenuTest").isDisplayed()
   }
 
   @Test
