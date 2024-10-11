@@ -4,8 +4,6 @@ import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onRoot
-import androidx.compose.ui.test.printToLog
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Route
@@ -40,7 +38,6 @@ class ProfileScreenTest : TestCase() {
     composeTestRule.onNodeWithTag("profileAddButton").assertExists()
     composeTestRule.onNodeWithTag("profileTrainButton").assertExists()
     composeTestRule.onNodeWithTag("bottomNavigationMenuTest").assertExists()
-
   }
 
   @Test
@@ -49,7 +46,6 @@ class ProfileScreenTest : TestCase() {
     composeTestRule.onNodeWithTag("profileScore").assertTextEquals("Score: 42’424")
     composeTestRule.onNodeWithTag("profileAddButton").assertTextEquals("Add a new friend")
     composeTestRule.onNodeWithTag("profileTrainButton").assertTextEquals("Train with a friend")
-
   }
 
   @Test
@@ -57,6 +53,5 @@ class ProfileScreenTest : TestCase() {
     composeTestRule.waitForIdle() // Wait for rendering
     composeTestRule.onNodeWithTag("profileAddButton").assertHasClickAction()
     composeTestRule.onNodeWithTag("profileTrainButton").assertHasClickAction()
-
   }
 }
