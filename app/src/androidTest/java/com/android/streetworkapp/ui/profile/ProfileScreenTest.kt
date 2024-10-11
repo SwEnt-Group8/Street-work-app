@@ -1,6 +1,7 @@
 package com.android.streetworkapp.ui.profile
 
 import androidx.compose.ui.test.assertHasClickAction
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -38,6 +39,13 @@ class ProfileScreenTest : TestCase() {
     composeTestRule.onNodeWithTag("profileAddButton").assertExists()
     composeTestRule.onNodeWithTag("profileTrainButton").assertExists()
     composeTestRule.onNodeWithTag("bottomNavigationMenuTest").assertExists()
+
+    composeTestRule.onNodeWithTag("ProfileScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("ProfileColumn").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("profileScore").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("profileAddButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("profileTrainButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("bottomNavigationMenuTest").assertIsDisplayed()
   }
 
   @Test
