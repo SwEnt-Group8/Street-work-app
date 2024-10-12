@@ -38,7 +38,7 @@ class ProfileScreenTest : TestCase() {
     composeTestRule.onNodeWithTag("profileScore").assertExists()
     composeTestRule.onNodeWithTag("profileAddButton").assertExists()
     composeTestRule.onNodeWithTag("profileTrainButton").assertExists()
-    composeTestRule.onNodeWithTag("bottomNavigationMenuTest").assertExists()
+    composeTestRule.onNodeWithTag("bottomNavigationMenu").assertExists()
 
     composeTestRule.onNodeWithTag("ProfileScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("ProfileColumn").assertIsDisplayed()
