@@ -1,6 +1,5 @@
 package com.android.streetworkapp.ui.navigation
 
-import androidx.activity.compose.setContent
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.ui.test.junit4.createComposeRule
