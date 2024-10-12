@@ -46,7 +46,7 @@ class ProfileScreenTest : TestCase() {
     composeTestRule.onNodeWithTag("profileAddButton").assertIsDisplayed()
     // composeTestRule.onNodeWithTag("profileTrainButton").assertIsDisplayed() =>
     // weirdly enough Train button dont display ?
-    composeTestRule.onNodeWithTag("bottomNavigationMenuTest").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsDisplayed()
   }
 
   @Test

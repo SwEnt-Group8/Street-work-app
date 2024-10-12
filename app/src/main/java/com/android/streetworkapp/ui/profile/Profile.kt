@@ -3,7 +3,6 @@ package com.android.streetworkapp.ui.profile
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -33,8 +32,7 @@ fun ProfileScreen(navigationActions: NavigationActions) {
       bottomBar = {
         BottomNavigationMenu(
             onTabSelect = { route -> navigationActions.navigateTo(route) },
-            tabList = LIST_TOP_LEVEL_DESTINATION,
-            selectedItem = navigationActions.currentRoute())
+            tabList = LIST_TOP_LEVEL_DESTINATION)
       },
       content = { padding ->
         Column(
@@ -42,44 +40,43 @@ fun ProfileScreen(navigationActions: NavigationActions) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)) {
               // profile placeholder
-              Row() {
-                Image(
-                    painter = painterResource(id = R.drawable.profile),
-                    contentDescription = "profile picture",
-                    modifier = Modifier.size(200.dp))
-              }
+
+              Image(
+                  painter = painterResource(id = R.drawable.profile),
+                  contentDescription = "profile picture",
+                  modifier = Modifier.size(200.dp))
+
               // score placeholder
-              Row() {
-                Text(
-                    text = "Score: 42’424",
-                    fontSize = 20.sp,
-                    modifier = Modifier.testTag("profileScore"))
-              }
+
+              Text(
+                  text = "Score: 42’424",
+                  fontSize = 20.sp,
+                  modifier = Modifier.testTag("profileScore"))
+
               // QR code placeholder
-              Row() {
-                Image(
-                    painter = painterResource(id = R.drawable.qrcode),
-                    contentDescription = "qr code",
-                    modifier = Modifier.size(260.dp))
-              }
+
+              Image(
+                  painter = painterResource(id = R.drawable.qrcode),
+                  contentDescription = "qr code",
+                  modifier = Modifier.size(260.dp))
+
+              Spacer(modifier = Modifier.height(10.dp))
               // button to add a new friend
-              Row() {
-                Button(
-                    onClick = {},
-                    modifier = Modifier.size(220.dp, 50.dp).testTag("profileAddButton")) {
-                      Text(text = "Add a new friend", fontSize = 17.sp)
-                    }
-              }
+
+              Button(
+                  onClick = {},
+                  modifier = Modifier.size(220.dp, 50.dp).testTag("profileAddButton")) {
+                    Text(text = "Add a new friend", fontSize = 17.sp)
+                  }
+
+              Spacer(modifier = Modifier.height(10.dp))
               // button to train with a friend
-              Row() {
-                Button(
-                    onClick = {},
-                    colors = ButtonDefaults.buttonColors(Color(0xFFA53A36)),
-                    modifier = Modifier.size(220.dp, 50.dp).testTag("profileTrainButton")) {
-                      Text(text = "Train with a friend", fontSize = 17.sp)
-                    }
-              }
-              Spacer(modifier = Modifier.height(100.dp))
+              Button(
+                  onClick = {},
+                  colors = ButtonDefaults.buttonColors(Color(0xFFA53A36)),
+                  modifier = Modifier.size(220.dp, 50.dp).testTag("profileTrainButton")) {
+                    Text(text = "Train with a friend", fontSize = 17.sp)
+                  }
             }
       })
 }
