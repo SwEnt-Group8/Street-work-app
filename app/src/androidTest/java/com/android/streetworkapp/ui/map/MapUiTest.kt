@@ -79,6 +79,8 @@ class MapUiTest {
           .onAllNodesWithTag("bottomNavigationItem")[i]
           .assertIsDisplayed()
           .performClick()
+
+      verify(navigationActions).navigateTo(LIST_TOP_LEVEL_DESTINATION[i])
     }
   }
 

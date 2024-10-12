@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -30,9 +31,11 @@ fun MapScreen(parkLocationViewModel: ParkLocationViewModel, navigationActions: N
   // hardcoded initial location values are used instead of the user's current location for now
   val initialLatLng = LatLng(46.518659400000004, 6.566561505148001)
 
-  val parks = parkLocationViewModel.parks.collectAsState().value
+  LaunchedEffect(initialLatLng) {
+    parkLocationViewModel.findNearbyParks(initialLatLng.latitude, initialLatLng.longitude)
+  }
 
-  parkLocationViewModel.findNearbyParks(initialLatLng.latitude, initialLatLng.longitude)
+  val parks = parkLocationViewModel.parks.collectAsState().value
 
   Scaffold(
       modifier = Modifier.testTag("mapScreen"),
