@@ -1,10 +1,31 @@
 package com.android.streetworkapp.model.user
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.launch
 
 open class UserViewModel(private val repository: UserRepository) : ViewModel() {
+
+  // LiveData to hold the current user
+  private val _currentUser = MutableLiveData<User?>()
+  val currentUser: LiveData<User?> get() = _currentUser
+
+  /**
+   * Loads the current user from Firestore based on the provided ID.
+   *
+   * @param uid The unique ID of the user to load.
+   */
+  fun loadCurrentUser(uid: String) {
+    viewModelScope.launch {
+      val user = repository.getUserByUid(uid)
+      _currentUser.postValue(user)
+    }
+  }
+
 
   // Companion object to provide a factory for UserViewModel
   companion object {
