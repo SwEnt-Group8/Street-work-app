@@ -14,6 +14,8 @@ interface UserRepository {
 
   suspend fun updateUserScore(uid: String, newScore: Int)
 
+  suspend fun increaseUserScore(uid: String, points: Int)
+
   suspend fun addFriend(uid: String, friendUid: String)
 
   suspend fun removeFriend(uid: String, friendUid: String)

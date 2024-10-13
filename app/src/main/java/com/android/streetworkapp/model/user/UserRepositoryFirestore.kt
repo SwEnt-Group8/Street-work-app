@@ -7,6 +7,8 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
+private const val s = "UID must not be empty"
+
 class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepository {
   // Setup the collection path
   companion object {
@@ -119,6 +121,27 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     } catch (e: Exception) {
       Log.e(
           "FirestoreError", "Error updating score of the user with ID: $uid. Reason: ${e.message}")
+    }
+  }
+
+  /**
+   * Increases the user's score in Firestore by a specified number of points.
+   *
+   * @param uid The unique ID of the user whose score is being increased.
+   * @param points The number of points to add to the user's score.
+   */
+  override suspend fun increaseUserScore(uid: String, points: Int) {
+    require(uid.isNotEmpty()) { "UID must not be empty" }
+    require(points >= 0) { "Points must be a non-negative integer" }
+    try {
+      db.collection("users")
+          .document(uid)
+          .update("score", FieldValue.increment(points.toLong()))
+          .await()
+    } catch (e: Exception) {
+      Log.e(
+          "FirestoreError",
+          "Error increasing score of the user with ID: $uid. Reason: ${e.message}")
     }
   }
 

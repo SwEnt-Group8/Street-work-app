@@ -78,6 +78,16 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
   }
 
   /**
+   * Increases the user's score in Firestore by the specified number of points.
+   *
+   * @param uid The unique ID of the user whose score is being increased.
+   * @param points The number of points to add to the user's score.
+   */
+  suspend fun increaseUserScore(uid: String, points: Int) {
+    repository.increaseUserScore(uid, points)
+  }
+
+  /**
    * Adds a friend to both the user's and friend's friend lists in Firestore.
    *
    * @param uid The unique ID of the user.
