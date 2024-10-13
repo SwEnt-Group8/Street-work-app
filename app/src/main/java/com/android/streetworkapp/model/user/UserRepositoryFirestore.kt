@@ -209,7 +209,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
             emptyList()
           }
 
-      User(uid = uid, name = name, email = email, score = score, friends = friends)
+      User(uid = uid, username = name, email = email, score = score, friends = friends)
     } catch (e: Exception) {
       Log.e("FirestoreError", "Error converting document to User", e)
       null

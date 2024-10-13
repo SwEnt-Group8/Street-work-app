@@ -80,7 +80,7 @@ class UserRepositoryFirestoreTest {
     // Assert the result is not null and contains expected values
     assertNotNull(user)
     assertEquals("123", user?.uid)
-    assertEquals("John Doe", user?.name)
+    assertEquals("John Doe", user?.username)
     assertEquals("john.doe@example.com", user?.email)
     assertEquals(100, user?.score)
     assertEquals(listOf("friend1", "friend2"), user?.friends)
@@ -117,7 +117,7 @@ class UserRepositoryFirestoreTest {
     val user = userRepository.getUserByEmail("john.doe@example.com")
     assertNotNull(user)
     assertEquals("123", user?.uid)
-    assertEquals("John Doe", user?.name)
+    assertEquals("John Doe", user?.username)
     assertEquals("john.doe@example.com", user?.email)
     assertEquals(100, user?.score)
     assertEquals(listOf("friend1", "friend2"), user?.friends)
@@ -184,13 +184,13 @@ class UserRepositoryFirestoreTest {
     val friend2 = friendsList?.find { it.uid == "friend2" }
 
     assertNotNull(friend1)
-    assertEquals("Friend One", friend1?.name)
+    assertEquals("Friend One", friend1?.username)
     assertEquals("friend1@example.com", friend1?.email)
     assertEquals(50, friend1?.score)
     assertTrue(friend1?.friends?.isEmpty() == true)
 
     assertNotNull(friend2)
-    assertEquals("Friend Two", friend2?.name)
+    assertEquals("Friend Two", friend2?.username)
     assertEquals("friend2@example.com", friend2?.email)
     assertEquals(60, friend2?.score)
     assertTrue(friend2?.friends?.isEmpty() == true)
@@ -216,7 +216,7 @@ class UserRepositoryFirestoreTest {
     val user =
         User(
             uid = "123",
-            name = "John Doe",
+            username = "John Doe",
             email = "john.doe@example.com",
             score = 100,
             friends = listOf("friend1", "friend2"))
@@ -364,7 +364,7 @@ class UserRepositoryFirestoreTest {
     val user =
         User(
             uid = "123",
-            name = "Test User",
+            username = "Test User",
             email = "test@example.com",
             score = 0,
             friends = emptyList())
@@ -487,7 +487,7 @@ class UserRepositoryFirestoreTest {
     // Assert the result
     assertNotNull(user)
     assertEquals("user123", user?.uid)
-    assertEquals("John Doe", user?.name)
+    assertEquals("John Doe", user?.username)
     assertEquals("john@example.com", user?.email)
     assertEquals(100, user?.score)
     assertEquals(listOf("friend1", "friend2"), user?.friends)
