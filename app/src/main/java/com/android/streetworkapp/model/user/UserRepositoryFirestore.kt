@@ -13,12 +13,10 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     private const val COLLECTION_PATH = "users"
   }
 
-  private lateinit var firestore: FirebaseFirestore
-
-  /** Initializes the Firestore instance. */
-  override fun init() {
-    firestore = FirebaseFirestore.getInstance()
-  }
+  /**
+   * Initializes the Firestore instance. override fun init() { firestore =
+   * FirebaseFirestore.getInstance() }
+   */
 
   /**
    * Generates a new unique ID for a user.
@@ -38,7 +36,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
   override suspend fun getUserByUid(uid: String): User? {
     require(uid.isNotEmpty()) { "UID must not be empty" }
     return try {
-      val document = firestore.collection("users").document(uid).get().await()
+      val document = db.collection("users").document(uid).get().await()
       documentToUser(document)
     } catch (e: Exception) {
       Log.e("FirestoreError", "Error getting user with ID: $uid. Reason: ${e.message}")
@@ -55,8 +53,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
   override suspend fun getUserByEmail(email: String): User? {
     require(email.isNotEmpty()) { "Email must not be empty" }
     return try {
-      val querySnapshot =
-          firestore.collection(COLLECTION_PATH).whereEqualTo("email", email).get().await()
+      val querySnapshot = db.collection(COLLECTION_PATH).whereEqualTo("email", email).get().await()
 
       if (querySnapshot.documents.isNotEmpty()) {
         documentToUser(querySnapshot.documents[0]) // Return the first match
@@ -79,17 +76,13 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     require(uid.isNotEmpty()) { "UID must not be empty" }
     return try {
       // Get the user's document first to retrieve the list of friend UIDs
-      val document = firestore.collection(COLLECTION_PATH).document(uid).get().await()
+      val document = db.collection(COLLECTION_PATH).document(uid).get().await()
       val friendIds = document.get("friends") as? List<String> ?: emptyList()
 
       if (friendIds.isNotEmpty()) {
         // Now fetch all the friends' user documents
         val friendsQuery =
-            firestore
-                .collection(COLLECTION_PATH)
-                .whereIn(FieldPath.documentId(), friendIds)
-                .get()
-                .await()
+            db.collection(COLLECTION_PATH).whereIn(FieldPath.documentId(), friendIds).get().await()
 
         friendsQuery.documents.mapNotNull {
           documentToUser(it)
@@ -111,7 +104,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
   override suspend fun addUser(user: User) {
     require(user.uid.isNotEmpty()) { "User ID must not be empty" }
     try {
-      firestore.collection("users").document(user.uid).set(user).await()
+      db.collection("users").document(user.uid).set(user).await()
     } catch (e: Exception) {
       Log.e("FirestoreError", "Error adding user: ${e.message}")
     }
@@ -127,7 +120,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     require(uid.isNotEmpty()) { "UID must not be empty" }
     require(newScore >= 0) { "Score must be a non-negative integer" }
     try {
-      firestore.collection("users").document(uid).update("score", newScore).await()
+      db.collection("users").document(uid).update("score", newScore).await()
     } catch (e: Exception) {
       Log.e(
           "FirestoreError", "Error updating score of the user with ID: $uid. Reason: ${e.message}")
@@ -145,14 +138,14 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     require(friendUid.isNotEmpty()) { "Friend UID must not be empty" }
     try {
       // Start a Firestore batch operation for both updates
-      val batch = firestore.batch()
+      val batch = db.batch()
 
       // Add friendId to the user's friends list
-      val userRef = firestore.collection("users").document(uid)
+      val userRef = db.collection("users").document(uid)
       batch.update(userRef, "friends", FieldValue.arrayUnion(friendUid))
 
       // Add uid to the friend's friends list and commit the batch
-      val friendRef = firestore.collection("users").document(friendUid)
+      val friendRef = db.collection("users").document(friendUid)
       batch.update(friendRef, "friends", FieldValue.arrayUnion(uid))
       batch.commit().await()
     } catch (e: Exception) {
@@ -171,14 +164,14 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     require(friendUid.isNotEmpty()) { "Friend UID must not be empty" }
     try {
       // Start a Firestore batch operation for both removals
-      val batch = firestore.batch()
+      val batch = db.batch()
 
       // Remove friendId from the user's friends list
-      val userRef = firestore.collection("users").document(uid)
+      val userRef = db.collection("users").document(uid)
       batch.update(userRef, "friends", FieldValue.arrayRemove(friendUid))
 
       // Remove uid from the friend's friends list and commit the batch
-      val friendRef = firestore.collection("users").document(friendUid)
+      val friendRef = db.collection("users").document(friendUid)
       batch.update(friendRef, "friends", FieldValue.arrayRemove(uid))
       batch.commit().await()
     } catch (e: Exception) {
@@ -194,7 +187,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
   override suspend fun deleteUserById(id: String) {
     require(id.isNotEmpty()) { "ID must not be empty" }
     try {
-      firestore.collection("users").document(id).delete().await()
+      db.collection("users").document(id).delete().await()
     } catch (e: Exception) {
       Log.e("FirestoreError", "Error deleting user: ${e.message}")
     }
@@ -206,7 +199,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
    * @param document The Firestore DocumentSnapshot containing user data.
    * @return A User object if the document is valid, or null if the document cannot be converted.
    */
-  private fun documentToUser(document: DocumentSnapshot): User? {
+  internal fun documentToUser(document: DocumentSnapshot): User? {
     return try {
       val uid = document.id
       val name = document.getString("name") ?: return null
@@ -218,7 +211,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
             document.get("friends") as? List<String> ?: emptyList()
           } catch (e: Exception) {
             Log.e("FirestoreError", "Error casting friends list", e)
-            emptyList<String>()
+            emptyList()
           }
 
       User(uid = uid, name = name, email = email, score = score, friends = friends)

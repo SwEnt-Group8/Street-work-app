@@ -2,8 +2,6 @@ package com.android.streetworkapp.model.user
 /** A repository interface for user data. */
 interface UserRepository {
 
-  fun init()
-
   fun getNewUid(): String
 
   suspend fun getUserByUid(uid: String): User?
