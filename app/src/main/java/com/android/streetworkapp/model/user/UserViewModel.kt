@@ -19,12 +19,6 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
         }
   }
 
-  /* Initializes the Firestore instance.
-  init {
-    repository.init()
-  }
-  */
-
   /**
    * Generates a new unique ID for a user.
    *
