@@ -6,6 +6,7 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldPath
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
@@ -238,6 +239,48 @@ class UserRepositoryFirestoreTest {
     userRepository.updateUserScore("123", 200)
     verify(documentRef).update("score", 200)
   }
+
+  @Test
+  fun increaseUserScore_withValidUidAndPoints_increasesScoreSuccessfully() = runTest {
+    whenever(db.collection("users")).thenReturn(collection)
+    whenever(collection.document("123")).thenReturn(documentRef)
+    whenever(documentRef.update(eq("score"), any())).thenReturn(Tasks.forResult(null))
+
+    userRepository.increaseUserScore("123", 10)
+
+    verify(documentRef).update(eq("score"), any())
+  }
+
+  @Test
+  fun increaseUserScore_withEmptyUid_throwsIllegalArgumentException() = runTest {
+    val exception = assertThrows(IllegalArgumentException::class.java) {
+      runBlocking { userRepository.increaseUserScore("", 10) }
+    }
+    assertEquals("UID must not be empty", exception.message)
+  }
+
+  @Test
+  fun increaseUserScore_withNegativePoints_throwsIllegalArgumentException() = runTest {
+    val exception = assertThrows(IllegalArgumentException::class.java) {
+      runBlocking { userRepository.increaseUserScore("123", -10) }
+    }
+    assertEquals("Points must be a non-negative integer", exception.message)
+  }
+
+  @Test
+  fun increaseUserScore_withException_logsError() = runTest {
+    whenever(db.collection("users")).thenReturn(collection)
+    whenever(collection.document("123")).thenReturn(documentRef)
+    val taskCompletionSource = TaskCompletionSource<Void>()
+    taskCompletionSource.setException(Exception("Firestore exception"))
+    val task = taskCompletionSource.task
+    whenever(documentRef.update(eq("score"), any())).thenReturn(task)
+
+    userRepository.increaseUserScore("123", 10)
+
+    verify(documentRef).update(eq("score"), any())
+  }
+
 
   @Test
   fun addFriend_withValidUids_addsFriendSuccessfully(): Unit = runBlocking {

@@ -63,12 +63,17 @@ class UserViewModelTest {
   }
 
   @Test
-  fun updateUserScore_calls_repository_with_correct_uid_and_score() = runTest {
+  fun updateUserScore_calls_repository_with_correct_uid_and_score_and_increment() = runTest {
     val uid = "user123"
     val newScore = 200
+    val incrScore = 50
     userViewModel.updateUserScore(uid, newScore)
     verify(repository).updateUserScore(uid, newScore)
+    userViewModel.increaseUserScore(uid, incrScore)
+    verify(repository).increaseUserScore(uid, incrScore)
   }
+
+
 
   @Test
   fun addFriend_calls_repository_with_correct_uids() = runTest {
