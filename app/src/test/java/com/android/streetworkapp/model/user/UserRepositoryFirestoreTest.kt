@@ -6,7 +6,6 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldPath
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
@@ -253,17 +252,19 @@ class UserRepositoryFirestoreTest {
 
   @Test
   fun increaseUserScore_withEmptyUid_throwsIllegalArgumentException() = runTest {
-    val exception = assertThrows(IllegalArgumentException::class.java) {
-      runBlocking { userRepository.increaseUserScore("", 10) }
-    }
+    val exception =
+        assertThrows(IllegalArgumentException::class.java) {
+          runBlocking { userRepository.increaseUserScore("", 10) }
+        }
     assertEquals("UID must not be empty", exception.message)
   }
 
   @Test
   fun increaseUserScore_withNegativePoints_throwsIllegalArgumentException() = runTest {
-    val exception = assertThrows(IllegalArgumentException::class.java) {
-      runBlocking { userRepository.increaseUserScore("123", -10) }
-    }
+    val exception =
+        assertThrows(IllegalArgumentException::class.java) {
+          runBlocking { userRepository.increaseUserScore("123", -10) }
+        }
     assertEquals("Points must be a non-negative integer", exception.message)
   }
 
@@ -280,7 +281,6 @@ class UserRepositoryFirestoreTest {
 
     verify(documentRef).update(eq("score"), any())
   }
-
 
   @Test
   fun addFriend_withValidUids_addsFriendSuccessfully(): Unit = runBlocking {

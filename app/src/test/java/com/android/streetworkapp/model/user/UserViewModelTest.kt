@@ -73,8 +73,6 @@ class UserViewModelTest {
     verify(repository).increaseUserScore(uid, incrScore)
   }
 
-
-
   @Test
   fun addFriend_calls_repository_with_correct_uids() = runTest {
     val uid = "user123"
