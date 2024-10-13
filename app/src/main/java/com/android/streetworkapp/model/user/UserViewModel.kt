@@ -12,7 +12,8 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
 
   // LiveData to hold the current user
   private val _currentUser = MutableLiveData<User?>()
-  val currentUser: LiveData<User?> get() = _currentUser
+  val currentUser: LiveData<User?>
+    get() = _currentUser
 
   /**
    * Loads the current user from Firestore based on the provided ID.
@@ -25,7 +26,6 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
       _currentUser.postValue(user)
     }
   }
-
 
   // Companion object to provide a factory for UserViewModel
   companion object {
