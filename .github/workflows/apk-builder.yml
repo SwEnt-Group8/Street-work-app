@@ -54,7 +54,8 @@ jobs:
 
       - name: Generate release tag
         id: tag
-        run: echo "::set-output name=release_tag::partagix_$(date +"%Y.%m.%d_%H-%M")"
+        run: |
+          echo "release_tag=streetworkapp_$(date +"%Y.%m.%d_%H-%M")" >> $GITHUB_OUTPUT
       
       - name: Rename APK
         run: mv app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/${{ steps.tag.outputs.release_tag }}.apk
@@ -62,18 +63,16 @@ jobs:
       - name: Upload APK in artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: partagix
+          name: streetworkapp
           path: app/build/outputs/apk/release/${{ steps.tag.outputs.release_tag }}.apk
           if-no-files-found: error
           retention-days: 90
 
-      # Load Google Maps API Key from secrets
       - name: Load Google Maps API Key
         env:
           MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
         run: echo "MAPS_API_KEY=${MAPS_API_KEY}" >> local.defaults.properties
 
-      # Load Firebase API Key from secrets
       - name: Load Firebase API Key
         env:
           FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
