@@ -56,7 +56,7 @@ class UserRepositoryFirestoreTest {
     // Setup the DocumentSnapshot
     `when`(document.exists()).thenReturn(true)
     `when`(document.id).thenReturn("123")
-    `when`(document.getString("name")).thenReturn("John Doe")
+    `when`(document.getString("username")).thenReturn("John Doe")
     `when`(document.getString("email")).thenReturn("john.doe@example.com")
     `when`(document.getLong("score")).thenReturn(100L)
     `when`(document.get("friends")).thenReturn(listOf("friend1", "friend2"))
@@ -118,7 +118,7 @@ class UserRepositoryFirestoreTest {
     val friendDocument1 = mock<DocumentSnapshot>()
     whenever(friendDocument1.exists()).thenReturn(true)
     whenever(friendDocument1.id).thenReturn("friend1")
-    whenever(friendDocument1.getString("name")).thenReturn("Friend One")
+    whenever(friendDocument1.getString("username")).thenReturn("Friend One")
     whenever(friendDocument1.getString("email")).thenReturn("friend1@example.com")
     whenever(friendDocument1.getLong("score")).thenReturn(50L)
     whenever(friendDocument1.get("friends")).thenReturn(emptyList<String>())
@@ -126,7 +126,7 @@ class UserRepositoryFirestoreTest {
     val friendDocument2 = mock<DocumentSnapshot>()
     whenever(friendDocument2.exists()).thenReturn(true)
     whenever(friendDocument2.id).thenReturn("friend2")
-    whenever(friendDocument2.getString("name")).thenReturn("Friend Two")
+    whenever(friendDocument2.getString("username")).thenReturn("Friend Two")
     whenever(friendDocument2.getString("email")).thenReturn("friend2@example.com")
     whenever(friendDocument2.getLong("score")).thenReturn(60L)
     whenever(friendDocument2.get("friends")).thenReturn(emptyList<String>())
@@ -174,7 +174,7 @@ class UserRepositoryFirestoreTest {
     // Setup the DocumentSnapshot
     `when`(document.exists()).thenReturn(true)
     `when`(document.id).thenReturn("123")
-    `when`(document.getString("name")).thenReturn("John Doe")
+    `when`(document.getString("username")).thenReturn("John Doe")
     `when`(document.getString("email")).thenReturn("john.doe@example.com")
     `when`(document.getLong("score")).thenReturn(100L)
     `when`(document.get("friends")).thenReturn(listOf("friend1", "friend2"))
@@ -183,7 +183,7 @@ class UserRepositoryFirestoreTest {
     `when`(querySnapshot.documents).thenReturn(listOf(document))
 
     val query = mock(Query::class.java)
-    `when`(db.collection("users")).thenReturn(collection)
+    `when`(db.collection("username")).thenReturn(collection)
     `when`(collection.whereEqualTo("email", "john.doe@example.com")).thenReturn(query)
     `when`(query.get()).thenReturn(Tasks.forResult(querySnapshot))
 
