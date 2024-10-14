@@ -99,9 +99,9 @@ class UserViewModelTest {
   }
 
   @Test
-  fun deleteUserById_calls_repository_with_correct_id() = runTest {
+  fun deleteUserByUid_calls_repository_with_correct_id() = runTest {
     val uid = "user123"
-    userViewModel.deleteUserById(uid)
-    verify(repository).deleteUserById(uid)
+    userViewModel.deleteUserByUid(uid)
+    verify(repository).deleteUserByUid(uid)
   }
 }

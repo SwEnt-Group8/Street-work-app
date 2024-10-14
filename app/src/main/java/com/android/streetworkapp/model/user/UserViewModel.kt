@@ -130,5 +130,5 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    *
    * @param uid The unique ID of the user to delete.
    */
-  fun deleteUserById(uid: String) = viewModelScope.launch { repository.deleteUserByUid(uid) }
+  fun deleteUserByUid(uid: String) = viewModelScope.launch { repository.deleteUserByUid(uid) }
 }

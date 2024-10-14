@@ -379,12 +379,12 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun deleteUserById_withValidId_deletesUserSuccessfully(): Unit = runBlocking {
+  fun deleteUserByUid_withValidId_deletesUserSuccessfully(): Unit = runBlocking {
     `when`(db.collection("users")).thenReturn(collection)
     `when`(collection.document("123")).thenReturn(documentRef)
     `when`(documentRef.delete()).thenReturn(Tasks.forResult(null))
 
-    userRepository.deleteUserById("123")
+    userRepository.deleteUserByUid("123")
     verify(documentRef).delete()
   }
 
@@ -540,7 +540,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun deleteUserById_withException_logsError() = runTest {
+  fun deleteUserByUid_withException_logsError() = runTest {
     // Mock Firestore interactions to throw an exception
     whenever(db.collection("users")).thenReturn(collection)
     whenever(collection.document("123")).thenReturn(documentRef)
@@ -551,7 +551,7 @@ class UserRepositoryFirestoreTest {
     whenever(documentRef.delete()).thenReturn(task)
 
     // Call the method under test
-    userRepository.deleteUserById("123")
+    userRepository.deleteUserByUid("123")
 
     // Verify that 'delete' was called
     verify(documentRef).delete()
