@@ -64,6 +64,29 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
   }
 
   /**
+   * Retrieves a user from Firestore based on the provided username.
+   *
+   * @param userName The username of the user to retrieve.
+   * @return The User object if found, or null if the user doesn't exist or an error occurs.
+   */
+  override suspend fun getUserByUserName(userName: String): User? {
+    require(userName.isNotEmpty()) { "Username must not be empty" }
+    return try {
+      val querySnapshot =
+          db.collection(COLLECTION_PATH).whereEqualTo("username", userName).get().await()
+
+      if (querySnapshot.documents.isNotEmpty()) {
+        documentToUser(querySnapshot.documents[0])
+      } else {
+        null
+      }
+    } catch (e: Exception) {
+      Log.e("FirestoreError", "Error getting user by username: $userName. Reason: ${e.message}")
+      null
+    }
+  }
+
+  /**
    * Retrieves the friends of a user from Firestore based on the provided user ID (uid).
    *
    * @param uid The unique ID of the user whose friends are being retrieved.

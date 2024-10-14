@@ -8,6 +8,8 @@ interface UserRepository {
 
   suspend fun getUserByEmail(email: String): User?
 
+  suspend fun getUserByUserName(userName: String): User?
+
   suspend fun getFriendsByUid(uid: String): List<User>?
 
   suspend fun addUser(user: User)

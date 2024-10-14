@@ -70,6 +70,16 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
   }
 
   /**
+   * Retrieves a user from Firestore based on the provided username.
+   *
+   * @param userName The username of the user to retrieve.
+   * @return The User object if found, or null if the user doesn't exist or an error occurs.
+   */
+  suspend fun getUserByUserName(userName: String) {
+    repository.getUserByUserName(userName)
+  }
+
+  /**
    * Retrieves a list of friends for a user based on the provided ID.
    *
    * @param uid The unique ID of the user to retrieve friends for.
