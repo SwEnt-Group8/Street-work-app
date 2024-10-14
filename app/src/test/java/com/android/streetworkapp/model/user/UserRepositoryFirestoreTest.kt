@@ -97,33 +97,6 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun getUserByEmail_withValidEmail_returnsUser() = runBlocking {
-    // Setup the DocumentSnapshot
-    `when`(document.exists()).thenReturn(true)
-    `when`(document.id).thenReturn("123")
-    `when`(document.getString("name")).thenReturn("John Doe")
-    `when`(document.getString("email")).thenReturn("john.doe@example.com")
-    `when`(document.getLong("score")).thenReturn(100L)
-    `when`(document.get("friends")).thenReturn(listOf("friend1", "friend2"))
-
-    val querySnapshot = mock(QuerySnapshot::class.java)
-    `when`(querySnapshot.documents).thenReturn(listOf(document))
-
-    val query = mock(Query::class.java)
-    `when`(db.collection("users")).thenReturn(collection)
-    `when`(collection.whereEqualTo("email", "john.doe@example.com")).thenReturn(query)
-    `when`(query.get()).thenReturn(Tasks.forResult(querySnapshot))
-
-    val user = userRepository.getUserByEmail("john.doe@example.com")
-    assertNotNull(user)
-    assertEquals("123", user?.uid)
-    assertEquals("John Doe", user?.username)
-    assertEquals("john.doe@example.com", user?.email)
-    assertEquals(100, user?.score)
-    assertEquals(listOf("friend1", "friend2"), user?.friends)
-  }
-
-  @Test
   fun getFriendsByUid_withValidUid_returnsListOfFriends() = runTest {
     // Mock User DocumentSnapshot
     val userDocument = mock<DocumentSnapshot>()
@@ -197,6 +170,33 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
+  fun getUserByEmail_withValidEmail_returnsUser() = runBlocking {
+    // Setup the DocumentSnapshot
+    `when`(document.exists()).thenReturn(true)
+    `when`(document.id).thenReturn("123")
+    `when`(document.getString("name")).thenReturn("John Doe")
+    `when`(document.getString("email")).thenReturn("john.doe@example.com")
+    `when`(document.getLong("score")).thenReturn(100L)
+    `when`(document.get("friends")).thenReturn(listOf("friend1", "friend2"))
+
+    val querySnapshot = mock(QuerySnapshot::class.java)
+    `when`(querySnapshot.documents).thenReturn(listOf(document))
+
+    val query = mock(Query::class.java)
+    `when`(db.collection("users")).thenReturn(collection)
+    `when`(collection.whereEqualTo("email", "john.doe@example.com")).thenReturn(query)
+    `when`(query.get()).thenReturn(Tasks.forResult(querySnapshot))
+
+    val user = userRepository.getUserByEmail("john.doe@example.com")
+    assertNotNull(user)
+    assertEquals("123", user?.uid)
+    assertEquals("John Doe", user?.username)
+    assertEquals("john.doe@example.com", user?.email)
+    assertEquals(100, user?.score)
+    assertEquals(listOf("friend1", "friend2"), user?.friends)
+  }
+
+  @Test
   fun getUserByEmail_withInvalidEmail_returnsNull() = runBlocking {
     val querySnapshot = mock(QuerySnapshot::class.java)
     `when`(querySnapshot.documents).thenReturn(emptyList())
@@ -208,6 +208,48 @@ class UserRepositoryFirestoreTest {
     `when`(query.get()).thenReturn(Tasks.forResult(querySnapshot))
 
     val user = userRepository.getUserByEmail("invalid@example.com")
+    assertNull(user)
+  }
+
+  @Test
+  fun getUserByUserName_withValidUserName_returnsUser(): Unit = runBlocking {
+    `when`(document.exists()).thenReturn(true)
+    `when`(document.id).thenReturn("123")
+    `when`(document.getString("username")).thenReturn("John Doe")
+    `when`(document.getString("email")).thenReturn("john.doe@example.com")
+    `when`(document.getLong("score")).thenReturn(100L)
+    `when`(document.get("friends")).thenReturn(emptyList<String>())
+
+    val querySnapshot = mock(QuerySnapshot::class.java)
+    `when`(querySnapshot.documents).thenReturn(listOf(document))
+
+    val query = mock(Query::class.java)
+    `when`(db.collection("users")).thenReturn(collection)
+    `when`(collection.whereEqualTo("username", "John Doe")).thenReturn(query)
+    `when`(query.get()).thenReturn(Tasks.forResult(querySnapshot))
+
+    val user = userRepository.getUserByUserName("John Doe")
+
+    assertNotNull(user)
+    assertEquals("123", user?.uid)
+    assertEquals("John Doe", user?.username)
+    assertEquals("john.doe@example.com", user?.email)
+    assertEquals(100, user?.score)
+    user?.friends?.isEmpty()?.let { assertTrue(it) }
+  }
+
+  @Test
+  fun getUserByUserName_withInvalidUserName_returnsNull(): Unit = runBlocking {
+    val querySnapshot = mock(QuerySnapshot::class.java)
+    `when`(querySnapshot.documents).thenReturn(emptyList())
+
+    val query = mock(Query::class.java)
+    `when`(db.collection("users")).thenReturn(collection)
+    `when`(collection.whereEqualTo("username", "InvalidUser")).thenReturn(query)
+    `when`(query.get()).thenReturn(Tasks.forResult(querySnapshot))
+
+    val user = userRepository.getUserByUserName("InvalidUser")
+
     assertNull(user)
   }
 
@@ -519,7 +561,7 @@ class UserRepositoryFirestoreTest {
   fun `documentToUser with valid document returns User`() {
     // Mock the DocumentSnapshot
     whenever(document.id).thenReturn("user123")
-    whenever(document.getString("name")).thenReturn("John Doe")
+    whenever(document.getString("username")).thenReturn("John Doe")
     whenever(document.getString("email")).thenReturn("john@example.com")
     whenever(document.getLong("score")).thenReturn(100L)
     whenever(document.get("friends")).thenReturn(listOf("friend1", "friend2"))
@@ -539,7 +581,7 @@ class UserRepositoryFirestoreTest {
   @Test
   fun `documentToUser with missing name returns null`() {
     whenever(document.id).thenReturn("user123")
-    whenever(document.getString("name")).thenReturn(null) // Missing name
+    whenever(document.getString("username")).thenReturn(null) // Missing name
     whenever(document.getString("email")).thenReturn("john@example.com")
     whenever(document.getLong("score")).thenReturn(100L)
     whenever(document.get("friends")).thenReturn(listOf("friend1", "friend2"))
@@ -552,7 +594,7 @@ class UserRepositoryFirestoreTest {
   @Test
   fun `documentToUser with missing email returns null`() {
     whenever(document.id).thenReturn("user123")
-    whenever(document.getString("name")).thenReturn("John Doe")
+    whenever(document.getString("username")).thenReturn("John Doe")
     whenever(document.getString("email")).thenReturn(null) // Missing email
     whenever(document.getLong("score")).thenReturn(100L)
     whenever(document.get("friends")).thenReturn(listOf("friend1", "friend2"))
@@ -565,7 +607,7 @@ class UserRepositoryFirestoreTest {
   @Test
   fun `documentToUser with missing score sets score to zero`() {
     whenever(document.id).thenReturn("user123")
-    whenever(document.getString("name")).thenReturn("John Doe")
+    whenever(document.getString("username")).thenReturn("John Doe")
     whenever(document.getString("email")).thenReturn("john@example.com")
     whenever(document.getLong("score")).thenReturn(null) // Missing score
     whenever(document.get("friends")).thenReturn(listOf("friend1", "friend2"))
@@ -579,7 +621,7 @@ class UserRepositoryFirestoreTest {
   @Test
   fun `documentToUser with missing friends sets empty friends list`() {
     whenever(document.id).thenReturn("user123")
-    whenever(document.getString("name")).thenReturn("John Doe")
+    whenever(document.getString("username")).thenReturn("John Doe")
     whenever(document.getString("email")).thenReturn("john@example.com")
     whenever(document.getLong("score")).thenReturn(100L)
     whenever(document.get("friends")).thenReturn(null) // Missing friends
@@ -593,7 +635,7 @@ class UserRepositoryFirestoreTest {
   @Test
   fun `documentToUser with friends of incorrect type sets empty friends list`() {
     whenever(document.id).thenReturn("user123")
-    whenever(document.getString("name")).thenReturn("John Doe")
+    whenever(document.getString("username")).thenReturn("John Doe")
     whenever(document.getString("email")).thenReturn("john@example.com")
     whenever(document.getLong("score")).thenReturn(100L)
     whenever(document.get("friends")).thenReturn("not a list") // Incorrect type
@@ -607,7 +649,7 @@ class UserRepositoryFirestoreTest {
   @Test
   fun `documentToUser with exception when getting friends sets empty friends list`() {
     whenever(document.id).thenReturn("user123")
-    whenever(document.getString("name")).thenReturn("John Doe")
+    whenever(document.getString("username")).thenReturn("John Doe")
     whenever(document.getString("email")).thenReturn("john@example.com")
     whenever(document.getLong("score")).thenReturn(100L)
     // Simulate exception when accessing 'friends' field
@@ -623,7 +665,7 @@ class UserRepositoryFirestoreTest {
   fun `documentToUser with exception when getting fields returns null`() {
     whenever(document.id).thenReturn("user123")
     // Simulate exception when accessing 'name' field
-    whenever(document.getString("name")).thenThrow(RuntimeException("Test exception"))
+    whenever(document.getString("username")).thenThrow(RuntimeException("Test exception"))
 
     val user = userRepository.documentToUser(document)
 

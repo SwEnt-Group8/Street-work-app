@@ -44,6 +44,15 @@ class UserViewModelTest {
   }
 
   @Test
+  fun getUserByUserName_calls_repository_with_correct_username() = runTest {
+    val userName = "John Doe"
+    val user = User("user123", userName, "john@example.com", 0, emptyList())
+    whenever(repository.getUserByUserName(userName)).thenReturn(user)
+    userViewModel.getUserByUserName(userName)
+    verify(repository).getUserByUserName(userName)
+  }
+
+  @Test
   fun getFriendsByUid_calls_repository_with_correct_uid() = runTest {
     val uid = "user123"
     val friends =
