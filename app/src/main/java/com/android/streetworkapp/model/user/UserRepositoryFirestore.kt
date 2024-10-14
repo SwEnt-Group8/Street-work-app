@@ -246,10 +246,16 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
       val username = document.getString("username") ?: return null
       val email = document.getString("email") ?: return null
       val score = document.getLong("score")?.toInt() ?: 0
+      // Safely handle the 'friends' field
+      val friends =
+          try {
+            document.get("friends") as? List<*> ?: emptyList<String>()
+          } catch (e: Exception) {
+            Log.e("FirestoreError", "Error retrieving friends list", e)
+            emptyList<String>() // Return an empty list in case of an exception
+          }
 
-      val friends = document.get("friends") as? List<*> ?: emptyList<String>()
       val validFriends = friends.filterIsInstance<String>()
-
       User(uid = uid, username = username, email = email, score = score, friends = validFriends)
     } catch (e: Exception) {
       Log.e("FirestoreError", "Error converting document to User", e)

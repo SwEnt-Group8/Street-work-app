@@ -1,6 +1,12 @@
 package com.android.streetworkapp.model.user
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -10,11 +16,20 @@ class UserViewModelTest {
 
   private lateinit var repository: UserRepository
   private lateinit var userViewModel: UserViewModel
+  private val testDispatcher = StandardTestDispatcher()
 
+  @OptIn(ExperimentalCoroutinesApi::class)
   @Before
   fun setUp() {
+    Dispatchers.setMain(testDispatcher)
     repository = mock()
     userViewModel = UserViewModel(repository)
+  }
+
+  @OptIn(ExperimentalCoroutinesApi::class)
+  @After
+  fun tearDown() {
+    Dispatchers.resetMain() // Reset the Main dispatcher after the test
   }
 
   @Test
@@ -31,6 +46,7 @@ class UserViewModelTest {
     val user = User(uid, "John Doe", "john@example.com", 100, emptyList())
     whenever(repository.getUserByUid(uid)).thenReturn(user)
     userViewModel.getUserById(uid)
+    testDispatcher.scheduler.advanceUntilIdle()
     verify(repository).getUserByUid(uid)
   }
 
@@ -40,6 +56,7 @@ class UserViewModelTest {
     val user = User("user123", "John Doe", email, 100, emptyList())
     whenever(repository.getUserByEmail(email)).thenReturn(user)
     userViewModel.getUserByEmail(email)
+    testDispatcher.scheduler.advanceUntilIdle()
     verify(repository).getUserByEmail(email)
   }
 
@@ -49,6 +66,7 @@ class UserViewModelTest {
     val user = User("user123", userName, "john@example.com", 0, emptyList())
     whenever(repository.getUserByUserName(userName)).thenReturn(user)
     userViewModel.getUserByUserName(userName)
+    testDispatcher.scheduler.advanceUntilIdle()
     verify(repository).getUserByUserName(userName)
   }
 
@@ -61,6 +79,7 @@ class UserViewModelTest {
             User("friend2", "Friend Two", "friend2@example.com", 60, emptyList()))
     whenever(repository.getFriendsByUid(uid)).thenReturn(friends)
     userViewModel.getFriendsByUid(uid)
+    testDispatcher.scheduler.advanceUntilIdle()
     verify(repository).getFriendsByUid(uid)
   }
 
@@ -68,6 +87,7 @@ class UserViewModelTest {
   fun addUser_calls_repository_with_correct_user() = runTest {
     val user = User("user123", "John Doe", "john@example.com", 100, emptyList())
     userViewModel.addUser(user)
+    testDispatcher.scheduler.advanceUntilIdle()
     verify(repository).addUser(user)
   }
 
@@ -77,8 +97,10 @@ class UserViewModelTest {
     val newScore = 200
     val incrScore = 50
     userViewModel.updateUserScore(uid, newScore)
+    testDispatcher.scheduler.advanceUntilIdle()
     verify(repository).updateUserScore(uid, newScore)
     userViewModel.increaseUserScore(uid, incrScore)
+    testDispatcher.scheduler.advanceUntilIdle()
     verify(repository).increaseUserScore(uid, incrScore)
   }
 
@@ -87,6 +109,7 @@ class UserViewModelTest {
     val uid = "user123"
     val friendUid = "friend123"
     userViewModel.addFriend(uid, friendUid)
+    testDispatcher.scheduler.advanceUntilIdle()
     verify(repository).addFriend(uid, friendUid)
   }
 
@@ -95,6 +118,7 @@ class UserViewModelTest {
     val uid = "user123"
     val friendUid = "friend123"
     userViewModel.removeFriend(uid, friendUid)
+    testDispatcher.scheduler.advanceUntilIdle()
     verify(repository).removeFriend(uid, friendUid)
   }
 
@@ -102,6 +126,7 @@ class UserViewModelTest {
   fun deleteUserByUid_calls_repository_with_correct_id() = runTest {
     val uid = "user123"
     userViewModel.deleteUserByUid(uid)
+    testDispatcher.scheduler.advanceUntilIdle()
     verify(repository).deleteUserByUid(uid)
   }
 }
