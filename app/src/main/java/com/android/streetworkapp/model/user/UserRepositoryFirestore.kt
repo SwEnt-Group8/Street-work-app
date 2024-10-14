@@ -243,7 +243,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
   internal fun documentToUser(document: DocumentSnapshot): User? {
     return try {
       val uid = document.id
-      val name = document.getString("name") ?: return null
+      val username = document.getString("username") ?: return null
       val email = document.getString("email") ?: return null
       val score = document.getLong("score")?.toInt() ?: 0
 
@@ -255,7 +255,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
             emptyList()
           }
 
-      User(uid = uid, username = name, email = email, score = score, friends = friends)
+      User(uid = uid, username = username, email = email, score = score, friends = friends)
     } catch (e: Exception) {
       Log.e("FirestoreError", "Error converting document to User", e)
       null
