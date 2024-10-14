@@ -97,7 +97,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     return try {
       // Get the user's document first to retrieve the list of friend UIDs
       val document = db.collection(COLLECTION_PATH).document(uid).get().await()
-      val friendIds = document.get("friends") as? List<*> ?: emptyList<String>()
+      val friendIds = document["friends"] as? List<*> ?: emptyList<String>()
 
       if (friendIds.isNotEmpty()) {
         // Now fetch all the friends' user documents
@@ -249,7 +249,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
       // Safely handle the 'friends' field
       val friends =
           try {
-            document.get("friends") as? List<*> ?: emptyList<String>()
+            document["friends"] as? List<*> ?: emptyList<String>()
           } catch (e: Exception) {
             Log.e("FirestoreError", "Error retrieving friends list", e)
             emptyList<String>() // Return an empty list in case of an exception
