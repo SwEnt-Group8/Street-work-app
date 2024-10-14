@@ -55,9 +55,7 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @param uid The unique ID of the user to retrieve.
    * @return The User object if found, or null if the user doesn't exist or an error occurs.
    */
-  fun getUserById(uid: String) = viewModelScope.launch {
-    repository.getUserByUid(uid)
-  }
+  fun getUserById(uid: String) = viewModelScope.launch { repository.getUserByUid(uid) }
 
   /**
    * Retrieves a user from Firestore based on the provided email.
@@ -65,9 +63,7 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @param email The email of the user to retrieve.
    * @return The User object if found, or null if the user doesn't exist or an error occurs.
    */
-  fun getUserByEmail(email: String) = viewModelScope.launch {
-    repository.getUserByEmail(email)
-  }
+  fun getUserByEmail(email: String) = viewModelScope.launch { repository.getUserByEmail(email) }
 
   /**
    * Retrieves a user from Firestore based on the provided username.
@@ -75,9 +71,8 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @param userName The username of the user to retrieve.
    * @return The User object if found, or null if the user doesn't exist or an error occurs.
    */
-  fun getUserByUserName(userName: String) = viewModelScope.launch {
-    repository.getUserByUserName(userName)
-  }
+  fun getUserByUserName(userName: String) =
+      viewModelScope.launch { repository.getUserByUserName(userName) }
 
   /**
    * Retrieves a list of friends for a user based on the provided ID.
@@ -85,18 +80,14 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @param uid The unique ID of the user to retrieve friends for.
    * @return A list of User objects representing the user's friends.
    */
-  fun getFriendsByUid(uid: String) = viewModelScope.launch {
-    repository.getFriendsByUid(uid)
-  }
+  fun getFriendsByUid(uid: String) = viewModelScope.launch { repository.getFriendsByUid(uid) }
 
   /**
    * Adds a new user to Firestore.
    *
    * @param user The User object to add to Firestore.
    */
-  fun addUser(user: User) = viewModelScope.launch {
-    repository.addUser(user)
-  }
+  fun addUser(user: User) = viewModelScope.launch { repository.addUser(user) }
 
   /**
    * Updates the user's score in Firestore.
@@ -104,9 +95,8 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @param uid The unique ID of the user whose score is being updated.
    * @param newScore The new score to set for the user.
    */
-  fun updateUserScore(uid: String, newScore: Int) = viewModelScope.launch {
-    repository.updateUserScore(uid, newScore)
-  }
+  fun updateUserScore(uid: String, newScore: Int) =
+      viewModelScope.launch { repository.updateUserScore(uid, newScore) }
 
   /**
    * Increases the user's score in Firestore by the specified number of points.
@@ -114,9 +104,8 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @param uid The unique ID of the user whose score is being increased.
    * @param points The number of points to add to the user's score.
    */
-  fun increaseUserScore(uid: String, points: Int) = viewModelScope.launch {
-    repository.increaseUserScore(uid, points)
-  }
+  fun increaseUserScore(uid: String, points: Int) =
+      viewModelScope.launch { repository.increaseUserScore(uid, points) }
 
   /**
    * Adds a friend to both the user's and friend's friend lists in Firestore.
@@ -124,9 +113,8 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @param uid The unique ID of the user.
    * @param friendUid The ID of the friend to add to the user's friend list.
    */
-  fun addFriend(uid: String, friendUid: String) = viewModelScope.launch {
-    repository.addFriend(uid, friendUid)
-  }
+  fun addFriend(uid: String, friendUid: String) =
+      viewModelScope.launch { repository.addFriend(uid, friendUid) }
 
   /**
    * Removes a friend from the user's friend list in Firestore.
@@ -134,16 +122,13 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @param uid The unique ID of the user.
    * @param friendUid The ID of the friend to remove from the user's friend list.
    */
-  fun removeFriend(uid: String, friendUid: String) = viewModelScope.launch {
-    repository.removeFriend(uid, friendUid)
-  }
+  fun removeFriend(uid: String, friendUid: String) =
+      viewModelScope.launch { repository.removeFriend(uid, friendUid) }
 
   /**
    * Deletes a user from Firestore based on the provided ID.
    *
    * @param uid The unique ID of the user to delete.
    */
-  fun deleteUserById(uid: String) = viewModelScope.launch {
-    repository.deleteUserByUid(uid)
-  }
+  fun deleteUserById(uid: String) = viewModelScope.launch { repository.deleteUserByUid(uid) }
 }
