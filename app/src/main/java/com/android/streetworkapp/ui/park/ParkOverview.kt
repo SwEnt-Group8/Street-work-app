@@ -17,16 +17,23 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,6 +50,7 @@ import com.android.sample.R
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventList
 import com.android.streetworkapp.model.park.Park
+import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.utils.toFormattedString
 
 /**
@@ -50,27 +58,43 @@ import com.android.streetworkapp.utils.toFormattedString
  *
  * @param park The park data to display.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ParkOverviewScreen(park: Park) {
-  Box(modifier = Modifier.fillMaxSize().testTag("parkOverviewScreen")) {
-    Column {
-      ImageTitle(image = park.image, title = park.name)
-      ParkDetails(park = park)
-      EventItemList(eventList = park.events)
+fun ParkOverviewScreen(navigationActions: NavigationActions, park: Park) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface),
+                navigationIcon = {
+                    IconButton(
+                        onClick = { navigationActions.goBack() },
+                        modifier = Modifier.testTag("goBackButton")) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Arrow Back Icon")
+                    }
+                })
+        }) { innerPadding ->
+        Box(modifier = Modifier.padding(innerPadding).fillMaxSize().testTag("parkOverviewScreen")) {
+            Column {
+                ImageTitle(image = park.image, title = park.name)
+                ParkDetails(park = park)
+                EventItemList(eventList = park.events)
+            }
+            FloatingActionButton(
+                onClick = {
+                    Log.d("ParkOverviewScreen", "Create event button clicked") // TODO: Handle button click
+                },
+                modifier =
+                Modifier.align(Alignment.BottomCenter)
+                    .padding(40.dp)
+                    .size(width = 150.dp, height = 40.dp)
+                    .testTag("createEventButton"),
+            ) {
+                Text("Create an event")
+            }
+        }
     }
-    FloatingActionButton(
-        onClick = {
-          Log.d("ParkOverviewScreen", "Create event button clicked") // TODO: Handle button click
-        },
-        modifier =
-            Modifier.align(Alignment.BottomCenter)
-                .padding(40.dp)
-                .size(width = 150.dp, height = 40.dp)
-                .testTag("createEventButton"),
-    ) {
-      Text("Create an event")
-    }
-  }
 }
 
 /**
