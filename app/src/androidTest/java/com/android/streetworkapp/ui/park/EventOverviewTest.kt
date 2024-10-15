@@ -1,0 +1,110 @@
+package com.android.streetworkapp.ui.park
+
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
+import com.android.streetworkapp.model.event.Event
+import com.android.streetworkapp.model.event.EventList
+import com.android.streetworkapp.model.park.Park
+import com.android.streetworkapp.model.parklocation.ParkLocation
+import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.utils.toFormattedString
+import com.google.firebase.Timestamp
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.mockito.Mockito.mock
+
+class EventOverviewTest {
+  private lateinit var park: Park
+  private lateinit var navigationActions: NavigationActions
+  private lateinit var event: Event
+
+  @get:Rule val composeTestRule = createComposeRule()
+
+  @Before
+  fun setUp() {
+    navigationActions = mock(NavigationActions::class.java)
+    val eventList =
+        EventList(
+            events =
+                listOf(
+                    Event(
+                        "1",
+                        "Group workout",
+                        "A fun group workout session to train new skills! \r\n\r\n" +
+                            "Come and join the fun of training with other motivated street workers while progressing on your figures\r\n" +
+                            "We accept all levels: newcomers welcome\r\n\r\n" +
+                            "see https/street-work-app/thissitedoesnotexist for more details",
+                        5,
+                        10,
+                        Timestamp.now(),
+                        "Malick")))
+
+    event = eventList.events.first()
+
+    // Park with events
+    park =
+        Park(
+            pid = "1",
+            name = "EPFL Esplanade",
+            location = ParkLocation(46.519962, 6.633597, "park"),
+            image = null,
+            rating = 4.5f,
+            nbrRating = 102,
+            occupancy = 0.8f,
+            events = eventList)
+
+    composeTestRule.setContent { EventOverviewScreen(navigationActions, event, park) }
+  }
+
+  @Test
+  fun everythingImmutableComposableAreDisplayed() {
+
+    composeTestRule.onNodeWithTag("eventOverviewScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("EventTopBar").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("eventTitle").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("eventBottomBar").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("joinEventButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("eventContent").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("ownerIcon").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("eventOwner").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("dateIcon").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("date").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("participantsIcon").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("participants").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("locationIcon").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("location").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("googleMap").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("eventTitle").assertTextEquals("Group workout")
+    composeTestRule.onNodeWithTag("eventOwner").assertTextEquals("Organized by: ${event.owner}")
+    composeTestRule.onNodeWithTag("date").assertTextEquals(event.date.toFormattedString())
+    composeTestRule
+        .onNodeWithTag("participants")
+        .assertTextEquals("Participants: ${event.participants}/${event.maxParticipants}")
+    composeTestRule.onNodeWithTag("location").assertTextEquals("at ${park.name}")
+  }
+
+  @Test
+  fun everythingIsDisplayedInDashBoard() {
+    composeTestRule.onNodeWithTag("evenDashboard").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("dashBoard").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("dashBoardContent").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("detailsTab").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("eventDescription").assertIsDisplayed().performScrollTo()
+    composeTestRule.onNodeWithTag("eventDescription").assertTextEquals(event.description)
+    composeTestRule.onNodeWithTag("participantsList").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("participantsTab").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("participantsList").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("eventDescription").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("detailsTab").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("participantsList").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("eventDescription").assertIsDisplayed()
+  }
+}

@@ -35,8 +35,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -60,17 +58,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 private val uiState: MutableStateFlow<OverviewUiState> = MutableStateFlow(OverviewUiState.Details)
 
-/**
- *
- */
+/**  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventOverviewScreen(navigationActions: NavigationActions, event: Event, park: Park) {
 
   Scaffold(
-      modifier = Modifier.fillMaxSize(),
+      modifier = Modifier.fillMaxSize().testTag("eventOverviewScreen"),
       topBar = {
         TopAppBar(
+            modifier = Modifier.testTag("EventTopBar"),
             title = {
               Row(modifier = Modifier.fillMaxWidth()) {
                 Text(
@@ -89,17 +86,16 @@ fun EventOverviewScreen(navigationActions: NavigationActions, event: Event, park
             })
       },
       bottomBar = {
-        BottomAppBar(containerColor = Color.Transparent) {
-          Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
-            Button(
-                onClick = {},
-            ) {
-              Text("Join an event")
+        BottomAppBar(
+            containerColor = Color.Transparent, modifier = Modifier.testTag("eventBottomBar")) {
+              Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
+                Button(onClick = {}, modifier = Modifier.testTag("joinEventButton")) {
+                  Text("Join an event", modifier = Modifier.testTag("joinEventButtonText"))
+                }
+              }
             }
-          }
-        }
       }) { padding ->
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize().testTag("eventContent")) {
           Column(modifier = Modifier.padding(padding).fillMaxHeight()) {
             Row(
                 modifier = Modifier.padding(16.dp),
@@ -107,7 +103,7 @@ fun EventOverviewScreen(navigationActions: NavigationActions, event: Event, park
                   Icon(
                       Icons.Outlined.AccountCircle,
                       contentDescription = "User",
-                      modifier = Modifier.padding(horizontal = 8.dp))
+                      modifier = Modifier.padding(horizontal = 8.dp).testTag("ownerIcon"))
                   Text("Organized by: ${event.owner}", modifier = Modifier.testTag("eventOwner"))
                 }
 
@@ -117,7 +113,7 @@ fun EventOverviewScreen(navigationActions: NavigationActions, event: Event, park
                   Icon(
                       Icons.Filled.DateRange,
                       contentDescription = "Date",
-                      modifier = Modifier.padding(horizontal = 8.dp))
+                      modifier = Modifier.padding(horizontal = 8.dp).testTag("dateIcon"))
                   Text(event.date.toFormattedString(), modifier = Modifier.testTag("date"))
                 }
 
@@ -127,11 +123,10 @@ fun EventOverviewScreen(navigationActions: NavigationActions, event: Event, park
                   Icon(
                       Icons.TwoTone.Face,
                       contentDescription = "participants",
-                      modifier = Modifier.padding(horizontal = 8.dp))
+                      modifier = Modifier.padding(horizontal = 8.dp).testTag("participantsIcon"))
                   Text(
                       "Participants: ${event.participants}/${event.maxParticipants}",
-                      modifier =
-                          Modifier.testTag("participants"))
+                      modifier = Modifier.testTag("participants"))
                 }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -152,7 +147,7 @@ fun EventOverviewScreen(navigationActions: NavigationActions, event: Event, park
                   Icon(
                       Icons.Outlined.LocationOn,
                       contentDescription = "location",
-                      modifier = Modifier.padding(horizontal = 8.dp))
+                      modifier = Modifier.padding(horizontal = 8.dp).testTag("locationIcon"))
                   Text("at ${park.name}", modifier = Modifier.testTag("location"))
                 }
 
@@ -172,19 +167,24 @@ fun EventOverviewScreen(navigationActions: NavigationActions, event: Event, park
 @Composable
 fun EventDashboard(event: Event) {
   Scaffold(
-      topBar = { DashBoardBar() },
-      modifier = Modifier.height(220.dp)) { padding ->
+      topBar = { DashBoardBar() }, modifier = Modifier.height(220.dp).testTag("evenDashboard")) {
+          padding ->
         Column(
             modifier =
                 Modifier.padding(20.dp)
+                    .testTag("dashBoardContent")
                     .wrapContentHeight()
                     .heightIn(max = 220.dp) // Set the maximum height
                     .verticalScroll(rememberScrollState())) {
               when (uiState.collectAsState().value) {
                 OverviewUiState.Details ->
-                    Text(event.description, modifier = Modifier.padding(padding))
+                    Text(
+                        event.description,
+                        modifier = Modifier.padding(padding).testTag("eventDescription"))
                 OverviewUiState.Participants ->
-                    Text("show participants", modifier = Modifier.padding(padding))
+                    Text(
+                        "show participants",
+                        modifier = Modifier.padding(padding).testTag("participantsList"))
               }
             }
       }
@@ -193,7 +193,7 @@ fun EventDashboard(event: Event) {
 @Composable
 fun DashBoardBar() {
   NavigationBar(
-      modifier = Modifier.testTag("bottomNavigationMenu").fillMaxWidth().height(56.dp),
+      modifier = Modifier.testTag("dashBoard").fillMaxWidth().height(56.dp),
   ) {
     val state = uiState.collectAsState().value
 
@@ -217,7 +217,7 @@ sealed class OverviewUiState {
   data object Participants : OverviewUiState()
 }
 
-@Preview
+/**@Preview
 @Composable
 fun PreviewEventOverviewScreen() {
   val navController = rememberNavController()
@@ -230,9 +230,9 @@ fun PreviewEventOverviewScreen() {
                       "1",
                       "Group workout",
                       "A fun group workout session to train new skills! \r\n\r\n" +
-                              "Come and join the fun of training with other motivated street workers while progressing on your figures\r\n" +
-                              "We accept all levels: newcomers welcome\r\n\r\n" +
-                              "see https/street-work-app/thissitedoesnotexist for more details",
+                          "Come and join the fun of training with other motivated street workers while progressing on your figures\r\n" +
+                          "We accept all levels: newcomers welcome\r\n\r\n" +
+                          "see https/street-work-app/thissitedoesnotexist for more details",
                       5,
                       10,
                       Timestamp.now(),
@@ -249,8 +249,5 @@ fun PreviewEventOverviewScreen() {
           nbrRating = 102,
           occupancy = 0.8f,
           events = eventList)
-  EventOverviewScreen(
-      navigationActions,
-      park.events.events.first(),
-      park)
-}
+  EventOverviewScreen(navigationActions, park.events.events.first(), park)
+}*/
