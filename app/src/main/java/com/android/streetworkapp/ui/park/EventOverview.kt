@@ -38,32 +38,26 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
 import com.android.streetworkapp.model.event.Event
-import com.android.streetworkapp.model.event.EventList
 import com.android.streetworkapp.model.park.Park
-import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.utils.toFormattedString
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.firebase.Timestamp
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.flow.MutableStateFlow
 
-//Mutable dashboard state
+// Mutable dashboard state
 private val uiState: MutableStateFlow<OverviewUiState> = MutableStateFlow(OverviewUiState.Details)
 
 /**
- * This screen displays an overview of a selcted event, including description location,
- * location and number of participants.
- * A map is displayed at the bottom of the screen to show the location of the event.
- * The user can also choose to join the event.
+ * This screen displays an overview of a selcted event, including description location, location and
+ * number of participants. A map is displayed at the bottom of the screen to show the location of
+ * the event. The user can also choose to join the event.
  *
  * @param navigationActions The navigation actions.
  * @param event The event to display.
@@ -99,9 +93,12 @@ fun EventOverviewScreen(navigationActions: NavigationActions, event: Event, park
         BottomAppBar(
             containerColor = Color.Transparent, modifier = Modifier.testTag("eventBottomBar")) {
               Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
-                Button(onClick = {}, modifier = Modifier.testTag("joinEventButton"), enabled = event.participants < event.maxParticipants) {
-                  Text("Join an event", modifier = Modifier.testTag("joinEventButtonText"))
-                }
+                Button(
+                    onClick = {},
+                    modifier = Modifier.testTag("joinEventButton"),
+                    enabled = event.participants < event.maxParticipants) {
+                      Text("Join an event", modifier = Modifier.testTag("joinEventButtonText"))
+                    }
               }
             }
       }) { padding ->
@@ -206,8 +203,8 @@ fun EventDashboard(event: Event) {
 }
 
 /**
- * Navigation bar for the event dashboard,
- * letting a user switch between the details or the participants of the event
+ * Navigation bar for the event dashboard, letting a user switch between the details or the
+ * participants of the event
  */
 @Composable
 fun DashBoardBar() {
@@ -230,49 +227,26 @@ fun DashBoardBar() {
   }
 }
 
-/**
- * Represents the different states of the event dashboard
- */
+/** Represents the different states of the event dashboard */
 sealed class OverviewUiState {
   data object Details : OverviewUiState()
 
   data object Participants : OverviewUiState()
 }
+/** Note: uncomment the following code to preview the event overview screen */
+
 /**
- * Note: uncomment the following code to preview the event overview screen
+ * @Preview
+ * @Composable fun PreviewEventOverviewScreen() { val navController = rememberNavController() val
+ *   navigationActions = NavigationActions(navController) val eventList = EventList( events =
+ *   listOf( Event( "1", "Group workout", "A fun group workout session to train new skills!
+ *   \r\n\r\n" + "Come and join the fun of training with other motivated street workers while
+ *   progressing on your figures\r\n" + "We accept all levels: newcomers welcome\r\n\r\n" + "see
+ *   https/street-work-app/thissitedoesnotexist for more details", 5, 10, Timestamp.now(),
+ *   "Malick")))
+ *
+ * // Park with events val park = Park( pid = "1", name = "EPFL Esplanade", location =
+ * ParkLocation(46.519962, 6.633597, "park"), image = null, rating = 4.5f, nbrRating = 102,
+ * occupancy = 0.8f, events = eventList) EventOverviewScreen(navigationActions,
+ * park.events.events.first(), park) }
  */
-
-/**@Preview
-@Composable
-fun PreviewEventOverviewScreen() {
-  val navController = rememberNavController()
-  val navigationActions = NavigationActions(navController)
-  val eventList =
-      EventList(
-          events =
-              listOf(
-                  Event(
-                      "1",
-                      "Group workout",
-                      "A fun group workout session to train new skills! \r\n\r\n" +
-                          "Come and join the fun of training with other motivated street workers while progressing on your figures\r\n" +
-                          "We accept all levels: newcomers welcome\r\n\r\n" +
-                          "see https/street-work-app/thissitedoesnotexist for more details",
-                      5,
-                      10,
-                      Timestamp.now(),
-                      "Malick")))
-
-  // Park with events
-  val park =
-      Park(
-          pid = "1",
-          name = "EPFL Esplanade",
-          location = ParkLocation(46.519962, 6.633597, "park"),
-          image = null,
-          rating = 4.5f,
-          nbrRating = 102,
-          occupancy = 0.8f,
-          events = eventList)
-  EventOverviewScreen(navigationActions, park.events.events.first(), park)
-}*/

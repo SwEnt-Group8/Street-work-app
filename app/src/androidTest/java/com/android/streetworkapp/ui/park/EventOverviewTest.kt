@@ -1,7 +1,5 @@
 package com.android.streetworkapp.ui.park
 
-import androidx.compose.ui.test.assertHasClickAction
-import androidx.compose.ui.test.assertHasNoClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
@@ -49,8 +47,7 @@ class EventOverviewTest {
                         "Malick")))
 
     event = eventList.events.first()
-      fullevent = event.copy(participants = 10, maxParticipants = 10)
-
+    fullevent = event.copy(participants = 10, maxParticipants = 10)
 
     // Park with events
     park =
@@ -68,7 +65,7 @@ class EventOverviewTest {
   @Test
   fun everythingImmutableComposableAreDisplayed() {
 
-      composeTestRule.setContent { EventOverviewScreen(navigationActions, event, park) }
+    composeTestRule.setContent { EventOverviewScreen(navigationActions, event, park) }
 
     composeTestRule.onNodeWithTag("eventOverviewScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("EventTopBar").assertIsDisplayed()
@@ -99,7 +96,7 @@ class EventOverviewTest {
   @Test
   fun everythingIsDisplayedInDashBoard() {
 
-      composeTestRule.setContent { EventOverviewScreen(navigationActions, event, park) }
+    composeTestRule.setContent { EventOverviewScreen(navigationActions, event, park) }
 
     composeTestRule.onNodeWithTag("evenDashboard").assertIsDisplayed()
     composeTestRule.onNodeWithTag("dashBoard").assertIsDisplayed()
