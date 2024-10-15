@@ -56,9 +56,19 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.flow.MutableStateFlow
 
+//Mutable dashboard state
 private val uiState: MutableStateFlow<OverviewUiState> = MutableStateFlow(OverviewUiState.Details)
 
-/**  */
+/**
+ * This screen displays an overview of a selcted event, including description location,
+ * location and number of participants.
+ * A map is displayed at the bottom of the screen to show the location of the event.
+ * The user can also choose to join the event.
+ *
+ * @param navigationActions The navigation actions.
+ * @param event The event to display.
+ * @param park The park where the event takes place.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventOverviewScreen(navigationActions: NavigationActions, event: Event, park: Park) {
@@ -89,7 +99,7 @@ fun EventOverviewScreen(navigationActions: NavigationActions, event: Event, park
         BottomAppBar(
             containerColor = Color.Transparent, modifier = Modifier.testTag("eventBottomBar")) {
               Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
-                Button(onClick = {}, modifier = Modifier.testTag("joinEventButton")) {
+                Button(onClick = {}, modifier = Modifier.testTag("joinEventButton"), enabled = event.participants < event.maxParticipants) {
                   Text("Join an event", modifier = Modifier.testTag("joinEventButtonText"))
                 }
               }
@@ -164,6 +174,11 @@ fun EventOverviewScreen(navigationActions: NavigationActions, event: Event, park
       }
 }
 
+/**
+ * mutable EventDashboard displaying the details of an event as well as its participants.
+ *
+ * @param event The event to display
+ */
 @Composable
 fun EventDashboard(event: Event) {
   Scaffold(
@@ -190,6 +205,10 @@ fun EventDashboard(event: Event) {
       }
 }
 
+/**
+ * Navigation bar for the event dashboard,
+ * letting a user switch between the details or the participants of the event
+ */
 @Composable
 fun DashBoardBar() {
   NavigationBar(
@@ -211,11 +230,17 @@ fun DashBoardBar() {
   }
 }
 
+/**
+ * Represents the different states of the event dashboard
+ */
 sealed class OverviewUiState {
   data object Details : OverviewUiState()
 
   data object Participants : OverviewUiState()
 }
+/**
+ * Note: uncomment the following code to preview the event overview screen
+ */
 
 /**@Preview
 @Composable

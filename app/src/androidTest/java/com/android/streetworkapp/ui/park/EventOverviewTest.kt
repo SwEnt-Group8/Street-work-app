@@ -1,5 +1,7 @@
 package com.android.streetworkapp.ui.park
 
+import androidx.compose.ui.test.assertHasClickAction
+import androidx.compose.ui.test.assertHasNoClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
@@ -23,6 +25,7 @@ class EventOverviewTest {
   private lateinit var park: Park
   private lateinit var navigationActions: NavigationActions
   private lateinit var event: Event
+  private lateinit var fullevent: Event
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -46,6 +49,8 @@ class EventOverviewTest {
                         "Malick")))
 
     event = eventList.events.first()
+      fullevent = event.copy(participants = 10, maxParticipants = 10)
+
 
     // Park with events
     park =
@@ -58,12 +63,12 @@ class EventOverviewTest {
             nbrRating = 102,
             occupancy = 0.8f,
             events = eventList)
-
-    composeTestRule.setContent { EventOverviewScreen(navigationActions, event, park) }
   }
 
   @Test
   fun everythingImmutableComposableAreDisplayed() {
+
+      composeTestRule.setContent { EventOverviewScreen(navigationActions, event, park) }
 
     composeTestRule.onNodeWithTag("eventOverviewScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("EventTopBar").assertIsDisplayed()
@@ -93,6 +98,9 @@ class EventOverviewTest {
 
   @Test
   fun everythingIsDisplayedInDashBoard() {
+
+      composeTestRule.setContent { EventOverviewScreen(navigationActions, event, park) }
+
     composeTestRule.onNodeWithTag("evenDashboard").assertIsDisplayed()
     composeTestRule.onNodeWithTag("dashBoard").assertIsDisplayed()
     composeTestRule.onNodeWithTag("dashBoardContent").assertIsDisplayed()
