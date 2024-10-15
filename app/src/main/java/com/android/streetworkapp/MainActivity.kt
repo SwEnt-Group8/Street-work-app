@@ -9,16 +9,20 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
+import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
+import com.android.streetworkapp.ui.map.MapScreen
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.profile.ProfileScreen
+import okhttp3.OkHttpClient
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     Log.d("MainActivity", "Setup content")
-    setContent(parent = null) {}
+    setContent(parent = null) { StreetWorkAppMain() }
   }
 }
 
@@ -29,9 +33,13 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
 
+  val client = OkHttpClient()
+  val overpassParkLocationRepository = OverpassParkLocationRepository(client)
+  val parkLocationViewModel = ParkLocationViewModel(overpassParkLocationRepository)
+
   NavHost(
       navController = navController,
-      startDestination = Route.AUTH) { // TODO: handle start destination based on signIn logic
+      startDestination = Route.PROFILE) { // TODO: handle start destination based on signIn logic
         navigation(
             startDestination = Screen.AUTH,
             route = Route.AUTH,
@@ -43,7 +51,7 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
             startDestination = Screen.MAP,
             route = Route.MAP,
         ) {
-          composable(Screen.MAP) {}
+          composable(Screen.MAP) { MapScreen(parkLocationViewModel, navigationActions) }
         }
 
         navigation(
