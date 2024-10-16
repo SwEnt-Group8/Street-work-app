@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import com.android.streetworkapp.model.event.Event
 
 /** Display a view that is used to add a new Event to a given park. */
@@ -32,7 +33,7 @@ fun ParticipantNumberSelection(event: Event) {
       horizontalAlignment = Alignment.CenterHorizontally,
       modifier = Modifier.fillMaxWidth()) {
         Slider(
-            modifier = Modifier.fillMaxWidth(0.8f),
+            modifier = Modifier.fillMaxWidth(0.8f).testTag("sliderMaxParticipants"),
             value = sliderPosition,
             onValueChange = {
               sliderPosition = it
