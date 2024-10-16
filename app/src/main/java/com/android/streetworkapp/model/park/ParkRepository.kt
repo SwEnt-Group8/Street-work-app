@@ -21,6 +21,8 @@ interface ParkRepository {
 
   suspend fun deleteRating(pid: String, rating: Int)
 
+  suspend fun updateCapacity(pid: String, capacity: Int)
+
   suspend fun incrementOccupancy(pid: String)
 
   suspend fun decrementOccupancy(pid: String)

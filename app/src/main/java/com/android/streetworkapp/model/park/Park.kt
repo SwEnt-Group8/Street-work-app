@@ -22,6 +22,7 @@ data class Park(
     var image: Image?,
     var rating: Float,
     var nbrRating: Int,
-    var occupancy: Float,
+    var capacity: Int,
+    var occupancy: Int,
     var events: List<String>
 )
