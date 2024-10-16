@@ -12,6 +12,7 @@ import androidx.navigation.navigation
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.ui.navigation.Screen
+import com.android.streetworkapp.ui.profile.AddFriendScreen
 import com.android.streetworkapp.ui.profile.ProfileScreen
 
 class MainActivity : ComponentActivity() {
@@ -51,6 +52,11 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
             route = Route.PROFILE,
         ) {
           composable(Screen.PROFILE) { ProfileScreen(navigationActions) }
+          composable(Screen.ADD_FRIEND) { AddFriendScreen(navigationActions) }
+          // composable(Screen.OVERVIEW) { OverviewScreen(listToDosViewModel, navigationActions) }
+          // composable(Screen.ADD_TODO) {AddToDoScreen(listToDosViewModel, navigationActions,
+          // locationViewModel)}
+
         }
       }
 
