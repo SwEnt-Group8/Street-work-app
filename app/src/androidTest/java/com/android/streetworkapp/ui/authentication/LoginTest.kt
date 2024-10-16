@@ -27,7 +27,7 @@ class LoginTest : TestCase() {
   @get:Rule val intentsTestRule = IntentsTestRule(MainActivity::class.java)
 
   @Test
-  fun UIComponentsDisplayed() {
+  fun uiComponentsDisplayed() {
     // Test uses useUnmerged = true for all children of containers,
     // otherwise will not be accessible for the test using testTags.
 
