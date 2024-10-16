@@ -21,15 +21,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.streetworkapp.ui.theme.*
 import com.android.streetworkapp.utils.GoogleAuthService
@@ -66,14 +62,8 @@ fun GoogleAuthButton(
                   modifier = Modifier.testTag("loginButtonText"),
                   text = "Sign in with Google",
                   style =
-                      TextStyle(
-                          fontSize = 14.sp,
-                          lineHeight = 17.sp,
-                          fontWeight = FontWeight(500),
-                          color = Color(0xFF3C4043),
-                          textAlign = TextAlign.Center,
-                          letterSpacing = 0.25.sp,
-                      ))
+                      GoogleAuthButtonTextStyle.copy(
+                          color = DarkGray, textAlign = TextAlign.Center))
             }
       }
 }
