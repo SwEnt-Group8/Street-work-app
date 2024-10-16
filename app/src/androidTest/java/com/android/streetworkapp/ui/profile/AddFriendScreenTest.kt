@@ -1,0 +1,69 @@
+package com.android.streetworkapp.ui.profile
+
+import androidx.compose.ui.test.assertHasClickAction
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.navigation.Route
+import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
+
+@RunWith(AndroidJUnit4::class)
+class AddFriendScreenTest : TestCase() {
+  private lateinit var navigationActions: NavigationActions
+
+  @get:Rule val composeTestRule = createComposeRule()
+
+  @Before
+  fun setUp() {
+    navigationActions = mock(NavigationActions::class.java)
+    // Mock the current route to be the add profile screen
+    `when`(navigationActions.currentRoute()).thenReturn(Route.PROFILE)
+    composeTestRule.setContent { AddFriendScreen(navigationActions) }
+  }
+
+  @Test
+  fun hasRequiredComponents() {
+    composeTestRule.waitForIdle() // Wait for rendering
+
+    composeTestRule.onNodeWithTag("addFriendScreen").assertExists()
+    composeTestRule.onNodeWithTag("goBackButton").assertExists()
+    composeTestRule.onNodeWithTag("AddFriendColumn").assertExists()
+    composeTestRule.onNodeWithTag("NFCButton").assertExists()
+    composeTestRule.onNodeWithTag("inputTodoTitle").assertExists()
+    composeTestRule.onNodeWithTag("RequestButton").assertExists()
+
+    composeTestRule.onNodeWithTag("addFriendScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("AddFriendColumn").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("NFCButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("inputTodoTitle").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("RequestButton").assertIsDisplayed()
+  }
+
+  @Test
+  fun textCorrectlyDisplayed() {
+    composeTestRule.waitForIdle() // Wait for rendering
+
+    composeTestRule.onNodeWithTag("addFriendTitle").assertTextEquals("Add a new friend")
+    composeTestRule.onNodeWithTag("NFCButton").assertTextEquals("Activate NFC")
+    composeTestRule.onNodeWithTag("RequestButton").assertTextEquals("Send request")
+  }
+
+  @Test
+  fun buttonWork() {
+    composeTestRule.waitForIdle() // Wait for rendering
+
+    composeTestRule.onNodeWithTag("goBackButton").assertHasClickAction()
+    composeTestRule.onNodeWithTag("NFCButton").assertHasClickAction()
+    composeTestRule.onNodeWithTag("RequestButton").assertHasClickAction()
+  }
+}
