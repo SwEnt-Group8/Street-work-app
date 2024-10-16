@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
+import com.android.streetworkapp.ui.theme.*
 import com.android.streetworkapp.utils.GoogleAuthService
 
 @Composable
@@ -48,14 +49,10 @@ fun GoogleAuthButton(
       modifier =
           Modifier.width(250.dp)
               .height(40.dp)
-              .border(width = 1.dp, color = Color(0xFFDADCE0), shape = RoundedCornerShape(20.dp))
-              .background(color = Color(0xFFFFFFFF), shape = RoundedCornerShape(20.dp))
+              .border(width = 1.dp, color = LightGray, shape = RoundedCornerShape(20.dp))
+              .background(color = White, shape = RoundedCornerShape(20.dp))
               .testTag("loginButton"),
-      colors =
-          ButtonDefaults.buttonColors(
-              containerColor = Color.White, // Custom background color
-              contentColor = Color(0xFF3C4043) // Custom text color
-              )) {
+      colors = ButtonDefaults.buttonColors(containerColor = White, contentColor = DarkGray)) {
         Row(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
