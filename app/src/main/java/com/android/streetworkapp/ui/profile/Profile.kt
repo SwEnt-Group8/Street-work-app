@@ -24,6 +24,7 @@ import com.android.sample.R
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenu
 import com.android.streetworkapp.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.navigation.Screen
 
 @Composable
 fun ProfileScreen(navigationActions: NavigationActions) {
@@ -64,7 +65,7 @@ fun ProfileScreen(navigationActions: NavigationActions) {
               // button to add a new friend
 
               Button(
-                  onClick = {},
+                  onClick = { navigationActions.navigateTo(Screen.ADD_FRIEND) },
                   modifier = Modifier.size(220.dp, 50.dp).testTag("profileAddButton")) {
                     Text(text = "Add a new friend", fontSize = 17.sp)
                   }
