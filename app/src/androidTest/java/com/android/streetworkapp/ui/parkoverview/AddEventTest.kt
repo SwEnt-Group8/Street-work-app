@@ -1,6 +1,7 @@
 package com.android.streetworkapp.ui.parkoverview
 
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -9,6 +10,8 @@ import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.swipeRight
 import com.android.streetworkapp.model.event.Event
+import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.park.AddEventScreen
 import com.android.streetworkapp.ui.park.EventDescriptionSelection
 import com.android.streetworkapp.ui.park.EventTitleSelection
 import com.android.streetworkapp.ui.park.ParticipantNumberSelection
@@ -17,15 +20,19 @@ import com.google.firebase.Timestamp
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mockito.mock
 
 class AddEventTest {
 
   private lateinit var event: Event
+  private lateinit var navigationActions: NavigationActions
 
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
   fun setUp() {
+    navigationActions = mock(NavigationActions::class.java)
+
     event =
         Event(
             eid = "1",
@@ -79,5 +86,13 @@ class AddEventTest {
     composeTestRule.onNodeWithTag("descriptionTag").performTextInput("test")
 
     assert(eventCopy.description == "test")
+  }
+
+  @Test
+  fun addEventScreenIsDisplayed() {
+    composeTestRule.setContent { AddEventScreen(navigationActions) }
+    composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addEventButton").assertIsDisplayed()
   }
 }
