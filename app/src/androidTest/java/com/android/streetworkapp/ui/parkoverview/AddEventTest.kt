@@ -5,8 +5,12 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performGesture
+import androidx.compose.ui.test.performTextClearance
+import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.swipeRight
 import com.android.streetworkapp.model.event.Event
+import com.android.streetworkapp.ui.park.EventDescriptionSelection
+import com.android.streetworkapp.ui.park.EventTitleSelection
 import com.android.streetworkapp.ui.park.ParticipantNumberSelection
 import com.android.streetworkapp.ui.park.TimeSelection
 import com.google.firebase.Timestamp
@@ -55,5 +59,25 @@ class AddEventTest {
     composeTestRule.onNodeWithTag("timeIcon").performClick()
     composeTestRule.onNodeWithTag("validateTime").performClick()
     assert(eventCopy.date != Timestamp(0, 0))
+  }
+
+  @Test
+  fun titleSelectionUpdatesEvent() {
+    val eventCopy = event.copy()
+    composeTestRule.setContent { EventTitleSelection(eventCopy) }
+    composeTestRule.onNodeWithTag("titleTag").performTextClearance()
+    composeTestRule.onNodeWithTag("titleTag").performTextInput("test")
+
+    assert(eventCopy.title == "test")
+  }
+
+  @Test
+  fun descriptionSelectionUpdatesEvent() {
+    val eventCopy = event.copy()
+    composeTestRule.setContent { EventDescriptionSelection(eventCopy) }
+    composeTestRule.onNodeWithTag("descriptionTag").performTextClearance()
+    composeTestRule.onNodeWithTag("descriptionTag").performTextInput("test")
+
+    assert(eventCopy.description == "test")
   }
 }

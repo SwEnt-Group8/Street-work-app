@@ -61,7 +61,7 @@ fun EventTitleSelection(event: Event) {
         event.title = title
       },
       label = { Text("What kind of event do you want to create?") },
-      modifier = Modifier.fillMaxWidth().height(64.dp))
+      modifier = Modifier.testTag("titleTag").fillMaxWidth().height(64.dp))
 }
 
 @Composable
@@ -72,10 +72,10 @@ fun EventDescriptionSelection(event: Event) {
       value = description,
       onValueChange = {
         description = it
-        event.title = description
+        event.description = description
       },
       label = { Text("Describe your event:") },
-      modifier = Modifier.fillMaxWidth().height(64.dp))
+      modifier = Modifier.testTag("descriptionTag").fillMaxWidth().height(64.dp))
 }
 
 @Composable
