@@ -50,7 +50,33 @@ import java.util.concurrent.TimeUnit
 /** Display a view that is used to add a new Event to a given park. */
 @Composable fun AddEventScreen() {}
 
-@Composable fun EventTypeSelection() {}
+@Composable
+fun EventTitleSelection(event: Event) {
+  var title by remember { mutableStateOf("") }
+
+  OutlinedTextField(
+      value = title,
+      onValueChange = {
+        title = it
+        event.title = title
+      },
+      label = { Text("What kind of event do you want to create?") },
+      modifier = Modifier.fillMaxWidth().height(64.dp))
+}
+
+@Composable
+fun EventDescriptionSelection(event: Event) {
+  var description by remember { mutableStateOf("") }
+
+  OutlinedTextField(
+      value = description,
+      onValueChange = {
+        description = it
+        event.title = description
+      },
+      label = { Text("Describe your event:") },
+      modifier = Modifier.fillMaxWidth().height(64.dp))
+}
 
 @Composable
 fun ParticipantNumberSelection(event: Event) {
