@@ -1,11 +1,14 @@
 package com.android.streetworkapp.ui.parkoverview
 
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performGesture
 import androidx.compose.ui.test.swipeRight
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.ui.park.ParticipantNumberSelection
+import com.android.streetworkapp.ui.park.TimeSelection
 import com.google.firebase.Timestamp
 import org.junit.Before
 import org.junit.Rule
@@ -39,5 +42,18 @@ class AddEventTest {
     // the slider
     composeTestRule.onNodeWithTag("sliderMaxParticipants").performGesture { this.swipeRight() }
     assert(eventCopy.maxParticipants == 10)
+  }
+
+  @OptIn(ExperimentalMaterial3Api::class)
+  @Test
+  fun timeSelectionUpdatesEvent() {
+    val eventCopy = event.copy()
+    assert(eventCopy.date == Timestamp(0, 0))
+    composeTestRule.setContent { TimeSelection(eventCopy) }
+    composeTestRule.onNodeWithTag("dateIcon").performClick()
+    composeTestRule.onNodeWithTag("validateDate").performClick()
+    composeTestRule.onNodeWithTag("timeIcon").performClick()
+    composeTestRule.onNodeWithTag("validateTime").performClick()
+    assert(eventCopy.date != Timestamp(0, 0))
   }
 }

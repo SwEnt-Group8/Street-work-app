@@ -86,9 +86,9 @@ fun ParticipantNumberSelection(event: Event) {
 fun TimeSelection(event: Event) {
   var showDatePicker by remember { mutableStateOf(false) }
   var showTimePicker by remember { mutableStateOf(false) }
-  val datePickerState = rememberDatePickerState()
 
   val currentTime = Calendar.getInstance()
+  val datePickerState = rememberDatePickerState(currentTime.timeInMillis)
   val timePickerState =
       rememberTimePickerState(
           initialHour = currentTime.get(Calendar.HOUR_OF_DAY),
@@ -102,8 +102,7 @@ fun TimeSelection(event: Event) {
               TimeUnit.MINUTES.toMillis(timePickerState.minute.toLong())))
 
   val selectedDate =
-      datePickerState.selectedDateMillis?.let { convertMillisToDate(it + currentTimeSelection!!) }
-          ?: ""
+      datePickerState.selectedDateMillis?.let { convertMillisToDate(currentTimeSelection!!) } ?: ""
 
   Box(modifier = Modifier.fillMaxWidth()) {
     OutlinedTextField(
@@ -113,12 +112,16 @@ fun TimeSelection(event: Event) {
         readOnly = true,
         trailingIcon = {
           Row {
-            IconButton(onClick = { showDatePicker = !showDatePicker }) {
-              Icon(imageVector = Icons.Default.DateRange, contentDescription = "Select date")
-            }
-            IconButton(onClick = { showTimePicker = !showTimePicker }) {
-              Icon(imageVector = Icons.Default.AddCircle, contentDescription = "Select date")
-            }
+            IconButton(
+                modifier = Modifier.testTag("dateIcon"),
+                onClick = { showDatePicker = !showDatePicker }) {
+                  Icon(imageVector = Icons.Default.DateRange, contentDescription = "Select date")
+                }
+            IconButton(
+                modifier = Modifier.testTag("timeIcon"),
+                onClick = { showTimePicker = !showTimePicker }) {
+                  Icon(imageVector = Icons.Default.AddCircle, contentDescription = "Select time")
+                }
           }
         },
         modifier = Modifier.fillMaxWidth().height(64.dp))
@@ -136,13 +139,13 @@ fun TimeSelection(event: Event) {
             }
 
         Button(
-            modifier = Modifier.offset(x = 280.dp, y = 140.dp),
+            modifier = Modifier.offset(x = 280.dp, y = 140.dp).testTag("validateDate"),
             onClick = {
               showDatePicker = false
 
               event.date =
                   datePickerState.selectedDateMillis
-                      ?.let { TimeUnit.MILLISECONDS.toSeconds(it + currentTimeSelection!!) }
+                      ?.let { TimeUnit.MILLISECONDS.toSeconds(currentTimeSelection!!) }
                       ?.let { Timestamp(it, 0) }!!
             }) {
               Text("Validate")
@@ -162,12 +165,13 @@ fun TimeSelection(event: Event) {
               TimePicker(state = timePickerState, modifier = Modifier.fillMaxWidth())
 
               Button(
+                  modifier = Modifier.testTag("validateTime"),
                   onClick = {
                     showTimePicker = false
 
                     event.date =
                         datePickerState.selectedDateMillis
-                            ?.let { TimeUnit.MILLISECONDS.toSeconds(it + currentTimeSelection!!) }
+                            ?.let { TimeUnit.MILLISECONDS.toSeconds(currentTimeSelection!!) }
                             ?.let { Timestamp(it, 0) }!!
                   }) {
                     Text("Validate")
