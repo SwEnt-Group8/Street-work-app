@@ -10,20 +10,26 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
@@ -37,8 +43,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import com.android.streetworkapp.model.event.Event
+import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -47,9 +55,77 @@ import java.util.Locale
 import java.util.TimeZone
 import java.util.concurrent.TimeUnit
 
-/** Display a view that is used to add a new Event to a given park. */
-@Composable fun AddEventScreen() {}
+/**
+ * Display a view that is used to add a new Event to a given park.
+ *
+ * @param navigationActions used to navigate in the app
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AddEventScreen(
+    navigationActions: NavigationActions
+) { // TODO: add future ParkViewModel and EventViewModel
 
+  // used until we have the corresponding viewModel TODO: update with new viewModel
+  val event = Event("unknown", "unknown", "unknown", 0, 2, Timestamp(0, 0), "unknown")
+
+  Scaffold(
+      modifier = Modifier.background(MaterialTheme.colorScheme.background),
+      topBar = {
+        TopAppBar(
+            title = {},
+            colors =
+                TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background),
+            navigationIcon = {
+              IconButton(
+                  onClick = { navigationActions.goBack() },
+                  modifier = Modifier.testTag("goBackButton")) {
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Arrow Back Icon")
+                  }
+            })
+      }) { innerPadding ->
+        Box(modifier = Modifier.padding(innerPadding).fillMaxSize().testTag("addEventScreen")) {
+          Column(
+              modifier = Modifier.fillMaxWidth(),
+              verticalArrangement = Arrangement.spacedBy(18.dp),
+              horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "Event Creation",
+                    fontSize = 24.sp,
+                )
+                EventTitleSelection(event)
+                EventDescriptionSelection(event)
+                TimeSelection(event)
+                Text(
+                    text = "How many participants do you want?",
+                    fontSize = 18.sp,
+                )
+                ParticipantNumberSelection(event)
+              }
+          FloatingActionButton(
+              onClick = {
+                // TODO: use one of the future viewModel to add the event to firebase
+                navigationActions.goBack()
+              },
+              modifier =
+                  Modifier.align(Alignment.BottomCenter)
+                      .padding(40.dp)
+                      .size(width = 150.dp, height = 40.dp)
+                      .testTag("addEventButton"),
+          ) {
+            Text("Add new event")
+          }
+        }
+      }
+}
+
+/**
+ * Used to change the title of the event
+ *
+ * @param event the event that will be updated
+ */
 @Composable
 fun EventTitleSelection(event: Event) {
   var title by remember { mutableStateOf("") }
@@ -61,9 +137,14 @@ fun EventTitleSelection(event: Event) {
         event.title = title
       },
       label = { Text("What kind of event do you want to create?") },
-      modifier = Modifier.testTag("titleTag").fillMaxWidth().height(64.dp))
+      modifier = Modifier.testTag("titleTag").fillMaxWidth(0.9f).height(64.dp))
 }
 
+/**
+ * Used to change the description of the event
+ *
+ * @param event the event that will be updated
+ */
 @Composable
 fun EventDescriptionSelection(event: Event) {
   var description by remember { mutableStateOf("") }
@@ -75,9 +156,14 @@ fun EventDescriptionSelection(event: Event) {
         event.description = description
       },
       label = { Text("Describe your event:") },
-      modifier = Modifier.testTag("descriptionTag").fillMaxWidth().height(64.dp))
+      modifier = Modifier.testTag("descriptionTag").fillMaxWidth(0.9f).height(128.dp))
 }
 
+/**
+ * Used to change the maximum number of participants of the event
+ *
+ * @param event the event that will be updated
+ */
 @Composable
 fun ParticipantNumberSelection(event: Event) {
   val minParticipants = 2 // We need at least 2 users for every event
@@ -107,6 +193,11 @@ fun ParticipantNumberSelection(event: Event) {
       }
 }
 
+/**
+ * Used to change the date and the hour of the event
+ *
+ * @param event the event that will be updated
+ */
 @ExperimentalMaterial3Api
 @Composable
 fun TimeSelection(event: Event) {
@@ -130,7 +221,7 @@ fun TimeSelection(event: Event) {
   val selectedDate =
       datePickerState.selectedDateMillis?.let { convertMillisToDate(currentTimeSelection!!) } ?: ""
 
-  Box(modifier = Modifier.fillMaxWidth()) {
+  Box(modifier = Modifier.fillMaxWidth(0.9f)) {
     OutlinedTextField(
         value = selectedDate,
         onValueChange = {},
@@ -157,7 +248,6 @@ fun TimeSelection(event: Event) {
         Box(
             modifier =
                 Modifier.fillMaxWidth()
-                    .offset(y = 64.dp)
                     .shadow(elevation = 4.dp)
                     .background(MaterialTheme.colorScheme.surface)
                     .padding(16.dp)) {
@@ -185,7 +275,7 @@ fun TimeSelection(event: Event) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier =
                 Modifier.fillMaxSize()
-                    .offset(y = 68.dp)
+                    .offset(y = 10.dp)
                     .background(MaterialTheme.colorScheme.surface)
                     .align(Alignment.Center)) {
               TimePicker(state = timePickerState, modifier = Modifier.fillMaxWidth())
