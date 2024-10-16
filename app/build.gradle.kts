@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
@@ -12,6 +15,15 @@ android {
     namespace = "com.android.sample"
     compileSdk = 34
 
+    // Load the API key from local.properties
+    val localProperties = Properties()
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localProperties.load(FileInputStream(localPropertiesFile))
+    }
+
+    val mapsApiKey: String = localProperties.getProperty("MAPS_API_KEY") ?: ""
+
     defaultConfig {
         applicationId = "com.android.streetworkapp"
         minSdk = 28
@@ -23,6 +35,7 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
     buildTypes {
@@ -79,8 +92,7 @@ android {
         unitTests {
             isIncludeAndroidResources = true
             isReturnDefaultValues = true
-
-
+            animationsDisabled = true
         }
 
     }
@@ -129,7 +141,7 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.navigation.testing)
-    implementation(libs.androidx.espresso.intents)
+    implementation(libs.androidx.navigation.compose)
     testImplementation(libs.json)
     implementation(libs.okhttp)
     implementation(libs.androidx.core.ktx)
@@ -138,13 +150,20 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(platform(libs.compose.bom))
     implementation(libs.firebase.auth.ktx)
-    implementation(libs.androidx.espresso.intents)
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.inline)
     testImplementation(libs.mockito.kotlin)
+    androidTestImplementation(libs.mockito.core)
+    androidTestImplementation(libs.mockito.kotlin)
+    androidTestImplementation(libs.mockito.android)
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
+
+    // Testing Unit
+    androidTestImplementation(libs.mockk)
+    androidTestImplementation(libs.mockk.android)
+    androidTestImplementation(libs.mockk.agent)
 
 
     // ------------- Jetpack Compose ------------------
@@ -187,6 +206,7 @@ dependencies {
     implementation(libs.firebase.ui.auth)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.auth)
+
     // Testing Unit
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)

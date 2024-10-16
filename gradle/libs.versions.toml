@@ -40,10 +40,16 @@ mapsCompose = "4.3.3"
 mapsComposeUtils = "4.3.0"
 
 # Test Libraries
+mockk = "1.13.7"
+mockkAgent = "1.13.7"
+mockkAndroid = "1.13.7"
+
 mockitoCore = "3.12.4"
 mockitoVersion = "5.13.0"
 mockitoInline = "3.12.4"
 mockitoKotlin = "5.4.0"
+mockitoAndroid = "5.13.0"
+
 espressoIntents = "3.6.1"
 
 [libraries]
@@ -58,7 +64,6 @@ androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecyc
 
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 compose-material3 = { group = "androidx.compose.material3", name = "material3" }
-mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockitoVersion" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 compose-ui = { group = "androidx.compose.ui", name = "ui" }
 compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
@@ -88,9 +93,15 @@ maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = 
 maps-compose-utils = { module = "com.google.maps.android:maps-compose-utils", version.ref = "mapsComposeUtils" }
 
 # Test Libraries :
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+mockk-agent = { module = "io.mockk:mockk-agent", version.ref = "mockkAgent" }
+mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockkAndroid" }
+
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
 mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockitoInline" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin" , version.ref="mockitoKotlin"}
+mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockitoVersion" }
+
 androidx-espresso-intents = { group = "androidx.test.espresso", name = "espresso-intents", version.ref = "espressoIntents" }
 
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }

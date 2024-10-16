@@ -13,6 +13,7 @@ import com.android.streetworkapp.ui.authentication.SignInScreen
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.ui.navigation.Screen
+import com.android.streetworkapp.ui.profile.ProfileScreen
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,7 +51,7 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
             startDestination = Screen.PROFILE,
             route = Route.PROFILE,
         ) {
-          composable(Screen.PROFILE) {}
+          composable(Screen.PROFILE) { ProfileScreen(navigationActions) }
         }
       }
 
