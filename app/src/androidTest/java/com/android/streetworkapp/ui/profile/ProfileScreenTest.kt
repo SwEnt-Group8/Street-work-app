@@ -6,6 +6,7 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Route
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -27,19 +28,13 @@ class ProfileScreenTest : TestCase() {
     navigationActions = mock(NavigationActions::class.java)
     // Mock the current route to be the add profile screen
     `when`(navigationActions.currentRoute()).thenReturn(Route.PROFILE)
-    composeTestRule.setContent { ProfileScreen(navigationActions) }
+    composeTestRule.setContent { ProfileScreen(navigationActions, UserViewModel(mock())) }
   }
-
-  // Todo add tests for new components
-  // Todo add tests for friends fetching behavior
-  // Todo add tests for list visualization (if friends exits vs empty)
 
   @Test
   fun hasRequiredComponents() {
     composeTestRule.waitForIdle() // Wait for rendering
     composeTestRule.onNodeWithTag("ProfileScreen").assertExists()
-    composeTestRule.onNodeWithTag("ProfileColumn").assertExists()
-    composeTestRule.onNodeWithTag("profileScore").assertExists()
     composeTestRule.onNodeWithTag("profileAddButton").assertExists()
     composeTestRule.onNodeWithTag("profileTrainButton").assertExists()
     composeTestRule.onNodeWithTag("bottomNavigationMenu").assertExists()
@@ -51,6 +46,15 @@ class ProfileScreenTest : TestCase() {
     // composeTestRule.onNodeWithTag("profileTrainButton").assertIsDisplayed() =>
     // weirdly enough Train button dont display ?
     composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsDisplayed()
+
+    // Tests for new components
+    composeTestRule.onNodeWithTag("profileSpacer").assertExists()
+    composeTestRule.onNodeWithTag("profileRow").assertExists()
+    composeTestRule.onNodeWithTag("profilePicture").assertExists().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("profileInfoColumn").assertExists()
+    composeTestRule.onNodeWithTag("profileInfoSpacer").assertExists()
+    composeTestRule.onNodeWithTag("profileInfoSpacer2").assertExists()
+    composeTestRule.onNodeWithTag("profileInfoSpacer3").assertExists()
   }
 
   @Test
