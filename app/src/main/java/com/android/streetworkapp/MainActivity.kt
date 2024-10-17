@@ -5,10 +5,12 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.ui.navigation.Screen
@@ -29,6 +31,8 @@ class MainActivity : ComponentActivity() {
 fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
+  // initialise the user viewmodel
+  val userViewModel: UserViewModel = viewModel(factory = UserViewModel.Factory)
 
   NavHost(
       navController = navController,
@@ -51,12 +55,10 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
             startDestination = Screen.PROFILE,
             route = Route.PROFILE,
         ) {
-          composable(Screen.PROFILE) { ProfileScreen(navigationActions) }
-          composable(Screen.ADD_FRIEND) { AddFriendScreen(navigationActions) }
-          // composable(Screen.OVERVIEW) { OverviewScreen(listToDosViewModel, navigationActions) }
-          // composable(Screen.ADD_TODO) {AddToDoScreen(listToDosViewModel, navigationActions,
-          // locationViewModel)}
-
+          // profile screen + list of friend
+          composable(Screen.PROFILE) { ProfileScreen(navigationActions, userViewModel) }
+          // screen for adding friend
+          composable(Screen.ADD_FRIEND) { AddFriendScreen(navigationActions, userViewModel) }
         }
       }
 

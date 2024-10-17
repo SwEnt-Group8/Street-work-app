@@ -1,11 +1,10 @@
 package com.android.streetworkapp.ui.profile
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -26,21 +25,33 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.sample.R
+import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddFriendScreen(navigationActions: NavigationActions) {
+fun AddFriendScreen(
+    navigationActions: NavigationActions,
+    userViewModel: UserViewModel = viewModel(factory = UserViewModel.Factory)
+) {
+  // variable for outlined text
   var id by remember { mutableStateOf("") }
+  // context for Toast
+  val context = LocalContext.current
+  // fake user ID (placeholder)
+  val uid = "user123"
 
   Scaffold(
       modifier = Modifier.testTag("addFriendScreen"),
       topBar = {
+        // button to go back
         TopAppBar(
             title = { Text("Add a new friend", Modifier.testTag("addFriendTitle")) },
             navigationIcon = {
@@ -62,28 +73,42 @@ fun AddFriendScreen(navigationActions: NavigationActions) {
                   contentDescription = "profile picture",
                   modifier = Modifier.size(200.dp))
 
-              // button activate NFC (don't work)
-
+              // button to activate NFC (don't work)
               Button(onClick = {}, modifier = Modifier.size(220.dp, 50.dp).testTag("NFCButton")) {
                 Text(text = "Activate NFC", fontSize = 17.sp)
               }
 
-              // add friend ID
+              // write friend ID
               OutlinedTextField(
                   value = id,
                   onValueChange = { id = it },
                   label = { Text("Friend ID") },
                   placeholder = { Text("Add a friend with id") },
                   modifier =
-                      Modifier.width(300.dp) // make the test field smaller
-                          .testTag("inputTodoTitle"))
+                      Modifier.width(300.dp) // make the text field smaller
+                          .testTag("inputID"))
 
+              // Put the id inside the friend list of USER
               Button(
-                  onClick = {}, modifier = Modifier.size(220.dp, 50.dp).testTag("RequestButton")) {
+                  onClick = {
+                    if (id.isEmpty()) {
+                      // If id is null or empty, show a toast message to the user
+                      Toast.makeText(context, "ID cannot be empty.", Toast.LENGTH_SHORT).show()
+                    } else {
+                      // add the friend to the user firendlist
+                      userViewModel.addFriend(uid, id)
+                      Toast.makeText(context, "Friend request sent.", Toast.LENGTH_SHORT).show()
+                      /*try {
+                        userViewModel.addFriend(uid, id)
+                        Toast.makeText(context, "Friend request sent.", Toast.LENGTH_SHORT).show()
+                      } catch (e: ApiException) {
+                        Toast.makeText(context, "Invalid ID", Toast.LENGTH_SHORT).show()
+                      }*/
+                    }
+                  },
+                  modifier = Modifier.size(220.dp, 50.dp).testTag("RequestButton")) {
                     Text(text = "Send request", fontSize = 17.sp)
                   }
-
-              Spacer(modifier = Modifier.height(10.dp))
             }
       })
 }
