@@ -33,3 +33,11 @@ val Typography =
         )
         */
         )
+
+// Typography of the google authentication button
+val GoogleAuthButtonTextStyle =
+    TextStyle(
+        fontSize = 14.sp,
+        lineHeight = 17.sp,
+        fontWeight = FontWeight.Medium, // Use a predefined weight from the FontWeight class
+        letterSpacing = 0.25.sp)
