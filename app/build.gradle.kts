@@ -6,8 +6,9 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.ktfmt)
     alias(libs.plugins.sonar)
-    alias(libs.plugins.gms)
     id("jacoco")
+
+    alias(libs.plugins.gms) // Google services (auth)
 }
 
 android {
@@ -149,6 +150,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(platform(libs.compose.bom))
+    implementation(libs.firebase.auth.ktx)
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.inline)
@@ -158,6 +160,7 @@ dependencies {
     androidTestImplementation(libs.mockito.android)
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.espresso.intents)
 
     // Testing Unit
     androidTestImplementation(libs.mockk)
@@ -185,12 +188,6 @@ dependencies {
     globalTestImplementation(libs.compose.test.junit)
     debugImplementation(libs.compose.test.manifest)
 
-    // Google Service and Maps
-    implementation(libs.play.services.maps)
-    implementation(libs.maps.compose)
-    implementation(libs.maps.compose.utils)
-    implementation(libs.play.services.auth)
-
     // --------- Kaspresso test framework ----------
     globalTestImplementation(libs.kaspresso)
     globalTestImplementation(libs.kaspresso.compose)
@@ -198,12 +195,20 @@ dependencies {
     // ----------       Robolectric     ------------
     testImplementation(libs.robolectric)
 
-    // Firebase
+
+    // ----------       Google Service and Maps     ------------
+    implementation(libs.play.services.maps)
+    implementation(libs.maps.compose)
+    implementation(libs.maps.compose.utils)
+    implementation(libs.play.services.auth)
+
+    // ----------       Firebase     ------------
     implementation(libs.firebase.database.ktx)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.ui.auth)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.auth)
+
     // Testing Unit
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
