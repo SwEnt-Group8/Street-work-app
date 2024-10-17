@@ -1,6 +1,12 @@
 name: APK build
 on:
   workflow_dispatch:
+    inputs:
+      tag_name:
+        required: true
+        type: string
+        description: "Version tag for this release (e.g., v0.1.0)"
+        default: "v0.1.0"
 
 permissions:
     contents: write
@@ -57,6 +63,12 @@ jobs:
         run: |
           find app/build/outputs/apk/ -name "*.apk" -exec ls -lh {} \;
           echo "apk_path=$(find app/build/outputs/apk/ -name "*.apk")" >> $GITHUB_ENV
+
+      - name: Create Git Tag
+        id: tag
+        run: |
+          git tag ${{ inputs.tag_name }}
+          git push origin ${{ inputs.tag_name }}
 
       - name: Upload APK in artifacts
         uses: actions/upload-artifact@v4
