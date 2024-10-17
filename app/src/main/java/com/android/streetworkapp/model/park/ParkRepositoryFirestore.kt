@@ -5,13 +5,9 @@ import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
 
-class ParkRepositoryFirestore(
-    private val db: FirebaseFirestore,
-    private val storage: FirebaseStorage
-) : ParkRepository {
+class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepository {
 
   companion object {
     private const val COLLECTION_PATH = "parks"
@@ -196,6 +192,7 @@ class ParkRepositoryFirestore(
       val pid = document.id
       val name = document.getString("name") ?: ""
       val location = document.get("location") as? ParkLocation ?: ParkLocation(0.0, 0.0, "0")
+      val imageReference = document.getString("imageReference") ?: ""
       val rating = document.getDouble("rating")?.toFloat() ?: 0.0f
       val nbrRating = document.getLong("nbrRating")?.toInt() ?: 0
       val capacity = document.getLong("capacity")?.toInt() ?: 0
@@ -203,13 +200,13 @@ class ParkRepositoryFirestore(
 
       val events =
           try {
-            document["events"] as? List<*> ?: emptyList<String>()
+            (document["events"] as? List<*>)?.filterIsInstance<String>() ?: emptyList<String>()
           } catch (e: Exception) {
             Log.e("FirestoreError", "Error retrieving events list", e)
             emptyList<String>()
           }
 
-      Park(pid, name, location, "", rating, nbrRating, capacity, occupancy, emptyList<String>())
+      Park(pid, name, location, imageReference, rating, nbrRating, capacity, occupancy, events)
     } catch (e: Exception) {
       Log.e("FirestoreError", "Error converting document to park: ${e.message}")
       null
