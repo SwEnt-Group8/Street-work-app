@@ -278,13 +278,13 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
   private fun documentToPark(document: DocumentSnapshot): Park? {
     return try {
       val pid = document.id
-      val name = document.getString("name") ?: ""
-      val location = document.get("location") as? ParkLocation ?: ParkLocation(0.0, 0.0, "0")
-      val imageReference = document.getString("imageReference") ?: ""
-      val rating = document.getDouble("rating")?.toFloat() ?: 0.0f
-      val nbrRating = document.getLong("nbrRating")?.toInt() ?: 0
-      val capacity = document.getLong("capacity")?.toInt() ?: 0
-      val occupancy = document.getLong("occupancy")?.toInt() ?: 0
+      val name = document["name"] as? String ?: ""
+      val location = document["location"] as? ParkLocation ?: ParkLocation(0.0, 0.0, "0")
+      val imageReference = document["imageReference"] as? String ?: ""
+      val rating = (document["rating"] as? Double)?.toFloat() ?: 0.0f
+      val nbrRating = (document["nbrRating"] as? Long)?.toInt() ?: 0
+      val capacity = (document["capacity"] as? Long)?.toInt() ?: 0
+      val occupancy = (document["occupancy"] as? Long)?.toInt() ?: 0
 
       val events =
           try {
