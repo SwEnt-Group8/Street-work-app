@@ -52,6 +52,9 @@ jobs:
       - name: Build APK
         run: ./gradlew assembleRelease
 
+      - name: Create APK output directory
+        run: mkdir -p app/build/outputs/apk/release/
+
       - name: Generate release tag
         id: tag
         run: |
