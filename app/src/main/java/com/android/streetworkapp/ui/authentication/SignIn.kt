@@ -75,20 +75,3 @@ fun SignInScreen(navigationActions: NavigationActions) {
         }
   }
 }
-/*
-   Tried to abstract even more by moving launcher instantiation away in a function in the same file
-   but it was not possible due to user argument not being modifiable in a function,
-   even as a mutableStateOf. Potential improvement for later.
-*/
-
-/*
-@Composable
-fun instantiateAuthLauncher(authService: GoogleAuthService,
-    onAuthSuccess:() -> Unit, onAuthError:() -> Unit
-): ManagedActivityResultLauncher<Intent, ActivityResult> {
-  return authService.rememberFirebaseAuthLauncher(
-      onAuthComplete = { onAuthSuccess()
-      },
-      onAuthError = { onAuthError() })
-}
-*/
