@@ -1,5 +1,6 @@
 package com.android.streetworkapp.ui.park
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -22,23 +25,27 @@ import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.twotone.Face
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import com.android.sample.R
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.ui.navigation.NavigationActions
@@ -63,111 +70,153 @@ private val uiState: MutableStateFlow<OverviewUiState> = MutableStateFlow(Overvi
  * @param event The event to display.
  * @param park The park where the event takes place.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventOverviewScreen(navigationActions: NavigationActions, event: Event, park: Park) {
 
   Scaffold(
       modifier = Modifier.fillMaxSize().testTag("eventOverviewScreen"),
-      topBar = {
-        TopAppBar(
-            modifier = Modifier.testTag("EventTopBar"),
-            title = {
-              Row(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    modifier = Modifier.testTag("eventTitle"),
-                    text = event.title,
-                    fontWeight = FontWeight.Bold,
-                    textDecoration = TextDecoration.Underline)
-              }
-            },
-            navigationIcon = {
-              IconButton(
-                  modifier = Modifier.testTag("goBackButton"),
-                  onClick = { navigationActions.goBack() }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
-                  }
-            })
-      },
+      topBar = { EventTopBar(title = event.title, navigationActions = navigationActions) },
       bottomBar = {
-        BottomAppBar(
-            containerColor = Color.Transparent, modifier = Modifier.testTag("eventBottomBar")) {
-              Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
-                Button(
-                    onClick = {},
-                    modifier = Modifier.testTag("joinEventButton"),
-                    enabled = event.participants < event.maxParticipants) {
-                      Text("Join an event", modifier = Modifier.testTag("joinEventButtonText"))
-                    }
-              }
-            }
+        EventBottomBar(participants = event.participants, maxParticipants = event.maxParticipants)
       }) { padding ->
         Box(modifier = Modifier.fillMaxSize().testTag("eventContent")) {
           Column(modifier = Modifier.padding(padding).fillMaxHeight()) {
-            Row(
-                modifier = Modifier.padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically) {
-                  Icon(
-                      Icons.Outlined.AccountCircle,
-                      contentDescription = "User",
-                      modifier = Modifier.padding(horizontal = 8.dp).testTag("ownerIcon"))
-                  Text("Organized by: ${event.owner}", modifier = Modifier.testTag("eventOwner"))
-                }
+            Row {
+              EventDetails(event)
 
-            Row(
-                modifier = Modifier.padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically) {
-                  Icon(
-                      Icons.Filled.DateRange,
-                      contentDescription = "Date",
-                      modifier = Modifier.padding(horizontal = 8.dp).testTag("dateIcon"))
-                  Text(event.date.toFormattedString(), modifier = Modifier.testTag("date"))
-                }
+              Spacer(modifier = Modifier.width(16.dp))
 
-            Row(
-                modifier = Modifier.padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically) {
-                  Icon(
-                      Icons.TwoTone.Face,
-                      contentDescription = "participants",
-                      modifier = Modifier.padding(horizontal = 8.dp).testTag("participantsIcon"))
-                  Text(
-                      "Participants: ${event.participants}/${event.maxParticipants}",
-                      modifier = Modifier.testTag("participants"))
-                }
-
+              Column(
+                  horizontalAlignment = Alignment.CenterHorizontally,
+                  verticalArrangement = Arrangement.Center) {
+                    Image(
+                        // If no image is provided, use the default park image generated by Dall-E
+                        painter = park.image ?: painterResource(id = R.drawable.park_default),
+                        contentDescription = "Park Image",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.size(150.dp).testTag("eventImage"))
+                  }
+            }
             Spacer(modifier = Modifier.height(16.dp))
 
             EventDashboard(event)
 
-            val parkLatLng = LatLng(park.location.lat, park.location.lon)
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Create a CameraPositionState to control the camera position
-
-            val cameraPositionState = rememberCameraPositionState {
-              position = CameraPosition.Builder().target(parkLatLng).zoom(15f).build()
-            }
-
-            Row(
-                modifier = Modifier.padding(bottom = 16.dp),
-                verticalAlignment = Alignment.CenterVertically) {
-                  Icon(
-                      Icons.Outlined.LocationOn,
-                      contentDescription = "location",
-                      modifier = Modifier.padding(horizontal = 8.dp).testTag("locationIcon"))
-                  Text("at ${park.name}", modifier = Modifier.testTag("location"))
-                }
-
-            GoogleMap(
-                modifier = Modifier.testTag("googleMap").fillMaxWidth().height(300.dp),
-                cameraPositionState = cameraPositionState) {
-                  Marker(
-                      contentDescription = "Marker",
-                      state =
-                          MarkerState(position = LatLng(parkLatLng.latitude, parkLatLng.longitude)))
-                }
+            EventMap(park)
           }
         }
+      }
+}
+
+/**
+ * Top bar for the event screen, displaying the title of the event and a back button.
+ *
+ * @param title The title of the event.
+ * @param navigationActions The navigation actions.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EventTopBar(title: String, navigationActions: NavigationActions) {
+  CenterAlignedTopAppBar(
+      colors =
+          TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface),
+      modifier = Modifier.testTag("EventTopBar"),
+      title = {
+        Text(modifier = Modifier.testTag("eventTitle"), text = title, fontWeight = FontWeight.Bold)
+      },
+      navigationIcon = {
+        IconButton(
+            modifier = Modifier.testTag("goBackButton"), onClick = { navigationActions.goBack() }) {
+              Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+            }
+      })
+}
+
+/**
+ * Bottom bar for the event screen, displaying a button to join the event.
+ *
+ * @param participants The number of participants that have joined the event.
+ * @param maxParticipants The maximum number of participants allowed in the event.
+ */
+@Composable
+fun EventBottomBar(participants: Int, maxParticipants: Int) {
+  BottomAppBar(containerColor = Color.Transparent, modifier = Modifier.testTag("eventBottomBar")) {
+    Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
+      Button(
+          onClick = {},
+          modifier = Modifier.testTag("joinEventButton"),
+          enabled = participants < maxParticipants) {
+            Text("Join this event", modifier = Modifier.testTag("joinEventButtonText"))
+          }
+    }
+  }
+}
+
+/**
+ * Displays the overview of the event, including the owner, date and number of participants.
+ *
+ * @param event The event to display.
+ */
+@Composable
+fun EventDetails(event: Event) {
+  Column {
+    Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+      Icon(
+          Icons.Outlined.AccountCircle,
+          contentDescription = "User",
+          modifier = Modifier.padding(horizontal = 8.dp).testTag("ownerIcon"))
+      Text("Organized by: ${event.owner}", modifier = Modifier.testTag("eventOwner"))
+    }
+
+    Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+      Icon(
+          Icons.Filled.DateRange,
+          contentDescription = "Date",
+          modifier = Modifier.padding(horizontal = 8.dp).testTag("dateIcon"))
+      Text(event.date.toFormattedString(), modifier = Modifier.testTag("date"))
+    }
+
+    Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+      Icon(
+          Icons.TwoTone.Face,
+          contentDescription = "participants",
+          modifier = Modifier.padding(horizontal = 8.dp).testTag("participantsIcon"))
+      Text(
+          "Participants: ${event.participants}/${event.maxParticipants}",
+          modifier = Modifier.testTag("participants"))
+    }
+  }
+}
+
+/**
+ * Displays a map showing the location of the event.
+ *
+ * @param park The park where the event takes place.
+ */
+@Composable
+fun EventMap(park: Park) {
+  val parkLatLng = LatLng(park.location.lat, park.location.lon)
+
+  // Create a CameraPositionState to control the camera position
+  val cameraPositionState = rememberCameraPositionState {
+    position = CameraPosition.Builder().target(parkLatLng).zoom(15f).build()
+  }
+
+  Row(modifier = Modifier.padding(bottom = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+    Icon(
+        Icons.Outlined.LocationOn,
+        contentDescription = "location",
+        modifier = Modifier.padding(horizontal = 8.dp).testTag("locationIcon"))
+    Text("at ${park.name}", modifier = Modifier.testTag("location"))
+  }
+
+  GoogleMap(
+      modifier = Modifier.testTag("googleMap").fillMaxSize(),
+      cameraPositionState = cameraPositionState) {
+        Marker(
+            contentDescription = "Marker",
+            state = MarkerState(position = LatLng(parkLatLng.latitude, parkLatLng.longitude)))
       }
 }
 
@@ -179,8 +228,9 @@ fun EventOverviewScreen(navigationActions: NavigationActions, event: Event, park
 @Composable
 fun EventDashboard(event: Event) {
   Scaffold(
-      topBar = { DashBoardBar() }, modifier = Modifier.height(220.dp).testTag("evenDashboard")) {
-          padding ->
+      topBar = { DashBoardBar() },
+      modifier = Modifier.height(220.dp).testTag("evenDashboard"),
+      containerColor = Color(0xFFEEF0F0)) { padding ->
         Column(
             modifier =
                 Modifier.padding(20.dp)
@@ -233,20 +283,40 @@ sealed class OverviewUiState {
 
   data object Participants : OverviewUiState()
 }
-/** Note: uncomment the following code to preview the event overview screen */
 
-/**
- * @Preview
- * @Composable fun PreviewEventOverviewScreen() { val navController = rememberNavController() val
- *   navigationActions = NavigationActions(navController) val eventList = EventList( events =
- *   listOf( Event( "1", "Group workout", "A fun group workout session to train new skills!
- *   \r\n\r\n" + "Come and join the fun of training with other motivated street workers while
- *   progressing on your figures\r\n" + "We accept all levels: newcomers welcome\r\n\r\n" + "see
- *   https/street-work-app/thissitedoesnotexist for more details", 5, 10, Timestamp.now(),
- *   "Malick")))
- *
- * // Park with events val park = Park( pid = "1", name = "EPFL Esplanade", location =
- * ParkLocation(46.519962, 6.633597, "park"), image = null, rating = 4.5f, nbrRating = 102,
- * occupancy = 0.8f, events = eventList) EventOverviewScreen(navigationActions,
- * park.events.events.first(), park) }
- */
+/** Note: uncomment the following code to preview the event overview screen */
+/*@Preview
+@Composable
+fun PreviewEventOverviewScreen() {
+  val navController = rememberNavController()
+  val navigationActions = NavigationActions(navController)
+  val eventList =
+      EventList(
+          events =
+              listOf(
+                  Event(
+                      "1",
+                      "Group workout",
+                      "A fun group workout session to train new skills!\r\n\r\n" +
+                          "Come and join the fun of training with other motivated street workers while progressing on your figures\r\n" +
+                          "We accept all levels: newcomers welcome\r\n\r\n" +
+                          "see https/street-work-app/thissitedoesnotexist for more details",
+                      5,
+                      10,
+                      Timestamp.now(),
+                      "Malick")))
+
+  // Park with events
+  val park =
+      Park(
+          pid = "1",
+          name = "EPFL Esplanade",
+          location = ParkLocation(46.519962, 6.633597, "park"),
+          image = null,
+          rating = 4.5f,
+          nbrRating = 102,
+          occupancy = 0.8f,
+          events = eventList)
+
+  EventOverviewScreen(navigationActions, park.events.events.first(), park)
+}*/

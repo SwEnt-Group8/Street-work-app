@@ -23,7 +23,9 @@ class EventOverviewTest {
   private lateinit var park: Park
   private lateinit var navigationActions: NavigationActions
   private lateinit var event: Event
-  private lateinit var fullevent: Event
+
+  // cannot be tested right now
+  // private lateinit var fullevent: Event
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -47,7 +49,7 @@ class EventOverviewTest {
                         "Malick")))
 
     event = eventList.events.first()
-    fullevent = event.copy(participants = 10, maxParticipants = 10)
+    // fullevent = event.copy(participants = 10, maxParticipants = 10)
 
     // Park with events
     park =
@@ -63,7 +65,7 @@ class EventOverviewTest {
   }
 
   @Test
-  fun everythingImmutableComposableAreDisplayed() {
+  fun everyImmutableComposableAreDisplayed() {
 
     composeTestRule.setContent { EventOverviewScreen(navigationActions, event, park) }
 
@@ -83,6 +85,7 @@ class EventOverviewTest {
     composeTestRule.onNodeWithTag("locationIcon").assertIsDisplayed()
     composeTestRule.onNodeWithTag("location").assertIsDisplayed()
     composeTestRule.onNodeWithTag("googleMap").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("eventImage").assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("eventTitle").assertTextEquals("Group workout")
     composeTestRule.onNodeWithTag("eventOwner").assertTextEquals("Organized by: ${event.owner}")
