@@ -64,7 +64,9 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @param uid The unique ID of the user to retrieve.
    * @return The User object if found, or null if the user doesn't exist or an error occurs.
    */
-  fun getUserById(uid: String) = viewModelScope.launch { repository.getUserByUid(uid) }
+  suspend fun getUserByUid(uid: String): User? {
+    return repository.getUserByUid(uid)
+  }
 
   /**
    * Retrieves a user from Firestore based on the provided email.
@@ -72,7 +74,9 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @param email The email of the user to retrieve.
    * @return The User object if found, or null if the user doesn't exist or an error occurs.
    */
-  fun getUserByEmail(email: String) = viewModelScope.launch { repository.getUserByEmail(email) }
+  suspend fun getUserByEmail(email: String): User? {
+    return repository.getUserByEmail(email)
+  }
 
   /**
    * Retrieves a user from Firestore based on the provided username.
@@ -80,8 +84,7 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @param userName The username of the user to retrieve.
    * @return The User object if found, or null if the user doesn't exist or an error occurs.
    */
-  fun getUserByUserName(userName: String) =
-      viewModelScope.launch { repository.getUserByUserName(userName) }
+  suspend fun getUserByUserName(userName: String): User? { return repository.getUserByUserName(userName) }
 
   /**
    * Retrieves a list of friends for a user based on the provided ID.
@@ -89,7 +92,7 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @param uid The unique ID of the user to retrieve friends for.
    * @return A list of User objects representing the user's friends.
    */
-  fun getFriendsByUid(uid: String) = viewModelScope.launch { repository.getFriendsByUid(uid) }
+  suspend fun getFriendsByUid(uid: String): List<User>? { return repository.getFriendsByUid(uid) }
 
   /**
    * Adds a new user to Firestore.
