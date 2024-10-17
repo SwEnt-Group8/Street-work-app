@@ -45,12 +45,15 @@ jobs:
         run: |
           echo $DATA | base64 -di > secrets.properties
           echo $DATA | base64 -di > local.defaults.properties
-  
+
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
-  
-      - name: Build APK
-        run: ./gradlew assembleRelease
+
+      - name: Build APK with detailed logs
+        run: ./gradlew assembleRelease --stacktrace --info
+
+      - name: List APK files
+        run: ls -R app/build/outputs/apk/
 
       - name: Create APK output directory
         run: mkdir -p app/build/outputs/apk/release/
