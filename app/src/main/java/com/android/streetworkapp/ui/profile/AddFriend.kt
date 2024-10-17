@@ -98,12 +98,6 @@ fun AddFriendScreen(
                       // add the friend to the user firendlist
                       userViewModel.addFriend(uid, id)
                       Toast.makeText(context, "Friend request sent.", Toast.LENGTH_SHORT).show()
-                      /*try {
-                        userViewModel.addFriend(uid, id)
-                        Toast.makeText(context, "Friend request sent.", Toast.LENGTH_SHORT).show()
-                      } catch (e: ApiException) {
-                        Toast.makeText(context, "Invalid ID", Toast.LENGTH_SHORT).show()
-                      }*/
                     }
                   },
                   modifier = Modifier.size(220.dp, 50.dp).testTag("RequestButton")) {
