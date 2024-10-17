@@ -29,6 +29,7 @@ import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.utils.GoogleAuthService
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
@@ -49,13 +50,8 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
       authService.rememberFirebaseAuthLauncher(
           onAuthComplete = { result ->
             user = result.user
-            userViewModel.viewModelScope.launch {
-              val fetchedUser = userViewModel.getUserByUid(user!!.uid)
-              if (fetchedUser == null) {
-                val newuser = User(user!!.uid, user!!.displayName!!, user!!.email!!, 0, emptyList())
-                userViewModel.addUser(newuser)
-              }
-            }
+            checkAndAddUser(user, userViewModel)
+
             Log.d("SignInScreen", "Sign-in successful user : $user")
             Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
             navigationActions.navigateTo(Screen.MAP)
@@ -83,5 +79,28 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
 
           GoogleAuthButton(authService, context, launcher)
         }
+  }
+}
+
+/**
+ * Checks if the user is already in the database, and if not, adds them.
+ *
+ * @param user The user to check and add.
+ * @param userViewModel The [UserViewModel] to use for database operations.
+ */
+fun checkAndAddUser(user: FirebaseUser?, userViewModel: UserViewModel) {
+  if (user == null) return
+  userViewModel.viewModelScope.launch {
+    val fetchedUser = userViewModel.getUserByUid(user.uid)
+    if (fetchedUser == null) {
+      val newUser =
+          User(
+              uid = user.uid,
+              username = user.displayName ?: "Unknown",
+              email = user.email ?: "Unknown",
+              score = 0,
+              friends = emptyList())
+      userViewModel.addUser(newUser)
+    }
   }
 }
