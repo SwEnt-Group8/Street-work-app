@@ -29,3 +29,9 @@ data class Event(
  * @param events The list of events.
  */
 data class EventList(val events: List<Event>)
+
+/** Constant values for events. */
+object EventConstants {
+  const val MAX_NUMBER_PARTICIPANTS = 10
+  const val MIN_NUMBER_PARTICIPANTS = 2
+}

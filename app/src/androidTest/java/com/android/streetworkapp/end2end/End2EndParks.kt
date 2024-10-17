@@ -32,6 +32,7 @@ import com.android.streetworkapp.StreetWorkApp
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
+import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.Route
 import io.mockk.every
 import io.mockk.mockk
@@ -100,7 +101,8 @@ class End2EndParks {
       StreetWorkApp(
           parkLocationViewModel,
           { navigateTo(Route.MAP) },
-          { idlingResource.decrement() }) // setup so as we're already on the MAP route
+          { idlingResource.decrement() },
+          UserViewModel(mockk())) // setup so as we're already on the MAP route
     }
 
     // Testing we can click on the marker that's already placed at the center of the screen and
