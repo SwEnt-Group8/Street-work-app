@@ -139,6 +139,7 @@ fun DependencyHandlerScope.globalTestImplementation(dep: Any) {
 dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
+    implementation (libs.androidx.material.icons.extended)
     implementation(libs.androidx.navigation.testing)
     implementation(libs.androidx.navigation.compose)
     testImplementation(libs.json)
