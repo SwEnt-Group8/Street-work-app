@@ -203,7 +203,6 @@ dependencies {
     implementation(libs.firebase.ui.auth)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.auth)
-    implementation(libs.firebase.storage)
 
     // Testing Unit
     testImplementation(libs.mockito.core)
