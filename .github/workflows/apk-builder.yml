@@ -52,25 +52,17 @@ jobs:
       - name: Build APK with detailed logs
         run: ./gradlew assembleRelease --stacktrace --info
 
-      - name: List APK files
-        run: ls -R app/build/outputs/apk/
-
-      - name: Create APK output directory
-        run: mkdir -p app/build/outputs/apk/release/
-
-      - name: Generate release tag
-        id: tag
+      - name: Find and list APK files
+        id: apkpath
         run: |
-          echo "release_tag=streetworkapp_$(date +"%Y.%m.%d_%H-%M")" >> $GITHUB_OUTPUT
-      
-      - name: Rename APK
-        run: mv app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/${{ steps.tag.outputs.release_tag }}.apk
+          find app/build/outputs/apk/ -name "*.apk" -exec ls -lh {} \;
+          echo "apk_path=$(find app/build/outputs/apk/ -name "*.apk")" >> $GITHUB_ENV
 
       - name: Upload APK in artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: streetworkapp
-          path: app/build/outputs/apk/release/${{ steps.tag.outputs.release_tag }}.apk
+          name: streetworkapp-${{ inputs.tag_name }}
+          path: ${{ env.apk_path }}
           if-no-files-found: error
           retention-days: 90
 
@@ -85,7 +77,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.tag.outputs.release_tag }}
-          files: app/build/outputs/apk/release/${{ steps.tag.outputs.release_tag }}.apk
+          tag_name: ${{ inputs.tag_name }}
+          files: ${{ env.apk_path }}
           draft: false
           token: ${{ secrets.GITHUB_TOKEN }}
