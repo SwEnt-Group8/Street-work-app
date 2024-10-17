@@ -1,6 +1,7 @@
 package com.android.streetworkapp.ui.parkoverview
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -17,6 +18,7 @@ import com.android.streetworkapp.ui.park.ParkOverview
 import com.android.streetworkapp.ui.park.ParkOverviewScreen
 import com.android.streetworkapp.ui.park.RatingComponent
 import com.google.firebase.Timestamp
+import io.mockk.verify
 import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Rule
