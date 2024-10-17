@@ -81,7 +81,7 @@ fun StreetWorkApp(
       Park(
           pid = "1",
           name = "EPFL Esplanade",
-          location = "EPFL",
+          location = null,
           image = null,
           rating = 4.5f,
           nbrRating = 102,
