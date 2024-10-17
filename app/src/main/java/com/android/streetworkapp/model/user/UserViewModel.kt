@@ -84,7 +84,9 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @param userName The username of the user to retrieve.
    * @return The User object if found, or null if the user doesn't exist or an error occurs.
    */
-  suspend fun getUserByUserName(userName: String): User? { return repository.getUserByUserName(userName) }
+  suspend fun getUserByUserName(userName: String): User? {
+    return repository.getUserByUserName(userName)
+  }
 
   /**
    * Retrieves a list of friends for a user based on the provided ID.
@@ -92,7 +94,9 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @param uid The unique ID of the user to retrieve friends for.
    * @return A list of User objects representing the user's friends.
    */
-  suspend fun getFriendsByUid(uid: String): List<User>? { return repository.getFriendsByUid(uid) }
+  suspend fun getFriendsByUid(uid: String): List<User>? {
+    return repository.getFriendsByUid(uid)
+  }
 
   /**
    * Adds a new user to Firestore.
