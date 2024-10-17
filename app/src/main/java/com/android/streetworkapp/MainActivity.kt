@@ -9,11 +9,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.android.streetworkapp.model.user.UserRepositoryFirestore
+import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.authentication.SignInScreen
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.profile.ProfileScreen
+import com.google.firebase.firestore.FirebaseFirestore
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,6 +33,11 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
 
+  // Instantiate fire store database and associated user repository :
+  val firestoreDB = FirebaseFirestore.getInstance()
+  val userRepository = UserRepositoryFirestore(firestoreDB)
+  val userViewModel = UserViewModel(userRepository)
+
   NavHost(
       navController = navController,
       startDestination = Route.AUTH) { // TODO: handle start destination based on signIn logic
@@ -37,7 +45,7 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
             startDestination = Screen.AUTH,
             route = Route.AUTH,
         ) {
-          composable(Screen.AUTH) { SignInScreen(navigationActions) }
+          composable(Screen.AUTH) { SignInScreen(navigationActions, userViewModel) }
         }
 
         navigation(

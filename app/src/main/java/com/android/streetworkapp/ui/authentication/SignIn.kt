@@ -23,6 +23,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
+import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.utils.GoogleAuthService
@@ -30,11 +31,10 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
 @Composable
-fun SignInScreen(navigationActions: NavigationActions) {
+fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewModel) {
 
   // This part of the code handles google sign-in :
   var user by remember { mutableStateOf(Firebase.auth.currentUser) }
-
   val token = stringResource(R.string.default_web_client_id)
   val context = LocalContext.current
 
@@ -46,6 +46,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
       authService.rememberFirebaseAuthLauncher(
           onAuthComplete = { result ->
             user = result.user
+            // todo call setCurrentUser in the viewmodel : userViewModel
             Log.d("SignInScreen", "Sign-in successful user : $user")
             Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
             navigationActions.navigateTo(Screen.MAP)
