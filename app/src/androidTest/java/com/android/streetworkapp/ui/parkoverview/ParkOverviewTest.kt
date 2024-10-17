@@ -1,4 +1,4 @@
-package com.android.streetworkapp.ui.park
+package com.android.streetworkapp.ui.parkoverview
 
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
@@ -11,6 +11,9 @@ import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventList
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.parklocation.ParkLocation
+import com.android.streetworkapp.ui.park.OccupancyBar
+import com.android.streetworkapp.ui.park.ParkOverviewScreen
+import com.android.streetworkapp.ui.park.RatingComponent
 import com.google.firebase.Timestamp
 import org.junit.Assert.assertThrows
 import org.junit.Before

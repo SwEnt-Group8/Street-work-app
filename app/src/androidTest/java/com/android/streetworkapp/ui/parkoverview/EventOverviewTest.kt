@@ -1,4 +1,4 @@
-package com.android.streetworkapp.ui.park
+package com.android.streetworkapp.ui.parkoverview
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
@@ -12,6 +12,7 @@ import com.android.streetworkapp.model.event.EventList
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.park.EventOverviewScreen
 import com.android.streetworkapp.utils.toFormattedString
 import com.google.firebase.Timestamp
 import org.junit.Before
