@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import com.android.streetworkapp.model.event.Event
+import com.android.streetworkapp.model.event.EventConstants
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
@@ -166,9 +167,7 @@ fun EventDescriptionSelection(event: Event) {
  */
 @Composable
 fun ParticipantNumberSelection(event: Event) {
-  val minParticipants = 2 // We need at least 2 users for every event
-  val maxParticipants = 10 // An event can not have more then 10 participants
-  var sliderPosition by remember { mutableFloatStateOf(minParticipants.toFloat()) }
+  var sliderPosition by remember { mutableFloatStateOf(EventConstants.MIN_NUMBER_PARTICIPANTS.toFloat()) }
 
   Column(
       verticalArrangement = Arrangement.Center,
@@ -188,7 +187,7 @@ fun ParticipantNumberSelection(event: Event) {
                     inactiveTrackColor = MaterialTheme.colorScheme.secondaryContainer,
                 ),
             steps = 7,
-            valueRange = minParticipants.toFloat()..maxParticipants.toFloat())
+            valueRange = EventConstants.MIN_NUMBER_PARTICIPANTS.toFloat()..EventConstants.MAX_NUMBER_PARTICIPANTS.toFloat())
         Text(text = sliderPosition.toInt().toString())
       }
 }
