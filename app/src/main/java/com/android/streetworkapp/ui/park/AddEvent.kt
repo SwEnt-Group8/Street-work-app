@@ -167,7 +167,9 @@ fun EventDescriptionSelection(event: Event) {
  */
 @Composable
 fun ParticipantNumberSelection(event: Event) {
-  var sliderPosition by remember { mutableFloatStateOf(EventConstants.MIN_NUMBER_PARTICIPANTS.toFloat()) }
+  var sliderPosition by remember {
+    mutableFloatStateOf(EventConstants.MIN_NUMBER_PARTICIPANTS.toFloat())
+  }
 
   Column(
       verticalArrangement = Arrangement.Center,
@@ -187,7 +189,10 @@ fun ParticipantNumberSelection(event: Event) {
                     inactiveTrackColor = MaterialTheme.colorScheme.secondaryContainer,
                 ),
             steps = 7,
-            valueRange = EventConstants.MIN_NUMBER_PARTICIPANTS.toFloat()..EventConstants.MAX_NUMBER_PARTICIPANTS.toFloat())
+            valueRange =
+                EventConstants.MIN_NUMBER_PARTICIPANTS.toFloat()..EventConstants
+                        .MAX_NUMBER_PARTICIPANTS
+                        .toFloat())
         Text(text = sliderPosition.toInt().toString())
       }
 }
