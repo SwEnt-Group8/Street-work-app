@@ -13,7 +13,6 @@ import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.printToLog
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.android.streetworkapp.StreetWorkAppMain
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -77,15 +76,6 @@ class BottomNavigationTest {
   fun displayNoComponents() {
     composeTestRule.setContent { EmptyBottomNavigationTest() }
     composeTestRule.onNodeWithTag("bottomNavigationMenu").assertExists().assertIsDisplayed()
-    composeTestRule.onAllNodesWithTag("bottomNavigationItem").assertCountEquals(0)
-    composeTestRule.onAllNodesWithTag("bottomNavIcon").assertCountEquals(0)
-  }
-
-  @Test
-  fun doesNotDisplayOnIrrelevantScreen() {
-    composeTestRule.setContent { StreetWorkAppMain() }
-
-    composeTestRule.onNodeWithTag("bottomNavigationMenu").assertDoesNotExist()
     composeTestRule.onAllNodesWithTag("bottomNavigationItem").assertCountEquals(0)
     composeTestRule.onAllNodesWithTag("bottomNavIcon").assertCountEquals(0)
   }

@@ -15,3 +15,11 @@ val WoodCharcoal = Color(0xFF464646)
 val MistGrey = Color(0xFFC4C4BC)
 val WhiteSmoke = Color(0xFFF4F4F4)
 val ShyBeige = Color(0xFFDEDAD1)
+
+// used in event overview
+val Snowflake = Color(0xFFE0E0E0)
+
+// GoogleAuthButton Colors :
+val White = Color(0xFFFFFFFF)
+val LightGray = Color(0xFFDADCE0)
+val DarkGray = Color(0xFF3C4043)

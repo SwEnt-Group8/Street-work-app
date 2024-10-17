@@ -2,6 +2,7 @@ package com.android.streetworkapp.model.park
 
 import androidx.compose.ui.graphics.painter.Painter
 import com.android.streetworkapp.model.event.EventList
+import com.android.streetworkapp.model.parklocation.ParkLocation
 
 /**
  * Represents a park.
@@ -18,7 +19,7 @@ import com.android.streetworkapp.model.event.EventList
 data class Park(
     val pid: String,
     var name: String,
-    var location: String, // TODO: Change to ParkLocation
+    var location: ParkLocation?,
     var image: Painter?,
     var rating: Float,
     var nbrRating: Int,

@@ -18,6 +18,7 @@ object Screen {
   const val MAP = "Map Screen"
   const val PROFILE = "Profile Screen"
   const val ADD_FRIEND = "AddFriend Screen"
+  const val PARK_OVERVIEW = "Park Overview Screen"
   const val UNK = "TBD Screen" // TODO: not yet defined
 }
 
