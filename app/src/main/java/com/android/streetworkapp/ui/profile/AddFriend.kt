@@ -74,9 +74,7 @@ fun AddFriendScreen(
                   modifier = Modifier.size(200.dp))
 
               // button to activate NFC (don't work)
-              Button(onClick = {}, modifier = Modifier.size(220.dp, 50.dp).testTag("NFCButton")) {
-                Text(text = "Activate NFC", fontSize = 17.sp)
-              }
+              NfcButton()
 
               // write friend ID
               OutlinedTextField(
