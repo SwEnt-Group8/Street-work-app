@@ -1,9 +1,9 @@
 package com.android.streetworkapp.ui.authentication
 
-import com.google.firebase.auth.FirebaseUser
-import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepository
+import com.android.streetworkapp.model.user.UserViewModel
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.*
@@ -40,11 +40,12 @@ class SignInTest {
   @Test
   fun checkAndAddUser_withExistingUser_doesNotAddUser() = runTest {
     // Given a FirebaseUser
-    val firebaseUser = mock(FirebaseUser::class.java).apply {
-      `when`(uid).thenReturn("user123")
-      `when`(displayName).thenReturn("John Doe")
-      `when`(email).thenReturn("john@example.com")
-    }
+    val firebaseUser =
+        mock(FirebaseUser::class.java).apply {
+          `when`(uid).thenReturn("user123")
+          `when`(displayName).thenReturn("John Doe")
+          `when`(email).thenReturn("john@example.com")
+        }
 
     // Mock the repository to return an existing user (user already exists)
     val existingUser = User("user123", "John Doe", "john@example.com", 100, emptyList())
