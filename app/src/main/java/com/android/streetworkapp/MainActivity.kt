@@ -21,8 +21,8 @@ import com.android.streetworkapp.ui.map.MapScreen
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.ui.navigation.Screen
-import com.android.streetworkapp.ui.profile.AddFriendScreen
 import com.android.streetworkapp.ui.park.ParkOverview
+import com.android.streetworkapp.ui.profile.AddFriendScreen
 import com.android.streetworkapp.ui.profile.ProfileScreen
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
