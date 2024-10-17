@@ -9,22 +9,22 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
-import com.android.streetworkapp.model.user.UserRepositoryFirestore
-import com.android.streetworkapp.model.user.UserViewModel
-import com.android.streetworkapp.ui.authentication.SignInScreen
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventList
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
+import com.android.streetworkapp.model.user.UserRepositoryFirestore
+import com.android.streetworkapp.model.user.UserViewModel
+import com.android.streetworkapp.ui.authentication.SignInScreen
 import com.android.streetworkapp.ui.map.MapScreen
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.park.ParkOverview
 import com.android.streetworkapp.ui.profile.ProfileScreen
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FirebaseFirestore
 import okhttp3.OkHttpClient
 
 class MainActivity : ComponentActivity() {
@@ -45,20 +45,20 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
   // viewmodels
   val parkLocationViewModel = ParkLocationViewModel(overpassParkLocationRepo)
 
-    // Instantiate fire store database and associated user repository :
-    val firestoreDB = FirebaseFirestore.getInstance()
-    val userRepository = UserRepositoryFirestore(firestoreDB)
-    val userViewModel = UserViewModel(userRepository)
+  // Instantiate fire store database and associated user repository :
+  val firestoreDB = FirebaseFirestore.getInstance()
+  val userRepository = UserRepositoryFirestore(firestoreDB)
+  val userViewModel = UserViewModel(userRepository)
 
-  StreetWorkApp(parkLocationViewModel, userViewModel, testInvokation)
+  StreetWorkApp(parkLocationViewModel, testInvokation, {}, userViewModel)
 }
 
 @Composable
 fun StreetWorkApp(
     parkLocationViewModel: ParkLocationViewModel,
-    userViewModel : UserViewModel,
     navTestInvokation: NavigationActions.() -> Unit = {},
-    mapCallbackOnMapLoaded: () -> Unit = {}
+    mapCallbackOnMapLoaded: () -> Unit = {},
+    userViewModel: UserViewModel,
 ) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
