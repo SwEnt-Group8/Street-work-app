@@ -23,7 +23,7 @@ jobs:
       # Load the google-services.json file from the secrets
       - name: Load Google Service file
         env:
-          DATA: ${{ secrets.GOOGLE_SERVICES_JSON }}
+          DATA: ${{ secrets.GOOGLE_SERVICES }}
         run: echo $DATA | base64 -di > app/google-services.json
 
       # Load the keystore file from the secrets
@@ -70,13 +70,8 @@ jobs:
 
       - name: Load Google Maps API Key
         env:
-          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
+          MAPS_API_KEY: ${{ secrets.LOCAL_PROPERTIES }}
         run: echo "MAPS_API_KEY=${MAPS_API_KEY}" >> local.defaults.properties
-
-      - name: Load Firebase API Key
-        env:
-          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
-        run: echo "FIREBASE_API_KEY=${FIREBASE_API_KEY}" >> local.defaults.properties
 
       - name: Release APK
         uses: softprops/action-gh-release@v2
