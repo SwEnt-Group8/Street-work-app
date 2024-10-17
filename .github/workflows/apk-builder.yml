@@ -68,10 +68,11 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
-      - name: Load Google Maps API Key
+      - name: Load and Decode Google Maps API Key
         env:
-          MAPS_API_KEY: ${{ secrets.LOCAL_PROPERTIES }}
-        run: echo "MAPS_API_KEY=${MAPS_API_KEY}" >> local.defaults.properties
+          DATA: ${{ secrets.LOCAL_PROPERTIES }}
+        run: |
+          echo $DATA | base64 -di | grep "MAPS_API_KEY" >> local.defaults.properties
 
       - name: Release APK
         uses: softprops/action-gh-release@v2
