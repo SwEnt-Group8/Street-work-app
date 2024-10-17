@@ -9,8 +9,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
-import com.android.streetworkapp.model.event.Event
-import com.android.streetworkapp.model.event.EventList
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocation
@@ -24,7 +22,6 @@ import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.park.ParkOverview
 import com.android.streetworkapp.ui.profile.ProfileScreen
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import okhttp3.OkHttpClient
 
@@ -64,20 +61,7 @@ fun StreetWorkApp(
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
 
-  val eventList =
-      EventList(
-          events =
-              listOf(
-                  Event(
-                      eid = "1",
-                      title = "Group workout",
-                      description = "A fun group workout session to train new skills",
-                      participants = 3,
-                      maxParticipants = 5,
-                      date = Timestamp(0, 0), // 01/01/1970 00:00
-                      owner = "user123")))
-
-  // Park with events
+  // Park with no events
   val testPark =
       Park(
           pid = "123",
