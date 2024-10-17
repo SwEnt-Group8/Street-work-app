@@ -196,7 +196,7 @@ fun EventDetails(event: Event) {
  */
 @Composable
 fun EventMap(park: Park) {
-  val parkLatLng = LatLng(park.location.lat, park.location.lon)
+  val parkLatLng = LatLng(park.location!!.lat, park.location!!.lon)
 
   // Create a CameraPositionState to control the camera position
   val cameraPositionState = rememberCameraPositionState {

@@ -19,7 +19,7 @@ import com.android.streetworkapp.model.parklocation.ParkLocation
 data class Park(
     val pid: String,
     var name: String,
-    var location: ParkLocation,
+    var location: ParkLocation?,
     var image: Painter?,
     var rating: Float,
     var nbrRating: Int,
