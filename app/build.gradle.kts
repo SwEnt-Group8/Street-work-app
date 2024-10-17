@@ -159,6 +159,7 @@ dependencies {
     androidTestImplementation(libs.mockito.android)
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.espresso.intents)
 
     // Testing Unit
     androidTestImplementation(libs.mockk)
