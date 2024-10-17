@@ -55,14 +55,15 @@ class EventOverviewTest {
     // Park with events
     park =
         Park(
-            pid = "1",
-            name = "EPFL Esplanade",
-            location = ParkLocation(46.519962, 6.633597, "park"),
-            image = null,
-            rating = 4.5f,
-            nbrRating = 102,
-            occupancy = 0.8f,
-            events = eventList)
+            pid = "123",
+            name = "Sample Park",
+            location = ParkLocation(0.0, 0.0, "321"),
+            imageReference = "parks/sample.png",
+            rating = 4.0f,
+            nbrRating = 2,
+            capacity = 10,
+            occupancy = 5,
+            events = emptyList())
   }
 
   @Test

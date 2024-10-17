@@ -1,7 +1,5 @@
 package com.android.streetworkapp.model.park
 
-import androidx.compose.ui.graphics.painter.Painter
-import com.android.streetworkapp.model.event.EventList
 import com.android.streetworkapp.model.parklocation.ParkLocation
 
 /**
@@ -19,10 +17,11 @@ import com.android.streetworkapp.model.parklocation.ParkLocation
 data class Park(
     val pid: String,
     var name: String,
-    var location: ParkLocation?,
-    var image: Painter?,
+    var location: ParkLocation,
+    var imageReference: String,
     var rating: Float,
     var nbrRating: Int,
-    var occupancy: Float,
-    var events: EventList
+    var capacity: Int,
+    var occupancy: Int,
+    var events: List<String>
 )

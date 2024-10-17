@@ -95,9 +95,9 @@ fun ParkOverview(navigationActions: NavigationActions, park: Park) {
 fun ParkOverviewScreen(park: Park, innerPadding: PaddingValues = PaddingValues(0.dp)) {
   Box(modifier = Modifier.padding(innerPadding).fillMaxSize().testTag("parkOverviewScreen")) {
     Column {
-      ImageTitle(image = park.image, title = park.name)
+      ImageTitle(image = null, title = park.name) // TODO: Fetch image from Firestore storage
       ParkDetails(park = park)
-      EventItemList(eventList = park.events)
+      EventItemList(eventList = EventList(emptyList())) // TODO: Fetch events from Firestore
     }
     FloatingActionButton(
         onClick = {
@@ -162,7 +162,7 @@ fun ParkDetails(park: Park) {
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(start = 16.dp, top = 6.dp, bottom = 2.dp))
     RatingComponent(rating = park.rating.toInt(), park.nbrRating) // Round the rating
-    OccupancyBar(occupancy = park.occupancy)
+    OccupancyBar(occupancy = (park.occupancy.toFloat() / park.capacity.toFloat()))
   }
 }
 
