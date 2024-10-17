@@ -78,7 +78,7 @@ class ParkOverviewTest {
   }
 
   @Test
-  fun parkOverviewScreenhasRequiredComponents() {
+  fun parkOverviewScreenHasRequiredComponents() {
     composeTestRule.setContent { ParkOverviewScreen(park) }
     composeTestRule.onNodeWithTag("parkOverviewScreen").isDisplayed()
     composeTestRule.onNodeWithTag("imageTitle").isDisplayed()
