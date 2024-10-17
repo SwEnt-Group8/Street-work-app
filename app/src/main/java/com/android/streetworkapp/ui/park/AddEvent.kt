@@ -13,8 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -241,7 +241,7 @@ fun TimeSelection(event: Event) {
             IconButton(
                 modifier = Modifier.testTag("timeIcon"),
                 onClick = { showTimePicker = !showTimePicker }) {
-                  Icon(imageVector = Icons.Default.AddCircle, contentDescription = "Select time")
+                  Icon(imageVector = Icons.Outlined.AccessTime, contentDescription = "Select time")
                 }
           }
         },
