@@ -14,6 +14,8 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
     private const val COLLECTION_PATH = "parks"
   }
 
+  val PID_EMPTY = "Park ID cannot be empty."
+
   /**
    * Get a new park ID.
    *
@@ -30,7 +32,7 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
    * @return The park with the given ID, or null if the park does not exist.
    */
   override suspend fun getParkByPid(pid: String): Park? {
-    require(pid.isNotEmpty()) {}
+    require(pid.isNotEmpty()) { PID_EMPTY }
     return try {
       val document = db.collection(COLLECTION_PATH).document(pid).get().await()
       documentToPark(document)
@@ -47,7 +49,7 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
    * @return The park with the given location ID, or null if the park does not exist.
    */
   override suspend fun getParkByLocationId(locationId: String): Park? {
-    require(locationId.isNotEmpty()) {}
+    require(locationId.isNotEmpty()) { "Location ID cannot be empty." }
     return try {
       val document =
           db.collection(COLLECTION_PATH).whereEqualTo("location.id", locationId).get().await()
@@ -66,8 +68,8 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
    * @param park The park to create.
    */
   override suspend fun createPark(park: Park) {
-    require(park.pid.isNotEmpty()) {}
-    require(park.location.id.isNotEmpty()) {}
+    require(park.pid.isNotEmpty()) { PID_EMPTY }
+    require(park.location.id.isNotEmpty()) { "Location ID cannot be empty." }
     try {
       db.collection(COLLECTION_PATH).document(park.pid).set(park).await()
     } catch (e: Exception) {
@@ -82,8 +84,8 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
    * @param name The new name.
    */
   override suspend fun updateName(pid: String, name: String) {
-    require(pid.isNotEmpty()) {}
-    require(name.isNotEmpty()) {}
+    require(pid.isNotEmpty()) { PID_EMPTY }
+    require(name.isNotEmpty()) { "Name cannot be empty." }
     try {
       db.collection(COLLECTION_PATH).document(pid).update("name", name).await()
     } catch (e: Exception) {
@@ -98,8 +100,8 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
    * @param imageReference The new image reference.
    */
   override suspend fun updateImageReference(pid: String, imageReference: String) {
-    require(pid.isNotEmpty()) {}
-    require(imageReference.isNotEmpty()) {}
+    require(pid.isNotEmpty()) { PID_EMPTY }
+    require(imageReference.isNotEmpty()) { "Image reference cannot be empty." }
     try {
       db.collection(COLLECTION_PATH).document(pid).update("imageReference", imageReference).await()
     } catch (e: Exception) {
@@ -114,8 +116,8 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
    * @param rating The rating to add from 1 to 5.
    */
   override suspend fun addRating(pid: String, rating: Int) {
-    require(pid.isNotEmpty()) {}
-    require(rating in 1..5) {}
+    require(pid.isNotEmpty()) { PID_EMPTY }
+    require(rating in 1..5) { "Rating must be between 1 and 5." }
     try {
       val document = db.collection(COLLECTION_PATH).document(pid).get().await()
       val currentRating = document.getDouble("rating") ?: 0.0
@@ -140,8 +142,8 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
    * @param rating The rating to delete from 1 to 5.
    */
   override suspend fun deleteRating(pid: String, rating: Int) {
-    require(pid.isNotEmpty()) {}
-    require(rating in 1..5) {}
+    require(pid.isNotEmpty()) { PID_EMPTY }
+    require(rating in 1..5) { "Rating must be between 1 and 5." }
     try {
       val document = db.collection(COLLECTION_PATH).document(pid).get().await()
       val currentRating = document.getDouble("rating") ?: 0.0
@@ -170,8 +172,8 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
    * @param capacity The new capacity.
    */
   override suspend fun updateCapacity(pid: String, capacity: Int) {
-    require(pid.isNotEmpty()) {}
-    require(capacity > 0) {}
+    require(pid.isNotEmpty()) { PID_EMPTY }
+    require(capacity > 0) { "Capacity must be greater than 0." }
     try {
       db.collection(COLLECTION_PATH).document(pid).update("capacity", capacity).await()
     } catch (e: Exception) {
@@ -185,7 +187,7 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
    * @param pid The park ID.
    */
   override suspend fun incrementOccupancy(pid: String) {
-    require(pid.isNotEmpty()) {}
+    require(pid.isNotEmpty()) { PID_EMPTY }
     try {
       val document = db.collection(COLLECTION_PATH).document(pid).get().await()
       val currentOccupancy = document.getLong("occupancy")?.toInt() ?: 0
@@ -202,7 +204,7 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
    * @param pid The park ID.
    */
   override suspend fun decrementOccupancy(pid: String) {
-    require(pid.isNotEmpty()) {}
+    require(pid.isNotEmpty()) { PID_EMPTY }
     try {
       val document = db.collection(COLLECTION_PATH).document(pid).get().await()
       val currentOccupancy = document.getLong("occupancy")?.toInt() ?: 0
@@ -222,8 +224,8 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
    * @param eid The event ID.
    */
   override suspend fun addEventToPark(pid: String, eid: String) {
-    require(pid.isNotEmpty()) {}
-    require(eid.isNotEmpty()) {}
+    require(pid.isNotEmpty()) { PID_EMPTY }
+    require(eid.isNotEmpty()) { "Event ID cannot be empty." }
     try {
       db.collection(COLLECTION_PATH)
           .document(pid)
@@ -241,8 +243,8 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
    * @param eid The event ID.
    */
   override suspend fun deleteEventFromPark(pid: String, eid: String) {
-    require(pid.isNotEmpty()) {}
-    require(eid.isNotEmpty()) {}
+    require(pid.isNotEmpty()) { PID_EMPTY }
+    require(eid.isNotEmpty()) { "Event ID cannot be empty." }
     try {
       db.collection(COLLECTION_PATH)
           .document(pid)
@@ -259,7 +261,7 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
    * @param pid The park ID.
    */
   override suspend fun deleteParkByPid(pid: String) {
-    require(pid.isNotEmpty()) {}
+    require(pid.isNotEmpty()) { PID_EMPTY }
     try {
       db.collection(COLLECTION_PATH).document(pid).delete().await()
     } catch (e: Exception) {
