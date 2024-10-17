@@ -326,7 +326,7 @@ class ParkRepositoryFirestoreTest {
   }
 
   @Test
-  fun addEventToPark_withValidPidAndEid_addsEventToParkSuccessfully() = runTest {
+  fun addEventToParkWithValidPidAndEidAddsEventToParkSuccessfully() = runTest {
     val pid = "123"
     val eid = "event1"
     val currentEvents = listOf("event2", "event3")
@@ -422,7 +422,7 @@ class ParkRepositoryFirestoreTest {
   }
 
   @Test
-  fun addRating_withInvalidRatingThrowsIllegalArgumentException() = runTest {
+  fun addRatingWithInvalidRatingThrowsIllegalArgumentException() = runTest {
     assertThrows(IllegalArgumentException::class.java) {
       runBlocking { parkRepository.addRating("123", 6) }
     }
