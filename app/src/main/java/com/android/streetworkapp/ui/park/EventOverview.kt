@@ -49,6 +49,7 @@ import com.android.sample.R
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.theme.snowflake
 import com.android.streetworkapp.utils.toFormattedString
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -230,7 +231,7 @@ fun EventDashboard(event: Event) {
   Scaffold(
       topBar = { DashBoardBar() },
       modifier = Modifier.height(220.dp).testTag("evenDashboard"),
-      containerColor = Color(0xFFEEF0F0)) { padding ->
+      containerColor = snowflake) { padding ->
         Column(
             modifier =
                 Modifier.padding(20.dp)
@@ -283,40 +284,3 @@ sealed class OverviewUiState {
 
   data object Participants : OverviewUiState()
 }
-
-/** Note: uncomment the following code to preview the event overview screen */
-/*@Preview
-@Composable
-fun PreviewEventOverviewScreen() {
-  val navController = rememberNavController()
-  val navigationActions = NavigationActions(navController)
-  val eventList =
-      EventList(
-          events =
-              listOf(
-                  Event(
-                      "1",
-                      "Group workout",
-                      "A fun group workout session to train new skills!\r\n\r\n" +
-                          "Come and join the fun of training with other motivated street workers while progressing on your figures\r\n" +
-                          "We accept all levels: newcomers welcome\r\n\r\n" +
-                          "see https/street-work-app/thissitedoesnotexist for more details",
-                      5,
-                      10,
-                      Timestamp.now(),
-                      "Malick")))
-
-  // Park with events
-  val park =
-      Park(
-          pid = "1",
-          name = "EPFL Esplanade",
-          location = ParkLocation(46.519962, 6.633597, "park"),
-          image = null,
-          rating = 4.5f,
-          nbrRating = 102,
-          occupancy = 0.8f,
-          events = eventList)
-
-  EventOverviewScreen(navigationActions, park.events.events.first(), park)
-}*/
