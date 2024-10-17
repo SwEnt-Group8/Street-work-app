@@ -30,6 +30,10 @@ class ProfileScreenTest : TestCase() {
     composeTestRule.setContent { ProfileScreen(navigationActions) }
   }
 
+  // Todo add tests for new components
+  // Todo add tests for friends fetching behavior
+  // Todo add tests for list visualization (if friends exits vs empty)
+
   @Test
   fun hasRequiredComponents() {
     composeTestRule.waitForIdle() // Wait for rendering
