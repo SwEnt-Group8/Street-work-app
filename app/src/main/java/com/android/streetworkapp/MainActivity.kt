@@ -13,6 +13,7 @@ import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventList
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
+import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
 import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
@@ -79,14 +80,15 @@ fun StreetWorkApp(
   // Park with events
   val testPark =
       Park(
-          pid = "1",
-          name = "EPFL Esplanade",
-          location = "EPFL",
-          image = null,
-          rating = 4.5f,
-          nbrRating = 102,
-          occupancy = 0.8f,
-          events = eventList)
+          pid = "123",
+          name = "Sample Park",
+          location = ParkLocation(0.0, 0.0, "321"),
+          imageReference = "parks/sample.png",
+          rating = 4.0f,
+          nbrRating = 2,
+          capacity = 10,
+          occupancy = 5,
+          events = emptyList())
 
   NavHost(
       navController = navController,
