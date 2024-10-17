@@ -1,7 +1,9 @@
 package com.android.streetworkapp.ui.authentication
 
-import com.android.streetworkapp.model.user.UserViewModel
 import com.google.firebase.auth.FirebaseUser
+import com.android.streetworkapp.model.user.UserViewModel
+import com.android.streetworkapp.model.user.User
+import com.android.streetworkapp.model.user.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.*
@@ -10,27 +12,24 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.`when`
+import org.mockito.Mockito.*
 import org.mockito.junit.MockitoJUnit
 import org.mockito.junit.MockitoRule
 import org.mockito.kotlin.any
-import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class SignInTest {
 
-  @get:Rule
-  val mockitoRule: MockitoRule = MockitoJUnit.rule()
+  @get:Rule val mockitoRule: MockitoRule = MockitoJUnit.rule()
 
-  @Mock
-  lateinit var userViewModel: UserViewModel
+  private lateinit var userViewModel: UserViewModel
+  @Mock lateinit var repository: UserRepository
   private val testDispatcher = StandardTestDispatcher()
 
   @Before
   fun setup() {
     Dispatchers.setMain(testDispatcher)
+    userViewModel = UserViewModel(repository)
   }
 
   @After
@@ -39,21 +38,35 @@ class SignInTest {
   }
 
   @Test
-  fun checkAndAddUser_withValidUser_addsUserIfNotExists() = runTest {
+  fun checkAndAddUser_withExistingUser_doesNotAddUser() = runTest {
     // Given a FirebaseUser
-    val firebaseUser = mock(FirebaseUser::class.java)
-    `when`(firebaseUser.uid).thenReturn("user123")
-    `when`(firebaseUser.displayName).thenReturn("John Doe")
-    `when`(firebaseUser.email).thenReturn("john@example.com")
+    val firebaseUser = mock(FirebaseUser::class.java).apply {
+      `when`(uid).thenReturn("user123")
+      `when`(displayName).thenReturn("John Doe")
+      `when`(email).thenReturn("john@example.com")
+    }
 
-    // User doesn't exist in the system
-    whenever(userViewModel.getUserByUid("user123")).thenReturn(null)
+    // Mock the repository to return an existing user (user already exists)
+    val existingUser = User("user123", "John Doe", "john@example.com", 100, emptyList())
+    `when`(repository.getUserByUid("user123")).thenReturn(existingUser)
 
     // Call the function
     checkAndAddUser(firebaseUser, userViewModel)
-    // Advance the time
+
+    // Advance the test dispatcher to execute the coroutine
     testDispatcher.scheduler.advanceUntilIdle()
-    // Verify that addUser is called
-    verify(userViewModel).addUser(any())
+
+    // Verify that addUser is not called
+    verify(repository, never()).addUser(any())
+  }
+
+  @Test
+  fun checkAndAddUser_withNullUser_doesNothing() = runTest {
+    // Call the function with a null user
+    checkAndAddUser(null, userViewModel)
+
+    // Verify that getUserByUid and addUser are not called
+    verify(repository, never()).getUserByUid(any())
+    verify(repository, never()).addUser(any())
   }
 }

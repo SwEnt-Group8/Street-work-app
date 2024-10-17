@@ -15,6 +15,14 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
   val currentUser: LiveData<User?>
     get() = _currentUser
 
+  private val _user = MutableLiveData<User?>()
+  val user: LiveData<User?>
+    get() = _user
+
+  private val _friends = MutableLiveData<List<User>?>()
+  val friends: LiveData<List<User>?>
+    get() = _friends
+
   /**
    * Sets the current user to the provided User object.
    *
@@ -64,8 +72,11 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @param uid The unique ID of the user to retrieve.
    * @return The User object if found, or null if the user doesn't exist or an error occurs.
    */
-  suspend fun getUserByUid(uid: String): User? {
-    return repository.getUserByUid(uid)
+  fun getUserByUid(uid: String) {
+    viewModelScope.launch {
+      val fetchedUser = repository.getUserByUid(uid)
+      _user.postValue(fetchedUser)
+    }
   }
 
   /**
@@ -74,8 +85,11 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @param email The email of the user to retrieve.
    * @return The User object if found, or null if the user doesn't exist or an error occurs.
    */
-  suspend fun getUserByEmail(email: String): User? {
-    return repository.getUserByEmail(email)
+  fun getUserByEmail(email: String) {
+    viewModelScope.launch {
+      val fetchedUser = repository.getUserByEmail(email)
+      _user.postValue(fetchedUser)
+    }
   }
 
   /**
@@ -84,8 +98,11 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @param userName The username of the user to retrieve.
    * @return The User object if found, or null if the user doesn't exist or an error occurs.
    */
-  suspend fun getUserByUserName(userName: String): User? {
-    return repository.getUserByUserName(userName)
+  fun getUserByUserName(userName: String) {
+    viewModelScope.launch {
+      val fetchedUser = repository.getUserByUserName(userName)
+      _user.postValue(fetchedUser)
+    }
   }
 
   /**
@@ -94,8 +111,11 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @param uid The unique ID of the user to retrieve friends for.
    * @return A list of User objects representing the user's friends.
    */
-  suspend fun getFriendsByUid(uid: String): List<User>? {
-    return repository.getFriendsByUid(uid)
+  fun getFriendsByUid(uid: String) {
+    viewModelScope.launch {
+      val fetchedFriends = repository.getFriendsByUid(uid)
+      _friends.postValue(fetchedFriends)
+    }
   }
 
   /**
