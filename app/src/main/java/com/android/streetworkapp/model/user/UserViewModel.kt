@@ -16,6 +16,15 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
     get() = _currentUser
 
   /**
+   * Sets the current user to the provided User object.
+   *
+   * @param user The User object to set as the current user.
+   */
+  fun setCurrentUser(user: User?) {
+    _currentUser.value = user
+  }
+
+  /**
    * Loads the current user from Firestore based on the provided ID.
    *
    * @param uid The unique ID of the user to load.
