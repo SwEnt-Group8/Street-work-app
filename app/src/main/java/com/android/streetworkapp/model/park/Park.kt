@@ -19,7 +19,7 @@ data class Park(
     val pid: String,
     var name: String,
     var location: ParkLocation,
-    var image: Image?,
+    var imageReference: String,
     var rating: Float,
     var nbrRating: Int,
     var capacity: Int,
