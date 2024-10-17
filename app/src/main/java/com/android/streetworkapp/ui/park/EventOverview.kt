@@ -49,7 +49,7 @@ import com.android.sample.R
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.ui.navigation.NavigationActions
-import com.android.streetworkapp.ui.theme.snowflake
+import com.android.streetworkapp.ui.theme.Snowflake
 import com.android.streetworkapp.utils.toFormattedString
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -231,7 +231,7 @@ fun EventDashboard(event: Event) {
   Scaffold(
       topBar = { DashBoardBar() },
       modifier = Modifier.height(220.dp).testTag("evenDashboard"),
-      containerColor = snowflake) { padding ->
+      containerColor = Snowflake) { padding ->
         Column(
             modifier =
                 Modifier.padding(20.dp)
