@@ -28,12 +28,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.streetworkapp.model.user.User
+import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenu
 import com.android.streetworkapp.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.streetworkapp.ui.navigation.NavigationActions
 
 @Composable
-fun ProfileScreen(navigationActions: NavigationActions) {
+fun ProfileScreen(navigationActions: NavigationActions, userViewModel: UserViewModel) {
   Scaffold(
       modifier = Modifier.testTag("ProfileScreen"),
       bottomBar = {
@@ -46,10 +47,10 @@ fun ProfileScreen(navigationActions: NavigationActions) {
             modifier = Modifier.fillMaxSize().padding(padding).testTag("ProfileColumn"),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)) {
-              Spacer(modifier = Modifier.height(10.dp))
+              Spacer(modifier = Modifier.height(10.dp).testTag("profileSpacer"))
 
               Row(
-                  modifier = Modifier.fillMaxWidth().padding(padding),
+                  modifier = Modifier.fillMaxWidth().padding(padding).testTag("profileRow"),
                   horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
                   verticalAlignment = Alignment.Top) {
 
@@ -57,17 +58,18 @@ fun ProfileScreen(navigationActions: NavigationActions) {
                     Image(
                         painter = painterResource(id = R.drawable.profile),
                         contentDescription = "profile picture",
-                        modifier = Modifier.size(200.dp))
+                        modifier = Modifier.size(200.dp).testTag("profilePicture"),
+                    )
 
-                    Column() {
-                      Spacer(modifier = Modifier.height(2.dp))
+                    Column(modifier = Modifier.testTag("profileInfoColumn")) {
+                      Spacer(modifier = Modifier.height(2.dp).testTag("profileInfoSpacer"))
                       // score placeholder
                       Text(
                           text = "Score: 42’424",
                           fontSize = 20.sp,
                           modifier = Modifier.testTag("profileScore"))
 
-                      Spacer(modifier = Modifier.height(10.dp))
+                      Spacer(modifier = Modifier.height(10.dp).testTag("profileInfoSpacer2"))
 
                       // button to add a new friend
                       Button(
@@ -76,7 +78,7 @@ fun ProfileScreen(navigationActions: NavigationActions) {
                             Text(text = "Add a new friend", fontSize = 17.sp)
                           }
 
-                      Spacer(modifier = Modifier.height(10.dp))
+                      Spacer(modifier = Modifier.height(10.dp).testTag("profileInfoSpacer3"))
 
                       // button to train with a friend
                       Button(
@@ -88,8 +90,19 @@ fun ProfileScreen(navigationActions: NavigationActions) {
                     }
                   }
 
-              // Friend list here :
-              val alice = User("uid_Alice", "Alice", "alice@gmail.com", 42, emptyList())
+              // currentUser = userViewModel.currentUser
+              // val friends = userViewModel.getFriendsByUid(currentUser.uid).collectAsState()
+
+              // val flover = userViewModel.getUserById("Z8qgzNOoQOR09x6QQYahcyzVXfE2")
+
+              // Placeholder MVVM calls :
+              val alice =
+                  User(
+                      "uid_Alice",
+                      "Alice",
+                      "alice@gmail.com",
+                      42,
+                      List(1) { "Z8qgzNOoQOR09x6QQYahcyzVXfE2" })
               val bob = User("uid_Bob", "Bob", "bob@gmail.com", 42, emptyList())
 
               val currentUser =
@@ -103,21 +116,20 @@ fun ProfileScreen(navigationActions: NavigationActions) {
                         bob.uid
                       })
 
-              val friendsUids = currentUser.friends
-
-              // Call MVVM to get friends User objects from uid :
-               val friends = List(2) {alice; bob}
-              // End of placeholder for MVVM call
+              val friends = List(10) { alice }
 
               // friends = emptyList()
 
               if (friends.isNotEmpty()) {
 
-                // LazyColumn is scollable
+                // LazyColumn is scrollable
                 LazyColumn(
-                    contentPadding = PaddingValues(vertical = 8.dp),
+                    contentPadding = PaddingValues(vertical = 2.dp),
                     modifier =
-                        Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(padding)) {
+                        Modifier.fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .padding(padding)
+                            .testTag("friendList")) {
                       items(friends) { friend -> DisplayFriend(friend, padding) }
                     }
               } else {
@@ -126,38 +138,13 @@ fun ProfileScreen(navigationActions: NavigationActions) {
                     fontSize = 20.sp,
                     text = "You have no friends yet :(")
               }
-
-              /*
-              Code extract from bootcamp :
-                LazyColumn(
-                    contentPadding = PaddingValues(vertical = 8.dp),
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(pd)) {
-                      items(todos.value.size) { index ->
-                        ToDoItem(todo = todos.value[index]) {
-                          listToDosViewModel.selectToDo(todos.value[index])
-                          navigationActions.navigateTo(Screen.EDIT_TODO)
-                        }
-                      }
-                    }
-                   */
-
-              /*
-                   tabList.forEach { tab ->
-                BottomNavigationItem(
-                    icon = { Icon(tab.icon, contentDescription = null) },
-                    label = { Text(tab.textId) },
-                    selected = tab.route == selectedItem,
-                    onClick = { onTabSelect(tab) },
-                    modifier = Modifier.clip(RoundedCornerShape(50.dp)).testTag(tab.textId))
-              }
-               */
             }
       })
 }
 
 @Composable
 fun DisplayFriend(friend: User, padding: PaddingValues) {
-  return Row(modifier = Modifier.fillMaxSize().padding(padding)) {
+  return Row(modifier = Modifier.fillMaxWidth().padding(padding)) {
 
     // profile placeholder
     Image(
@@ -165,12 +152,18 @@ fun DisplayFriend(friend: User, padding: PaddingValues) {
         contentDescription = "profile picture",
         modifier = Modifier.size(75.dp))
 
-    Spacer(modifier = Modifier.width(2.dp))
+    Spacer(modifier = Modifier.width(10.dp))
 
-    // username
-    Text(modifier = Modifier.padding(padding), fontSize = 20.sp, text = friend.username)
+    Column(modifier = Modifier.fillMaxWidth().padding(padding)) {
 
-    // score
-    Text(text = "Score: ${friend.score}", fontSize = 20.sp, modifier = Modifier.padding(padding))
+      // Small spacing between elements
+      Spacer(modifier = Modifier.height(12.dp))
+
+      // username
+      Text(fontSize = 22.sp, text = friend.username)
+
+      // score
+      Text(text = "Score: ${friend.score}", fontSize = 22.sp, modifier = Modifier.padding(padding))
+    }
   }
 }

@@ -90,7 +90,7 @@ fun StreetWorkApp(
 
   NavHost(
       navController = navController,
-      startDestination = Route.AUTH) { // TODO: handle start destination based on signIn logic
+      startDestination = Route.PROFILE) { // TODO: handle start destination based on signIn logic
         navigation(
             startDestination = Screen.AUTH,
             route = Route.AUTH,
@@ -112,7 +112,7 @@ fun StreetWorkApp(
             startDestination = Screen.PROFILE,
             route = Route.PROFILE,
         ) {
-          composable(Screen.PROFILE) { ProfileScreen(navigationActions) }
+          composable(Screen.PROFILE) { ProfileScreen(navigationActions, userViewModel) }
         }
       }
 
