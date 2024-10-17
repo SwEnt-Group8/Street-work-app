@@ -22,6 +22,7 @@ import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.park.ParkOverview
+import com.android.streetworkapp.ui.profile.AddFriendScreen
 import com.android.streetworkapp.ui.profile.ProfileScreen
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
@@ -112,7 +113,10 @@ fun StreetWorkApp(
             startDestination = Screen.PROFILE,
             route = Route.PROFILE,
         ) {
-          composable(Screen.PROFILE) { ProfileScreen(navigationActions) }
+          // profile screen + list of friend
+          composable(Screen.PROFILE) { ProfileScreen(navigationActions, userViewModel) }
+          // screen for adding friend
+          composable(Screen.ADD_FRIEND) { AddFriendScreen(navigationActions, userViewModel) }
         }
       }
 

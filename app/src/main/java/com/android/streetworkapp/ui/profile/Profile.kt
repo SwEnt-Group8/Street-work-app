@@ -20,13 +20,19 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.sample.R
+import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenu
 import com.android.streetworkapp.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.navigation.Screen
 
 @Composable
-fun ProfileScreen(navigationActions: NavigationActions) {
+fun ProfileScreen(
+    navigationActions: NavigationActions,
+    userViewModel: UserViewModel = viewModel(factory = UserViewModel.Factory)
+) {
   Scaffold(
       modifier = Modifier.testTag("ProfileScreen"),
       bottomBar = {
@@ -61,10 +67,10 @@ fun ProfileScreen(navigationActions: NavigationActions) {
                   modifier = Modifier.size(260.dp))
 
               Spacer(modifier = Modifier.height(10.dp))
-              // button to add a new friend
 
+              // button to go to add friend screen
               Button(
-                  onClick = {},
+                  onClick = { navigationActions.navigateTo(Screen.ADD_FRIEND) },
                   modifier = Modifier.size(220.dp, 50.dp).testTag("profileAddButton")) {
                     Text(text = "Add a new friend", fontSize = 17.sp)
                   }
