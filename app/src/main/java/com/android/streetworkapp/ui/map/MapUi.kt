@@ -12,6 +12,7 @@ import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenu
 import com.android.streetworkapp.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.navigation.Screen
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -26,7 +27,11 @@ import com.google.maps.android.compose.rememberCameraPositionState
  * @param navigationActions The navigation actions to navigate to other screens.
  */
 @Composable
-fun MapScreen(parkLocationViewModel: ParkLocationViewModel, navigationActions: NavigationActions) {
+fun MapScreen(
+    parkLocationViewModel: ParkLocationViewModel,
+    navigationActions: NavigationActions,
+    callbackOnMapLoaded: () -> Unit = {}
+) {
 
   // hardcoded initial location values are used instead of the user's current location for now
   val initialLatLng = LatLng(46.518659400000004, 6.566561505148001)
@@ -52,14 +57,18 @@ fun MapScreen(parkLocationViewModel: ParkLocationViewModel, navigationActions: N
 
         // Display the Google Map
         GoogleMap(
+            onMapLoaded = callbackOnMapLoaded,
             modifier = Modifier.fillMaxSize().padding(innerPadding).testTag("googleMap"),
             cameraPositionState = cameraPositionState) {
               parks.forEach { park ->
                 Marker(
                     contentDescription = "Marker",
                     state = MarkerState(position = LatLng(park.lat, park.lon)),
-                    /** onClick = { navigationActions.navigateTo(Screen.UNK) true } */
-                )
+                    onClick = {
+                      // TODO: selectPark
+                      navigationActions.navigateTo(Screen.PARK_OVERVIEW)
+                      true
+                    })
               }
             }
       }

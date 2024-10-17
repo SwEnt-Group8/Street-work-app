@@ -17,6 +17,7 @@ import com.android.streetworkapp.ui.park.ParkOverview
 import com.android.streetworkapp.ui.park.ParkOverviewScreen
 import com.android.streetworkapp.ui.park.RatingComponent
 import com.google.firebase.Timestamp
+import io.mockk.verify
 import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Rule
