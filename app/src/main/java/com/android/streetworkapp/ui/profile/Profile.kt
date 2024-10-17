@@ -27,6 +27,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
+import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenu
 import com.android.streetworkapp.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.streetworkapp.ui.navigation.NavigationActions
@@ -88,7 +89,26 @@ fun ProfileScreen(navigationActions: NavigationActions) {
                   }
 
               // Friend list here :
-              var friends = listOf("Friend 1", "Friend 2", "Friend 3", "Friend 4", "Friend 5")
+              val alice = User("uid_Alice", "Alice", "alice@gmail.com", 42, emptyList())
+              val bob = User("uid_Bob", "Bob", "bob@gmail.com", 42, emptyList())
+
+              val currentUser =
+                  User(
+                      "uid_current",
+                      "Current User",
+                      "user@gmail.com",
+                      42,
+                      List(2) {
+                        alice.uid
+                        bob.uid
+                      })
+
+              val friendsUids = currentUser.friends
+
+              // Call MVVM to get friends User objects from uid :
+               val friends = List(2) {alice; bob}
+              // End of placeholder for MVVM call
+
               // friends = emptyList()
 
               if (friends.isNotEmpty()) {
@@ -136,7 +156,7 @@ fun ProfileScreen(navigationActions: NavigationActions) {
 }
 
 @Composable
-fun DisplayFriend(friend: String, padding: PaddingValues) {
+fun DisplayFriend(friend: User, padding: PaddingValues) {
   return Row(modifier = Modifier.fillMaxSize().padding(padding)) {
 
     // profile placeholder
@@ -147,9 +167,10 @@ fun DisplayFriend(friend: String, padding: PaddingValues) {
 
     Spacer(modifier = Modifier.width(2.dp))
 
-    Text(
-        modifier = Modifier.padding(padding).testTag("emptyFriendList"),
-        fontSize = 20.sp,
-        text = friend)
+    // username
+    Text(modifier = Modifier.padding(padding), fontSize = 20.sp, text = friend.username)
+
+    // score
+    Text(text = "Score: ${friend.score}", fontSize = 20.sp, modifier = Modifier.padding(padding))
   }
 }
