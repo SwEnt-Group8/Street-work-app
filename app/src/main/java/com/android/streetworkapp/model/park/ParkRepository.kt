@@ -15,7 +15,7 @@ interface ParkRepository {
 
   suspend fun updateName(pid: String, name: String)
 
-  suspend fun updateImage(pid: String, image: Image)
+  suspend fun updateImageReference(pid: String, imageReference: String)
 
   suspend fun addRating(pid: String, rating: Int)
 
