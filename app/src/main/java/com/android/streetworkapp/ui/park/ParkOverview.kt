@@ -17,16 +17,23 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,16 +50,50 @@ import com.android.sample.R
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventList
 import com.android.streetworkapp.model.park.Park
+import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.utils.toFormattedString
 
+/**
+ * Display the overview of a park, including park details and a list of events.
+ *
+ * @param navigationActions navigation class
+ * @param park The park data to display.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ParkOverview(navigationActions: NavigationActions, park: Park) {
+  Scaffold(
+      modifier = Modifier.testTag("ParkOverview"),
+      topBar = {
+        TopAppBar(
+            modifier = Modifier.testTag("ParkOverviewTopBar"),
+            title = {},
+            colors =
+                TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface),
+            navigationIcon = {
+              IconButton(
+                  onClick = { navigationActions.goBack() },
+                  modifier = Modifier.testTag("goBackButtonOverviewScreen")) {
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Arrow Back Icon")
+                  }
+            })
+      }) { innerPadding ->
+        ParkOverviewScreen(
+            park, innerPadding) // we declare this so that it doesn't impact the tests in
+        // PackOverviewScreen (exceptions wouldn't be caught as it's async and
+        // tests would fail)
+      }
+}
 /**
  * Display the overview of a park, including park details and a list of events.
  *
  * @param park The park data to display.
  */
 @Composable
-fun ParkOverviewScreen(park: Park) {
-  Box(modifier = Modifier.fillMaxSize().testTag("parkOverviewScreen")) {
+fun ParkOverviewScreen(park: Park, innerPadding: PaddingValues = PaddingValues(0.dp)) {
+  Box(modifier = Modifier.padding(innerPadding).fillMaxSize().testTag("parkOverviewScreen")) {
     Column {
       ImageTitle(image = park.image, title = park.name)
       ParkDetails(park = park)
