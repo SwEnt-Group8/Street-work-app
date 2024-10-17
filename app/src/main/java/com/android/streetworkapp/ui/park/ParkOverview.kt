@@ -56,45 +56,62 @@ import com.android.streetworkapp.utils.toFormattedString
 /**
  * Display the overview of a park, including park details and a list of events.
  *
+ * @param navigationActions navigation class
  * @param park The park data to display.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ParkOverviewScreen(navigationActions: NavigationActions, park: Park) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface),
-                navigationIcon = {
-                    IconButton(
-                        onClick = { navigationActions.goBack() },
-                        modifier = Modifier.testTag("goBackButton")) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Arrow Back Icon")
-                    }
-                })
-        }) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding).fillMaxSize().testTag("parkOverviewScreen")) {
-            Column {
-                ImageTitle(image = park.image, title = park.name)
-                ParkDetails(park = park)
-                EventItemList(eventList = park.events)
-            }
-            FloatingActionButton(
-                onClick = {
-                    Log.d("ParkOverviewScreen", "Create event button clicked") // TODO: Handle button click
-                },
-                modifier =
-                Modifier.align(Alignment.BottomCenter)
-                    .padding(40.dp)
-                    .size(width = 150.dp, height = 40.dp)
-                    .testTag("createEventButton"),
-            ) {
-                Text("Create an event")
-            }
-        }
+fun ParkOverview(navigationActions: NavigationActions, park: Park) {
+  Scaffold(
+      modifier = Modifier.testTag("ParkOverview"),
+      topBar = {
+        TopAppBar(
+            modifier = Modifier.testTag("ParkOverviewTopBar"),
+            title = {},
+            colors =
+                TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface),
+            navigationIcon = {
+              IconButton(
+                  onClick = { navigationActions.goBack() },
+                  modifier = Modifier.testTag("goBackButtonOverviewScreen")) {
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Arrow Back Icon")
+                  }
+            })
+      }) { innerPadding ->
+        ParkOverviewScreen(
+            park, innerPadding) // we declare this so that it doesn't impact the tests in
+        // PackOverviewScreen (exceptions wouldn't be caught as it's async and
+        // tests would fail)
+      }
+}
+/**
+ * Display the overview of a park, including park details and a list of events.
+ *
+ * @param park The park data to display.
+ */
+@Composable
+fun ParkOverviewScreen(park: Park, innerPadding: PaddingValues = PaddingValues(0.dp)) {
+  Box(modifier = Modifier.padding(innerPadding).fillMaxSize().testTag("parkOverviewScreen")) {
+    Column {
+      ImageTitle(image = park.image, title = park.name)
+      ParkDetails(park = park)
+      EventItemList(eventList = park.events)
     }
+    FloatingActionButton(
+        onClick = {
+          Log.d("ParkOverviewScreen", "Create event button clicked") // TODO: Handle button click
+        },
+        modifier =
+            Modifier.align(Alignment.BottomCenter)
+                .padding(40.dp)
+                .size(width = 150.dp, height = 40.dp)
+                .testTag("createEventButton"),
+    ) {
+      Text("Create an event")
+    }
+  }
 }
 
 /**
