@@ -7,16 +7,28 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
+/** A repository interface using Firestore for park data. */
 class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepository {
 
   companion object {
     private const val COLLECTION_PATH = "parks"
   }
 
+  /**
+   * Get a new park ID.
+   *
+   * @return A new park ID.
+   */
   override fun getNewPid(): String {
     return db.collection(COLLECTION_PATH).document().id
   }
 
+  /**
+   * Get a park by its ID.
+   *
+   * @param pid The park ID.
+   * @return The park with the given ID, or null if the park does not exist.
+   */
   override suspend fun getParkByPid(pid: String): Park? {
     require(pid.isNotEmpty()) {}
     return try {
@@ -28,6 +40,12 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
     }
   }
 
+  /**
+   * Get a park by its location ID.
+   *
+   * @param locationId The location ID.
+   * @return The park with the given location ID, or null if the park does not exist.
+   */
   override suspend fun getParkByLocationId(locationId: String): Park? {
     require(locationId.isNotEmpty()) {}
     return try {
@@ -42,6 +60,11 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
     }
   }
 
+  /**
+   * Create a new park.
+   *
+   * @param park The park to create.
+   */
   override suspend fun createPark(park: Park) {
     require(park.pid.isNotEmpty()) {}
     require(park.location.id.isNotEmpty()) {}
@@ -52,6 +75,12 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
     }
   }
 
+  /**
+   * Update the name of a park.
+   *
+   * @param pid The park ID.
+   * @param name The new name.
+   */
   override suspend fun updateName(pid: String, name: String) {
     require(pid.isNotEmpty()) {}
     require(name.isNotEmpty()) {}
@@ -62,6 +91,12 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
     }
   }
 
+  /**
+   * Update the image reference of a park.
+   *
+   * @param pid The park ID.
+   * @param imageReference The new image reference.
+   */
   override suspend fun updateImageReference(pid: String, imageReference: String) {
     require(pid.isNotEmpty()) {}
     require(imageReference.isNotEmpty()) {}
@@ -72,6 +107,12 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
     }
   }
 
+  /**
+   * Add a rating to a park.
+   *
+   * @param pid The park ID.
+   * @param rating The rating to add from 1 to 5.
+   */
   override suspend fun addRating(pid: String, rating: Int) {
     require(pid.isNotEmpty()) {}
     require(rating in 1..5) {}
@@ -92,6 +133,12 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
     }
   }
 
+  /**
+   * Delete a rating from a park.
+   *
+   * @param pid The park ID.
+   * @param rating The rating to delete from 1 to 5.
+   */
   override suspend fun deleteRating(pid: String, rating: Int) {
     require(pid.isNotEmpty()) {}
     require(rating in 1..5) {}
@@ -116,6 +163,12 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
     }
   }
 
+  /**
+   * Update the capacity of a park.
+   *
+   * @param pid The park ID.
+   * @param capacity The new capacity.
+   */
   override suspend fun updateCapacity(pid: String, capacity: Int) {
     require(pid.isNotEmpty()) {}
     require(capacity > 0) {}
@@ -126,6 +179,11 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
     }
   }
 
+  /**
+   * Increment the occupancy of a park by one person.
+   *
+   * @param pid The park ID.
+   */
   override suspend fun incrementOccupancy(pid: String) {
     require(pid.isNotEmpty()) {}
     try {
@@ -138,6 +196,11 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
     }
   }
 
+  /**
+   * Decrement the occupancy of a park by one person.
+   *
+   * @param pid The park ID.
+   */
   override suspend fun decrementOccupancy(pid: String) {
     require(pid.isNotEmpty()) {}
     try {
@@ -152,6 +215,12 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
     }
   }
 
+  /**
+   * Add an event to a park.
+   *
+   * @param pid The park ID.
+   * @param eid The event ID.
+   */
   override suspend fun addEventToPark(pid: String, eid: String) {
     require(pid.isNotEmpty()) {}
     require(eid.isNotEmpty()) {}
@@ -165,6 +234,12 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
     }
   }
 
+  /**
+   * Delete an event from a park.
+   *
+   * @param pid The park ID.
+   * @param eid The event ID.
+   */
   override suspend fun deleteEventFromPark(pid: String, eid: String) {
     require(pid.isNotEmpty()) {}
     require(eid.isNotEmpty()) {}
@@ -178,6 +253,11 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
     }
   }
 
+  /**
+   * Delete a park by its ID.
+   *
+   * @param pid The park ID.
+   */
   override suspend fun deleteParkByPid(pid: String) {
     require(pid.isNotEmpty()) {}
     try {
@@ -187,6 +267,12 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
     }
   }
 
+  /**
+   * Convert a Firestore document to a park object.
+   *
+   * @param document The Firestore document.
+   * @return The park object, or null if the conversion failed.
+   */
   private fun documentToPark(document: DocumentSnapshot): Park? {
     return try {
       val pid = document.id
