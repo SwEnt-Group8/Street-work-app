@@ -1,6 +1,5 @@
 package com.android.streetworkapp.model.park
 
-import android.media.Image
 import com.android.streetworkapp.model.parklocation.ParkLocation
 
 /**

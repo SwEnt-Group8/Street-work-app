@@ -1,7 +1,5 @@
 package com.android.streetworkapp.model.park
 
-import android.media.Image
-
 /** A repository interface for park data. */
 interface ParkRepository {
 
