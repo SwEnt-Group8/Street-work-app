@@ -89,8 +89,10 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
  * @param userViewModel The [UserViewModel] to use for database operations.
  */
 fun checkAndAddUser(user: FirebaseUser?, userViewModel: UserViewModel) {
+  Log.d("SignInScreen", "Entered checkAndAddUser")
   if (user == null) return
   userViewModel.viewModelScope.launch {
+    Log.d("SignInScreen", "Entered coroutine")
     val fetchedUser = userViewModel.getUserByUid(user.uid)
     if (fetchedUser == null) {
       val newuser = User(user.uid, user.displayName!!, user.email!!, 0, emptyList())
