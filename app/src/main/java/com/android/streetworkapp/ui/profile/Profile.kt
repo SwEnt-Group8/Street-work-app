@@ -92,7 +92,6 @@ fun ProfileScreen(navigationActions: NavigationActions, userViewModel: UserViewM
 
               // currentUser = userViewModel.currentUser
               // val friends = userViewModel.getFriendsByUid(currentUser.uid).collectAsState()
-
               // val flover = userViewModel.getUserById("Z8qgzNOoQOR09x6QQYahcyzVXfE2")
 
               // Placeholder MVVM calls :
@@ -134,7 +133,7 @@ fun ProfileScreen(navigationActions: NavigationActions, userViewModel: UserViewM
                     }
               } else {
                 Text(
-                    modifier = Modifier.padding(padding).testTag("emptyFriendList"),
+                    modifier = Modifier.padding(padding).testTag("emptyFriendListText"),
                     fontSize = 20.sp,
                     text = "You have no friends yet :(")
               }
