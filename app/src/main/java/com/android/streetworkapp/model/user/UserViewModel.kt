@@ -72,11 +72,8 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @param uid The unique ID of the user to retrieve.
    * @return The User object if found, or null if the user doesn't exist or an error occurs.
    */
-  fun getUserByUid(uid: String) {
-    viewModelScope.launch {
-      val fetchedUser = repository.getUserByUid(uid)
-      _user.postValue(fetchedUser)
-    }
+  suspend fun getUserByUid(uid: String): User? {
+    return repository.getUserByUid(uid)
   }
 
   /**

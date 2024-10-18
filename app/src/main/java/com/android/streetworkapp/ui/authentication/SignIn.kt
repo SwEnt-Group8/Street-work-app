@@ -93,14 +93,8 @@ fun checkAndAddUser(user: FirebaseUser?, userViewModel: UserViewModel) {
   userViewModel.viewModelScope.launch {
     val fetchedUser = userViewModel.getUserByUid(user.uid)
     if (fetchedUser == null) {
-      val newUser =
-          User(
-              uid = user.uid,
-              username = user.displayName ?: "Unknown",
-              email = user.email ?: "Unknown",
-              score = 0,
-              friends = emptyList())
-      userViewModel.addUser(newUser)
+      val newuser = User(user.uid, user.displayName!!, user.email!!, 0, emptyList())
+      userViewModel.addUser(newuser)
     }
   }
 }
