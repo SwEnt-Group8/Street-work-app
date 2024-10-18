@@ -28,9 +28,7 @@ jobs:
 
       # Load the google-services.json file from the secrets
       - name: Load Google Service file
-        env:
-          DATA: ${{ secrets.GOOGLE_SERVICES }}
-        run: echo $DATA | base64 -di > app/google-services.json
+        run: echo "${{ secrets.GOOGLE_SERVICES }}" > app/google-services.json
 
       # Load the keystore file from the secrets
       - name: Load Keystore file
