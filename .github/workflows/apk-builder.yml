@@ -9,17 +9,17 @@ on:
         default: "v0.1.0"
 
 permissions:
-    contents: write
-      
+  contents: write
+
 jobs:
-    build:
-      name: Build Release APK
-      runs-on: ubuntu-latest
-  
-      steps:
+  build:
+    name: Build Debug APK
+    runs-on: ubuntu-latest
+
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-  
+
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -35,15 +35,15 @@ jobs:
       # Load the keystore file from the secrets
       - name: Load Keystore file
         env:
-          DATA: ${{ secrets.KEYSTORE_JKS}}
+          DATA: ${{ secrets.KEYSTORE_JKS }}
         run: echo $DATA | base64 -di > app/upload-keystore.jks
 
       # Load the keystore.properties file from the secrets
       - name: Load Keystore properties file
         env:
-          DATA: ${{ secrets.KEYSTORE}}
+          DATA: ${{ secrets.KEYSTORE }}
         run: echo $DATA | base64 -di > keystore.properties
-      
+
       # Load the secrets
       - name: Load secrets
         env:
@@ -56,13 +56,13 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build APK with detailed logs
-        run: ./gradlew assembleRelease --stacktrace --info
+        run: ./gradlew assembleDebug --stacktrace --info
 
       - name: Find and list APK files
         id: apkpath
         run: |
           find app/build/outputs/apk/ -name "*.apk" -exec ls -lh {} \;
-          echo "apk_path=$(find app/build/outputs/apk/ -name "*.apk")" >> $GITHUB_ENV
+          echo "apk_path=$(find app/build/outputs/apk/debug/*.apk)" >> $GITHUB_ENV
 
       - name: Create Git Tag
         id: tag
@@ -73,9 +73,8 @@ jobs:
       - name: Upload APK in artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: streetworkapp-${{ inputs.tag_name }}
-          path: ${{ env.apk_path }}
-          if-no-files-found: error
+          name: streetworkapp-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
           retention-days: 90
 
       - name: Load and Decode Google Maps API Key
