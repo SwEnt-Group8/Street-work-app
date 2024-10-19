@@ -45,7 +45,7 @@ class UserViewModelTest {
     val uid = "user123"
     val user = User(uid, "John Doe", "john@example.com", 100, emptyList())
     whenever(repository.getUserByUid(uid)).thenReturn(user)
-    userViewModel.getUserById(uid)
+    userViewModel.getUserByUid(uid)
     testDispatcher.scheduler.advanceUntilIdle()
     verify(repository).getUserByUid(uid)
   }
