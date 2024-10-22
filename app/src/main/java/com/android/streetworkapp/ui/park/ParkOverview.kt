@@ -46,11 +46,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.rememberNavController
 import com.android.sample.R
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventList
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.utils.toFormattedString
 
 /**
@@ -81,7 +83,9 @@ fun ParkOverview(navigationActions: NavigationActions, park: Park) {
             })
       }) { innerPadding ->
         ParkOverviewScreen(
-            park, innerPadding) // we declare this so that it doesn't impact the tests in
+            park,
+            innerPadding,
+            navigationActions) // we declare this so that it doesn't impact the tests in
         // PackOverviewScreen (exceptions wouldn't be caught as it's async and
         // tests would fail)
       }
@@ -92,7 +96,11 @@ fun ParkOverview(navigationActions: NavigationActions, park: Park) {
  * @param park The park data to display.
  */
 @Composable
-fun ParkOverviewScreen(park: Park, innerPadding: PaddingValues = PaddingValues(0.dp)) {
+fun ParkOverviewScreen(
+    park: Park,
+    innerPadding: PaddingValues = PaddingValues(0.dp),
+    navigationActions: NavigationActions = NavigationActions(rememberNavController())
+) {
   Box(modifier = Modifier.padding(innerPadding).fillMaxSize().testTag("parkOverviewScreen")) {
     Column {
       ImageTitle(image = null, title = park.name) // TODO: Fetch image from Firestore storage
@@ -101,6 +109,8 @@ fun ParkOverviewScreen(park: Park, innerPadding: PaddingValues = PaddingValues(0
     }
     FloatingActionButton(
         onClick = {
+          navigationActions.navigateTo(Screen.ADD_EVENT)
+
           Log.d("ParkOverviewScreen", "Create event button clicked") // TODO: Handle button click
         },
         modifier =

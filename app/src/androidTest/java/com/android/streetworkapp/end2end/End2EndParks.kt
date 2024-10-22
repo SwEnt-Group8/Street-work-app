@@ -29,6 +29,8 @@ import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.idling.CountingIdlingResource
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.streetworkapp.StreetWorkApp
+import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
@@ -102,7 +104,10 @@ class End2EndParks {
           parkLocationViewModel,
           { navigateTo(Route.MAP) },
           { idlingResource.decrement() },
-          UserViewModel(mockk())) // setup so as we're already on the MAP route
+          UserViewModel(mockk()),
+          ParkViewModel(mockk()),
+          EventViewModel(mockk()))
+      // setup so as we're already on the MAP route
     }
 
     // Testing we can click on the marker that's already placed at the center of the screen and
