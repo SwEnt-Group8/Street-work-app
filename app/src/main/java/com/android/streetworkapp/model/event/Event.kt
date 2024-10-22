@@ -12,6 +12,8 @@ import com.google.firebase.Timestamp
  * @param maxParticipants The maximum number of participants.
  * @param date The event date.
  * @param owner The event owner.
+ * @param listParticipants The list of id of users.
+ * @param parkId The id of the park for this event.
  */
 data class Event(
     val eid: String,
@@ -21,6 +23,9 @@ data class Event(
     var maxParticipants: Int,
     var date: Timestamp,
     var owner: String,
+    var listParticipants: List<String> = emptyList(),
+    var parkId: String = "Unknown Park"
+    // Default parameters can be removed once the viewModels are updated
 )
 
 /**
