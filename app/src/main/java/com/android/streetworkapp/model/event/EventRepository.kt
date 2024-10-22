@@ -5,5 +5,5 @@ interface EventRepository {
 
   fun getNewEid(): String
 
-  suspend fun createEvent(event: Event)
+  suspend fun addEvent(event: Event)
 }
