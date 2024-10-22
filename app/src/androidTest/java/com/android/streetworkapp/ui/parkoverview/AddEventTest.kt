@@ -10,6 +10,12 @@ import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.swipeRight
 import com.android.streetworkapp.model.event.Event
+import com.android.streetworkapp.model.event.EventRepository
+import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.park.ParkRepository
+import com.android.streetworkapp.model.park.ParkViewModel
+import com.android.streetworkapp.model.user.UserRepository
+import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.park.AddEventScreen
 import com.android.streetworkapp.ui.park.EventDescriptionSelection
@@ -21,17 +27,34 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
 
 class AddEventTest {
 
   private lateinit var event: Event
   private lateinit var navigationActions: NavigationActions
+  private lateinit var userRepository: UserRepository
+  private lateinit var userViewModel: UserViewModel
+
+  private lateinit var parkRepository: ParkRepository
+  private lateinit var parkViewModel: ParkViewModel
+
+  private lateinit var eventRepository: EventRepository
+  private lateinit var eventViewModel: EventViewModel
 
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
   fun setUp() {
     navigationActions = mock(NavigationActions::class.java)
+    userRepository = mock(UserRepository::class.java)
+    userViewModel = UserViewModel(userRepository)
+
+    parkRepository = mock(ParkRepository::class.java)
+    parkViewModel = ParkViewModel(parkRepository)
+
+    eventRepository = mock(EventRepository::class.java)
+    eventViewModel = EventViewModel(eventRepository)
 
     event =
         Event(
@@ -90,7 +113,10 @@ class AddEventTest {
 
   @Test
   fun addEventScreenIsDisplayed() {
-    composeTestRule.setContent { AddEventScreen(navigationActions) }
+    `when`(eventViewModel.getNewEid()).thenReturn("test")
+    composeTestRule.setContent {
+      AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
+    }
     composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addEventButton").assertIsDisplayed()

@@ -47,6 +47,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventConstants
+import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.park.ParkViewModel
+import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
@@ -64,11 +67,32 @@ import java.util.concurrent.TimeUnit
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEventScreen(
-    navigationActions: NavigationActions
-) { // TODO: add future ParkViewModel and EventViewModel
+    navigationActions: NavigationActions,
+    parkViewModel: ParkViewModel,
+    eventViewModel: EventViewModel,
+    userViewModel: UserViewModel
+) {
 
-  // used until we have the corresponding viewModel TODO: update with new viewModel
-  val event = Event("unknown", "unknown", "unknown", 0, 2, Timestamp(0, 0), "unknown")
+  val eid = eventViewModel.getNewEid()
+  val event =
+      Event(
+          eid,
+          "unknown",
+          "unknown",
+          0,
+          EventConstants.MIN_NUMBER_PARTICIPANTS,
+          Timestamp(0, 0),
+          "unknown")
+
+  val owner = userViewModel.currentUser.value?.uid
+  if (!owner.isNullOrEmpty()) {
+    event.owner = owner
+  }
+
+  val parkId = "Unkown park" // TODO: do the same with ParkViewModel once updated
+  if (!parkId.isNullOrEmpty()) {
+    event.parkId = parkId
+  }
 
   Scaffold(
       modifier = Modifier.background(MaterialTheme.colorScheme.background),
@@ -107,7 +131,8 @@ fun AddEventScreen(
               }
           FloatingActionButton(
               onClick = {
-                // TODO: use one of the future viewModel to add the event to firebase
+                // TODO: check that it works on the database
+                eventViewModel.addEvent(event)
                 navigationActions.goBack()
               },
               modifier =
