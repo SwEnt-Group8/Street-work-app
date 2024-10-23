@@ -9,7 +9,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.android.streetworkapp.model.event.EventRepositoryFirestore
+import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.Park
+import com.android.streetworkapp.model.park.ParkRepositoryFirestore
+import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
@@ -20,6 +24,7 @@ import com.android.streetworkapp.ui.map.MapScreen
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.ui.navigation.Screen
+import com.android.streetworkapp.ui.park.AddEventScreen
 import com.android.streetworkapp.ui.park.ParkOverview
 import com.android.streetworkapp.ui.profile.AddFriendScreen
 import com.android.streetworkapp.ui.profile.ProfileScreen
@@ -49,7 +54,16 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
   val userRepository = UserRepositoryFirestore(firestoreDB)
   val userViewModel = UserViewModel(userRepository)
 
-  StreetWorkApp(parkLocationViewModel, testInvokation, {}, userViewModel)
+  // Instantiate park repository :
+  val parkRepository = ParkRepositoryFirestore(firestoreDB)
+  val parkViewModel = ParkViewModel(parkRepository)
+
+  // Instantiate event repository :
+  val eventRepository = EventRepositoryFirestore(firestoreDB)
+  val eventViewModel = EventViewModel(eventRepository)
+
+  StreetWorkApp(
+      parkLocationViewModel, testInvokation, {}, userViewModel, parkViewModel, eventViewModel)
 }
 
 @Composable
@@ -58,6 +72,8 @@ fun StreetWorkApp(
     navTestInvokation: NavigationActions.() -> Unit = {},
     mapCallbackOnMapLoaded: () -> Unit = {},
     userViewModel: UserViewModel,
+    parkViewModel: ParkViewModel,
+    eventViewModel: EventViewModel
 ) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
@@ -93,6 +109,9 @@ fun StreetWorkApp(
             MapScreen(parkLocationViewModel, navigationActions, mapCallbackOnMapLoaded)
           }
           composable(Screen.PARK_OVERVIEW) { ParkOverview(navigationActions, testPark) }
+          composable(Screen.ADD_EVENT) {
+            AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
+          }
         }
 
         navigation(
