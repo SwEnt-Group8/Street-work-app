@@ -1,5 +1,6 @@
 package com.android.streetworkapp.ui.park
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -73,13 +75,15 @@ fun AddEventScreen(
     userViewModel: UserViewModel
 ) {
 
+  val context = LocalContext.current
+
   val eid = eventViewModel.getNewEid()
   val event =
       Event(
           eid,
-          "unknown",
-          "unknown",
-          0,
+          "",
+          "",
+          1, // set to one by default, because the owner is also a participant
           EventConstants.MIN_NUMBER_PARTICIPANTS,
           Timestamp(0, 0),
           "unknown")
@@ -89,7 +93,7 @@ fun AddEventScreen(
     event.owner = owner
   }
 
-  val parkId = "Unkown park" // TODO: do the same with ParkViewModel once updated
+  val parkId = "Unknown park" // TODO: do the same with ParkViewModel once updated
   if (!parkId.isNullOrEmpty()) {
     event.parkId = parkId
   }
@@ -132,8 +136,14 @@ fun AddEventScreen(
           FloatingActionButton(
               onClick = {
                 // TODO: check that it works on the database
-                eventViewModel.addEvent(event)
-                navigationActions.goBack()
+
+                if (event.title.isEmpty()) {
+                  Toast.makeText(context, "Please fill the title of the event", Toast.LENGTH_SHORT)
+                      .show()
+                } else {
+                  eventViewModel.addEvent(event)
+                  navigationActions.goBack()
+                }
               },
               modifier =
                   Modifier.align(Alignment.BottomCenter)
