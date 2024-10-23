@@ -22,13 +22,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import com.android.sample.R
+import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.utils.GoogleAuthService
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.launch
 
 @Composable
 fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewModel) {
@@ -46,7 +50,8 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
       authService.rememberFirebaseAuthLauncher(
           onAuthComplete = { result ->
             user = result.user
-            // todo call setCurrentUser in the viewmodel : userViewModel
+            checkAndAddUser(user, userViewModel)
+
             Log.d("SignInScreen", "Sign-in successful user : $user")
             Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
             navigationActions.navigateTo(Screen.MAP)
@@ -74,5 +79,24 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
 
           GoogleAuthButton(authService, context, launcher)
         }
+  }
+}
+
+/**
+ * Checks if the user is already in the database, and if not, adds them.
+ *
+ * @param user The user to check and add.
+ * @param userViewModel The [UserViewModel] to use for database operations.
+ */
+fun checkAndAddUser(user: FirebaseUser?, userViewModel: UserViewModel) {
+  Log.d("SignInScreen", "Entered checkAndAddUser")
+  if (user == null) return
+  userViewModel.viewModelScope.launch {
+    Log.d("SignInScreen", "Entered coroutine")
+    val fetchedUser = userViewModel.getUserByUid(user.uid)
+    if (fetchedUser == null) {
+      val newuser = User(user.uid, user.displayName!!, user.email!!, 0, emptyList())
+      userViewModel.addUser(newuser)
+    }
   }
 }
