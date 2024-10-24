@@ -48,14 +48,14 @@ class EventRepositoryFirestoreTest {
 
     eventRepository = EventRepositoryFirestore(db)
     event =
-      Event(
-        eid = "1",
-        title = "Group workout",
-        description = "A fun group workout session to train new skills",
-        participants = 3,
-        maxParticipants = 5,
-        date = Timestamp(0, 0), // 01/01/1970 00:00
-        owner = "user123")
+        Event(
+            eid = "1",
+            title = "Group workout",
+            description = "A fun group workout session to train new skills",
+            participants = 3,
+            maxParticipants = 5,
+            date = Timestamp(0, 0), // 01/01/1970 00:00
+            owner = "user123")
 
     whenever(db.collection("events")).thenReturn(collection)
     `when`(db.collection(any())).thenReturn(collection)
@@ -86,7 +86,6 @@ class EventRepositoryFirestoreTest {
   fun getEvents_calls_collection_get() {
     // Ensure that mockToDoQuerySnapshot is properly initialized and mocked
     `when`(collection.get()).thenReturn(Tasks.forResult(query))
-
 
     // Ensure the QuerySnapshot returns a list of mock DocumentSnapshots
     `when`(query.documents).thenReturn(listOf())
