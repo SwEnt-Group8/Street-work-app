@@ -1,4 +1,4 @@
-package com.android.streetworkapp.ui.park
+package com.android.streetworkapp.ui.event
 
 import android.widget.Toast
 import androidx.compose.foundation.background
