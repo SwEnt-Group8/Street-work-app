@@ -1,4 +1,4 @@
-package com.android.streetworkapp.ui.park
+package com.android.streetworkapp.ui.event
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -60,7 +60,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.flow.MutableStateFlow
 
 // Mutable dashboard state
-private val uiState: MutableStateFlow<OverviewUiState> = MutableStateFlow(OverviewUiState.Details)
+private val uiState: MutableStateFlow<DashboardState> = MutableStateFlow(DashboardState.Details)
 
 /**
  * This screen displays an overview of a selcted event, including description location, location and
@@ -244,11 +244,11 @@ fun EventDashboard(event: Event) {
                     .heightIn(max = 220.dp) // Set the maximum height
                     .verticalScroll(rememberScrollState())) {
               when (uiState.collectAsState().value) {
-                OverviewUiState.Details ->
+                DashboardState.Details ->
                     Text(
                         event.description,
                         modifier = Modifier.padding(padding).testTag("eventDescription"))
-                OverviewUiState.Participants ->
+                DashboardState.Participants ->
                     Text(
                         "show participants",
                         modifier = Modifier.padding(padding).testTag("participantsList"))
@@ -271,20 +271,20 @@ fun DashBoardBar() {
     NavigationBarItem(
         modifier = Modifier.testTag("detailsTab"),
         icon = { Text("Details") },
-        selected = state == OverviewUiState.Details,
-        onClick = { uiState.value = OverviewUiState.Details })
+        selected = state == DashboardState.Details,
+        onClick = { uiState.value = DashboardState.Details })
 
     NavigationBarItem(
         modifier = Modifier.testTag("participantsTab"),
         icon = { Text("Participants") },
-        selected = state == OverviewUiState.Participants,
-        onClick = { uiState.value = OverviewUiState.Participants })
+        selected = state == DashboardState.Participants,
+        onClick = { uiState.value = DashboardState.Participants })
   }
 }
 
 /** Represents the different states of the event dashboard */
-sealed class OverviewUiState {
-  data object Details : OverviewUiState()
+sealed class DashboardState {
+  data object Details : DashboardState()
 
-  data object Participants : OverviewUiState()
+  data object Participants : DashboardState()
 }

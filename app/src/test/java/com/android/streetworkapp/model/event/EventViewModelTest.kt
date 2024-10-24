@@ -10,6 +10,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
+import org.mockito.kotlin.any
 
 class EventViewModelTest {
 
@@ -39,5 +40,12 @@ class EventViewModelTest {
     eventViewModel.addEvent(event)
     testDispatcher.scheduler.advanceUntilIdle()
     verify(repository).addEvent(event)
+  }
+
+  @Test
+  fun getEventsCallsRepository() = runTest {
+    eventViewModel.getEvents()
+    testDispatcher.scheduler.advanceUntilIdle()
+    verify(repository).getEvents(any(), any())
   }
 }

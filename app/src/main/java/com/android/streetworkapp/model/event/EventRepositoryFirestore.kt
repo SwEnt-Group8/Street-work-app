@@ -1,6 +1,7 @@
 package com.android.streetworkapp.model.event
 
 import android.util.Log
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
@@ -18,6 +19,38 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
    */
   override fun getNewEid(): String {
     return db.collection(COLLECTION_PATH).document().id
+  }
+
+  /**
+   * Fetch all events from the database.
+   *
+   * @param onSuccess The callback to execute on success.
+   * @param onFailure The callback to execute on failure.
+   */
+  override fun getEvents(onSuccess: (List<Event>) -> Unit, onFailure: (Exception) -> Unit) {
+    try {
+      db.collection(COLLECTION_PATH)
+          .get()
+          .addOnSuccessListener { documents ->
+            val eventList =
+                documents.documents.mapNotNull {
+                  Event(
+                      eid = it.id,
+                      title = it.get("title") as String,
+                      description = it.get("description") as String,
+                      participants = (it.get("participants") as Long).toInt(),
+                      maxParticipants = (it.get("maxParticipants") as Long).toInt(),
+                      date = it.get("date") as Timestamp,
+                      owner = it.get("owner") as String,
+                      listParticipants = it.get("listParticipants") as List<String>,
+                      parkId = it.get("parkId") as String)
+                }
+            onSuccess(eventList)
+          }
+          .addOnFailureListener(onFailure)
+    } catch (e: Exception) {
+      Log.e("FirestoreError", "Error getting events: ${e.message}")
+    }
   }
 
   /**

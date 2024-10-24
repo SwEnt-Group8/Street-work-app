@@ -20,11 +20,11 @@ import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
 import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.authentication.SignInScreen
+import com.android.streetworkapp.ui.event.AddEventScreen
 import com.android.streetworkapp.ui.map.MapScreen
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.ui.navigation.Screen
-import com.android.streetworkapp.ui.park.AddEventScreen
 import com.android.streetworkapp.ui.park.ParkOverview
 import com.android.streetworkapp.ui.profile.AddFriendScreen
 import com.android.streetworkapp.ui.profile.ProfileScreen
@@ -108,7 +108,9 @@ fun StreetWorkApp(
           composable(Screen.MAP) {
             MapScreen(parkLocationViewModel, navigationActions, mapCallbackOnMapLoaded)
           }
-          composable(Screen.PARK_OVERVIEW) { ParkOverview(navigationActions, testPark) }
+          composable(Screen.PARK_OVERVIEW) {
+            ParkOverview(navigationActions, testPark, eventViewModel)
+          }
           composable(Screen.ADD_EVENT) {
             AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
           }
