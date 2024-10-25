@@ -16,12 +16,12 @@ import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
+import com.android.streetworkapp.ui.event.AddEventScreen
+import com.android.streetworkapp.ui.event.EventDescriptionSelection
+import com.android.streetworkapp.ui.event.EventTitleSelection
+import com.android.streetworkapp.ui.event.ParticipantNumberSelection
+import com.android.streetworkapp.ui.event.TimeSelection
 import com.android.streetworkapp.ui.navigation.NavigationActions
-import com.android.streetworkapp.ui.park.AddEventScreen
-import com.android.streetworkapp.ui.park.EventDescriptionSelection
-import com.android.streetworkapp.ui.park.EventTitleSelection
-import com.android.streetworkapp.ui.park.ParticipantNumberSelection
-import com.android.streetworkapp.ui.park.TimeSelection
 import com.google.firebase.Timestamp
 import org.junit.Before
 import org.junit.Rule
