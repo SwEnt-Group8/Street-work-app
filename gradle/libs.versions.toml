@@ -1,5 +1,6 @@
 [versions]
 # Plugins
+coreTesting = "2.2.0"
 gms = "4.4.2"
 agp = "8.3.0"
 json = "20240303"
@@ -52,6 +53,7 @@ mockitoAndroid = "5.13.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "coreTesting" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 json = { module = "org.json:json", version.ref = "json" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
