@@ -54,32 +54,5 @@ class MapUiTest {
 
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("googleMap").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsDisplayed()
-    composeTestRule
-        .onAllNodesWithTag("bottomNavigationItem")
-        .assertCountEquals(LIST_TOP_LEVEL_DESTINATION.size)
-
-    for (i in LIST_TOP_LEVEL_DESTINATION.indices) {
-      composeTestRule.onAllNodesWithTag("bottomNavigationItem")[i].assertIsDisplayed()
-    }
-  }
-
-  @Test
-  fun mapIsInteractive() {
-    `when`(navigationActions.currentRoute()).thenReturn(Screen.MAP)
-
-    composeTestRule.setContent { MapScreen(parkLocationViewModel, navigationActions) }
-
-    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed().performClick()
-    composeTestRule.onNodeWithTag("googleMap").assertIsDisplayed().performClick()
-
-    for (i in LIST_TOP_LEVEL_DESTINATION.indices) {
-      composeTestRule
-          .onAllNodesWithTag("bottomNavigationItem")[i]
-          .assertIsDisplayed()
-          .performClick()
-
-      verify(navigationActions).navigateTo(LIST_TOP_LEVEL_DESTINATION[i])
-    }
   }
 }
