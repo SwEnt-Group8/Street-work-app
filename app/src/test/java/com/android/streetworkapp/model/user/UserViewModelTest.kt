@@ -1,5 +1,6 @@
 package com.android.streetworkapp.model.user
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -9,6 +10,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.*
 
@@ -17,6 +19,8 @@ class UserViewModelTest {
   private lateinit var repository: UserRepository
   private lateinit var userViewModel: UserViewModel
   private val testDispatcher = StandardTestDispatcher()
+  @get:Rule
+  val instantTaskExecutorRule = InstantTaskExecutorRule()
 
   @OptIn(ExperimentalCoroutinesApi::class)
   @Before
@@ -128,5 +132,17 @@ class UserViewModelTest {
     userViewModel.deleteUserByUid(uid)
     testDispatcher.scheduler.advanceUntilIdle()
     verify(repository).deleteUserByUid(uid)
+  }
+  @Test
+  fun loadCurrentUser_calls_repository_with_correct_uid_and_updates_currentUser() = runTest {
+    val uid = "user123"
+    val user = User(uid, "John Doe", "john@example.com", 100, emptyList())
+    whenever(repository.getUserByUid(uid)).thenReturn(user)
+    userViewModel.loadCurrentUser(uid)
+    testDispatcher.scheduler.advanceUntilIdle()
+    var observedUser: User? = null
+    userViewModel.currentUser.observeForever { observedUser = it }
+    verify(repository).getUserByUid(uid)
+    assertEquals(user, observedUser)
   }
 }
