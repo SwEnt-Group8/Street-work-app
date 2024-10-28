@@ -1,5 +1,6 @@
 package com.android.streetworkapp.model.user
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -9,6 +10,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.*
 
@@ -17,6 +19,7 @@ class UserViewModelTest {
   private lateinit var repository: UserRepository
   private lateinit var userViewModel: UserViewModel
   private val testDispatcher = StandardTestDispatcher()
+  @get:Rule val instantTaskExecutorRule = InstantTaskExecutorRule()
 
   @OptIn(ExperimentalCoroutinesApi::class)
   @Before
@@ -45,7 +48,7 @@ class UserViewModelTest {
     val uid = "user123"
     val user = User(uid, "John Doe", "john@example.com", 100, emptyList())
     whenever(repository.getUserByUid(uid)).thenReturn(user)
-    userViewModel.getUserById(uid)
+    userViewModel.getUserByUid(uid)
     testDispatcher.scheduler.advanceUntilIdle()
     verify(repository).getUserByUid(uid)
   }
@@ -128,5 +131,63 @@ class UserViewModelTest {
     userViewModel.deleteUserByUid(uid)
     testDispatcher.scheduler.advanceUntilIdle()
     verify(repository).deleteUserByUid(uid)
+  }
+
+  @Test
+  fun loadCurrentUser_calls_repository_with_correct_uid_and_updates_currentUser() = runTest {
+    val uid = "user123"
+    val user = User(uid, "John Doe", "john@example.com", 100, emptyList())
+    whenever(repository.getUserByUid(uid)).thenReturn(user)
+    userViewModel.loadCurrentUser(uid)
+    testDispatcher.scheduler.advanceUntilIdle()
+    var observedUser: User? = null
+    userViewModel.currentUser.observeForever { observedUser = it }
+    verify(repository).getUserByUid(uid)
+    assertEquals(user, observedUser)
+  }
+
+  @Test
+  fun setCurrentUser_updates_currentUser() {
+    val user = User("user123", "John Doe", "john@example.com", 100, emptyList())
+    userViewModel.setCurrentUser(user)
+
+    var observedUser: User? = null
+    userViewModel.currentUser.observeForever { observedUser = it }
+
+    assertEquals(user, observedUser)
+  }
+
+  @Test
+  fun getUser_updates_user() = runTest {
+    val user = User("user123", "Jane Doe", "jane@example.com", 50, emptyList())
+    whenever(repository.getUserByEmail("jane@example.com")).thenReturn(user)
+
+    userViewModel.getUserByEmail("jane@example.com")
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    var observedUser: User? = null
+    userViewModel.user.observeForever { observedUser = it }
+
+    verify(repository).getUserByEmail("jane@example.com")
+    assertEquals(user, observedUser)
+  }
+
+  @Test
+  fun getFriendsByUid_updates_friends() = runTest {
+    val uid = "user123"
+    val friends =
+        listOf(
+            User("friend1", "Friend One", "friend1@example.com", 50, emptyList()),
+            User("friend2", "Friend Two", "friend2@example.com", 60, emptyList()))
+    whenever(repository.getFriendsByUid(uid)).thenReturn(friends)
+
+    userViewModel.getFriendsByUid(uid)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    var observedFriends: List<User>? = null
+    userViewModel.friends.observeForever { observedFriends = it }
+
+    verify(repository).getFriendsByUid(uid)
+    assertEquals(friends, observedFriends)
   }
 }

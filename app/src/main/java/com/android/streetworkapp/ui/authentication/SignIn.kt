@@ -23,10 +23,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
+import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.utils.GoogleAuthService
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -46,14 +48,15 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
       authService.rememberFirebaseAuthLauncher(
           onAuthComplete = { result ->
             user = result.user
-            // todo call setCurrentUser in the viewmodel : userViewModel
+            checkAndAddUser(user, userViewModel)
+
             Log.d("SignInScreen", "Sign-in successful user : $user")
             Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
             navigationActions.navigateTo(Screen.MAP)
           },
           onAuthError = {
             user = null
-            Log.d("SignInScreen", "Sign-in failed")
+            Log.d("SignInScreen", "Sign-in failed : $it")
             Toast.makeText(context, "Login failed!", Toast.LENGTH_LONG).show()
           })
 
@@ -75,4 +78,30 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
           GoogleAuthButton(authService, context, launcher)
         }
   }
+}
+
+/**
+ * Checks if the user is already in the database, and if not, adds them.
+ *
+ * @param user The user to check and add.
+ * @param userViewModel The [UserViewModel] to use for database operations.
+ */
+fun checkAndAddUser(user: FirebaseUser?, userViewModel: UserViewModel) {
+  Log.d("SignInScreen", "Entered checkAndAddUser")
+  if (user == null) return
+  // Observe _user for the result of fetchUserByUid
+  val observer =
+      object : androidx.lifecycle.Observer<User?> {
+        override fun onChanged(value: User?) {
+          if (value == null) {
+            // User doesn't exist, so add them
+            val newUser = User(user.uid, user.displayName!!, user.email!!, 0, emptyList())
+            userViewModel.addUser(newUser)
+          }
+          // Remove the observer after one-time use
+          userViewModel.user.removeObserver(this)
+        }
+      }
+  userViewModel.user.observeForever(observer)
+  userViewModel.getUserByUid(user.uid)
 }
