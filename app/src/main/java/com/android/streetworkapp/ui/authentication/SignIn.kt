@@ -22,7 +22,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewModelScope
 import com.android.sample.R
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserViewModel
@@ -32,7 +31,6 @@ import com.android.streetworkapp.utils.GoogleAuthService
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.launch
 
 @Composable
 fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewModel) {
@@ -91,12 +89,19 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
 fun checkAndAddUser(user: FirebaseUser?, userViewModel: UserViewModel) {
   Log.d("SignInScreen", "Entered checkAndAddUser")
   if (user == null) return
-  userViewModel.viewModelScope.launch {
-    Log.d("SignInScreen", "Entered coroutine")
-    val fetchedUser = userViewModel.getUserByUid(user.uid)
-    if (fetchedUser == null) {
-      val newuser = User(user.uid, user.displayName!!, user.email!!, 0, emptyList())
-      userViewModel.addUser(newuser)
-    }
-  }
+  // Observe _user for the result of fetchUserByUid
+  val observer =
+      object : androidx.lifecycle.Observer<User?> {
+        override fun onChanged(value: User?) {
+          if (value == null) {
+            // User doesn't exist, so add them
+            val newUser = User(user.uid, user.displayName!!, user.email!!, 0, emptyList())
+            userViewModel.addUser(newUser)
+          }
+          // Remove the observer after one-time use
+          userViewModel.user.removeObserver(this)
+        }
+      }
+  userViewModel.user.observeForever(observer)
+  userViewModel.getUserByUid(user.uid)
 }

@@ -1,5 +1,6 @@
 package com.android.streetworkapp.ui.authentication
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
@@ -21,6 +22,7 @@ import org.mockito.kotlin.any
 class SignInTest {
 
   @get:Rule val mockitoRule: MockitoRule = MockitoJUnit.rule()
+  @get:Rule val instantExecutorRule = InstantTaskExecutorRule()
 
   private lateinit var userViewModel: UserViewModel
   @Mock lateinit var repository: UserRepository
