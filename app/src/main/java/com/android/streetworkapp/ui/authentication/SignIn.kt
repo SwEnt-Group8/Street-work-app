@@ -58,7 +58,7 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
           },
           onAuthError = {
             user = null
-            Log.d("SignInScreen", "Sign-in failed")
+            Log.d("SignInScreen", "Sign-in failed : $it")
             Toast.makeText(context, "Login failed!", Toast.LENGTH_LONG).show()
           })
 
