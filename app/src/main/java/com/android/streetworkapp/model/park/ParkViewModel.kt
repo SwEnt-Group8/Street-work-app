@@ -56,7 +56,7 @@ open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
   fun getParkByPid(pid: String) {
     viewModelScope.launch {
       val fetchedPark = repository.getParkByPid(pid)
-      _currentPark.postValue(fetchedPark)
+      _park.postValue(fetchedPark)
     }
   }
 
@@ -69,7 +69,7 @@ open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
   fun getParkByLocationId(locationId: String) {
     viewModelScope.launch {
       val fetchedPark = repository.getParkByLocationId(locationId)
-      _currentPark.postValue(fetchedPark)
+      _park.postValue(fetchedPark)
     }
   }
 
