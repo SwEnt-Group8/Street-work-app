@@ -3,8 +3,14 @@ package com.android.streetworkapp.ui.navigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Place
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 
 object Route {
   const val AUTH = "Auth"
@@ -22,6 +28,28 @@ object Screen {
   const val ADD_EVENT = "Add Event Screen"
   const val UNK = "TBD Screen" // TODO: not yet defined
 }
+
+data class ScreenParams(val screenName: String, val isBottomBarVisible: Boolean, val isTopBarVisible: Boolean) {
+  companion object {
+    val AUTH = ScreenParams(Screen.AUTH, isBottomBarVisible = false, isTopBarVisible = false)
+    val MAP = ScreenParams(Screen.MAP, isBottomBarVisible = true, isTopBarVisible = false)
+    val PROFILE = ScreenParams(Screen.PROFILE, isBottomBarVisible = true, isTopBarVisible = false)
+    val ADD_FRIEND = ScreenParams(Screen.ADD_FRIEND, isBottomBarVisible = true, isTopBarVisible = true)
+    val PARK_OVERVIEW = ScreenParams(Screen.PARK_OVERVIEW, isBottomBarVisible = true, isTopBarVisible = true)
+    val ADD_EVENT = ScreenParams(Screen.ADD_EVENT, isBottomBarVisible = true, isTopBarVisible = true)
+  }
+}
+
+val LIST_OF_SCREENS = listOf(
+  ScreenParams.AUTH,
+  ScreenParams.MAP,
+  ScreenParams.PROFILE,
+  ScreenParams.ADD_FRIEND,
+  ScreenParams.PARK_OVERVIEW,
+  ScreenParams.ADD_EVENT
+)
+
+
 
 /**
  * Represents a top-level destination in the app's navigation.
@@ -45,6 +73,7 @@ val LIST_TOP_LEVEL_DESTINATION = listOf(TopLevelDestinations.MAP, TopLevelDestin
 open class NavigationActions(
     private val navController: NavHostController,
 ) {
+
   /**
    * Navigate to the specified [TopLevelDestination]
    *
@@ -96,5 +125,14 @@ open class NavigationActions(
    */
   open fun currentRoute(): String {
     return navController.currentDestination?.route.orEmpty()
+  }
+
+  /**
+   * Will update the currentScreenName to the screen name on each destination change
+   */
+  open fun registerStringListenerOnDestinationChange(currentScreenName: MutableState<String?>) {
+    navController.addOnDestinationChangedListener {_, dest, _ ->
+      currentScreenName.value = dest.route
+    }
   }
 }
