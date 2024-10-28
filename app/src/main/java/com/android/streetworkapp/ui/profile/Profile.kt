@@ -2,7 +2,9 @@ package com.android.streetworkapp.ui.profile
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -31,18 +33,14 @@ import com.android.streetworkapp.ui.navigation.Screen
 @Composable
 fun ProfileScreen(
     navigationActions: NavigationActions,
-    userViewModel: UserViewModel = viewModel(factory = UserViewModel.Factory)
+    userViewModel: UserViewModel = viewModel(factory = UserViewModel.Factory),
+    innerPaddingValues: PaddingValues = PaddingValues(0.dp)
 ) {
-  Scaffold(
-      modifier = Modifier.testTag("ProfileScreen"),
-      bottomBar = {
-        BottomNavigationMenu(
-            onTabSelect = { route -> navigationActions.navigateTo(route) },
-            tabList = LIST_TOP_LEVEL_DESTINATION)
-      },
-      content = { padding ->
+  Box(
+      modifier = Modifier.testTag("ProfileScreen")
+  ) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(padding).testTag("ProfileColumn"),
+            modifier = Modifier.fillMaxSize().padding(innerPaddingValues).testTag("ProfileColumn"),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)) {
               // profile placeholder
@@ -84,5 +82,5 @@ fun ProfileScreen(
                     Text(text = "Train with a friend", fontSize = 17.sp)
                   }
             }
-      })
+      }
 }
