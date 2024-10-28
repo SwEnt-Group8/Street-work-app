@@ -40,7 +40,7 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
   fun loadCurrentUser(uid: String) {
     viewModelScope.launch {
       val user = repository.getUserByUid(uid)
-      _currentUser.postValue(user)
+      _currentUser.setValue(user)
     }
   }
 
@@ -75,7 +75,7 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
   fun getUserByUid(uid: String) {
     viewModelScope.launch {
       val user = repository.getUserByUid(uid)
-      _user.postValue(user)
+      _user.setValue(user)
     }
   }
 
@@ -88,7 +88,7 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
   fun getUserByEmail(email: String) {
     viewModelScope.launch {
       val fetchedUser = repository.getUserByEmail(email)
-      _user.postValue(fetchedUser)
+      _user.setValue(fetchedUser)
     }
   }
 
@@ -101,7 +101,7 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
   fun getUserByUserName(userName: String) {
     viewModelScope.launch {
       val fetchedUser = repository.getUserByUserName(userName)
-      _user.postValue(fetchedUser)
+      _user.setValue(fetchedUser)
     }
   }
 
@@ -114,7 +114,7 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
   fun getFriendsByUid(uid: String) {
     viewModelScope.launch {
       val fetchedFriends = repository.getFriendsByUid(uid)
-      _friends.postValue(fetchedFriends)
+      _friends.setValue(fetchedFriends)
     }
   }
 
