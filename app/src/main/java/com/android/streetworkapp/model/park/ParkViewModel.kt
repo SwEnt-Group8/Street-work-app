@@ -27,6 +27,18 @@ open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
   }
 
   /**
+   * Load the current park from the database using its ID.
+   *
+   * @param pid The park ID.
+   */
+  fun loadCurrentPark(pid: String) {
+    viewModelScope.launch {
+      val fetchedPark = repository.getParkByPid(pid)
+      _currentPark.postValue(fetchedPark)
+    }
+  }
+
+  /**
    * Get a new park ID.
    *
    * @return A new park ID.
