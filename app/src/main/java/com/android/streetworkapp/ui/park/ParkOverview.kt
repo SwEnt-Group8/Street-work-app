@@ -57,44 +57,6 @@ import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.utils.toFormattedString
 
-/**
- * Display the overview of a park, including park details and a list of events.
- *
- * @param navigationActions navigation class
- * @param park The park data to display.
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ParkOverview(navigationActions: NavigationActions, park: Park, eventViewModel: EventViewModel) {
-  eventViewModel.getEvents()
-
-  Scaffold(
-      modifier = Modifier.testTag("ParkOverview"),
-      topBar = {
-        TopAppBar(
-            modifier = Modifier.testTag("ParkOverviewTopBar"),
-            title = {},
-            colors =
-                TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface),
-            navigationIcon = {
-              IconButton(
-                  onClick = { navigationActions.goBack() },
-                  modifier = Modifier.testTag("goBackButtonOverviewScreen")) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Arrow Back Icon")
-                  }
-            })
-      }) { innerPadding ->
-        ParkOverviewScreen(
-            park,
-            innerPadding,
-            navigationActions,
-            eventViewModel) // we declare this so that it doesn't impact the tests in
-        // PackOverviewScreen (exceptions wouldn't be caught as it's async and
-        // tests would fail)
-      }
-}
 
 /**
  * Display the overview of a park, including park details and a list of events.
