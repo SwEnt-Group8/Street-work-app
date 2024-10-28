@@ -18,6 +18,15 @@ open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
     get() = _park
 
   /**
+   * Set the current park.
+   *
+   * @param park The park to set as the current park.
+   */
+  fun setCurrentPark(park: Park?) {
+    _currentPark.value = park
+  }
+
+  /**
    * Get a new park ID.
    *
    * @return A new park ID.
