@@ -9,6 +9,7 @@ import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.printToLog
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.streetworkapp.StreetWorkApp
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
@@ -78,21 +79,6 @@ class MapUiTest {
           .assertIsDisplayed()
           .performClick()
 
-      verify(navigationActions).navigateTo(LIST_TOP_LEVEL_DESTINATION[i])
-    }
-  }
-
-  @Test
-  fun routeChangesWhenBottomNavigationItemIsClicked() {
-    `when`(navigationActions.currentRoute()).thenReturn(Screen.MAP)
-
-    composeTestRule.setContent { MapScreen(parkLocationViewModel, navigationActions) }
-
-    for (i in LIST_TOP_LEVEL_DESTINATION.indices) {
-      composeTestRule
-          .onAllNodesWithTag("bottomNavigationItem")[i]
-          .assertIsDisplayed()
-          .performClick()
       verify(navigationActions).navigateTo(LIST_TOP_LEVEL_DESTINATION[i])
     }
   }
