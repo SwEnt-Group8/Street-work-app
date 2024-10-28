@@ -19,8 +19,7 @@ class UserViewModelTest {
   private lateinit var repository: UserRepository
   private lateinit var userViewModel: UserViewModel
   private val testDispatcher = StandardTestDispatcher()
-  @get:Rule
-  val instantTaskExecutorRule = InstantTaskExecutorRule()
+  @get:Rule val instantTaskExecutorRule = InstantTaskExecutorRule()
 
   @OptIn(ExperimentalCoroutinesApi::class)
   @Before
@@ -133,6 +132,7 @@ class UserViewModelTest {
     testDispatcher.scheduler.advanceUntilIdle()
     verify(repository).deleteUserByUid(uid)
   }
+
   @Test
   fun loadCurrentUser_calls_repository_with_correct_uid_and_updates_currentUser() = runTest {
     val uid = "user123"
