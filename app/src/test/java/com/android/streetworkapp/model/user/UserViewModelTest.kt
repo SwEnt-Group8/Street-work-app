@@ -145,4 +145,49 @@ class UserViewModelTest {
     verify(repository).getUserByUid(uid)
     assertEquals(user, observedUser)
   }
+
+  @Test
+  fun setCurrentUser_updates_currentUser() {
+    val user = User("user123", "John Doe", "john@example.com", 100, emptyList())
+    userViewModel.setCurrentUser(user)
+
+    var observedUser: User? = null
+    userViewModel.currentUser.observeForever { observedUser = it }
+
+    assertEquals(user, observedUser)
+  }
+
+  @Test
+  fun getUser_updates_user() = runTest {
+    val user = User("user123", "Jane Doe", "jane@example.com", 50, emptyList())
+    whenever(repository.getUserByEmail("jane@example.com")).thenReturn(user)
+
+    userViewModel.getUserByEmail("jane@example.com")
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    var observedUser: User? = null
+    userViewModel.user.observeForever { observedUser = it }
+
+    verify(repository).getUserByEmail("jane@example.com")
+    assertEquals(user, observedUser)
+  }
+
+  @Test
+  fun getFriendsByUid_updates_friends() = runTest {
+    val uid = "user123"
+    val friends =
+        listOf(
+            User("friend1", "Friend One", "friend1@example.com", 50, emptyList()),
+            User("friend2", "Friend Two", "friend2@example.com", 60, emptyList()))
+    whenever(repository.getFriendsByUid(uid)).thenReturn(friends)
+
+    userViewModel.getFriendsByUid(uid)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    var observedFriends: List<User>? = null
+    userViewModel.friends.observeForever { observedFriends = it }
+
+    verify(repository).getFriendsByUid(uid)
+    assertEquals(friends, observedFriends)
+  }
 }
