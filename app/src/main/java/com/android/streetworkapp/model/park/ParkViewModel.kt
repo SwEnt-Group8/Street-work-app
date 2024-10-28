@@ -1,10 +1,17 @@
 package com.android.streetworkapp.model.park
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
 open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
+
+  // LiveData of the current park
+  private val _currentPark = MutableLiveData<Park?>()
+  val currentPark: LiveData<Park?>
+    get() = _currentPark
 
   /**
    * Get a new park ID.
