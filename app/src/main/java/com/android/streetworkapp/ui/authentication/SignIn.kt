@@ -57,7 +57,7 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
           onAuthError = {
             user = null
             Log.d("SignInScreen", "Sign-in failed : $it")
-            Toast.makeText(context, "Login failed!", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Login failed! : $it", Toast.LENGTH_LONG).show()
           })
 
   Box(modifier = Modifier.fillMaxSize().testTag("loginScreenBoxContainer")) {
