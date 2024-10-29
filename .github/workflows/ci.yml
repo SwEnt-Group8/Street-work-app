@@ -124,10 +124,6 @@ jobs:
           echo "KEYSTORE_ALIAS length: ${#KEYSTORE_ALIAS}"
           echo "::add-mask::$KEY_PASSWORD"
           echo "KEY_PASSWORD length: ${#KEY_PASSWORD}"
-
-      # Check keystore secrets (debugging purpose)
-      - name: Check Keystore Secrets
-        run: |
           echo "KEYSTORE_PASSWORD hash: $(echo -n $KEYSTORE_PASSWORD | sha256sum)"
           echo "KEYSTORE_ALIAS hash: $(echo -n $KEYSTORE_ALIAS | sha256sum)"
           echo "KEY_PASSWORD hash: $(echo -n $KEY_PASSWORD | sha256sum)"
@@ -139,6 +135,9 @@ jobs:
           echo "DEBUG_KEY: '$DEBUG_KEY'"
           echo "DEBUG_KEY length: ${#DEBUG_KEY}"
           echo "DEBUG_KEY hash: $(echo -n $DEBUG_KEY | sha256sum)"
+          echo "Printing DEBUG_KEY character by character:"
+          for (( i=0; i<${#DEBUG_KEY}; i++ )); do
+            echo "${DEBUG_KEY:$i:1}"
 
       - name: Grant execute permission for gradlew
         run: |
