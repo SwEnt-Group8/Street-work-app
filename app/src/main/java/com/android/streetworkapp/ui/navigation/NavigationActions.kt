@@ -29,14 +29,14 @@ object Screen {
   const val UNK = "TBD Screen" // TODO: not yet defined
 }
 
-data class ScreenParams(val screenName: String, val isBottomBarVisible: Boolean, val isTopBarVisible: Boolean) {
+data class ScreenParams(val screenName: String, val isBottomBarVisible: Boolean, val isTopBarVisible: Boolean, val topAppBarManager: TopAppBarManager? ) {
   companion object {
-    val AUTH = ScreenParams(Screen.AUTH, isBottomBarVisible = false, isTopBarVisible = false)
-    val MAP = ScreenParams(Screen.MAP, isBottomBarVisible = true, isTopBarVisible = false)
-    val PROFILE = ScreenParams(Screen.PROFILE, isBottomBarVisible = true, isTopBarVisible = false)
-    val ADD_FRIEND = ScreenParams(Screen.ADD_FRIEND, isBottomBarVisible = true, isTopBarVisible = true)
-    val PARK_OVERVIEW = ScreenParams(Screen.PARK_OVERVIEW, isBottomBarVisible = true, isTopBarVisible = true)
-    val ADD_EVENT = ScreenParams(Screen.ADD_EVENT, isBottomBarVisible = true, isTopBarVisible = true)
+    val AUTH = ScreenParams(Screen.AUTH, isBottomBarVisible = false, isTopBarVisible = false, null)
+    val MAP = ScreenParams(Screen.MAP, isBottomBarVisible = true, isTopBarVisible = true, TopAppBarManager("Map"))
+    val PROFILE = ScreenParams(Screen.PROFILE, isBottomBarVisible = true, isTopBarVisible = true, TopAppBarManager("My Profile"))
+    val ADD_FRIEND = ScreenParams(Screen.ADD_FRIEND, isBottomBarVisible = true, isTopBarVisible = true, TopAppBarManager("Add a new Friend", hasNavigationIcon = true, navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
+    val PARK_OVERVIEW = ScreenParams(Screen.PARK_OVERVIEW, isBottomBarVisible = true, isTopBarVisible = true, TopAppBarManager("Park Overview", hasNavigationIcon = true, navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
+    val ADD_EVENT = ScreenParams(Screen.ADD_EVENT, isBottomBarVisible = true, isTopBarVisible = true, TopAppBarManager("Event Creation", hasNavigationIcon = true, navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON ))
   }
 }
 
@@ -48,8 +48,6 @@ val LIST_OF_SCREENS = listOf(
   ScreenParams.PARK_OVERVIEW,
   ScreenParams.ADD_EVENT
 )
-
-
 
 /**
  * Represents a top-level destination in the app's navigation.
