@@ -3,7 +3,9 @@ package com.android.streetworkapp.ui.profile
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -39,7 +41,9 @@ import com.android.streetworkapp.ui.navigation.NavigationActions
 @Composable
 fun AddFriendScreen(
     navigationActions: NavigationActions,
-    userViewModel: UserViewModel = viewModel(factory = UserViewModel.Factory)
+    userViewModel: UserViewModel = viewModel(factory = UserViewModel.Factory),
+    innerPaddingValues: PaddingValues = PaddingValues(0.dp)
+
 ) {
   // variable for outlined text
   var id by remember { mutableStateOf("") }
@@ -48,24 +52,11 @@ fun AddFriendScreen(
   // fake user ID (placeholder)
   val uid = "user123"
 
-  Scaffold(
-      modifier = Modifier.testTag("addFriendScreen"),
-      topBar = {
-        // button to go back
-        TopAppBar(
-            title = { Text("Add a new friend", Modifier.testTag("addFriendTitle")) },
-            navigationIcon = {
-              IconButton(
-                  onClick = { navigationActions.goBack() }, Modifier.testTag("goBackButton")) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                        contentDescription = "Back")
-                  }
-            })
-      },
-      content = { padding ->
+  Box(
+      modifier = Modifier.testTag("addFriendScreen")
+  ){
         Column(
-            modifier = Modifier.fillMaxSize().padding(padding).testTag("AddFriendColumn"),
+            modifier = Modifier.fillMaxSize().padding(innerPaddingValues).testTag("AddFriendColumn"),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterVertically)) {
               Image(
@@ -102,5 +93,5 @@ fun AddFriendScreen(
                     Text(text = "Send request", fontSize = 17.sp)
                   }
             }
-      })
+      }
 }
