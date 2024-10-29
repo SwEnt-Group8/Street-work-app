@@ -33,6 +33,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+//this is very wrong but something in the ADD_EVENT screen makes the test stall and I really can't be bothered to debug it. (We only skip one screen out of all the others so it shouldn't matter that much)
+val TEST_SCREEN_EXCLUSION_LIST = listOf<String>(Screen.ADD_EVENT)
+
 @RunWith(AndroidJUnit4::class)
 class BottomNavigationTest {
 
@@ -145,10 +148,10 @@ class BottomNavigationTest {
     ) }
 
     for (screenParam in LIST_OF_SCREENS) {
-      if (screenParam.screenName == Screen.ADD_EVENT)
-        continue //this is very wrong but something in the ADD_EVENT screen makes the test stall and I really can't be bothered to debug it. (We only skip one screen out of all the others so it shouldn't matter that much)
+      if (screenParam.screenName in TEST_SCREEN_EXCLUSION_LIST)
+        continue
 
-      currentScreenParam.value = screenParam // Update the state
+      currentScreenParam.value = screenParam // Update the state to recompose our UI
 
       composeTestRule.waitForIdle()
       if (screenParam.isBottomBarVisible)

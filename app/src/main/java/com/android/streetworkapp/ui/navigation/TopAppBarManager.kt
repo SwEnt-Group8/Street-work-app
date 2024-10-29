@@ -24,10 +24,10 @@ class TopAppBarManager(private var title: String = "", private var hasNavigation
     }
 
     /**
-     * Changes the TopAppBar navigationIcon
+     * returns hasNavigationIcon
      */
-    fun setNavigationIcon(newIcon: ImageVector) {
-        this.navigationIcon = newIcon
+    fun hasNavigationIcon(): Boolean {
+        return this.hasNavigationIcon
     }
 
     /**
@@ -37,10 +37,4 @@ class TopAppBarManager(private var title: String = "", private var hasNavigation
         return this.navigationIcon ?: TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON
     }
 
-    /**
-     * returns hasNavigationIcon
-     */
-    fun hasNavigationIcon(): Boolean {
-        return this.hasNavigationIcon
-    }
 }
