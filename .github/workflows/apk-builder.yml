@@ -1,4 +1,5 @@
-name: APK build
+name: APK Build and Release
+
 on:
   workflow_dispatch:
     inputs:
@@ -7,81 +8,110 @@ on:
         type: string
         description: "Version tag for this release (e.g., v0.1.0)"
         default: "v0.1.0"
+      build_type:
+        required: true
+        type: choice
+        description: "Select the build type (debug or release)"
+        options:
+          - debug
+          - release
+        default: debug
 
 permissions:
   contents: write
 
 jobs:
   build:
-    name: Build Debug APK
+    name: Build and Release Debug APK
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Set up the Java Development Kit
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # Load the google-services.json file from the secrets
-      - name: Load Google Service file
-        run: echo "${{ secrets.GOOGLE_SERVICES }}" > app/google-services.json
+      # Load google-services.json from GitHub Secrets
+      - name: Load Google Services configuration
+        env:
+          DATA: ${{ secrets.GOOGLE_SERVICES }}
+        run: echo "$DATA" | base64 -d > app/google-services.json
 
-      # Load the keystore file from the secrets
+      # Load the keystore (.jks) file from GitHub Secrets
       - name: Load Keystore file
         env:
           DATA: ${{ secrets.KEYSTORE_JKS }}
-        run: echo $DATA | base64 -di > app/upload-keystore.jks
+        run: echo "$DATA" | base64 -d > app/upload-keystore.jks
 
-      # Load the keystore.properties file from the secrets
+      # Load keystore.properties from GitHub Secrets
       - name: Load Keystore properties file
         env:
           DATA: ${{ secrets.KEYSTORE }}
-        run: echo $DATA | base64 -di > keystore.properties
+        run: echo "$DATA" | base64 -d > keystore.properties
 
-      # Load the secrets
-      - name: Load secrets
+      # Load other secrets (e.g., API keys) if needed
+      - name: Load additional secrets
         env:
           DATA: ${{ secrets.SECRETS }}
         run: |
-          echo $DATA | base64 -di > secrets.properties
-          echo $DATA | base64 -di > local.defaults.properties
+          echo "$DATA" | base64 -d > secrets.properties
+          echo "$DATA" | base64 -d > local.defaults.properties
 
-      - name: Grant execute permission for gradlew
+      # Grant execute permission for Gradle wrapper
+      - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      - name: Build APK with detailed logs
-        run: ./gradlew assembleDebug --stacktrace --info
+      # Build APK with debug configuration and detailed logs
+      - name: Build APK with logs
+        run: |
+          if [ "${{ inputs.build_type }}" == "release" ]; then
+            ./gradlew assembleRelease --stacktrace --info
+          else
+            ./gradlew assembleDebug --stacktrace --info
+          fi
 
+      # Locate and list the generated APK files
       - name: Find and list APK files
         id: apkpath
         run: |
-          find app/build/outputs/apk/ -name "*.apk" -exec ls -lh {} \;
-          echo "apk_path=$(find app/build/outputs/apk/debug/*.apk)" >> $GITHUB_ENV
+          if [ "${{ inputs.build_type }}" == "release" ]; then
+            find app/build/outputs/apk/release/ -name "*.apk" -exec ls -lh {} \;
+            echo "apk_path=$(find app/build/outputs/apk/release/*.apk)" >> $GITHUB_ENV
+          else
+            find app/build/outputs/apk/debug/ -name "*.apk" -exec ls -lh {} \;
+            echo "apk_path=$(find app/build/outputs/apk/debug/*.apk)" >> $GITHUB_ENV
+          fi
 
+      # Create a Git tag for the release
       - name: Create Git Tag
         id: tag
         run: |
           git tag ${{ inputs.tag_name }}
           git push origin ${{ inputs.tag_name }}
 
-      - name: Upload APK in artifacts
+      # Upload the generated APK as a build artifact
+      - name: Upload APK to GitHub Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: streetworkapp-debug
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: streetworkapp-${{ inputs.build_type }}
+          path: ${{ env.apk_path }}
           retention-days: 90
 
+      # Load and decode Google Maps API Key into local.defaults.properties
       - name: Load and Decode Google Maps API Key
         env:
           DATA: ${{ secrets.LOCAL_PROPERTIES }}
         run: |
-          echo $DATA | base64 -di | grep "MAPS_API_KEY" >> local.defaults.properties
+          echo "$DATA" | base64 -d | grep "MAPS_API_KEY" >> local.defaults.properties
 
-      - name: Release APK
+      # Release the APK on GitHub with the specified tag
+      - name: Publish Release on GitHub
         uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
