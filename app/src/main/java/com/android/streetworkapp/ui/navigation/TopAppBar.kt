@@ -18,8 +18,8 @@ import androidx.compose.ui.platform.testTag
 fun TopAppBarWrapper(navigationActions: NavigationActions, topAppBarManager: TopAppBarManager?) {
     topAppBarManager?.let {
         TopAppBar(
-            modifier = Modifier.testTag("TopAppBar"),
-            title = { Text(topAppBarManager.getTopAppBarTitle()) },
+            modifier = Modifier.testTag("topAppBar"),
+            title = { Text(modifier = Modifier.testTag("topAppBarTitle"), text = topAppBarManager.getTopAppBarTitle()) },
             colors =
             TopAppBarDefaults.topAppBarColors(
                 containerColor = MaterialTheme.colorScheme.surface
