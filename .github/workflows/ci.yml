@@ -132,6 +132,13 @@ jobs:
           echo "KEYSTORE_ALIAS hash: $(echo -n $KEYSTORE_ALIAS | sha256sum)"
           echo "KEY_PASSWORD hash: $(echo -n $KEY_PASSWORD | sha256sum)"
 
+      - name: Print DEBUG_KEY for Debugging
+        env:
+          DEBUG_KEY: ${{ secrets.DEBUG_KEY }}
+        run: |
+          echo "DEBUG_KEY: '$DEBUG_KEY'"
+          echo "DEBUG_KEY length: ${#DEBUG_KEY}"
+          echo "DEBUG_KEY hash: $(echo -n $DEBUG_KEY | sha256sum)"
 
       - name: Grant execute permission for gradlew
         run: |
