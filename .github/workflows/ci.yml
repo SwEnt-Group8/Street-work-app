@@ -74,15 +74,6 @@ jobs:
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
 
-      - name: Grant execute permission for gradlew
-        run: |
-          chmod +x ./gradlew
-
-      # Check formatting
-      - name: KTFmt Check
-        run: |
-          ./gradlew ktfmtCheck
-
       # Load google-services.json and local.properties from the secrets
       - name: Decode secrets
         env:
@@ -92,6 +83,32 @@ jobs:
           echo "$GOOGLE_SERVICES" | base64 --decode > ./app/google-services.json
           echo "$LOCAL_PROPERTIES" | base64 --decode > ./local.properties
 
+      # Load keystore.jks from the secrets
+      - name: Load Keystore file
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: echo "$KEYSTORE_BASE64" | base64 --decode > keystore.jks
+
+      # Set environment variables for keystore passwords
+      - name: Set Keystore Environment Variables
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          echo "::add-mask::$KEYSTORE_PASSWORD"
+          echo "::add-mask::$KEYSTORE_ALIAS"
+          echo "::add-mask::$KEY_PASSWORD"
+
+      - name: Grant execute permission for gradlew
+        run: |
+          chmod +x ./gradlew
+
+      # Check formatting
+      - name: KTFmt Check
+        run: |
+          ./gradlew ktfmtCheck
+
       # This step runs gradle commands to build the application
       - name: Assemble
         run: |
@@ -99,13 +116,13 @@ jobs:
           ./gradlew assemble lint --parallel --build-cache
 
       # Run Unit tests
-      - name: Run tests
+      - name: Run Unit tests
         run: |
           # To run the CI with debug information, add --info
           ./gradlew check --parallel --build-cache
 
       # Run connected tests on the emulator
-      - name: run tests
+      - name: Run emulated tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34

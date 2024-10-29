@@ -22,7 +22,7 @@ permissions:
 
 jobs:
   build:
-    name: Build and Release Debug APK
+    name: Build APK
     runs-on: ubuntu-latest
 
     steps:
@@ -43,31 +43,35 @@ jobs:
           DATA: ${{ secrets.GOOGLE_SERVICES }}
         run: echo "$DATA" | base64 -d > app/google-services.json
 
+      # Load and decode Google Maps API Key into local.properties
+      - name: Load and Decode Google Maps API Key
+        env:
+          DATA: ${{ secrets.LOCAL_PROPERTIES }}
+        run: |
+          echo "$DATA" | base64 -d | grep "MAPS_API_KEY" >> local.properties
+
       # Load the keystore (.jks) file from GitHub Secrets
       - name: Load Keystore file
         env:
           DATA: ${{ secrets.KEYSTORE_JKS }}
-        run: echo "$DATA" | base64 -d > app/upload-keystore.jks
+        run: echo "$DATA" | base64 -d > keystore.jks
 
-      # Load keystore.properties from GitHub Secrets
-      - name: Load Keystore properties file
+      # Set environment variables for keystore passwords
+      - name: Set Keystore Environment Variables
         env:
-          DATA: ${{ secrets.KEYSTORE }}
-        run: echo "$DATA" | base64 -d > keystore.properties
-
-      # Load other secrets (e.g., API keys) if needed
-      - name: Load additional secrets
-        env:
-          DATA: ${{ secrets.SECRETS }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          echo "$DATA" | base64 -d > secrets.properties
-          echo "$DATA" | base64 -d > local.defaults.properties
+          echo "::add-mask::$KEYSTORE_PASSWORD"
+          echo "::add-mask::$KEYSTORE_ALIAS"
+          echo "::add-mask::$KEY_PASSWORD"
 
       # Grant execute permission for Gradle wrapper
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      # Build APK with debug configuration and detailed logs
+      # Build APK with appropriate configuration and detailed logs
       - name: Build APK with logs
         run: |
           if [ "${{ inputs.build_type }}" == "release" ]; then
@@ -102,13 +106,6 @@ jobs:
           name: streetworkapp-${{ inputs.build_type }}
           path: ${{ env.apk_path }}
           retention-days: 90
-
-      # Load and decode Google Maps API Key into local.defaults.properties
-      - name: Load and Decode Google Maps API Key
-        env:
-          DATA: ${{ secrets.LOCAL_PROPERTIES }}
-        run: |
-          echo "$DATA" | base64 -d | grep "MAPS_API_KEY" >> local.defaults.properties
 
       # Release the APK on GitHub with the specified tag
       - name: Publish Release on GitHub
