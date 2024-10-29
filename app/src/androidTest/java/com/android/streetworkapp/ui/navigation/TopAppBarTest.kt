@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
@@ -70,7 +71,15 @@ class TopAppBarTest {
         parkLocationViewModel = ParkLocationViewModel(parkLocationRepository)
     }
 
-    
+    @Test
+    fun changingTitleInManagerMakesItChangeOnScreen() {
+        val topAppBarManager = TopAppBarManager("old title")
+
+        topAppBarManager.setTopAppBarTitle("new title")
+        composeTestRule.setContent { TopAppBarWrapper(NavigationActions(mockk()), topAppBarManager) }
+        composeTestRule.onNodeWithTag("topAppBarTitle").assertIsDisplayed().assertTextEquals("new title")
+    }
+
     @Test
     fun isDisplayedCorrectlyOnScreens() {
         val currentScreenParam = mutableStateOf(LIST_OF_SCREENS.first()) //can't call setContent twice per test so we use this instead
