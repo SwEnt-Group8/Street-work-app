@@ -16,7 +16,6 @@ import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.park.OccupancyBar
-import com.android.streetworkapp.ui.park.ParkOverview
 import com.android.streetworkapp.ui.park.ParkOverviewScreen
 import com.android.streetworkapp.ui.park.RatingComponent
 import com.google.firebase.Timestamp
@@ -201,21 +200,5 @@ class ParkOverviewTest {
     composeTestRule.setContent { OccupancyBar(occupancy = 1.0f) }
     composeTestRule.onNodeWithTag("occupancyBar").isDisplayed()
     composeTestRule.onNodeWithTag("occupancyText").assertTextEquals("100% Occupancy")
-  }
-
-  @Test
-  fun topBarAndParkOverviewScreenAreDisplayedInParkOverview() {
-    composeTestRule.setContent { ParkOverview(navigationActions, park, eventViewModel) }
-
-    composeTestRule.onNodeWithTag("ParkOverviewTopBar").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("parkOverviewScreen").assertIsDisplayed()
-  }
-
-  @Test
-  fun topBarArrowBackCallsNavigationActionsGoBack() {
-    composeTestRule.setContent { ParkOverview(navigationActions, park, eventViewModel) }
-
-    composeTestRule.onNodeWithTag("goBackButtonOverviewScreen").performClick()
-    verify(navigationActions).goBack()
   }
 }
