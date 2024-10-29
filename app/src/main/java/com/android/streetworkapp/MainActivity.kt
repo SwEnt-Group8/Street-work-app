@@ -149,7 +149,7 @@ fun StreetWorkApp(
               ) {
                 composable(Screen.AUTH) {
                   SignInScreen(navigationActions, userViewModel)
-                } // TODO: restore
+                }
               }
 
               navigation(
