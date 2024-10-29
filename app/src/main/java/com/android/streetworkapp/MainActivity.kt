@@ -147,9 +147,7 @@ fun StreetWorkApp(
                   startDestination = Screen.AUTH,
                   route = Route.AUTH,
               ) {
-                composable(Screen.AUTH) {
-                  SignInScreen(navigationActions, userViewModel)
-                }
+                composable(Screen.AUTH) { SignInScreen(navigationActions, userViewModel) }
               }
 
               navigation(
@@ -176,9 +174,13 @@ fun StreetWorkApp(
                   route = Route.PROFILE,
               ) {
                 // profile screen + list of friend
-                composable(Screen.PROFILE) { ProfileScreen(navigationActions, userViewModel) }
+                composable(Screen.PROFILE) {
+                  ProfileScreen(navigationActions, userViewModel, innerPadding)
+                }
                 // screen for adding friend
-                composable(Screen.ADD_FRIEND) { AddFriendScreen(navigationActions, userViewModel) }
+                composable(Screen.ADD_FRIEND) {
+                  AddFriendScreen(navigationActions, userViewModel, innerPadding)
+                }
               }
             }
         navigationActions.apply(navTestInvokation)
