@@ -15,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.Park
@@ -27,6 +28,7 @@ import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.authentication.SignInScreen
 import com.android.streetworkapp.ui.event.AddEventScreen
+import com.android.streetworkapp.ui.event.EventOverviewScreen
 import com.android.streetworkapp.ui.map.MapScreen
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenu
 import com.android.streetworkapp.ui.navigation.LIST_OF_SCREENS
@@ -35,14 +37,14 @@ import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.navigation.ScreenParams
-import com.android.streetworkapp.ui.navigation.TopLevelDestination
-import com.android.streetworkapp.ui.navigation.TopLevelDestinations
-import com.android.streetworkapp.ui.park.ParkOverview
+import com.android.streetworkapp.ui.navigation.TopAppBarWrapper
+import com.android.streetworkapp.ui.park.ParkOverviewScreen
 import com.android.streetworkapp.ui.profile.AddFriendScreen
 import com.android.streetworkapp.ui.profile.ProfileScreen
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.flow.distinctUntilChanged
 import okhttp3.OkHttpClient
+import java.util.Date
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,7 +97,6 @@ fun StreetWorkApp(
   var screenParams by remember { mutableStateOf<ScreenParams?>(null) }
 
   navigationActions.registerStringListenerOnDestinationChange(currentScreenName)
-
   screenParams = LIST_OF_SCREENS.find { currentScreenName.value == it.screenName }
 
   // Park with no events
@@ -110,7 +111,25 @@ fun StreetWorkApp(
           capacity = 10,
           occupancy = 5,
           events = emptyList())
+
+
+    val sampleEvent = Event(
+        eid = "event123",
+        title = "Community Park Cleanup",
+        description = "Join us for a day of community service to clean up the local park!",
+        participants = 15,
+        maxParticipants = 50,
+        date = Timestamp(Date()),  // Current date and time
+        owner = "ownerUserId",
+        listParticipants = listOf("user1", "user2", "user3"),
+        parkId = "park567"
+    )
   Scaffold(
+    topBar = {
+        screenParams?.isTopBarVisible?.takeIf { it }?.let {
+            TopAppBarWrapper(navigationActions, screenParams?.topAppBarManager)
+        }
+    },
     bottomBar = {
         screenParams?.isBottomBarVisible?.takeIf { it }?.let {
             BottomNavigationMenu(
@@ -122,13 +141,13 @@ fun StreetWorkApp(
   ){ innerPadding ->
       NavHost(
           navController = navController,
-          startDestination = Route.MAP //TODO: change to SignIn
+          startDestination = Route.AUTH
       ) { // TODO: handle start destination based on signIn logic
           navigation(
               startDestination = Screen.AUTH,
               route = Route.AUTH,
           ) {
-              composable(Screen.AUTH) { SignInScreen(navigationActions, userViewModel) }
+              composable(Screen.AUTH) { SignInScreen(navigationActions, userViewModel) } //TODO: restore
           }
 
           navigation(
@@ -139,7 +158,7 @@ fun StreetWorkApp(
                   MapScreen(parkLocationViewModel, navigationActions, mapCallbackOnMapLoaded, innerPadding)
               }
               composable(Screen.PARK_OVERVIEW) {
-                  ParkOverview(navigationActions, testPark, eventViewModel)
+                  ParkOverviewScreen(testPark, innerPadding, navigationActions, eventViewModel)
               }
               composable(Screen.ADD_EVENT) {
                   AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
