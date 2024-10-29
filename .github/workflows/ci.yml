@@ -100,6 +100,14 @@ jobs:
           echo "::add-mask::$KEYSTORE_ALIAS"
           echo "::add-mask::$KEY_PASSWORD"
 
+      # Check keystore secrets (debugging purpose)
+      - name: Check Keystore Secrets
+        run: |
+          echo "KEYSTORE_PASSWORD hash: $(echo -n $KEYSTORE_PASSWORD | sha256sum)"
+          echo "KEYSTORE_ALIAS hash: $(echo -n $KEYSTORE_ALIAS | sha256sum)"
+          echo "KEY_PASSWORD hash: $(echo -n $KEY_PASSWORD | sha256sum)"
+
+
       - name: Grant execute permission for gradlew
         run: |
           chmod +x ./gradlew
