@@ -73,6 +73,10 @@ jobs:
 
       # Build APK with appropriate configuration and detailed logs
       - name: Build APK with logs
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           if [ "${{ inputs.build_type }}" == "release" ]; then
             ./gradlew assembleRelease --stacktrace --info
