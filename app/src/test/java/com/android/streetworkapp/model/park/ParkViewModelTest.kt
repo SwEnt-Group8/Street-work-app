@@ -23,6 +23,18 @@ class ParkViewModelTest {
   private lateinit var parkViewModel: ParkViewModel
   private val testDispatcher = StandardTestDispatcher()
 
+  private fun createPark(pid: String = "123", locationId: String = "321") =
+      Park(
+          pid = pid,
+          name = "Sample Park",
+          location = ParkLocation(0.0, 0.0, locationId),
+          imageReference = "parks/sample.png",
+          rating = 4.0f,
+          nbrRating = 2,
+          capacity = 10,
+          occupancy = 5,
+          events = listOf("event1", "event2"))
+
   @get:Rule val instantTaskExecutorRule = InstantTaskExecutorRule()
 
   @OptIn(ExperimentalCoroutinesApi::class)
@@ -50,17 +62,7 @@ class ParkViewModelTest {
   @Test
   fun getParkByPidCallsRepositoryWithCorrectPid() = runTest {
     val pid = "user123"
-    val park =
-        Park(
-            pid = pid,
-            name = "Sample Park",
-            location = ParkLocation(0.0, 0.0, "321"),
-            imageReference = "parks/sample.png",
-            rating = 4.0f,
-            nbrRating = 2,
-            capacity = 10,
-            occupancy = 5,
-            events = listOf("event1", "event2"))
+    val park = createPark(pid = pid)
     whenever(repository.getParkByPid(pid)).thenReturn(park)
     parkViewModel.getParkByPid(pid)
     testDispatcher.scheduler.advanceUntilIdle()
@@ -70,17 +72,7 @@ class ParkViewModelTest {
   @Test
   fun getParkByLocationIdCallsRepositoryWithCorrectLocationId() = runTest {
     val locationId = "location123"
-    val park =
-        Park(
-            pid = "123",
-            name = "Sample Park",
-            location = ParkLocation(0.0, 0.0, locationId),
-            imageReference = "parks/sample.png",
-            rating = 4.0f,
-            nbrRating = 2,
-            capacity = 10,
-            occupancy = 5,
-            events = listOf("event1", "event2"))
+    val park = createPark(locationId = locationId)
     whenever(repository.getParkByLocationId(locationId)).thenReturn(park)
     parkViewModel.getParkByLocationId(locationId)
     testDispatcher.scheduler.advanceUntilIdle()
@@ -89,17 +81,7 @@ class ParkViewModelTest {
 
   @Test
   fun createParkCallsRepositoryWithCorrectPark() = runTest {
-    val park =
-        Park(
-            pid = "123",
-            name = "Sample Park",
-            location = ParkLocation(0.0, 0.0, "321"),
-            imageReference = "parks/sample.png",
-            rating = 4.0f,
-            nbrRating = 2,
-            capacity = 10,
-            occupancy = 5,
-            events = listOf("event1", "event2"))
+    val park = createPark()
     parkViewModel.createPark(park)
     testDispatcher.scheduler.advanceUntilIdle()
     verify(repository).createPark(park)
@@ -194,17 +176,7 @@ class ParkViewModelTest {
 
   @Test
   fun setCurrentParkUpdatesCurrentPark() {
-    val park =
-        Park(
-            pid = "123",
-            name = "Sample Park",
-            location = ParkLocation(0.0, 0.0, "321"),
-            imageReference = "parks/sample.png",
-            rating = 4.0f,
-            nbrRating = 2,
-            capacity = 10,
-            occupancy = 5,
-            events = listOf("event1", "event2"))
+    val park = createPark()
     parkViewModel.setCurrentPark(park)
 
     var observedPark: Park? = null
@@ -215,17 +187,7 @@ class ParkViewModelTest {
 
   @Test
   fun getParkByPidUpdatesPark() = runTest {
-    val park =
-        Park(
-            pid = "123",
-            name = "Sample Park",
-            location = ParkLocation(0.0, 0.0, "321"),
-            imageReference = "parks/sample.png",
-            rating = 4.0f,
-            nbrRating = 2,
-            capacity = 10,
-            occupancy = 5,
-            events = listOf("event1", "event2"))
+    val park = createPark()
     whenever(repository.getParkByPid("123")).thenReturn(park)
 
     parkViewModel.getParkByPid("123")
@@ -241,17 +203,7 @@ class ParkViewModelTest {
   @Test
   fun loadCurrentParkCallsRepositoryWithCorrectPidAndUpdatesCurrentPark() = runTest {
     val pid = "park123"
-    val park =
-        Park(
-            pid = pid,
-            name = "Sample Park",
-            location = ParkLocation(0.0, 0.0, "321"),
-            imageReference = "parks/sample.png",
-            rating = 4.0f,
-            nbrRating = 2,
-            capacity = 10,
-            occupancy = 5,
-            events = listOf("event1", "event2"))
+    val park = createPark(pid = pid)
     whenever(repository.getParkByPid(pid)).thenReturn(park)
     parkViewModel.loadCurrentPark(pid)
     testDispatcher.scheduler.advanceUntilIdle()
