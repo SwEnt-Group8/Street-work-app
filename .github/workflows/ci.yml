@@ -138,6 +138,10 @@ jobs:
 
       # Run connected tests on the emulator
       - name: Run emulated tests
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
