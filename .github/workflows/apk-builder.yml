@@ -53,7 +53,7 @@ jobs:
       # Load the keystore (.jks) file from GitHub Secrets
       - name: Load Keystore file
         env:
-          DATA: ${{ secrets.KEYSTORE_JKS }}
+          DATA: ${{ secrets.KEYSTORE_BASE64 }}
         run: echo "$DATA" | base64 -d > keystore.jks
 
       # Set environment variables for keystore passwords
