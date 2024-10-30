@@ -1,4 +1,4 @@
-name: APK Build and Release
+name: APK Builder
 
 on:
   workflow_dispatch:
@@ -56,14 +56,6 @@ jobs:
           DATA: ${{ secrets.KEYSTORE_BASE64 }}
         run: echo "$DATA" | base64 -d > keystore.jks
 
-      # Check the SHA-1 fingerprint of the keystore
-      - name: Verify SHA-1 fingerprint of keystore
-        env:
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
-        run: |
-          keytool -list -v -keystore keystore.jks -alias $KEYSTORE_ALIAS -storepass $KEYSTORE_PASSWORD | grep 'SHA1:'
-
       # Set environment variables for keystore passwords
       - name: Set Keystore Environment Variables
         env:
@@ -87,9 +79,9 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           if [ "${{ inputs.build_type }}" == "release" ]; then
-            ./gradlew assembleRelease --stacktrace --info
+            ./gradlew assembleRelease
           else
-            ./gradlew assembleDebug --stacktrace --info
+            ./gradlew assembleDebug
           fi
 
       # Locate and list the generated APK files
