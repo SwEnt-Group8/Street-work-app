@@ -20,16 +20,16 @@ fun TopAppBarWrapper(navigationActions: NavigationActions, topAppBarManager: Top
         title = {
           Text(
               modifier = Modifier.testTag("topAppBarTitle"),
-              text = topAppBarManager.getTopAppBarTitle())
+              text = it.getTopAppBarTitle())
         },
         colors =
             TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface),
         navigationIcon = {
-          if (topAppBarManager.hasNavigationIcon()) {
+          if (it.hasNavigationIcon()) {
             IconButton(
                 onClick = { navigationActions.goBack() },
                 modifier = Modifier.testTag("goBackButton")) {
-                  Icon(topAppBarManager.getNavigationIcon(), contentDescription = "Back Icon")
+                  Icon(it.getNavigationIcon(), contentDescription = "Back Icon")
                 }
           }
         })
