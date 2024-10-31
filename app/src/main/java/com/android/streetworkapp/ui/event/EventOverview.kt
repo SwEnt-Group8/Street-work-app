@@ -1,5 +1,6 @@
 package com.android.streetworkapp.ui.event
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,13 +42,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.android.sample.R
 import com.android.streetworkapp.model.event.Event
+import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.Park
+import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.theme.Snowflake
 import com.android.streetworkapp.utils.toFormattedString
@@ -68,12 +72,17 @@ private val uiState: MutableStateFlow<DashboardState> = MutableStateFlow(Dashboa
  * the event. The user can also choose to join the event.
  *
  * @param navigationActions The navigation actions.
- * @param event The event to display.
- * @param park The park where the event takes place.
+ * @param eventViewModel The event handler, provides the currently selected event.
+ * @param parkViewModel The park viewModel, used to fetch the correct park according to parkId.
  */
 @Composable
-fun EventOverviewScreen(navigationActions: NavigationActions, event: Event, park: Park) {
+fun EventOverviewScreen(
+    navigationActions: NavigationActions,
+    eventViewModel: EventViewModel,
+    parkViewModel: ParkViewModel
+) {
 
+  val event = eventViewModel.currentEvent.collectAsState().value!!
   Scaffold(
       modifier = Modifier.fillMaxSize().testTag("eventOverviewScreen"),
       topBar = { EventTopBar(title = event.title, navigationActions = navigationActions) },
@@ -108,7 +117,8 @@ fun EventOverviewScreen(navigationActions: NavigationActions, event: Event, park
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            EventMap(park)
+            parkViewModel.getParkByPid(event.parkId)
+            EventMap(parkViewModel.park.value!!)
           }
         }
       }
@@ -146,10 +156,13 @@ fun EventTopBar(title: String, navigationActions: NavigationActions) {
  */
 @Composable
 fun EventBottomBar(participants: Int, maxParticipants: Int) {
+  val context = LocalContext.current
+
   BottomAppBar(containerColor = Color.Transparent, modifier = Modifier.testTag("eventBottomBar")) {
     Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
       Button(
-          onClick = {},
+          // TODO: Implement the join event functionality
+          onClick = { Toast.makeText(context, "To be implemented", Toast.LENGTH_SHORT).show() },
           modifier = Modifier.testTag("joinEventButton"),
           enabled = participants < maxParticipants) {
             Text("Join this event", modifier = Modifier.testTag("joinEventButtonText"))

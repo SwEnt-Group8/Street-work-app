@@ -86,7 +86,8 @@ fun AddEventScreen(
           1, // set to one by default, because the owner is also a participant
           EventConstants.MIN_NUMBER_PARTICIPANTS,
           Timestamp(0, 0),
-          "unknown")
+          "unknown",
+          parkId = parkViewModel.currentPark.value?.pid ?: "unknown park")
 
   val owner = userViewModel.currentUser.value?.uid
   if (!owner.isNullOrEmpty()) {
@@ -135,8 +136,6 @@ fun AddEventScreen(
               }
           FloatingActionButton(
               onClick = {
-                // TODO: check that it works on the database
-
                 if (event.title.isEmpty()) {
                   Toast.makeText(context, "Please fill the title of the event", Toast.LENGTH_SHORT)
                       .show()

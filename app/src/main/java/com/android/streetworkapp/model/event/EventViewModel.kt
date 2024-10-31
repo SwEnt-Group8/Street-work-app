@@ -14,6 +14,21 @@ open class EventViewModel(private val repository: EventRepository) : ViewModel()
 
   val uiState: StateFlow<EventOverviewUiState> = _uiState
 
+  // current selected event
+  private val _currentEvent = MutableStateFlow<Event?>(null)
+  val currentEvent: StateFlow<Event?>
+    get() = _currentEvent
+
+  fun setCurrentEvent(event: Event?) {
+    _currentEvent.value = event
+  }
+
+  fun getEventByEid(eid: String) {
+    viewModelScope.launch {
+      val fetchedEvent = repository.getEventByEid(eid)
+      _currentEvent.value = fetchedEvent
+    }
+  }
   /**
    * Get a new event ID.
    *
@@ -25,15 +40,17 @@ open class EventViewModel(private val repository: EventRepository) : ViewModel()
 
   /** Fetch all events from the database. */
   fun getEvents() {
-    repository.getEvents(
-        onSuccess = {
-          if (it.isEmpty()) {
-            _uiState.value = EventOverviewUiState.Empty
-          } else {
-            _uiState.value = EventOverviewUiState.NotEmpty(it)
-          }
-        },
-        onFailure = { Log.e("FirestoreError", "Error getting events: ${it.message}") })
+    viewModelScope.launch {
+      repository.getEvents(
+          onSuccess = {
+            if (it.isEmpty()) {
+              _uiState.value = EventOverviewUiState.Empty
+            } else {
+              _uiState.value = EventOverviewUiState.NotEmpty(it)
+            }
+          },
+          onFailure = { Log.e("FirestoreError", "Error getting events: ${it.message}") })
+    }
   }
 
   /**

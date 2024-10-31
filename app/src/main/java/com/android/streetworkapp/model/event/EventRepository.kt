@@ -5,7 +5,9 @@ interface EventRepository {
 
   fun getNewEid(): String
 
-  fun getEvents(onSuccess: (List<Event>) -> Unit, onFailure: (Exception) -> Unit)
+  suspend fun getEventByEid(eid: String): Event?
+
+  suspend fun getEvents(onSuccess: (List<Event>) -> Unit, onFailure: (Exception) -> Unit)
 
   suspend fun addEvent(event: Event)
 }

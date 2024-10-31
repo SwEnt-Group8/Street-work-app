@@ -20,6 +20,7 @@ object Screen {
   const val ADD_FRIEND = "AddFriend Screen"
   const val PARK_OVERVIEW = "Park Overview Screen"
   const val ADD_EVENT = "Add Event Screen"
+  const val EVENT_OVERVIEW = "Event Overview Screen"
   const val UNK = "TBD Screen" // TODO: not yet defined
 }
 

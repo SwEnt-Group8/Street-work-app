@@ -93,7 +93,7 @@ fun StreetWorkApp(
 
   NavHost(
       navController = navController,
-      startDestination = Route.AUTH) { // TODO: handle start destination based on signIn logic
+      startDestination = Route.MAP) { // TODO: handle start destination based on signIn logic
         navigation(
             startDestination = Screen.AUTH,
             route = Route.AUTH,
@@ -114,6 +114,7 @@ fun StreetWorkApp(
           composable(Screen.ADD_EVENT) {
             AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
           }
+          composable(Screen.EVENT_OVERVIEW) {}
         }
 
         navigation(

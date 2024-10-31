@@ -112,7 +112,7 @@ fun ParkOverviewScreen(
     Column {
       ImageTitle(image = null, title = park.name) // TODO: Fetch image from Firestore storage
       ParkDetails(park = park)
-      EventItemList(eventViewModel) // TODO: Fetch events from Firestore
+      EventItemList(eventViewModel, navigationActions) // TODO: Fetch events from Firestore
     }
     FloatingActionButton(
         onClick = {
@@ -239,7 +239,7 @@ fun OccupancyBar(occupancy: Float) {
  * @param eventList The list of events to display.
  */
 @Composable
-fun EventItemList(eventViewModel: EventViewModel) {
+fun EventItemList(eventViewModel: EventViewModel, navigationActions: NavigationActions) {
   val uiState = eventViewModel.uiState.collectAsState().value
 
   Column(modifier = Modifier.testTag("eventItemList")) {
@@ -251,7 +251,9 @@ fun EventItemList(eventViewModel: EventViewModel) {
 
     when (uiState) {
       is EventOverviewUiState.NotEmpty -> {
-        LazyColumn { items(uiState.eventList) { event -> EventItem(event = event) } }
+        LazyColumn {
+          items(uiState.eventList) { event -> EventItem(event, eventViewModel, navigationActions) }
+        }
       }
       is EventOverviewUiState.Empty -> {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -273,7 +275,7 @@ fun EventItemList(eventViewModel: EventViewModel) {
  * @param event The event data to display.
  */
 @Composable
-fun EventItem(event: Event) {
+fun EventItem(event: Event, eventViewModel: EventViewModel, navigationActions: NavigationActions) {
   ListItem(
       modifier = Modifier.padding(0.dp).testTag("eventItem"),
       headlineContent = { Text(text = event.title) },
@@ -298,7 +300,8 @@ fun EventItem(event: Event) {
       trailingContent = {
         Button(
             onClick = {
-              Log.d("EventItem", "About event button clicked") // TODO: Handle button click
+              eventViewModel.setCurrentEvent(event)
+              navigationActions.navigateTo(Screen.ADD_EVENT)
             },
             modifier = Modifier.size(width = 80.dp, height = 48.dp).testTag("eventButton"),
             colors = ButtonDefaults.buttonColors(),
