@@ -18,9 +18,7 @@ fun TopAppBarWrapper(navigationActions: NavigationActions, topAppBarManager: Top
     TopAppBar(
         modifier = Modifier.testTag("topAppBar"),
         title = {
-          Text(
-              modifier = Modifier.testTag("topAppBarTitle"),
-              text = it.getTopAppBarTitle())
+          Text(modifier = Modifier.testTag("topAppBarTitle"), text = it.getTopAppBarTitle())
         },
         colors =
             TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface),
