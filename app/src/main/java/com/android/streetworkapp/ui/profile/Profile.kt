@@ -26,7 +26,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.sample.R
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserViewModel
@@ -37,7 +36,8 @@ import com.android.streetworkapp.ui.navigation.Screen
 
 @Composable
 fun ProfileScreen(navigationActions: NavigationActions, userViewModel: UserViewModel) {
- // Kemin version -> viewModel(factory = UserViewModel.Factory)
+  // Kemin version -> viewModel(factory = UserViewModel.Factory)
+  // Using import androidx.lifecycle.viewmodel.compose.viewModel
 
   Scaffold(
       modifier = Modifier.testTag("ProfileScreen"),
@@ -77,7 +77,7 @@ fun ProfileScreen(navigationActions: NavigationActions, userViewModel: UserViewM
 
                       // button to add a new friend
                       Button(
-                          onClick = {navigationActions.navigateTo(Screen.ADD_FRIEND)},
+                          onClick = { navigationActions.navigateTo(Screen.ADD_FRIEND) },
                           modifier = Modifier.size(220.dp, 50.dp).testTag("profileAddButton")) {
                             Text(text = "Add a new friend", fontSize = 17.sp)
                           }
