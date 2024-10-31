@@ -1,10 +1,42 @@
 package com.android.streetworkapp.model.park
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
 open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
+
+  // LiveData of the current park
+  private val _currentPark = MutableLiveData<Park?>()
+  val currentPark: LiveData<Park?>
+    get() = _currentPark
+
+  private val _park = MutableLiveData<Park?>()
+  val park: LiveData<Park?>
+    get() = _park
+
+  /**
+   * Set the current park.
+   *
+   * @param park The park to set as the current park.
+   */
+  fun setCurrentPark(park: Park?) {
+    _currentPark.value = park
+  }
+
+  /**
+   * Load the current park from the database using its ID.
+   *
+   * @param pid The park ID.
+   */
+  fun loadCurrentPark(pid: String) {
+    viewModelScope.launch {
+      val fetchedPark = repository.getParkByPid(pid)
+      _currentPark.setValue(fetchedPark)
+    }
+  }
 
   /**
    * Get a new park ID.
@@ -21,7 +53,12 @@ open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
    * @param pid The park ID.
    * @return The park with the given ID, or null if the park does not exist.
    */
-  fun getParkByPid(pid: String) = viewModelScope.launch { repository.getParkByPid(pid) }
+  fun getParkByPid(pid: String) {
+    viewModelScope.launch {
+      val fetchedPark = repository.getParkByPid(pid)
+      _park.setValue(fetchedPark)
+    }
+  }
 
   /**
    * Get a park by its location ID.
@@ -29,8 +66,12 @@ open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
    * @param locationId The location ID.
    * @return The park with the given location ID, or null if the park does not exist.
    */
-  fun getParkByLocationId(locationId: String) =
-      viewModelScope.launch { repository.getParkByLocationId(locationId) }
+  fun getParkByLocationId(locationId: String) {
+    viewModelScope.launch {
+      val fetchedPark = repository.getParkByLocationId(locationId)
+      _park.setValue(fetchedPark)
+    }
+  }
 
   /**
    * Create a park.
