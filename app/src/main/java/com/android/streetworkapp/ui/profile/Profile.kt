@@ -118,27 +118,31 @@ fun ProfileScreen(navigationActions: NavigationActions, userViewModel: UserViewM
               val friends = List(10) { alice }
 
               // friends = emptyList()
-
-              if (friends.isNotEmpty()) {
-
-                // LazyColumn is scrollable
-                LazyColumn(
-                    contentPadding = PaddingValues(vertical = 2.dp),
-                    modifier =
-                        Modifier.fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                            .padding(padding)
-                            .testTag("friendList")) {
-                      items(friends) { friend -> DisplayFriend(friend, padding) }
-                    }
-              } else {
-                Text(
-                    modifier = Modifier.padding(padding).testTag("emptyFriendListText"),
-                    fontSize = 20.sp,
-                    text = "You have no friends yet :(")
-              }
+              DisplayFriendList(friends, padding)
             }
       })
+}
+
+@Composable
+fun DisplayFriendList(friends: List<User>, padding: PaddingValues) {
+  return if (friends.isNotEmpty()) {
+
+    // LazyColumn is scrollable
+    LazyColumn(
+        contentPadding = PaddingValues(vertical = 2.dp),
+        modifier =
+            Modifier.fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .padding(padding)
+                .testTag("friendList")) {
+          items(friends) { friend -> DisplayFriend(friend, padding) }
+        }
+  } else {
+    Text(
+        modifier = Modifier.padding(padding).testTag("emptyFriendListText"),
+        fontSize = 20.sp,
+        text = "You have no friends yet :(")
+  }
 }
 
 @Composable
