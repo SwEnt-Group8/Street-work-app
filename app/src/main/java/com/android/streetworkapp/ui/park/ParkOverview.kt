@@ -35,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -46,11 +47,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.rememberNavController
 import com.android.sample.R
 import com.android.streetworkapp.model.event.Event
-import com.android.streetworkapp.model.event.EventList
+import com.android.streetworkapp.model.event.EventOverviewUiState
+import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.utils.toFormattedString
 
 /**
@@ -61,7 +65,9 @@ import com.android.streetworkapp.utils.toFormattedString
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ParkOverview(navigationActions: NavigationActions, park: Park) {
+fun ParkOverview(navigationActions: NavigationActions, park: Park, eventViewModel: EventViewModel) {
+  eventViewModel.getEvents()
+
   Scaffold(
       modifier = Modifier.testTag("ParkOverview"),
       topBar = {
@@ -81,26 +87,37 @@ fun ParkOverview(navigationActions: NavigationActions, park: Park) {
             })
       }) { innerPadding ->
         ParkOverviewScreen(
-            park, innerPadding) // we declare this so that it doesn't impact the tests in
+            park,
+            innerPadding,
+            navigationActions,
+            eventViewModel) // we declare this so that it doesn't impact the tests in
         // PackOverviewScreen (exceptions wouldn't be caught as it's async and
         // tests would fail)
       }
 }
+
 /**
  * Display the overview of a park, including park details and a list of events.
  *
  * @param park The park data to display.
  */
 @Composable
-fun ParkOverviewScreen(park: Park, innerPadding: PaddingValues = PaddingValues(0.dp)) {
+fun ParkOverviewScreen(
+    park: Park,
+    innerPadding: PaddingValues = PaddingValues(0.dp),
+    navigationActions: NavigationActions = NavigationActions(rememberNavController()),
+    eventViewModel: EventViewModel
+) {
   Box(modifier = Modifier.padding(innerPadding).fillMaxSize().testTag("parkOverviewScreen")) {
     Column {
-      ImageTitle(image = park.image, title = park.name)
+      ImageTitle(image = null, title = park.name) // TODO: Fetch image from Firestore storage
       ParkDetails(park = park)
-      EventItemList(eventList = park.events)
+      EventItemList(eventViewModel) // TODO: Fetch events from Firestore
     }
     FloatingActionButton(
         onClick = {
+          navigationActions.navigateTo(Screen.ADD_EVENT)
+
           Log.d("ParkOverviewScreen", "Create event button clicked") // TODO: Handle button click
         },
         modifier =
@@ -162,7 +179,7 @@ fun ParkDetails(park: Park) {
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(start = 16.dp, top = 6.dp, bottom = 2.dp))
     RatingComponent(rating = park.rating.toInt(), park.nbrRating) // Round the rating
-    OccupancyBar(occupancy = park.occupancy)
+    OccupancyBar(occupancy = (park.occupancy.toFloat() / park.capacity.toFloat()))
   }
 }
 
@@ -222,24 +239,30 @@ fun OccupancyBar(occupancy: Float) {
  * @param eventList The list of events to display.
  */
 @Composable
-fun EventItemList(eventList: EventList) {
+fun EventItemList(eventViewModel: EventViewModel) {
+  val uiState = eventViewModel.uiState.collectAsState().value
+
   Column(modifier = Modifier.testTag("eventItemList")) {
     Text(
         text = "Events",
         fontSize = 24.sp,
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(start = 16.dp, top = 6.dp, bottom = 2.dp))
-    if (eventList.events.isEmpty()) {
-      Box(modifier = Modifier.fillMaxSize()) {
-        Text(
-            text = "No event is planned yet",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Light,
-            modifier =
-                Modifier.align(Alignment.Center).padding(bottom = 40.dp).testTag("noEventText"))
+
+    when (uiState) {
+      is EventOverviewUiState.NotEmpty -> {
+        LazyColumn { items(uiState.eventList) { event -> EventItem(event = event) } }
       }
-    } else {
-      LazyColumn { items(eventList.events) { event -> EventItem(event = event) } }
+      is EventOverviewUiState.Empty -> {
+        Box(modifier = Modifier.fillMaxSize()) {
+          Text(
+              text = "No event is planned yet",
+              fontSize = 16.sp,
+              fontWeight = FontWeight.Light,
+              modifier =
+                  Modifier.align(Alignment.Center).padding(bottom = 40.dp).testTag("noEventText"))
+        }
+      }
     }
   }
 }

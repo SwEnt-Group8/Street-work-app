@@ -74,15 +74,6 @@ jobs:
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
 
-      - name: Grant execute permission for gradlew
-        run: |
-          chmod +x ./gradlew
-
-      # Check formatting
-      - name: KTFmt Check
-        run: |
-          ./gradlew ktfmtCheck
-
       # Load google-services.json and local.properties from the secrets
       - name: Decode secrets
         env:
@@ -92,20 +83,65 @@ jobs:
           echo "$GOOGLE_SERVICES" | base64 --decode > ./app/google-services.json
           echo "$LOCAL_PROPERTIES" | base64 --decode > ./local.properties
 
+      # Load keystore.jks from the secrets
+      - name: Load Keystore file
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          # Check if the environment variable is set
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "KEYSTORE_BASE64 is not set!"
+            exit 1
+          else
+            echo "KEYSTORE_BASE64 is set, decoding..."
+          fi
+          
+          # Decode the keystore and save it to keystore.jks
+          echo "$KEYSTORE_BASE64" | base64 --decode > keystore.jks
+          
+          # Verify that the keystore file has been created
+          if [ -f keystore.jks ]; then
+            echo "keystore.jks created successfully."
+          else
+            echo "Failed to create keystore.jks."
+            exit 1
+          fi
+          
+          # Check the file size (for debugging purposes)
+          echo "Size of keystore.jks:"
+          ls -lh keystore.jks
+
+      - name: Grant execute permission for gradlew
+        run: |
+          chmod +x ./gradlew
+
+      # Check formatting
+      - name: KTFmt Check
+        run: |
+          ./gradlew ktfmtCheck
+
       # This step runs gradle commands to build the application
       - name: Assemble
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           # To run the CI with debug information, add --info
           ./gradlew assemble lint --parallel --build-cache
 
       # Run Unit tests
-      - name: Run tests
+      - name: Run Unit tests
         run: |
           # To run the CI with debug information, add --info
           ./gradlew check --parallel --build-cache
 
       # Run connected tests on the emulator
-      - name: run tests
+      - name: Run emulated tests
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34

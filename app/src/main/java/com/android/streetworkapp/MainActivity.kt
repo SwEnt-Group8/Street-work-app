@@ -9,21 +9,25 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
-import com.android.streetworkapp.model.event.Event
-import com.android.streetworkapp.model.event.EventList
+import com.android.streetworkapp.model.event.EventRepositoryFirestore
+import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.Park
+import com.android.streetworkapp.model.park.ParkRepositoryFirestore
+import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
+import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
 import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.authentication.SignInScreen
+import com.android.streetworkapp.ui.event.AddEventScreen
 import com.android.streetworkapp.ui.map.MapScreen
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.park.ParkOverview
+import com.android.streetworkapp.ui.profile.AddFriendScreen
 import com.android.streetworkapp.ui.profile.ProfileScreen
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import okhttp3.OkHttpClient
 
@@ -50,7 +54,16 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
   val userRepository = UserRepositoryFirestore(firestoreDB)
   val userViewModel = UserViewModel(userRepository)
 
-  StreetWorkApp(parkLocationViewModel, testInvokation, {}, userViewModel)
+  // Instantiate park repository :
+  val parkRepository = ParkRepositoryFirestore(firestoreDB)
+  val parkViewModel = ParkViewModel(parkRepository)
+
+  // Instantiate event repository :
+  val eventRepository = EventRepositoryFirestore(firestoreDB)
+  val eventViewModel = EventViewModel(eventRepository)
+
+  StreetWorkApp(
+      parkLocationViewModel, testInvokation, {}, userViewModel, parkViewModel, eventViewModel)
 }
 
 @Composable
@@ -59,34 +72,24 @@ fun StreetWorkApp(
     navTestInvokation: NavigationActions.() -> Unit = {},
     mapCallbackOnMapLoaded: () -> Unit = {},
     userViewModel: UserViewModel,
+    parkViewModel: ParkViewModel,
+    eventViewModel: EventViewModel
 ) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
 
-  val eventList =
-      EventList(
-          events =
-              listOf(
-                  Event(
-                      eid = "1",
-                      title = "Group workout",
-                      description = "A fun group workout session to train new skills",
-                      participants = 3,
-                      maxParticipants = 5,
-                      date = Timestamp(0, 0), // 01/01/1970 00:00
-                      owner = "user123")))
-
-  // Park with events
+  // Park with no events
   val testPark =
       Park(
-          pid = "1",
-          name = "EPFL Esplanade",
-          location = "EPFL",
-          image = null,
-          rating = 4.5f,
-          nbrRating = 102,
-          occupancy = 0.8f,
-          events = eventList)
+          pid = "123",
+          name = "Sample Park",
+          location = ParkLocation(0.0, 0.0, "321"),
+          imageReference = "parks/sample.png",
+          rating = 4.0f,
+          nbrRating = 2,
+          capacity = 10,
+          occupancy = 5,
+          events = emptyList())
 
   NavHost(
       navController = navController,
@@ -105,7 +108,12 @@ fun StreetWorkApp(
           composable(Screen.MAP) {
             MapScreen(parkLocationViewModel, navigationActions, mapCallbackOnMapLoaded)
           }
-          composable(Screen.PARK_OVERVIEW) { ParkOverview(navigationActions, testPark) }
+          composable(Screen.PARK_OVERVIEW) {
+            ParkOverview(navigationActions, testPark, eventViewModel)
+          }
+          composable(Screen.ADD_EVENT) {
+            AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
+          }
         }
 
         navigation(
@@ -113,6 +121,10 @@ fun StreetWorkApp(
             route = Route.PROFILE,
         ) {
           composable(Screen.PROFILE) { ProfileScreen(navigationActions, userViewModel) }
+          // profile screen + list of friend
+          composable(Screen.PROFILE) { ProfileScreen(navigationActions, userViewModel) }
+          // screen for adding friend
+          composable(Screen.ADD_FRIEND) { AddFriendScreen(navigationActions, userViewModel) }
         }
       }
 

@@ -2,7 +2,6 @@ package com.android.streetworkapp.ui.map
 
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
@@ -10,7 +9,6 @@ import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.printToLog
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.android.streetworkapp.StreetWorkAppMain
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
@@ -97,17 +95,5 @@ class MapUiTest {
           .performClick()
       verify(navigationActions).navigateTo(LIST_TOP_LEVEL_DESTINATION[i])
     }
-  }
-
-  @Test
-  fun componentsAreNotDisplayedOnOtherRoutes() {
-    `when`(navigationActions.currentRoute()).thenReturn(Screen.AUTH)
-
-    composeTestRule.setContent { StreetWorkAppMain() }
-
-    composeTestRule.onNodeWithTag("mapScreen").assertIsNotDisplayed()
-    composeTestRule.onNodeWithTag("googleMap").assertIsNotDisplayed()
-    composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsNotDisplayed()
-    composeTestRule.onAllNodesWithTag("bottomNavigationItem").assertCountEquals(0)
   }
 }

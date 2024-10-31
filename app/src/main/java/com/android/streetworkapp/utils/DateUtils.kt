@@ -16,3 +16,16 @@ fun Timestamp.toFormattedString(): String {
   sdf.timeZone = TimeZone.getTimeZone("UTC") // Set to UTC to avoid timezone issues
   return sdf.format(this.toDate())
 }
+
+/**
+ * Convert a [String] of format "dd/MM/yyyy HH:mm" to a [Timestamp] object.
+ *
+ * @return The [Timestamp] object.
+ */
+fun String.toTimestamp(): Timestamp {
+  val pattern = "dd/MM/yyyy HH:mm"
+  val sdf = SimpleDateFormat(pattern, Locale.getDefault())
+  sdf.timeZone = TimeZone.getTimeZone("UTC") // Set to UTC to avoid timezone issues
+  val date = sdf.parse(this)
+  return Timestamp(date!!)
+}

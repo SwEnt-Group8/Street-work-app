@@ -1,5 +1,6 @@
-package com.android.streetworkapp.ui.park
+package com.android.streetworkapp.ui.event
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,12 +42,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventConstants
+import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.park.ParkViewModel
+import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
@@ -64,11 +69,34 @@ import java.util.concurrent.TimeUnit
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEventScreen(
-    navigationActions: NavigationActions
-) { // TODO: add future ParkViewModel and EventViewModel
+    navigationActions: NavigationActions,
+    parkViewModel: ParkViewModel,
+    eventViewModel: EventViewModel,
+    userViewModel: UserViewModel
+) {
 
-  // used until we have the corresponding viewModel TODO: update with new viewModel
-  val event = Event("unknown", "unknown", "unknown", 0, 2, Timestamp(0, 0), "unknown")
+  val context = LocalContext.current
+
+  val eid = eventViewModel.getNewEid()
+  val event =
+      Event(
+          eid,
+          "",
+          "",
+          1, // set to one by default, because the owner is also a participant
+          EventConstants.MIN_NUMBER_PARTICIPANTS,
+          Timestamp(0, 0),
+          "unknown")
+
+  val owner = userViewModel.currentUser.value?.uid
+  if (!owner.isNullOrEmpty()) {
+    event.owner = owner
+  }
+
+  val parkId = "Unknown park" // TODO: do the same with ParkViewModel once updated
+  if (!parkId.isNullOrEmpty()) {
+    event.parkId = parkId
+  }
 
   Scaffold(
       modifier = Modifier.background(MaterialTheme.colorScheme.background),
@@ -107,8 +135,15 @@ fun AddEventScreen(
               }
           FloatingActionButton(
               onClick = {
-                // TODO: use one of the future viewModel to add the event to firebase
-                navigationActions.goBack()
+                // TODO: check that it works on the database
+
+                if (event.title.isEmpty()) {
+                  Toast.makeText(context, "Please fill the title of the event", Toast.LENGTH_SHORT)
+                      .show()
+                } else {
+                  eventViewModel.addEvent(event)
+                  navigationActions.goBack()
+                }
               },
               modifier =
                   Modifier.align(Alignment.BottomCenter)
