@@ -115,8 +115,6 @@ fun AddEventScreen(
           }
       FloatingActionButton(
           onClick = {
-            // TODO: check that it works on the database
-
             if (event.title.isEmpty()) {
               Toast.makeText(context, "Please fill the title of the event", Toast.LENGTH_SHORT)
                   .show()
