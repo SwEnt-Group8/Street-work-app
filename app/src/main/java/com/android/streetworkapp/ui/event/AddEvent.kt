@@ -91,7 +91,7 @@ fun AddEventScreen(
     event.owner = owner
   }
 
-  val parkId = "Unknown park" // TODO: do the same with ParkViewModel once updated
+  val parkId = parkViewModel.currentPark.value?.pid
   if (!parkId.isNullOrEmpty()) {
     event.parkId = parkId
   }
