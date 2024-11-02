@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -163,7 +164,8 @@ fun EventTitleSelection(event: Event) {
         event.title = title
       },
       label = { Text("What kind of event do you want to create?") },
-      modifier = Modifier.testTag("titleTag").fillMaxWidth(0.9f).height(64.dp))
+      modifier = Modifier.testTag("titleTag").fillMaxWidth(0.9f).height(64.dp),
+  )
 }
 
 /**
@@ -218,7 +220,7 @@ fun ParticipantNumberSelection(event: Event) {
                 EventConstants.MIN_NUMBER_PARTICIPANTS.toFloat()..EventConstants
                         .MAX_NUMBER_PARTICIPANTS
                         .toFloat())
-        Text(text = sliderPosition.toInt().toString())
+        Text(text = sliderPosition.toInt().toString(), color = Color.Black)
       }
 }
 
@@ -285,6 +287,7 @@ fun TimeSelection(event: Event) {
 
         Button(
             modifier = Modifier.offset(x = 280.dp, y = 140.dp).testTag("validateDate"),
+            colors = ButtonColors(Color.Blue, Color.White, Color.Blue, Color.White),
             onClick = {
               showDatePicker = false
 
@@ -311,6 +314,7 @@ fun TimeSelection(event: Event) {
 
               Button(
                   modifier = Modifier.testTag("validateTime"),
+                  colors = ButtonColors(Color.Blue, Color.White, Color.Blue, Color.White),
                   onClick = {
                     showTimePicker = false
 
