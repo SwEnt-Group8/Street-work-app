@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -104,6 +105,7 @@ fun AddEventScreen(
           modifier = Modifier.fillMaxWidth(),
           verticalArrangement = Arrangement.spacedBy(18.dp),
           horizontalAlignment = Alignment.CenterHorizontally) {
+            Spacer(modifier = Modifier.size(24.dp))
             EventTitleSelection(event)
             EventDescriptionSelection(event)
             TimeSelection(event)
@@ -115,7 +117,11 @@ fun AddEventScreen(
           }
       FloatingActionButton(
           onClick = {
-            if (event.title.isEmpty()) {
+            if (event.date.toDate() < Calendar.getInstance().time) {
+              Toast.makeText(
+                      context, "Please select a valid time in the future", Toast.LENGTH_SHORT)
+                  .show()
+            } else if (event.title.isEmpty()) {
               Toast.makeText(context, "Please fill the title of the event", Toast.LENGTH_SHORT)
                   .show()
             } else {
@@ -124,7 +130,8 @@ fun AddEventScreen(
             }
           },
           modifier =
-              Modifier.align(Alignment.BottomCenter)
+              Modifier.align(Alignment.Center)
+                  .offset(0.dp, 100.dp)
                   .padding(40.dp)
                   .size(width = 150.dp, height = 40.dp)
                   .testTag("addEventButton"),
