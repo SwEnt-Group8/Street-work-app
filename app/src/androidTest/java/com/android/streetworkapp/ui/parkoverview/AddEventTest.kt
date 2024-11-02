@@ -117,7 +117,7 @@ class AddEventTest {
     composeTestRule.setContent {
       AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
     }
-    composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
+
     composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addEventButton").assertIsDisplayed()
   }

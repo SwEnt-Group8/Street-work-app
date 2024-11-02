@@ -1,16 +1,16 @@
 package com.android.streetworkapp.ui.map
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.dp
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
-import com.android.streetworkapp.ui.navigation.BottomNavigationMenu
-import com.android.streetworkapp.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.google.android.gms.maps.model.CameraPosition
@@ -30,7 +30,8 @@ import com.google.maps.android.compose.rememberCameraPositionState
 fun MapScreen(
     parkLocationViewModel: ParkLocationViewModel,
     navigationActions: NavigationActions,
-    callbackOnMapLoaded: () -> Unit = {}
+    callbackOnMapLoaded: () -> Unit = {},
+    innerPaddingValues: PaddingValues = PaddingValues(0.dp)
 ) {
 
   // hardcoded initial location values are used instead of the user's current location for now
@@ -42,34 +43,27 @@ fun MapScreen(
 
   val parks = parkLocationViewModel.parks.collectAsState().value
 
-  Scaffold(
-      modifier = Modifier.testTag("mapScreen"),
-      bottomBar = {
-        BottomNavigationMenu(
-            onTabSelect = { destination -> navigationActions.navigateTo(destination) },
-            tabList = LIST_TOP_LEVEL_DESTINATION)
-      }) { innerPadding ->
+  Box(modifier = Modifier.testTag("mapScreen")) {
+    // Create a CameraPositionState to control the camera position
+    val cameraPositionState = rememberCameraPositionState {
+      position = CameraPosition.Builder().target(initialLatLng).zoom(12f).build()
+    }
 
-        // Create a CameraPositionState to control the camera position
-        val cameraPositionState = rememberCameraPositionState {
-          position = CameraPosition.Builder().target(initialLatLng).zoom(12f).build()
+    // Display the Google Map
+    GoogleMap(
+        onMapLoaded = callbackOnMapLoaded,
+        modifier = Modifier.fillMaxSize().padding(innerPaddingValues).testTag("googleMap"),
+        cameraPositionState = cameraPositionState) {
+          parks.forEach { park ->
+            Marker(
+                contentDescription = "Marker",
+                state = MarkerState(position = LatLng(park.lat, park.lon)),
+                onClick = {
+                  // TODO: selectPark
+                  navigationActions.navigateTo(Screen.PARK_OVERVIEW)
+                  true
+                })
+          }
         }
-
-        // Display the Google Map
-        GoogleMap(
-            onMapLoaded = callbackOnMapLoaded,
-            modifier = Modifier.fillMaxSize().padding(innerPadding).testTag("googleMap"),
-            cameraPositionState = cameraPositionState) {
-              parks.forEach { park ->
-                Marker(
-                    contentDescription = "Marker",
-                    state = MarkerState(position = LatLng(park.lat, park.lon)),
-                    onClick = {
-                      // TODO: selectPark
-                      navigationActions.navigateTo(Screen.PARK_OVERVIEW)
-                      true
-                    })
-              }
-            }
-      }
+  }
 }
