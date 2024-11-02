@@ -133,7 +133,7 @@ class AddEventTest {
     composeTestRule.onNodeWithTag("addEventButton").performClick()
     composeTestRule
         .onNodeWithTag("addEventScreen")
-        .assertIsDisplayed() // we that that a click with no changes in the default value does not
+        .assertIsDisplayed() // we want that a click with no changes in the default value does not
     // make the user leave the screen
   }
 
@@ -154,7 +154,7 @@ class AddEventTest {
     composeTestRule.onNodeWithTag("addEventButton").performClick()
     composeTestRule
         .onNodeWithTag("addEventScreen")
-        .assertIsDisplayed() // we that that a click with changes in the time but no changes in the
+        .assertIsDisplayed() // we want that a click with changes in the time but no changes in the
     // default value of the title does not make the user leave the screen
   }
 }
