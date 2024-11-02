@@ -40,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -138,9 +139,10 @@ fun AddEventScreen(
                   .padding(40.dp)
                   .size(width = 150.dp, height = 40.dp)
                   .testTag("addEventButton"),
-      ) {
-        Text("Add new event")
-      }
+          containerColor = Color.Blue,
+          contentColor = Color.White) {
+            Text("Add new event")
+          }
     }
   }
 }
