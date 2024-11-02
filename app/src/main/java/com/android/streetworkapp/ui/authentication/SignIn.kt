@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -49,7 +51,7 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
           onAuthComplete = { result ->
             user = result.user
             checkAndAddUser(user, userViewModel)
-
+            user?.let { firebaseUser -> userViewModel.getUserByUid(firebaseUser.uid) }
             Log.d("SignInScreen", "Sign-in successful user : $user")
             Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
             navigationActions.navigateTo(Screen.MAP)
@@ -59,6 +61,30 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
             Log.d("SignInScreen", "Sign-in failed : $it")
             Toast.makeText(context, "Login failed! : $it", Toast.LENGTH_LONG).show()
           })
+
+    // Observe the user data to check if the user already exists in the database
+    val currentUser by userViewModel.user.observeAsState()
+    LaunchedEffect(currentUser) {
+        user?.let { firebaseUser ->
+            if (currentUser == null) {
+                // If no existing data, set loggedInUser with default values and add the user
+                val newUser = User(
+                    uid = firebaseUser.uid,
+                    username = firebaseUser.displayName ?: "Unknown",
+                    email = firebaseUser.email ?: "No Email",
+                    score = 0,
+                    friends = emptyList()
+                )
+                userViewModel.addUser(newUser)
+                userViewModel.setCurrentUser(newUser)
+                Log.d("SignInScreen", "New user added: $newUser")
+            } else {
+                // Set loggedInUser with existing data
+                userViewModel.setCurrentUser(currentUser)
+                Log.d("SignInScreen", "Existing user loaded: $currentUser")
+            }
+        }
+    }
 
   Box(modifier = Modifier.fillMaxSize().testTag("loginScreenBoxContainer")) {
 
