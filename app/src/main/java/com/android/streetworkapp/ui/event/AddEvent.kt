@@ -126,6 +126,9 @@ fun AddEventScreen(
                   .show()
             } else {
               eventViewModel.addEvent(event)
+              parkViewModel.currentPark.value?.let {
+                parkViewModel.addEventToPark(it.pid, event.eid)
+              }
               navigationActions.goBack()
             }
           },
