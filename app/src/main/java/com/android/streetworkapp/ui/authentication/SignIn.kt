@@ -62,29 +62,29 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
             Toast.makeText(context, "Login failed! : $it", Toast.LENGTH_LONG).show()
           })
 
-    // Observe the user data to check if the user already exists in the database
-    val currentUser by userViewModel.user.observeAsState()
-    LaunchedEffect(currentUser) {
-        user?.let { firebaseUser ->
-            if (currentUser == null) {
-                // If no existing data, set loggedInUser with default values and add the user
-                val newUser = User(
-                    uid = firebaseUser.uid,
-                    username = firebaseUser.displayName ?: "Unknown",
-                    email = firebaseUser.email ?: "No Email",
-                    score = 0,
-                    friends = emptyList()
-                )
-                userViewModel.addUser(newUser)
-                userViewModel.setCurrentUser(newUser)
-                Log.d("SignInScreen", "New user added: $newUser")
-            } else {
-                // Set loggedInUser with existing data
-                userViewModel.setCurrentUser(currentUser)
-                Log.d("SignInScreen", "Existing user loaded: $currentUser")
-            }
-        }
+  // Observe the user data to check if the user already exists in the database
+  val currentUser by userViewModel.user.observeAsState()
+  LaunchedEffect(currentUser) {
+    user?.let { firebaseUser ->
+      if (currentUser == null) {
+        // If no existing data, set loggedInUser with default values and add the user
+        val newUser =
+            User(
+                uid = firebaseUser.uid,
+                username = firebaseUser.displayName ?: "Unknown",
+                email = firebaseUser.email ?: "No Email",
+                score = 0,
+                friends = emptyList())
+        userViewModel.addUser(newUser)
+        userViewModel.setCurrentUser(newUser)
+        Log.d("SignInScreen", "New user added: $newUser")
+      } else {
+        // Set loggedInUser with existing data
+        userViewModel.setCurrentUser(currentUser)
+        Log.d("SignInScreen", "Existing user loaded: $currentUser")
+      }
     }
+  }
 
   Box(modifier = Modifier.fillMaxSize().testTag("loginScreenBoxContainer")) {
 
