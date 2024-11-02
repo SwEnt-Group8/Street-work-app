@@ -134,7 +134,7 @@ class AddEventTest {
     composeTestRule
         .onNodeWithTag("addEventScreen")
         .assertIsDisplayed() // we that that a click with no changes in the default value does not
-                             // make the user leave the screen
+    // make the user leave the screen
   }
 
   @Test
@@ -155,6 +155,6 @@ class AddEventTest {
     composeTestRule
         .onNodeWithTag("addEventScreen")
         .assertIsDisplayed() // we that that a click with changes in the time but no changes in the
-                             // default value of the title does not make the user leave the screen
+    // default value of the title does not make the user leave the screen
   }
 }
