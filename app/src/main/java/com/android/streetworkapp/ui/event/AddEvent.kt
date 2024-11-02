@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material3.Button
@@ -24,13 +24,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TimePicker
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
@@ -72,7 +69,8 @@ fun AddEventScreen(
     navigationActions: NavigationActions,
     parkViewModel: ParkViewModel,
     eventViewModel: EventViewModel,
-    userViewModel: UserViewModel
+    userViewModel: UserViewModel,
+    paddingValues: PaddingValues = PaddingValues(0.dp)
 ) {
 
   val context = LocalContext.current
@@ -98,63 +96,43 @@ fun AddEventScreen(
     event.parkId = parkId
   }
 
-  Scaffold(
-      modifier = Modifier.background(MaterialTheme.colorScheme.background),
-      topBar = {
-        TopAppBar(
-            title = {},
-            colors =
-                TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background),
-            navigationIcon = {
-              IconButton(
-                  onClick = { navigationActions.goBack() },
-                  modifier = Modifier.testTag("goBackButton")) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Arrow Back Icon")
-                  }
-            })
-      }) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding).fillMaxSize().testTag("addEventScreen")) {
-          Column(
-              modifier = Modifier.fillMaxWidth(),
-              verticalArrangement = Arrangement.spacedBy(18.dp),
-              horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "Event Creation",
-                    fontSize = 24.sp,
-                )
-                EventTitleSelection(event)
-                EventDescriptionSelection(event)
-                TimeSelection(event)
-                Text(
-                    text = "How many participants do you want?",
-                    fontSize = 18.sp,
-                )
-                ParticipantNumberSelection(event)
-              }
-          FloatingActionButton(
-              onClick = {
-                // TODO: check that it works on the database
-
-                if (event.title.isEmpty()) {
-                  Toast.makeText(context, "Please fill the title of the event", Toast.LENGTH_SHORT)
-                      .show()
-                } else {
-                  eventViewModel.addEvent(event)
-                  navigationActions.goBack()
-                }
-              },
-              modifier =
-                  Modifier.align(Alignment.BottomCenter)
-                      .padding(40.dp)
-                      .size(width = 150.dp, height = 40.dp)
-                      .testTag("addEventButton"),
-          ) {
-            Text("Add new event")
+  Box(
+      modifier = Modifier.padding(paddingValues).background(MaterialTheme.colorScheme.background),
+  ) {
+    Box(modifier = Modifier.padding(top = 25.dp).fillMaxSize().testTag("addEventScreen")) {
+      Column(
+          modifier = Modifier.fillMaxWidth(),
+          verticalArrangement = Arrangement.spacedBy(18.dp),
+          horizontalAlignment = Alignment.CenterHorizontally) {
+            EventTitleSelection(event)
+            EventDescriptionSelection(event)
+            TimeSelection(event)
+            Text(
+                text = "How many participants do you want?",
+                fontSize = 18.sp,
+            )
+            ParticipantNumberSelection(event)
           }
-        }
+      FloatingActionButton(
+          onClick = {
+            if (event.title.isEmpty()) {
+              Toast.makeText(context, "Please fill the title of the event", Toast.LENGTH_SHORT)
+                  .show()
+            } else {
+              eventViewModel.addEvent(event)
+              navigationActions.goBack()
+            }
+          },
+          modifier =
+              Modifier.align(Alignment.BottomCenter)
+                  .padding(40.dp)
+                  .size(width = 150.dp, height = 40.dp)
+                  .testTag("addEventButton"),
+      ) {
+        Text("Add new event")
       }
+    }
+  }
 }
 
 /**

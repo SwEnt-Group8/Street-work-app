@@ -4,11 +4,17 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.Park
@@ -22,13 +28,20 @@ import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.authentication.SignInScreen
 import com.android.streetworkapp.ui.event.AddEventScreen
 import com.android.streetworkapp.ui.map.MapScreen
+import com.android.streetworkapp.ui.navigation.BottomNavigationMenu
+import com.android.streetworkapp.ui.navigation.LIST_OF_SCREENS
+import com.android.streetworkapp.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.ui.navigation.Screen
-import com.android.streetworkapp.ui.park.ParkOverview
+import com.android.streetworkapp.ui.navigation.ScreenParams
+import com.android.streetworkapp.ui.navigation.TopAppBarWrapper
+import com.android.streetworkapp.ui.park.ParkOverviewScreen
 import com.android.streetworkapp.ui.profile.AddFriendScreen
 import com.android.streetworkapp.ui.profile.ProfileScreen
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
+import java.util.Date
 import okhttp3.OkHttpClient
 
 class MainActivity : ComponentActivity() {
@@ -78,6 +91,14 @@ fun StreetWorkApp(
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
 
+  val currentScreenName = remember {
+    mutableStateOf<String?>(null)
+  } // not using by here since I want to pass the mutableState to a fn
+  var screenParams by remember { mutableStateOf<ScreenParams?>(null) }
+
+  navigationActions.registerStringListenerOnDestinationChange(currentScreenName)
+  screenParams = LIST_OF_SCREENS.find { currentScreenName.value == it.screenName }
+
   // Park with no events
   val testPark =
       Park(
@@ -91,43 +112,79 @@ fun StreetWorkApp(
           occupancy = 5,
           events = emptyList())
 
-  NavHost(
-      navController = navController,
-      startDestination = Route.AUTH) { // TODO: handle start destination based on signIn logic
-        navigation(
-            startDestination = Screen.AUTH,
-            route = Route.AUTH,
-        ) {
-          composable(Screen.AUTH) { SignInScreen(navigationActions, userViewModel) }
-        }
+  val sampleEvent =
+      Event(
+          eid = "event123",
+          title = "Community Park Cleanup",
+          description = "Join us for a day of community service to clean up the local park!",
+          participants = 15,
+          maxParticipants = 50,
+          date = Timestamp(Date()), // Current date and time
+          owner = "ownerUserId",
+          listParticipants = listOf("user1", "user2", "user3"),
+          parkId = "park567")
+  Scaffold(
+      topBar = {
+        screenParams
+            ?.isTopBarVisible
+            ?.takeIf { it }
+            ?.let { TopAppBarWrapper(navigationActions, screenParams?.topAppBarManager) }
+      },
+      bottomBar = {
+        screenParams
+            ?.isBottomBarVisible
+            ?.takeIf { it }
+            ?.let {
+              BottomNavigationMenu(
+                  onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+                  tabList = LIST_TOP_LEVEL_DESTINATION)
+            }
+      }) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = Route.AUTH) { // TODO: handle start destination based on signIn logic
+              navigation(
+                  startDestination = Screen.AUTH,
+                  route = Route.AUTH,
+              ) {
+                composable(Screen.AUTH) { SignInScreen(navigationActions, userViewModel) }
+              }
 
-        navigation(
-            startDestination = Screen.MAP,
-            route = Route.MAP,
-        ) {
-          composable(Screen.MAP) {
-            MapScreen(parkLocationViewModel, navigationActions, mapCallbackOnMapLoaded)
-          }
-          composable(Screen.PARK_OVERVIEW) {
-            ParkOverview(navigationActions, testPark, eventViewModel)
-          }
-          composable(Screen.ADD_EVENT) {
-            AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
-          }
-        }
+              navigation(
+                  startDestination = Screen.MAP,
+                  route = Route.MAP,
+              ) {
+                composable(Screen.MAP) {
+                  MapScreen(
+                      parkLocationViewModel,
+                      navigationActions,
+                      mapCallbackOnMapLoaded,
+                      innerPadding)
+                }
+                composable(Screen.PARK_OVERVIEW) {
+                  ParkOverviewScreen(testPark, innerPadding, navigationActions, eventViewModel)
+                }
+                composable(Screen.ADD_EVENT) {
+                  AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
+                }
+              }
 
-        navigation(
-            startDestination = Screen.PROFILE,
-            route = Route.PROFILE,
-        ) {
-          // profile screen + list of friend
-          composable(Screen.PROFILE) { ProfileScreen(navigationActions, userViewModel) }
-          // screen for adding friend
-          composable(Screen.ADD_FRIEND) { AddFriendScreen(navigationActions, userViewModel) }
-        }
+              navigation(
+                  startDestination = Screen.PROFILE,
+                  route = Route.PROFILE,
+              ) {
+                // profile screen + list of friend
+                composable(Screen.PROFILE) {
+                  ProfileScreen(navigationActions, userViewModel, innerPadding)
+                }
+                // screen for adding friend
+                composable(Screen.ADD_FRIEND) {
+                  AddFriendScreen(navigationActions, userViewModel, innerPadding)
+                }
+              }
+            }
+        navigationActions.apply(navTestInvokation)
       }
-
-  navigationActions.apply(navTestInvokation)
 }
 
 @Composable

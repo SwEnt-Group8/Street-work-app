@@ -33,15 +33,15 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
   }
 
   /**
-   * Loads the current user from Firestore based on the provided ID.
+   * Loads the current user from Firestore based on the provided user.
    *
-   * @param uid The unique ID of the user to load.
+   * @param user The user to load.
    */
-  fun loadCurrentUser(uid: String) {
-    viewModelScope.launch {
-      val user = repository.getUserByUid(uid)
-      _currentUser.setValue(user)
+  fun loadCurrentUser(user: User?) {
+    if (user != null) {
+      require(user.uid.isNotEmpty()) { "UID must not be empty" }
     }
+    viewModelScope.launch { _currentUser.setValue(user) }
   }
 
   // Companion object to provide a factory for UserViewModel

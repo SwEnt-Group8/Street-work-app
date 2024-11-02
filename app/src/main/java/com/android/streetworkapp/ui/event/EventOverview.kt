@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -72,7 +73,12 @@ private val uiState: MutableStateFlow<DashboardState> = MutableStateFlow(Dashboa
  * @param park The park where the event takes place.
  */
 @Composable
-fun EventOverviewScreen(navigationActions: NavigationActions, event: Event, park: Park) {
+fun EventOverviewScreen(
+    navigationActions: NavigationActions,
+    event: Event,
+    park: Park,
+    paddingValues: PaddingValues = PaddingValues(0.dp)
+) {
 
   Scaffold(
       modifier = Modifier.fillMaxSize().testTag("eventOverviewScreen"),

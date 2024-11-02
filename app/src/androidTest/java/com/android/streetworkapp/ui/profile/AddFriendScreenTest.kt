@@ -70,14 +70,12 @@ class AddFriendScreenTest : TestCase() {
     composeTestRule.waitForIdle() // Wait for rendering
 
     composeTestRule.onNodeWithTag("addFriendScreen").assertExists()
-    composeTestRule.onNodeWithTag("goBackButton").assertExists()
     composeTestRule.onNodeWithTag("AddFriendColumn").assertExists()
     composeTestRule.onNodeWithTag("NFCButton").assertExists()
     composeTestRule.onNodeWithTag("inputID").assertExists()
     composeTestRule.onNodeWithTag("RequestButton").assertExists()
 
     composeTestRule.onNodeWithTag("addFriendScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("AddFriendColumn").assertIsDisplayed()
     composeTestRule.onNodeWithTag("NFCButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputID").assertIsDisplayed()
@@ -88,7 +86,6 @@ class AddFriendScreenTest : TestCase() {
   fun textCorrectlyDisplayed() {
     composeTestRule.waitForIdle() // Wait for rendering
 
-    composeTestRule.onNodeWithTag("addFriendTitle").assertTextEquals("Add a new friend")
     composeTestRule.onNodeWithTag("NFCButton").assertTextEquals("Activate NFC")
     composeTestRule.onNodeWithTag("RequestButton").assertTextEquals("Send request")
   }
@@ -97,7 +94,6 @@ class AddFriendScreenTest : TestCase() {
   fun buttonWork() {
     composeTestRule.waitForIdle() // Wait for rendering
 
-    composeTestRule.onNodeWithTag("goBackButton").assertHasClickAction()
     composeTestRule.onNodeWithTag("NFCButton").assertHasClickAction()
     composeTestRule.onNodeWithTag("RequestButton").assertHasClickAction()
   }
