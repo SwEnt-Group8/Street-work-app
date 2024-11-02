@@ -41,9 +41,7 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
     if (user != null) {
       require(user.uid.isNotEmpty()) { "UID must not be empty" }
     }
-    viewModelScope.launch {
-      _currentUser.setValue(user)
-    }
+    viewModelScope.launch { _currentUser.setValue(user) }
   }
 
   // Companion object to provide a factory for UserViewModel
