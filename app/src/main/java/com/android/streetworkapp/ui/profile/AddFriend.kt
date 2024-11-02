@@ -16,6 +16,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -42,8 +43,8 @@ fun AddFriendScreen(
   var id by remember { mutableStateOf("") }
   // context for Toast
   val context = LocalContext.current
-  // fake user ID (placeholder)
-  val uid = "user123"
+  val currentUser by userViewModel.currentUser.observeAsState()
+  val uid = currentUser?.uid ?: ""
 
   Box(modifier = Modifier.testTag("addFriendScreen")) {
     Column(
