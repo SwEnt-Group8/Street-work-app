@@ -77,6 +77,12 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
     }
   }
 
+  /**
+   * Get or create a park by its location.
+   *
+   * @param location The park location.
+   * @return The park with the given location, or a new park if it does not exist.
+   */
   override suspend fun getOrCreateParkByLocation(location: ParkLocation): Park? {
     require(location.id.isNotEmpty()) { "Location ID cannot be empty." }
     return try {
