@@ -212,4 +212,17 @@ class ParkViewModelTest {
     verify(repository).getParkByPid(pid)
     assertEquals(park, observedPark)
   }
+
+  @Test
+  fun getOrCreateParkByLocationCallsRepositoryWithCorrectLocationAndReturnsPark() = runTest {
+    val parkLocation = ParkLocation(0.0, 0.0, "location123")
+    val park = createPark(pid = "123", locationId = "location123")
+    whenever(repository.getOrCreateParkByLocation(parkLocation)).thenReturn(park)
+
+    val result = parkViewModel.getOrCreateParkByLocation(parkLocation)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    verify(repository).getOrCreateParkByLocation(parkLocation)
+    assertEquals(park, result)
+  }
 }
