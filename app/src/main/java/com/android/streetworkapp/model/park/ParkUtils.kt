@@ -6,15 +6,13 @@ import com.android.streetworkapp.model.parklocation.ParkLocation
  * Create a new default park given the park ID and location
  *
  * @param pid The park ID.
- * @param lon The park longitude.
- * @param lat The park latitude.
- * @param locationId The park location ID.
+ * @param parkLocation The park location.
  */
-fun createDefaultPark(pid: String, lon: Double, lat: Double, locationId: String): Park {
+fun createDefaultPark(pid: String, parkLocation: ParkLocation): Park {
   return Park(
       pid = pid,
-      name = "Default Park $locationId",
-      location = ParkLocation(lon, lat, locationId),
+      name = "Default Park ${parkLocation.id}",
+      location = parkLocation,
       imageReference = "",
       rating = 1f,
       nbrRating = 0,
