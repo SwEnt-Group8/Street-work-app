@@ -13,7 +13,7 @@ interface ParkRepository {
 
   suspend fun createPark(park: Park)
 
-  suspend fun getOrCreateParkByLocation(location: ParkLocation): Park
+  suspend fun getOrCreateParkByLocation(location: ParkLocation): Park?
 
   suspend fun updateName(pid: String, name: String)
 
