@@ -77,6 +77,24 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
     }
   }
 
+  override suspend fun getOrCreateParkByLocation(location: ParkLocation): Park? {
+    require(location.id.isNotEmpty()) { "Location ID cannot be empty." }
+    return try {
+      val document =
+          db.collection(COLLECTION_PATH).whereEqualTo("location.id", location.id).get().await()
+      if (document.isEmpty) {
+        val park = createDefaultPark(getNewPid(), location)
+        createPark(park)
+        park
+      } else {
+        documentToPark(document.documents.first())
+      }
+    } catch (e: Exception) {
+      Log.e("FirestoreError", "Error getting or creating park by location: ${e.message}")
+      null
+    }
+  }
+
   /**
    * Update the name of a park.
    *
