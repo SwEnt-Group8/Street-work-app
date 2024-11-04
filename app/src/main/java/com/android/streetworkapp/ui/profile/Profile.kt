@@ -164,7 +164,10 @@ fun DisplayFriend(friend: User, padding: PaddingValues = PaddingValues(0.dp)) {
       Text(fontSize = 22.sp, text = friend.username, modifier = Modifier.testTag("friendUsername"))
 
       // score
-      Text(text = "Score: ${friend.score}", fontSize = 22.sp, modifier = Modifier.padding(padding).testTag("friendScore"))
+      Text(
+          text = "Score: ${friend.score}",
+          fontSize = 22.sp,
+          modifier = Modifier.padding(padding).testTag("friendScore"))
     }
   }
 }
