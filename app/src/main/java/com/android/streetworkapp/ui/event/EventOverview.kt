@@ -1,6 +1,7 @@
 package com.android.streetworkapp.ui.event
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -81,8 +82,7 @@ fun EventOverviewScreen(
 ) {
 
   Scaffold(
-      modifier = Modifier.fillMaxSize().testTag("eventOverviewScreen"),
-      topBar = { EventTopBar(title = event.title, navigationActions = navigationActions) },
+      modifier = Modifier.fillMaxSize().padding(paddingValues).testTag("eventOverviewScreen"),
       bottomBar = {
         EventBottomBar(participants = event.participants, maxParticipants = event.maxParticipants)
       }) { padding ->
@@ -118,30 +118,6 @@ fun EventOverviewScreen(
           }
         }
       }
-}
-
-/**
- * Top bar for the event screen, displaying the title of the event and a back button.
- *
- * @param title The title of the event.
- * @param navigationActions The navigation actions.
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun EventTopBar(title: String, navigationActions: NavigationActions) {
-  CenterAlignedTopAppBar(
-      colors =
-          TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface),
-      modifier = Modifier.testTag("EventTopBar"),
-      title = {
-        Text(modifier = Modifier.testTag("eventTitle"), text = title, fontWeight = FontWeight.Bold)
-      },
-      navigationIcon = {
-        IconButton(
-            modifier = Modifier.testTag("goBackButton"), onClick = { navigationActions.goBack() }) {
-              Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
-            }
-      })
 }
 
 /**
@@ -238,29 +214,45 @@ fun EventMap(park: Park) {
  */
 @Composable
 fun EventDashboard(event: Event) {
-  Scaffold(
-      topBar = { DashBoardBar() },
-      modifier = Modifier.height(220.dp).testTag("evenDashboard"),
-      containerColor = Snowflake) { padding ->
+    // Main container column with a fixed height and scrollable inner content
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(220.dp) // Restrict the total height of the dashboard
+            .background(Color(0xFFF0F0F0)) // Example background color
+            .testTag("eventDashboard")
+    ) {
+        // Top bar
+        DashBoardBar()
+
+        // Scrollable content area
         Column(
-            modifier =
-                Modifier.padding(20.dp)
-                    .testTag("dashBoardContent")
-                    .wrapContentHeight()
-                    .heightIn(max = 220.dp) // Set the maximum height
-                    .verticalScroll(rememberScrollState())) {
-              when (uiState.collectAsState().value) {
-                DashboardState.Details ->
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp)
+                .testTag("dashboardContent")
+                .verticalScroll(rememberScrollState()) // Make the content scrollable
+        ) {
+            when (uiState.collectAsState().value) {
+                DashboardState.Details -> {
                     Text(
-                        event.description,
-                        modifier = Modifier.padding(padding).testTag("eventDescription"))
-                DashboardState.Participants ->
+                        text = event.description,
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .testTag("eventDescription")
+                    )
+                }
+                DashboardState.Participants -> {
                     Text(
-                        "show participants",
-                        modifier = Modifier.padding(padding).testTag("participantsList"))
-              }
+                        text = "Show participants",
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .testTag("participantsList")
+                    )
+                }
             }
-      }
+        }
+    }
 }
 
 /**
