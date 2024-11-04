@@ -53,81 +53,67 @@ fun ProfileScreen(
   val currentUser =
       User("uid_current", "Current User", "user@gmail.com", 42424, listOf(alice.uid, bob.uid))
 
-  val friendList = listOf(alice, bob)
+  var friendList = listOf(alice, bob)
+  // friendList = emptyList()
 
   Box(modifier = Modifier.testTag("ProfileScreen")) {
     Column(
         modifier = Modifier.fillMaxSize().padding(innerPaddingValues).testTag("ProfileColumn"),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)) {
-          // profile placeholder
 
-          Image(
-              painter = painterResource(id = R.drawable.profile),
-              contentDescription = "profile picture",
-              modifier = Modifier.size(200.dp))
+          Spacer(modifier = Modifier.height(4.dp).testTag("profileSpacer"))
 
-          Column(
-              modifier =
-                  Modifier.fillMaxSize().padding(innerPaddingValues).testTag("ProfileColumn"),
-              horizontalAlignment = Alignment.CenterHorizontally,
-              verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)) {
-                Spacer(modifier = Modifier.height(10.dp).testTag("profileSpacer"))
+          Row(
+              modifier = Modifier.fillMaxWidth().padding(innerPaddingValues).testTag("profileRow"),
+              horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+              verticalAlignment = Alignment.Top) {
 
-                Row(
-                    modifier =
-                        Modifier.fillMaxWidth().padding(innerPaddingValues).testTag("profileRow"),
-                    horizontalArrangement =
-                        Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
-                    verticalAlignment = Alignment.Top) {
+                // profile placeholder
+                Image(
+                    painter = painterResource(id = R.drawable.profile),
+                    contentDescription = "profile picture",
+                    modifier = Modifier.size(200.dp).testTag("profilePicture"),
+                )
 
-                      // profile placeholder
-                      Image(
-                          painter = painterResource(id = R.drawable.profile),
-                          contentDescription = "profile picture",
-                          modifier = Modifier.size(200.dp).testTag("profilePicture"),
-                      )
+                Column(modifier = Modifier.testTag("profileInfoColumn")) {
+                  Spacer(modifier = Modifier.height(2.dp).testTag("profileInfoSpacer"))
+                  // name placeholder
+                  Text(
+                      text = currentUser.username,
+                      fontSize = 30.sp,
+                      modifier = Modifier.testTag("profileUsername"))
 
-                      Column(modifier = Modifier.testTag("profileInfoColumn")) {
-                        Spacer(modifier = Modifier.height(2.dp).testTag("profileInfoSpacer"))
-                        // name placeholder
-                        Text(
-                            text = currentUser.username,
-                            fontSize = 30.sp,
-                            modifier = Modifier.testTag("profileUsername"))
+                  // score placeholder
+                  Text(
+                      text = "Score: ${currentUser.score}",
+                      fontSize = 20.sp,
+                      modifier = Modifier.testTag("profileScore"))
 
-                        // score placeholder
-                        Text(
-                            text = "Score: ${currentUser.score}",
-                            fontSize = 20.sp,
-                            modifier = Modifier.testTag("profileScore"))
+                  Spacer(modifier = Modifier.height(10.dp).testTag("profileInfoSpacer2"))
 
-                        Spacer(modifier = Modifier.height(10.dp).testTag("profileInfoSpacer2"))
-
-                        // button to add a new friend
-                        Button(
-                            onClick = { navigationActions.navigateTo(Screen.ADD_FRIEND) },
-                            modifier = Modifier.size(220.dp, 50.dp).testTag("profileAddButton")) {
-                              Text(text = "Add a new friend", fontSize = 17.sp)
-                            }
-
-                        Spacer(modifier = Modifier.height(10.dp).testTag("profileInfoSpacer3"))
-
-                        // button to train with a friend
-                        Button(
-                            onClick = {
-                              Toast.makeText(context, "Not implemented yet", Toast.LENGTH_LONG)
-                                  .show()
-                            },
-                            colors = ButtonDefaults.buttonColors(Color(0xFFA53A36)),
-                            modifier = Modifier.size(220.dp, 50.dp).testTag("profileTrainButton")) {
-                              Text(text = "Train with a friend", fontSize = 17.sp)
-                            }
+                  // button to add a new friend
+                  Button(
+                      onClick = { navigationActions.navigateTo(Screen.ADD_FRIEND) },
+                      modifier = Modifier.size(220.dp, 50.dp).testTag("profileAddButton")) {
+                        Text(text = "Add a new friend", fontSize = 17.sp)
                       }
-                    }
 
-                DisplayFriendList(friendList, innerPaddingValues)
+                  Spacer(modifier = Modifier.height(10.dp).testTag("profileInfoSpacer3"))
+
+                  // button to train with a friend
+                  Button(
+                      onClick = {
+                        Toast.makeText(context, "Not implemented yet", Toast.LENGTH_LONG).show()
+                      },
+                      colors = ButtonDefaults.buttonColors(Color(0xFFA53A36)),
+                      modifier = Modifier.size(220.dp, 50.dp).testTag("profileTrainButton")) {
+                        Text(text = "Train with a friend", fontSize = 17.sp)
+                      }
+                }
               }
+
+          DisplayFriendList(friendList, innerPaddingValues)
         }
   }
 }
