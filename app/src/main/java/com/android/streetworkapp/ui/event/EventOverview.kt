@@ -51,6 +51,7 @@ import com.android.sample.R
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.navigation.ScreenParams
 import com.android.streetworkapp.ui.theme.Snowflake
 import com.android.streetworkapp.utils.toFormattedString
 import com.google.android.gms.maps.model.CameraPosition
@@ -81,13 +82,11 @@ fun EventOverviewScreen(
     paddingValues: PaddingValues = PaddingValues(0.dp)
 ) {
 
-  Scaffold(
-      modifier = Modifier.fillMaxSize().padding(paddingValues).testTag("eventOverviewScreen"),
-      bottomBar = {
-        EventBottomBar(participants = event.participants, maxParticipants = event.maxParticipants)
-      }) { padding ->
+  Box(
+      modifier = Modifier.fillMaxSize().padding(paddingValues).testTag("eventOverviewScreen"))
+ {
         Box(modifier = Modifier.fillMaxSize().testTag("eventContent")) {
-          Column(modifier = Modifier.padding(padding).fillMaxHeight()) {
+          Column(modifier = Modifier.fillMaxHeight()) {
             Row {
               EventDetails(event)
 
@@ -219,7 +218,7 @@ fun EventDashboard(event: Event) {
         modifier = Modifier
             .fillMaxWidth()
             .height(220.dp) // Restrict the total height of the dashboard
-            .background(Color(0xFFF0F0F0)) // Example background color
+            .background(Snowflake) // Example background color
             .testTag("eventDashboard")
     ) {
         // Top bar
@@ -229,7 +228,7 @@ fun EventDashboard(event: Event) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp)
+                .padding(10.dp)
                 .testTag("dashboardContent")
                 .verticalScroll(rememberScrollState()) // Make the content scrollable
         ) {
