@@ -61,7 +61,6 @@ fun ProfileScreen(
         modifier = Modifier.fillMaxSize().padding(innerPaddingValues).testTag("ProfileColumn"),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)) {
-
           Spacer(modifier = Modifier.height(4.dp).testTag("profileSpacer"))
 
           Row(
@@ -118,6 +117,12 @@ fun ProfileScreen(
   }
 }
 
+/**
+ * This function displays the friends list.
+ *
+ * @param friends - The list of friends to display.
+ * @param padding - The padding to apply to the friend list.
+ */
 @Composable
 fun DisplayFriendList(friends: List<User>, padding: PaddingValues = PaddingValues(0.dp)) {
   return if (friends.isNotEmpty()) {
@@ -140,6 +145,12 @@ fun DisplayFriendList(friends: List<User>, padding: PaddingValues = PaddingValue
   }
 }
 
+/**
+ * This function displays a friend (for the friend list).
+ *
+ * @param friend - The friend to display.
+ * @param padding - The padding to apply to the friend display.
+ */
 @Composable
 fun DisplayFriend(friend: User, padding: PaddingValues = PaddingValues(0.dp)) {
   return Row(modifier = Modifier.fillMaxWidth().padding(padding).testTag("friendRow")) {
