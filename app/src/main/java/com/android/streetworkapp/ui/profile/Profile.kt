@@ -122,7 +122,7 @@ fun ProfileScreen(navigationActions: NavigationActions, userViewModel: UserViewM
 }
 
 @Composable
-fun DisplayFriendList(friends: List<User>, padding: PaddingValues) {
+fun DisplayFriendList(friends: List<User>, padding: PaddingValues = PaddingValues(0.dp)) {
   return if (friends.isNotEmpty()) {
 
     // LazyColumn is scrollable
@@ -144,14 +144,14 @@ fun DisplayFriendList(friends: List<User>, padding: PaddingValues) {
 }
 
 @Composable
-fun DisplayFriend(friend: User, padding: PaddingValues) {
-  return Row(modifier = Modifier.fillMaxWidth().padding(padding)) {
+fun DisplayFriend(friend: User, padding: PaddingValues = PaddingValues(0.dp)) {
+  return Row(modifier = Modifier.fillMaxWidth().padding(padding).testTag("friendRow")) {
 
     // profile placeholder
     Image(
         painter = painterResource(id = R.drawable.profile),
         contentDescription = "profile picture",
-        modifier = Modifier.size(75.dp))
+        modifier = Modifier.size(75.dp).testTag("friendProfilePicture"))
 
     Spacer(modifier = Modifier.width(10.dp))
 
@@ -161,10 +161,10 @@ fun DisplayFriend(friend: User, padding: PaddingValues) {
       Spacer(modifier = Modifier.height(12.dp))
 
       // username
-      Text(fontSize = 22.sp, text = friend.username)
+      Text(fontSize = 22.sp, text = friend.username, modifier = Modifier.testTag("friendUsername"))
 
       // score
-      Text(text = "Score: ${friend.score}", fontSize = 22.sp, modifier = Modifier.padding(padding))
+      Text(text = "Score: ${friend.score}", fontSize = 22.sp, modifier = Modifier.padding(padding).testTag("friendScore"))
     }
   }
 }
