@@ -3,6 +3,7 @@ package com.android.streetworkapp.ui.profile
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -17,7 +18,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,18 +28,20 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.sample.R
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserViewModel
-import com.android.streetworkapp.ui.navigation.BottomNavigationMenu
-import com.android.streetworkapp.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 
 @Composable
-fun ProfileScreen(navigationActions: NavigationActions, userViewModel: UserViewModel) {
-  // Kemin version -> viewModel(factory = UserViewModel.Factory)
-  // Using import androidx.lifecycle.viewmodel.compose.viewModel
+fun ProfileScreen(
+    navigationActions: NavigationActions,
+    userViewModel: UserViewModel = viewModel(factory = UserViewModel.Factory),
+    innerPaddingValues: PaddingValues = PaddingValues(0.dp)
+) {
+
   val context = LocalContext.current
 
   // Fake data extraction from the MVVM :
@@ -53,72 +55,81 @@ fun ProfileScreen(navigationActions: NavigationActions, userViewModel: UserViewM
 
   val friendList = listOf(alice, bob)
 
-  Scaffold(
-      modifier = Modifier.testTag("ProfileScreen"),
-      bottomBar = {
-        BottomNavigationMenu(
-            onTabSelect = { route -> navigationActions.navigateTo(route) },
-            tabList = LIST_TOP_LEVEL_DESTINATION)
-      },
-      content = { padding ->
-        Column(
-            modifier = Modifier.fillMaxSize().padding(padding).testTag("ProfileColumn"),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)) {
-              Spacer(modifier = Modifier.height(10.dp).testTag("profileSpacer"))
+  Box(modifier = Modifier.testTag("ProfileScreen")) {
+    Column(
+        modifier = Modifier.fillMaxSize().padding(innerPaddingValues).testTag("ProfileColumn"),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)) {
+          // profile placeholder
 
-              Row(
-                  modifier = Modifier.fillMaxWidth().padding(padding).testTag("profileRow"),
-                  horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
-                  verticalAlignment = Alignment.Top) {
+          Image(
+              painter = painterResource(id = R.drawable.profile),
+              contentDescription = "profile picture",
+              modifier = Modifier.size(200.dp))
 
-                    // profile placeholder
-                    Image(
-                        painter = painterResource(id = R.drawable.profile),
-                        contentDescription = "profile picture",
-                        modifier = Modifier.size(200.dp).testTag("profilePicture"),
-                    )
+          Column(
+              modifier =
+                  Modifier.fillMaxSize().padding(innerPaddingValues).testTag("ProfileColumn"),
+              horizontalAlignment = Alignment.CenterHorizontally,
+              verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)) {
+                Spacer(modifier = Modifier.height(10.dp).testTag("profileSpacer"))
 
-                    Column(modifier = Modifier.testTag("profileInfoColumn")) {
-                      Spacer(modifier = Modifier.height(2.dp).testTag("profileInfoSpacer"))
-                      // name placeholder
-                      Text(
-                          text = currentUser.username,
-                          fontSize = 30.sp,
-                          modifier = Modifier.testTag("profileUsername"))
+                Row(
+                    modifier =
+                        Modifier.fillMaxWidth().padding(innerPaddingValues).testTag("profileRow"),
+                    horizontalArrangement =
+                        Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+                    verticalAlignment = Alignment.Top) {
 
-                      // score placeholder
-                      Text(
-                          text = "Score: ${currentUser.score}",
-                          fontSize = 20.sp,
-                          modifier = Modifier.testTag("profileScore"))
+                      // profile placeholder
+                      Image(
+                          painter = painterResource(id = R.drawable.profile),
+                          contentDescription = "profile picture",
+                          modifier = Modifier.size(200.dp).testTag("profilePicture"),
+                      )
 
-                      Spacer(modifier = Modifier.height(10.dp).testTag("profileInfoSpacer2"))
+                      Column(modifier = Modifier.testTag("profileInfoColumn")) {
+                        Spacer(modifier = Modifier.height(2.dp).testTag("profileInfoSpacer"))
+                        // name placeholder
+                        Text(
+                            text = currentUser.username,
+                            fontSize = 30.sp,
+                            modifier = Modifier.testTag("profileUsername"))
 
-                      // button to add a new friend
-                      Button(
-                          onClick = { navigationActions.navigateTo(Screen.ADD_FRIEND) },
-                          modifier = Modifier.size(220.dp, 50.dp).testTag("profileAddButton")) {
-                            Text(text = "Add a new friend", fontSize = 17.sp)
-                          }
+                        // score placeholder
+                        Text(
+                            text = "Score: ${currentUser.score}",
+                            fontSize = 20.sp,
+                            modifier = Modifier.testTag("profileScore"))
 
-                      Spacer(modifier = Modifier.height(10.dp).testTag("profileInfoSpacer3"))
+                        Spacer(modifier = Modifier.height(10.dp).testTag("profileInfoSpacer2"))
 
-                      // button to train with a friend
-                      Button(
-                          onClick = {
-                            Toast.makeText(context, "Not implemented yet", Toast.LENGTH_LONG).show()
-                          },
-                          colors = ButtonDefaults.buttonColors(Color(0xFFA53A36)),
-                          modifier = Modifier.size(220.dp, 50.dp).testTag("profileTrainButton")) {
-                            Text(text = "Train with a friend", fontSize = 17.sp)
-                          }
+                        // button to add a new friend
+                        Button(
+                            onClick = { navigationActions.navigateTo(Screen.ADD_FRIEND) },
+                            modifier = Modifier.size(220.dp, 50.dp).testTag("profileAddButton")) {
+                              Text(text = "Add a new friend", fontSize = 17.sp)
+                            }
+
+                        Spacer(modifier = Modifier.height(10.dp).testTag("profileInfoSpacer3"))
+
+                        // button to train with a friend
+                        Button(
+                            onClick = {
+                              Toast.makeText(context, "Not implemented yet", Toast.LENGTH_LONG)
+                                  .show()
+                            },
+                            colors = ButtonDefaults.buttonColors(Color(0xFFA53A36)),
+                            modifier = Modifier.size(220.dp, 50.dp).testTag("profileTrainButton")) {
+                              Text(text = "Train with a friend", fontSize = 17.sp)
+                            }
+                      }
                     }
-                  }
 
-              DisplayFriendList(friendList, padding)
-            }
-      })
+                DisplayFriendList(friendList, innerPaddingValues)
+              }
+        }
+  }
 }
 
 @Composable

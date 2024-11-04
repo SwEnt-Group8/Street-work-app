@@ -1,20 +1,11 @@
 package com.android.streetworkapp.ui.navigation
 
-import android.annotation.SuppressLint
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onRoot
-import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.printToLog
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.streetworkapp.StreetWorkApp
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
 import com.android.streetworkapp.model.event.EventViewModel
@@ -30,37 +21,11 @@ import io.mockk.mockk
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 
-// this is very wrong but something in the ADD_EVENT screen makes the test stall and I really can't
-// be bothered to debug it. (We only skip one screen out of all the others so it shouldn't matter
-// that much)
-val TEST_SCREEN_EXCLUSION_LIST = listOf<String>(Screen.ADD_EVENT)
-
-@RunWith(AndroidJUnit4::class)
-class BottomNavigationTest {
+class TopAppBarTest {
 
   private lateinit var parkLocationRepository: OverpassParkLocationRepository
   private lateinit var parkLocationViewModel: ParkLocationViewModel
-
-  @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-  @Composable
-  fun BottomNavigationTest() {
-    Scaffold(
-        bottomBar = {
-          BottomNavigationMenu(onTabSelect = {}, tabList = LIST_TOP_LEVEL_DESTINATION)
-        }) {
-          Text("test")
-        }
-  }
-
-  @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-  @Composable
-  fun EmptyBottomNavigationTest() {
-    Scaffold(bottomBar = { BottomNavigationMenu(onTabSelect = {}, tabList = listOf()) }) {
-      Text("test")
-    }
-  }
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -91,47 +56,19 @@ class BottomNavigationTest {
   }
 
   @Test
-  fun printComposeHierarchy() {
-    composeTestRule.setContent { BottomNavigationTest() }
-    composeTestRule.onRoot().printToLog("BottomNavigationTest")
-  }
+  fun changingTitleInManagerMakesItChangeOnScreen() {
+    val topAppBarManager = TopAppBarManager("old title")
 
-  @Test
-  fun displayAllComponents() {
-    composeTestRule.setContent { BottomNavigationTest() }
-    composeTestRule.onNodeWithTag("bottomNavigationMenu").assertExists().assertIsDisplayed()
+    topAppBarManager.setTopAppBarTitle("new title")
+    composeTestRule.setContent { TopAppBarWrapper(NavigationActions(mockk()), topAppBarManager) }
     composeTestRule
-        .onAllNodesWithTag("bottomNavigationItem")
-        .assertCountEquals(LIST_TOP_LEVEL_DESTINATION.size)
-
-    val navItems = composeTestRule.onAllNodesWithTag("bottomNavigationItem")
-
-    for (i in LIST_TOP_LEVEL_DESTINATION.indices) {
-      navItems[i].assertIsDisplayed()
-    }
-  }
-
-  @Test
-  fun menuItemsAreClickable() {
-    composeTestRule.setContent { BottomNavigationTest() }
-    val navItems = composeTestRule.onAllNodesWithTag("bottomNavigationItem")
-
-    for (i in LIST_TOP_LEVEL_DESTINATION.indices) {
-      navItems[i].performClick()
-    }
-  }
-
-  @Test
-  fun displayNoComponents() {
-    composeTestRule.setContent { EmptyBottomNavigationTest() }
-    composeTestRule.onNodeWithTag("bottomNavigationMenu").assertExists().assertIsDisplayed()
-    composeTestRule.onAllNodesWithTag("bottomNavigationItem").assertCountEquals(0)
-    composeTestRule.onAllNodesWithTag("bottomNavIcon").assertCountEquals(0)
+        .onNodeWithTag("topAppBarTitle")
+        .assertIsDisplayed()
+        .assertTextEquals("new title")
   }
 
   @Test
   fun isDisplayedCorrectlyOnScreens() {
-
     val currentScreenParam =
         mutableStateOf(
             LIST_OF_SCREENS.first()) // can't call setContent twice per test so we use this instead
@@ -148,12 +85,16 @@ class BottomNavigationTest {
     for (screenParam in LIST_OF_SCREENS) {
       if (screenParam.screenName in TEST_SCREEN_EXCLUSION_LIST) continue
 
-      currentScreenParam.value = screenParam // Update the state to recompose our UI
+      currentScreenParam.value = screenParam // Update the state
 
       composeTestRule.waitForIdle()
-      if (screenParam.isBottomBarVisible)
-          composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsDisplayed()
-      else composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsNotDisplayed()
+      if (screenParam.isTopBarVisible) {
+        composeTestRule.onNodeWithTag("topAppBar").assertIsDisplayed()
+        screenParam.topAppBarManager?.let { topAppBarManager ->
+          if (topAppBarManager.hasNavigationIcon())
+              composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
+        }
+      } else composeTestRule.onNodeWithTag("topAppBar").assertIsNotDisplayed()
     }
   }
 }
