@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -39,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -91,7 +94,7 @@ fun AddEventScreen(
     event.owner = owner
   }
 
-  val parkId = "Unknown park" // TODO: do the same with ParkViewModel once updated
+  val parkId = parkViewModel.currentPark.value?.pid
   if (!parkId.isNullOrEmpty()) {
     event.parkId = parkId
   }
@@ -104,6 +107,7 @@ fun AddEventScreen(
           modifier = Modifier.fillMaxWidth(),
           verticalArrangement = Arrangement.spacedBy(18.dp),
           horizontalAlignment = Alignment.CenterHorizontally) {
+            Spacer(modifier = Modifier.size(24.dp))
             EventTitleSelection(event)
             EventDescriptionSelection(event)
             TimeSelection(event)
@@ -115,22 +119,28 @@ fun AddEventScreen(
           }
       FloatingActionButton(
           onClick = {
-            if (event.title.isEmpty()) {
+            if (event.date.toDate() < Calendar.getInstance().time) {
+              Toast.makeText(context, "Date cannot be in the past", Toast.LENGTH_SHORT).show()
+            } else if (event.title.isEmpty()) {
               Toast.makeText(context, "Please fill the title of the event", Toast.LENGTH_SHORT)
                   .show()
             } else {
               eventViewModel.addEvent(event)
+              parkViewModel.addEventToPark(event.parkId, event.eid)
+
               navigationActions.goBack()
             }
           },
           modifier =
-              Modifier.align(Alignment.BottomCenter)
+              Modifier.align(Alignment.Center)
+                  .offset(0.dp, 100.dp)
                   .padding(40.dp)
                   .size(width = 150.dp, height = 40.dp)
                   .testTag("addEventButton"),
-      ) {
-        Text("Add new event")
-      }
+          containerColor = Color.Blue,
+          contentColor = Color.White) {
+            Text("Add new event")
+          }
     }
   }
 }
@@ -151,7 +161,8 @@ fun EventTitleSelection(event: Event) {
         event.title = title
       },
       label = { Text("What kind of event do you want to create?") },
-      modifier = Modifier.testTag("titleTag").fillMaxWidth(0.9f).height(64.dp))
+      modifier = Modifier.testTag("titleTag").fillMaxWidth(0.9f).height(64.dp),
+  )
 }
 
 /**
@@ -206,7 +217,7 @@ fun ParticipantNumberSelection(event: Event) {
                 EventConstants.MIN_NUMBER_PARTICIPANTS.toFloat()..EventConstants
                         .MAX_NUMBER_PARTICIPANTS
                         .toFloat())
-        Text(text = sliderPosition.toInt().toString())
+        Text(text = sliderPosition.toInt().toString(), color = Color.Black)
       }
 }
 
@@ -273,6 +284,7 @@ fun TimeSelection(event: Event) {
 
         Button(
             modifier = Modifier.offset(x = 280.dp, y = 140.dp).testTag("validateDate"),
+            colors = ButtonColors(Color.Blue, Color.White, Color.Blue, Color.White),
             onClick = {
               showDatePicker = false
 
@@ -299,6 +311,7 @@ fun TimeSelection(event: Event) {
 
               Button(
                   modifier = Modifier.testTag("validateTime"),
+                  colors = ButtonColors(Color.Blue, Color.White, Color.Blue, Color.White),
                   onClick = {
                     showTimePicker = false
 
