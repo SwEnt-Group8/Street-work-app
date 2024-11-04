@@ -60,7 +60,7 @@ class ProfileScreenTest : TestCase() {
   @Test
   fun textCorrectlyDisplayed() {
     composeTestRule.waitForIdle() // Wait for rendering
-    composeTestRule.onNodeWithTag("profileScore").assertTextEquals("Score: 42’424")
+    composeTestRule.onNodeWithTag("profileScore").assertTextEquals("Score: 42424")
     composeTestRule.onNodeWithTag("profileAddButton").assertTextEquals("Add a new friend")
     composeTestRule.onNodeWithTag("profileTrainButton").assertTextEquals("Train with a friend")
   }
