@@ -35,16 +35,13 @@ class ProfileScreenTest : TestCase() {
   fun hasRequiredComponents() {
     composeTestRule.waitForIdle() // Wait for rendering
     composeTestRule.onNodeWithTag("ProfileScreen").assertExists()
-    composeTestRule.onNodeWithTag("ProfileColumn").assertExists()
     composeTestRule.onNodeWithTag("profileScore").assertExists()
     composeTestRule.onNodeWithTag("profileAddButton").assertExists()
     composeTestRule.onNodeWithTag("profileTrainButton").assertExists()
     composeTestRule.onNodeWithTag("ProfileScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("ProfileColumn").assertIsDisplayed()
     composeTestRule.onNodeWithTag("profileScore").assertIsDisplayed()
     composeTestRule.onNodeWithTag("profileAddButton").assertIsDisplayed()
-    // composeTestRule.onNodeWithTag("profileTrainButton").assertIsDisplayed() =>
-    // weirdly enough Train button dont display ?
+    composeTestRule.onNodeWithTag("profileTrainButton").assertIsDisplayed()
 
     // Tests for new components
     composeTestRule.onNodeWithTag("profileSpacer").assertExists()
