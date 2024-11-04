@@ -120,17 +120,14 @@ fun AddEventScreen(
       FloatingActionButton(
           onClick = {
             if (event.date.toDate() < Calendar.getInstance().time) {
-              Toast.makeText(
-                      context, "Please select a valid time in the future", Toast.LENGTH_SHORT)
-                  .show()
+              Toast.makeText(context, "Date cannot be in the past", Toast.LENGTH_SHORT).show()
             } else if (event.title.isEmpty()) {
               Toast.makeText(context, "Please fill the title of the event", Toast.LENGTH_SHORT)
                   .show()
             } else {
               eventViewModel.addEvent(event)
-              parkViewModel.currentPark.value?.let {
-                parkViewModel.addEventToPark(it.pid, event.eid)
-              }
+              parkViewModel.addEventToPark(event.parkId, event.eid)
+
               navigationActions.goBack()
             }
           },
