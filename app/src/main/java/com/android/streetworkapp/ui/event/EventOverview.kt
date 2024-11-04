@@ -109,26 +109,6 @@ fun EventOverviewScreen(
 }
 
 /**
- * Bottom bar for the event screen, displaying a button to join the event.
- *
- * @param participants The number of participants that have joined the event.
- * @param maxParticipants The maximum number of participants allowed in the event.
- */
-@Composable
-fun EventBottomBar(participants: Int, maxParticipants: Int) {
-  BottomAppBar(containerColor = Color.Transparent, modifier = Modifier.testTag("eventBottomBar")) {
-    Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
-      Button(
-          onClick = {},
-          modifier = Modifier.testTag("joinEventButton"),
-          enabled = participants < maxParticipants) {
-            Text("Join this event", modifier = Modifier.testTag("joinEventButtonText"))
-          }
-    }
-  }
-}
-
-/**
  * Displays the overview of the event, including the owner, date and number of participants.
  *
  * @param event The event to display.
@@ -250,7 +230,7 @@ fun EventDashboard(event: Event) {
 @Composable
 fun DashBoardBar() {
   NavigationBar(
-      modifier = Modifier.testTag("dashBoard").fillMaxWidth().height(56.dp),
+      modifier = Modifier.testTag("dashboard").fillMaxWidth().height(56.dp),
   ) {
     val state = uiState.collectAsState().value
 
