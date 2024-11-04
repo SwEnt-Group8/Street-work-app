@@ -33,10 +33,20 @@ data class ScreenParams(
     val topAppBarManager: TopAppBarManager?
 ) {
   companion object {
-    val AUTH = ScreenParams(Screen.AUTH, isBottomBarVisible = false, BottomNavigationMenuType.NONE, isTopBarVisible = false, null)
+    val AUTH =
+        ScreenParams(
+            Screen.AUTH,
+            isBottomBarVisible = false,
+            BottomNavigationMenuType.NONE,
+            isTopBarVisible = false,
+            null)
     val MAP =
         ScreenParams(
-            Screen.MAP, isBottomBarVisible = true, BottomNavigationMenuType.DEFAULT,isTopBarVisible = true, TopAppBarManager("Map"))
+            Screen.MAP,
+            isBottomBarVisible = true,
+            BottomNavigationMenuType.DEFAULT,
+            isTopBarVisible = true,
+            TopAppBarManager("Map"))
     val PROFILE =
         ScreenParams(
             Screen.PROFILE,
@@ -74,16 +84,16 @@ data class ScreenParams(
                 "Event Creation",
                 hasNavigationIcon = true,
                 navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
-  val EVENT_OVERVIEW =
-      ScreenParams(
-          Screen.EVENT_OVERVIEW,
-          isBottomBarVisible = true,
-          BottomNavigationMenuType.EVENT_OVERVIEW,
-          isTopBarVisible = true,
-          TopAppBarManager(
-              "<Event Name>",
-              hasNavigationIcon = true,
-              navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
+    val EVENT_OVERVIEW =
+        ScreenParams(
+            Screen.EVENT_OVERVIEW,
+            isBottomBarVisible = true,
+            BottomNavigationMenuType.EVENT_OVERVIEW,
+            isTopBarVisible = true,
+            TopAppBarManager(
+                "<Event Name>",
+                hasNavigationIcon = true,
+                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
   }
 }
 
@@ -95,8 +105,7 @@ val LIST_OF_SCREENS =
         ScreenParams.ADD_FRIEND,
         ScreenParams.PARK_OVERVIEW,
         ScreenParams.ADD_EVENT,
-        ScreenParams.EVENT_OVERVIEW
-    )
+        ScreenParams.EVENT_OVERVIEW)
 
 /**
  * Represents a top-level destination in the app's navigation.

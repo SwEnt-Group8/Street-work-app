@@ -130,40 +130,50 @@ class BottomNavigationTest {
     composeTestRule.onAllNodesWithTag("bottomNavIcon").assertCountEquals(0)
   }
 
-    @Test
-    fun bottomBarDisplaysCorrectlyOnScreens() {
+  @Test
+  fun bottomBarDisplaysCorrectlyOnScreens() {
 
-        val currentScreenParam =
-            mutableStateOf(
-                LIST_OF_SCREENS.first()) // can't call setContent twice per test so we use this instead
-        composeTestRule.setContent {
-            StreetWorkApp(
-                parkLocationViewModel,
-                { navigateTo(currentScreenParam.value.screenName) },
-                {},
-                UserViewModel(mockk<UserRepositoryFirestore>()),
-                ParkViewModel(mockk<ParkRepositoryFirestore>()),
-                EventViewModel(mockk<EventRepositoryFirestore>()))
-        }
-
-        val bottomNavTypeToTest =  BottomNavigationMenuType.entries.filter { it != BottomNavigationMenuType.NONE }
-
-        for (screenParam in LIST_OF_SCREENS) {
-            if (screenParam.screenName in TEST_SCREEN_EXCLUSION_LIST) continue
-
-            currentScreenParam.value = screenParam // Update the state to recompose our UI
-
-            composeTestRule.waitForIdle()
-            if (screenParam.isBottomBarVisible) {
-                when (screenParam.bottomBarType) {
-                    BottomNavigationMenuType.NONE -> Assert.fail("Invalid use of the bottomBar setup, if isBottomBarVisible is set to false its type should be set to NONE")
-                    BottomNavigationMenuType.DEFAULT -> composeTestRule.onNodeWithTag(BottomNavigationMenuType.DEFAULT.getTopLevelTestTag()).assertIsDisplayed()
-                    BottomNavigationMenuType.EVENT_OVERVIEW -> composeTestRule.onNodeWithTag(BottomNavigationMenuType.EVENT_OVERVIEW.getTopLevelTestTag()).assertIsDisplayed()
-                }
-            } else {
-                for (bottomNavType in bottomNavTypeToTest)
-                    composeTestRule.onNodeWithTag(bottomNavType.getTopLevelTestTag()).assertIsNotDisplayed()
-            }
-        }
+    val currentScreenParam =
+        mutableStateOf(
+            LIST_OF_SCREENS.first()) // can't call setContent twice per test so we use this instead
+    composeTestRule.setContent {
+      StreetWorkApp(
+          parkLocationViewModel,
+          { navigateTo(currentScreenParam.value.screenName) },
+          {},
+          UserViewModel(mockk<UserRepositoryFirestore>()),
+          ParkViewModel(mockk<ParkRepositoryFirestore>()),
+          EventViewModel(mockk<EventRepositoryFirestore>()))
     }
+
+    val bottomNavTypeToTest =
+        BottomNavigationMenuType.entries.filter { it != BottomNavigationMenuType.NONE }
+
+    for (screenParam in LIST_OF_SCREENS) {
+      if (screenParam.screenName in TEST_SCREEN_EXCLUSION_LIST) continue
+
+      currentScreenParam.value = screenParam // Update the state to recompose our UI
+
+      composeTestRule.waitForIdle()
+      if (screenParam.isBottomBarVisible) {
+        when (screenParam.bottomBarType) {
+          BottomNavigationMenuType.NONE ->
+              Assert.fail(
+                  "Invalid use of the bottomBar setup, if isBottomBarVisible is set to false its type should be set to NONE")
+          BottomNavigationMenuType.DEFAULT ->
+              composeTestRule
+                  .onNodeWithTag(BottomNavigationMenuType.DEFAULT.getTopLevelTestTag())
+                  .assertIsDisplayed()
+          BottomNavigationMenuType.EVENT_OVERVIEW ->
+              composeTestRule
+                  .onNodeWithTag(BottomNavigationMenuType.EVENT_OVERVIEW.getTopLevelTestTag())
+                  .assertIsDisplayed()
+        }
+      } else {
+        for (bottomNavType in bottomNavTypeToTest) composeTestRule
+            .onNodeWithTag(bottomNavType.getTopLevelTestTag())
+            .assertIsNotDisplayed()
+      }
+    }
+  }
 }

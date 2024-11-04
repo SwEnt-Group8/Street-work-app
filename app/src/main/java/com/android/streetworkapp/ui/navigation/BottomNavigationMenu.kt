@@ -15,17 +15,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 
 enum class BottomNavigationMenuType {
-    NONE,
-    DEFAULT,
-    EVENT_OVERVIEW;
+  NONE,
+  DEFAULT,
+  EVENT_OVERVIEW;
 
-    fun getTopLevelTestTag(): String {
-        return when(this) {
-            NONE -> ""
-            DEFAULT -> "bottomNavigationMenu"
-            EVENT_OVERVIEW -> "eventBottomBar"
-        }
+  fun getTopLevelTestTag(): String {
+    return when (this) {
+      NONE -> ""
+      DEFAULT -> "bottomNavigationMenu"
+      EVENT_OVERVIEW -> "eventBottomBar"
     }
+  }
 }
 
 /**
@@ -40,17 +40,19 @@ fun BottomNavigationMenu(
     tabList: List<TopLevelDestination>
 ) {
 
-  NavigationBar(modifier = Modifier.testTag(BottomNavigationMenuType.DEFAULT.getTopLevelTestTag()), containerColor = Color.Gray) {
-    tabList.forEach { topLevelDestination ->
-      NavigationBarItem(
-          modifier = Modifier.testTag("bottomNavigationItem"),
-          icon = {
-            Icon(topLevelDestination.icon, contentDescription = topLevelDestination.textId)
-          },
-          selected = false,
-          onClick = { onTabSelect(topLevelDestination) })
-    }
-  }
+  NavigationBar(
+      modifier = Modifier.testTag(BottomNavigationMenuType.DEFAULT.getTopLevelTestTag()),
+      containerColor = Color.Gray) {
+        tabList.forEach { topLevelDestination ->
+          NavigationBarItem(
+              modifier = Modifier.testTag("bottomNavigationItem"),
+              icon = {
+                Icon(topLevelDestination.icon, contentDescription = topLevelDestination.textId)
+              },
+              selected = false,
+              onClick = { onTabSelect(topLevelDestination) })
+        }
+      }
 }
 
 /**
@@ -61,14 +63,16 @@ fun BottomNavigationMenu(
  */
 @Composable
 fun EventBottomBar(participants: Int, maxParticipants: Int) {
-    BottomAppBar(containerColor = Color.Transparent, modifier = Modifier.testTag(BottomNavigationMenuType.EVENT_OVERVIEW.getTopLevelTestTag())) {
+  BottomAppBar(
+      containerColor = Color.Transparent,
+      modifier = Modifier.testTag(BottomNavigationMenuType.EVENT_OVERVIEW.getTopLevelTestTag())) {
         Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
-            Button(
-                onClick = {},
-                modifier = Modifier.testTag("joinEventButton"),
-                enabled = participants < maxParticipants) {
+          Button(
+              onClick = {},
+              modifier = Modifier.testTag("joinEventButton"),
+              enabled = participants < maxParticipants) {
                 Text("Join this event", modifier = Modifier.testTag("joinEventButtonText"))
-            }
+              }
         }
-    }
+      }
 }
