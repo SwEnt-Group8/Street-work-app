@@ -27,11 +27,11 @@ import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.authentication.SignInScreen
 import com.android.streetworkapp.ui.event.AddEventScreen
-import com.android.streetworkapp.ui.event.EventBottomBar
 import com.android.streetworkapp.ui.event.EventOverviewScreen
 import com.android.streetworkapp.ui.map.MapScreen
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenu
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenuType
+import com.android.streetworkapp.ui.navigation.EventBottomBar
 import com.android.streetworkapp.ui.navigation.LIST_OF_SCREENS
 import com.android.streetworkapp.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.streetworkapp.ui.navigation.NavigationActions
@@ -151,7 +151,7 @@ fun StreetWorkApp(
                         EventBottomBar(sampleEvent.participants, sampleEvent.maxParticipants) //TODO: modify to have the event that we'll have selected
                     }
 
-                    BottomNavigationMenuType.NONE -> { } //we shouldn't land here but if someone messes up the ScreenParams setup simply don't draw anything
+                    BottomNavigationMenuType.NONE -> { } //we shouldn't land here, tests will throw exception if this happens. (Still need to handle the case to compile though)
                 }
             }
       }) { innerPadding ->
@@ -159,15 +159,12 @@ fun StreetWorkApp(
             navController = navController,
             startDestination = Route.AUTH) { // TODO: handle start destination based on signIn logic
               navigation(
-                  startDestination = Screen.EVENT_OVERVIEW,
+                  startDestination = Screen.AUTH,
                   route = Route.AUTH,
               ) {
                 composable(Screen.AUTH) {
                     SignInScreen(navigationActions, userViewModel)
                 }
-                  composable(Screen.EVENT_OVERVIEW) { //TODO: remove
-                      EventOverviewScreen(navigationActions, sampleEvent, testPark, innerPadding)
-                  }
               }
               navigation(
                   startDestination = Screen.MAP,
