@@ -12,31 +12,22 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.twotone.Face
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -45,13 +36,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.android.sample.R
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.ui.navigation.NavigationActions
-import com.android.streetworkapp.ui.navigation.ScreenParams
 import com.android.streetworkapp.ui.theme.Snowflake
 import com.android.streetworkapp.utils.toFormattedString
 import com.google.android.gms.maps.model.CameraPosition
@@ -66,7 +55,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 private val uiState: MutableStateFlow<DashboardState> = MutableStateFlow(DashboardState.Details)
 
 /**
- * This screen displays an overview of a selcted event, including description location, location and
+ * This screen displays an overview of a selected event, including description location, location and
  * number of participants. A map is displayed at the bottom of the screen to show the location of
  * the event. The user can also choose to join the event.
  *
