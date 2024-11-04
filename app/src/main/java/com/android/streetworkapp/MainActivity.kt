@@ -93,7 +93,7 @@ fun StreetWorkApp(
 
   NavHost(
       navController = navController,
-      startDestination = Route.PROFILE) { // TODO: handle start destination based on signIn logic
+      startDestination = Route.AUTH) { // TODO: handle start destination based on signIn logic
         navigation(
             startDestination = Screen.AUTH,
             route = Route.AUTH,
