@@ -15,8 +15,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 
 enum class BottomNavigationMenuType {
-    NONE, DEFAULT, EVENT_OVERVIEW
+    NONE,
+    DEFAULT,
+    EVENT_OVERVIEW;
 
+    fun getTopLevelTestTag(): String {
+        return when(this) {
+            NONE -> ""
+            DEFAULT -> "bottomNavigationMenu"
+            EVENT_OVERVIEW -> "eventBottomBar"
+        }
+    }
 }
 
 /**
@@ -31,7 +40,7 @@ fun BottomNavigationMenu(
     tabList: List<TopLevelDestination>
 ) {
 
-  NavigationBar(modifier = Modifier.testTag("bottomNavigationMenu"), containerColor = Color.Gray) {
+  NavigationBar(modifier = Modifier.testTag(BottomNavigationMenuType.DEFAULT.getTopLevelTestTag()), containerColor = Color.Gray) {
     tabList.forEach { topLevelDestination ->
       NavigationBarItem(
           modifier = Modifier.testTag("bottomNavigationItem"),
@@ -52,7 +61,7 @@ fun BottomNavigationMenu(
  */
 @Composable
 fun EventBottomBar(participants: Int, maxParticipants: Int) {
-    BottomAppBar(containerColor = Color.Transparent, modifier = Modifier.testTag("eventBottomBar")) {
+    BottomAppBar(containerColor = Color.Transparent, modifier = Modifier.testTag(BottomNavigationMenuType.EVENT_OVERVIEW.getTopLevelTestTag())) {
         Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
             Button(
                 onClick = {},
