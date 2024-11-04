@@ -23,20 +23,20 @@ class ProfileFriendsListTest {
     val friend = User("uid-alice", "Alice", "alice@gmail.com", 42, emptyList())
     composeTestRule.setContent { DisplayFriend(friend) }
 
-    composeTestRule.onNodeWithTag("friendProfilePicture")
-      .assertExists()
-      .assertIsDisplayed()
+    composeTestRule.onNodeWithTag("friendProfilePicture").assertExists().assertIsDisplayed()
 
-    composeTestRule.onNodeWithTag("friendUsername")
-      .assertExists()
-      .assertIsDisplayed()
-      .assertTextEquals(friend.username)
+    composeTestRule
+        .onNodeWithTag("friendUsername")
+        .assertExists()
+        .assertIsDisplayed()
+        .assertTextEquals(friend.username)
 
-    composeTestRule.onNodeWithTag("friendScore")
-      .assertExists()
-      .assertIsDisplayed()
-      .assertTextEquals("Score: ${friend.score}")
-    }
+    composeTestRule
+        .onNodeWithTag("friendScore")
+        .assertExists()
+        .assertIsDisplayed()
+        .assertTextEquals("Score: ${friend.score}")
+  }
 
   @Test
   fun isFriendListCorrectlyDisplayed() {
@@ -50,11 +50,12 @@ class ProfileFriendsListTest {
     composeTestRule.onNodeWithTag("emptyFriendListText").assertIsNotDisplayed()
 
     // We also need to check that there are enough elements in the list
-    composeTestRule.onNodeWithTag("friendList")
-      .assertExists()
-      .assertIsDisplayed()
-      .onChildren()
-      .assertCountEquals(friends.size)
+    composeTestRule
+        .onNodeWithTag("friendList")
+        .assertExists()
+        .assertIsDisplayed()
+        .onChildren()
+        .assertCountEquals(friends.size)
   }
 
   @Test
@@ -62,10 +63,11 @@ class ProfileFriendsListTest {
     val friends = emptyList<User>()
     composeTestRule.setContent { DisplayFriendList(friends) }
 
-    composeTestRule.onNodeWithTag("emptyFriendListText")
-      .assertExists()
-      .assertIsDisplayed()
-      .assertTextEquals("You have no friends yet :(")
+    composeTestRule
+        .onNodeWithTag("emptyFriendListText")
+        .assertExists()
+        .assertIsDisplayed()
+        .assertTextEquals("You have no friends yet :(")
 
     composeTestRule.onNodeWithTag("friendList").assertIsNotDisplayed()
   }
