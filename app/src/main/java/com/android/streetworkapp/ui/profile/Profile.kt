@@ -1,5 +1,6 @@
 package com.android.streetworkapp.ui.profile
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -38,6 +40,18 @@ import com.android.streetworkapp.ui.navigation.Screen
 fun ProfileScreen(navigationActions: NavigationActions, userViewModel: UserViewModel) {
   // Kemin version -> viewModel(factory = UserViewModel.Factory)
   // Using import androidx.lifecycle.viewmodel.compose.viewModel
+  val context = LocalContext.current
+
+  // Fake data extraction from the MVVM :
+  val alice =
+      User("uid_Alice", "Alice", "alice@gmail.com", 42, listOf("Z8qgzNOoQOR09x6QQYahcyzVXfE2"))
+
+  val bob = User("uid_Bob", "Bob", "bob@gmail.com", 64, emptyList())
+
+  val currentUser =
+      User("uid_current", "Current User", "user@gmail.com", 42424, listOf(alice.uid, bob.uid))
+
+  val friendList = listOf(alice, bob)
 
   Scaffold(
       modifier = Modifier.testTag("ProfileScreen"),
@@ -67,9 +81,15 @@ fun ProfileScreen(navigationActions: NavigationActions, userViewModel: UserViewM
 
                     Column(modifier = Modifier.testTag("profileInfoColumn")) {
                       Spacer(modifier = Modifier.height(2.dp).testTag("profileInfoSpacer"))
+                      // name placeholder
+                      Text(
+                          text = currentUser.username,
+                          fontSize = 30.sp,
+                          modifier = Modifier.testTag("profileUsername"))
+
                       // score placeholder
                       Text(
-                          text = "Score: 42’424",
+                          text = "Score: ${currentUser.score}",
                           fontSize = 20.sp,
                           modifier = Modifier.testTag("profileScore"))
 
@@ -86,7 +106,9 @@ fun ProfileScreen(navigationActions: NavigationActions, userViewModel: UserViewM
 
                       // button to train with a friend
                       Button(
-                          onClick = {},
+                          onClick = {
+                            Toast.makeText(context, "Not implemented yet", Toast.LENGTH_LONG).show()
+                          },
                           colors = ButtonDefaults.buttonColors(Color(0xFFA53A36)),
                           modifier = Modifier.size(220.dp, 50.dp).testTag("profileTrainButton")) {
                             Text(text = "Train with a friend", fontSize = 17.sp)
@@ -94,35 +116,7 @@ fun ProfileScreen(navigationActions: NavigationActions, userViewModel: UserViewM
                     }
                   }
 
-              // currentUser = userViewModel.currentUser
-              // val friends = userViewModel.getFriendsByUid(currentUser.uid).collectAsState()
-              // val flover = userViewModel.getUserById("Z8qgzNOoQOR09x6QQYahcyzVXfE2")
-
-              // Placeholder MVVM calls :
-              val alice =
-                  User(
-                      "uid_Alice",
-                      "Alice",
-                      "alice@gmail.com",
-                      42,
-                      List(1) { "Z8qgzNOoQOR09x6QQYahcyzVXfE2" })
-              val bob = User("uid_Bob", "Bob", "bob@gmail.com", 42, emptyList())
-
-              val currentUser =
-                  User(
-                      "uid_current",
-                      "Current User",
-                      "user@gmail.com",
-                      42,
-                      List(2) {
-                        alice.uid
-                        bob.uid
-                      })
-
-              val friends = List(10) { alice }
-
-              // friends = emptyList()
-              DisplayFriendList(friends, padding)
+              DisplayFriendList(friendList, padding)
             }
       })
 }
