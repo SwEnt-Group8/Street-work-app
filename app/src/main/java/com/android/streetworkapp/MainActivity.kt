@@ -27,6 +27,7 @@ import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.authentication.SignInScreen
 import com.android.streetworkapp.ui.event.AddEventScreen
+import com.android.streetworkapp.ui.event.EventOverviewScreen
 import com.android.streetworkapp.ui.map.MapScreen
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenu
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenuType
@@ -149,13 +150,12 @@ fun StreetWorkApp(
                 BottomNavigationMenuType.EVENT_OVERVIEW -> {
                   EventBottomBar(
                       sampleEvent.participants,
-                      sampleEvent
-                          .maxParticipants) // TODO: modify to have the event that we'll have
-                                            // selected
+                      sampleEvent.maxParticipants) // TODO: modify to have the event that we'll have
+                  // selected
                 }
                 BottomNavigationMenuType
                     .NONE -> {} // we shouldn't land here, tests will throw exception if this
-                                // happens. (Still need to handle the case to compile though)
+              // happens. (Still need to handle the case to compile though)
               }
             }
       }) { innerPadding ->
@@ -184,6 +184,16 @@ fun StreetWorkApp(
                 }
                 composable(Screen.ADD_EVENT) {
                   AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
+                }
+                composable(Screen.EVENT_OVERVIEW) {
+                  EventOverviewScreen(
+                      navigationActions,
+                      sampleEvent,
+                      testPark,
+                      innerPadding) // TODO: change to current park and current selected Event
+                  // Note: navigationActions is not used here atm but it will be useful to link
+                  // event to parks (ex: user clicks on event notif in social and wants to see the
+                  // park overview from here)
                 }
               }
 
