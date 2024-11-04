@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
@@ -22,7 +21,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -34,6 +32,7 @@ import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
+import com.android.streetworkapp.ui.theme.ButtonRed
 
 @Composable
 fun ProfileScreen(
@@ -53,16 +52,14 @@ fun ProfileScreen(
   val currentUser =
       User("uid_current", "Current User", "user@gmail.com", 42424, listOf(alice.uid, bob.uid))
 
-  var friendList = listOf(alice, bob)
-  // friendList = emptyList()
+  val friendList = listOf(alice, bob)
+  // val friendList = emptyList()
 
   Box(modifier = Modifier.testTag("ProfileScreen")) {
     Column(
         modifier = Modifier.fillMaxSize().padding(innerPaddingValues).testTag("ProfileColumn"),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)) {
-          Spacer(modifier = Modifier.height(4.dp).testTag("profileSpacer"))
-
           Row(
               modifier = Modifier.fillMaxWidth().padding(innerPaddingValues).testTag("profileRow"),
               horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
@@ -75,44 +72,41 @@ fun ProfileScreen(
                     modifier = Modifier.size(200.dp).testTag("profilePicture"),
                 )
 
-                Column(modifier = Modifier.testTag("profileInfoColumn")) {
-                  Spacer(modifier = Modifier.height(2.dp).testTag("profileInfoSpacer"))
+                Column(modifier = Modifier.testTag("profileInfoColumn").padding(2.dp)) {
+
                   // name placeholder
                   Text(
                       text = currentUser.username,
                       fontSize = 30.sp,
-                      modifier = Modifier.testTag("profileUsername"))
+                      modifier = Modifier.testTag("profileUsername").padding(2.dp))
 
                   // score placeholder
                   Text(
                       text = "Score: ${currentUser.score}",
                       fontSize = 20.sp,
-                      modifier = Modifier.testTag("profileScore"))
-
-                  Spacer(modifier = Modifier.height(10.dp).testTag("profileInfoSpacer2"))
+                      modifier = Modifier.testTag("profileScore").padding(2.dp))
 
                   // button to add a new friend
                   Button(
                       onClick = { navigationActions.navigateTo(Screen.ADD_FRIEND) },
-                      modifier = Modifier.size(220.dp, 50.dp).testTag("profileAddButton")) {
+                      modifier =
+                          Modifier.size(220.dp, 50.dp).testTag("profileAddButton").padding(2.dp)) {
                         Text(text = "Add a new friend", fontSize = 17.sp)
                       }
-
-                  Spacer(modifier = Modifier.height(10.dp).testTag("profileInfoSpacer3"))
 
                   // button to train with a friend
                   Button(
                       onClick = {
                         Toast.makeText(context, "Not implemented yet", Toast.LENGTH_LONG).show()
                       },
-                      colors = ButtonDefaults.buttonColors(Color(0xFFA53A36)),
+                      colors = ButtonDefaults.buttonColors(ButtonRed),
                       modifier = Modifier.size(220.dp, 50.dp).testTag("profileTrainButton")) {
                         Text(text = "Train with a friend", fontSize = 17.sp)
                       }
                 }
               }
 
-          DisplayFriendList(friendList, innerPaddingValues)
+          DisplayFriendList(friendList)
         }
   }
 }
@@ -121,25 +115,20 @@ fun ProfileScreen(
  * This function displays the friends list.
  *
  * @param friends - The list of friends to display.
- * @param padding - The padding to apply to the friend list.
  */
 @Composable
-fun DisplayFriendList(friends: List<User>, padding: PaddingValues = PaddingValues(0.dp)) {
+fun DisplayFriendList(friends: List<User>) {
   return if (friends.isNotEmpty()) {
 
     // LazyColumn is scrollable
     LazyColumn(
-        contentPadding = PaddingValues(vertical = 2.dp),
-        modifier =
-            Modifier.fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(padding)
-                .testTag("friendList")) {
-          items(friends) { friend -> DisplayFriend(friend, padding) }
+        contentPadding = PaddingValues(vertical = 0.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).testTag("friendList")) {
+          items(friends) { friend -> DisplayFriend(friend) }
         }
   } else {
     Text(
-        modifier = Modifier.padding(padding).testTag("emptyFriendListText"),
+        modifier = Modifier.testTag("emptyFriendListText"),
         fontSize = 20.sp,
         text = "You have no friends yet :(")
   }
@@ -149,11 +138,10 @@ fun DisplayFriendList(friends: List<User>, padding: PaddingValues = PaddingValue
  * This function displays a friend (for the friend list).
  *
  * @param friend - The friend to display.
- * @param padding - The padding to apply to the friend display.
  */
 @Composable
-fun DisplayFriend(friend: User, padding: PaddingValues = PaddingValues(0.dp)) {
-  return Row(modifier = Modifier.fillMaxWidth().padding(padding).testTag("friendRow")) {
+fun DisplayFriend(friend: User) {
+  return Row(modifier = Modifier.fillMaxWidth().testTag("friendRow")) {
 
     // profile placeholder
     Image(
@@ -161,12 +149,10 @@ fun DisplayFriend(friend: User, padding: PaddingValues = PaddingValues(0.dp)) {
         contentDescription = "profile picture",
         modifier = Modifier.size(75.dp).testTag("friendProfilePicture"))
 
-    Spacer(modifier = Modifier.width(10.dp))
-
-    Column(modifier = Modifier.fillMaxWidth().padding(padding)) {
+    Column(modifier = Modifier.fillMaxWidth()) {
 
       // Small spacing between elements
-      Spacer(modifier = Modifier.height(12.dp))
+      Spacer(modifier = Modifier.height(8.dp))
 
       // username
       Text(fontSize = 22.sp, text = friend.username, modifier = Modifier.testTag("friendUsername"))
@@ -175,7 +161,7 @@ fun DisplayFriend(friend: User, padding: PaddingValues = PaddingValues(0.dp)) {
       Text(
           text = "Score: ${friend.score}",
           fontSize = 22.sp,
-          modifier = Modifier.padding(padding).testTag("friendScore"))
+          modifier = Modifier.testTag("friendScore"))
     }
   }
 }
