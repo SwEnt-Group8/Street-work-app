@@ -31,7 +31,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -63,6 +62,10 @@ fun ProfileScreen(
       User("uid_current", "Current User", "user@gmail.com", 42424, listOf(alice.uid, bob.uid))
 
   val friendList = listOf(alice, bob)
+
+  // fetch profile picture from firebase
+  val photo = Firebase.auth.currentUser?.photoUrl
+
   // val friendList = emptyList()
 
   Box(modifier = Modifier.testTag("ProfileScreen")) {
@@ -75,21 +78,14 @@ fun ProfileScreen(
               horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
               verticalAlignment = Alignment.Top) {
 
-                // fetch profile picture from firebase
-                val auth = Firebase.auth
-                val user = auth.currentUser
-                val photo = user?.photoUrl
-                val placeholderUri =
-                    "https://picsum.photos/200/300".toUri() // Placeholder image URI
-
                 // display the profile picture
                 AsyncImage(
                     model =
                         ImageRequest.Builder(LocalContext.current)
-                            .data(photo ?: placeholderUri)
+                            .data(photo ?: R.drawable.profile)
                             .placeholder(R.drawable.profile)
                             .build(),
-                    contentDescription = null,
+                    contentDescription = "user_profile_picture",
                     contentScale = ContentScale.Crop,
                     modifier =
                         Modifier.size(180.dp)
