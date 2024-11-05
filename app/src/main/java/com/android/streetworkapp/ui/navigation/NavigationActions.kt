@@ -21,6 +21,7 @@ object Screen {
   const val ADD_FRIEND = "AddFriend Screen"
   const val PARK_OVERVIEW = "Park Overview Screen"
   const val ADD_EVENT = "Add Event Screen"
+  const val PROGRESSION = "Progression Screen"
   const val UNK = "TBD Screen" // TODO: not yet defined
 }
 
@@ -68,6 +69,15 @@ data class ScreenParams(
                 "Event Creation",
                 hasNavigationIcon = true,
                 navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
+    val PROGRESSION =
+          ScreenParams(
+              Screen.PROGRESSION,
+              isBottomBarVisible = true,
+              isTopBarVisible = true,
+              TopAppBarManager(
+                  "My Progress",
+                  hasNavigationIcon = false))
+
   }
 }
 
@@ -78,7 +88,9 @@ val LIST_OF_SCREENS =
         ScreenParams.PROFILE,
         ScreenParams.ADD_FRIEND,
         ScreenParams.PARK_OVERVIEW,
-        ScreenParams.ADD_EVENT)
+        ScreenParams.ADD_EVENT,
+        ScreenParams.PROGRESSION
+    )
 
 /**
  * Represents a top-level destination in the app's navigation.
