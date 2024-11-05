@@ -87,6 +87,7 @@ val sampleAchievements = listOf(
     )
 )
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ProgressScreen(navigationActions: NavigationActions, paddingValues: PaddingValues = PaddingValues(0.dp)) {
     val progressBarSize = 145.dp
@@ -118,20 +119,14 @@ fun ProgressScreen(navigationActions: NavigationActions, paddingValues: PaddingV
         }
 
         item {
-            // Metrics Section
             Text(
                 text = "Metrics",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
-                textAlign = TextAlign.Start,
-                color = Color.Black,
-                modifier = Modifier
-                    .padding(start = 20.dp, bottom = 8.dp)
-                    .fillMaxWidth()
+                color = Color.Black
             )
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                verticalAlignment = Alignment.CenterVertically
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
             ) {
                 MetricCard(label = "Total score", value = "4'321")
                 MetricCard(label = "Parks visited", value = "3")
@@ -209,16 +204,18 @@ fun CircularProgressBar(
  */
 @Composable
 fun MetricCard(label: String, value: String) {
-    Column(
-        horizontalAlignment = Alignment.Start,
-        modifier = Modifier.border(
-            width = 1.dp,
-            color = Color.LightGray,
-            shape = RoundedCornerShape(8.dp)
-        ).padding(top = 12.dp, bottom = 12.dp, start = 10.dp, end = 36.dp )
-    ) {
-        Text(text = label, fontSize = 13.sp, color = Color.Gray)
-        Text(text = value, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+    Box(modifier = Modifier.padding(vertical = 4.dp)) {
+        Column(
+            horizontalAlignment = Alignment.Start,
+            modifier = Modifier.border(
+                width = 1.dp,
+                color = Color.LightGray,
+                shape = RoundedCornerShape(8.dp)
+            ).padding(top = 12.dp, bottom = 12.dp, start = 10.dp, end = 36.dp)
+        ) {
+            Text(text = label, fontSize = 13.sp, color = Color.Gray)
+            Text(text = value, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+        }
     }
 }
 
