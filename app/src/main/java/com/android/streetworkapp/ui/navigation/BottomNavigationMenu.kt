@@ -1,5 +1,6 @@
 package com.android.streetworkapp.ui.navigation
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 
 enum class BottomNavigationMenuType {
@@ -63,12 +65,15 @@ fun BottomNavigationMenu(
  */
 @Composable
 fun EventBottomBar(participants: Int, maxParticipants: Int) {
+  val context = LocalContext.current
   BottomAppBar(
       containerColor = Color.Transparent,
       modifier = Modifier.testTag(BottomNavigationMenuType.EVENT_OVERVIEW.getTopLevelTestTag())) {
         Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
           Button(
-              onClick = {},
+              onClick = {
+                Toast.makeText(context, "not yet implemented", Toast.LENGTH_LONG).show()
+              },
               modifier = Modifier.testTag("joinEventButton"),
               enabled = participants < maxParticipants) {
                 Text("Join this event", modifier = Modifier.testTag("joinEventButtonText"))
