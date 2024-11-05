@@ -2,6 +2,7 @@ package com.android.streetworkapp.ui.profile
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,24 +16,33 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.android.sample.R
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.theme.ButtonRed
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 @Composable
 fun ProfileScreen(
@@ -65,12 +75,27 @@ fun ProfileScreen(
               horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
               verticalAlignment = Alignment.Top) {
 
-                // profile placeholder
-                Image(
-                    painter = painterResource(id = R.drawable.profile),
-                    contentDescription = "profile picture",
-                    modifier = Modifier.size(200.dp).testTag("profilePicture"),
-                )
+                // fetch profile picture from firebase
+                val auth = Firebase.auth
+                val user = auth.currentUser
+                val photo = user?.photoUrl
+                val placeholderUri =
+                    "https://picsum.photos/200/300".toUri() // Placeholder image URI
+
+                // display the profile picture
+                AsyncImage(
+                    model =
+                        ImageRequest.Builder(LocalContext.current)
+                            .data(photo ?: placeholderUri)
+                            .placeholder(R.drawable.profile)
+                            .build(),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier =
+                        Modifier.size(180.dp)
+                            .clip(CircleShape)
+                            .border(5.dp, Color.LightGray, CircleShape)
+                            .testTag("profilePicture"))
 
                 Column(modifier = Modifier.testTag("profileInfoColumn").padding(2.dp)) {
 
