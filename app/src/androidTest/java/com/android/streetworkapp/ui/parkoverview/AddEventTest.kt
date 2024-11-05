@@ -117,8 +117,44 @@ class AddEventTest {
     composeTestRule.setContent {
       AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
     }
-    composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
+
     composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addEventButton").assertIsDisplayed()
+  }
+
+  @Test
+  fun addEventScreenWithUnchangedTimeDoesNotChangeScreen() {
+    `when`(eventViewModel.getNewEid()).thenReturn("test")
+    composeTestRule.setContent {
+      AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
+    }
+
+    composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addEventButton").performClick()
+    composeTestRule
+        .onNodeWithTag("addEventScreen")
+        .assertIsDisplayed() // we want that a click with no changes in the default value does not
+    // make the user leave the screen
+  }
+
+  @Test
+  fun addEventScreenWithUnchangedTitleDoesNotChangeScreen() {
+    `when`(eventViewModel.getNewEid()).thenReturn("test")
+    composeTestRule.setContent {
+      AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
+    }
+
+    composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("dateIcon").performClick()
+    composeTestRule.onNodeWithTag("validateDate").performClick()
+    composeTestRule.onNodeWithTag("timeIcon").performClick()
+    composeTestRule.onNodeWithTag("validateTime").performClick()
+
+    composeTestRule.onNodeWithTag("addEventButton").performClick()
+    composeTestRule
+        .onNodeWithTag("addEventScreen")
+        .assertIsDisplayed() // we want that a click with changes in the time but no changes in the
+    // default value of the title does not make the user leave the screen
   }
 }

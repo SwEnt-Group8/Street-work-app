@@ -3,6 +3,7 @@ package com.android.streetworkapp.ui.navigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Place
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
 
@@ -23,6 +24,88 @@ object Screen {
   const val EVENT_OVERVIEW = "Event Overview Screen"
   const val UNK = "TBD Screen" // TODO: not yet defined
 }
+
+data class ScreenParams(
+    val screenName: String,
+    val isBottomBarVisible: Boolean,
+    val bottomBarType: BottomNavigationMenuType,
+    val isTopBarVisible: Boolean,
+    val topAppBarManager: TopAppBarManager?
+) {
+  companion object {
+    val AUTH =
+        ScreenParams(
+            Screen.AUTH,
+            isBottomBarVisible = false,
+            BottomNavigationMenuType.NONE,
+            isTopBarVisible = false,
+            null)
+    val MAP =
+        ScreenParams(
+            Screen.MAP,
+            isBottomBarVisible = true,
+            BottomNavigationMenuType.DEFAULT,
+            isTopBarVisible = true,
+            TopAppBarManager("Map"))
+    val PROFILE =
+        ScreenParams(
+            Screen.PROFILE,
+            isBottomBarVisible = true,
+            BottomNavigationMenuType.DEFAULT,
+            isTopBarVisible = true,
+            TopAppBarManager("My Profile"))
+    val ADD_FRIEND =
+        ScreenParams(
+            Screen.ADD_FRIEND,
+            isBottomBarVisible = true,
+            BottomNavigationMenuType.DEFAULT,
+            isTopBarVisible = true,
+            TopAppBarManager(
+                "Add a new Friend",
+                hasNavigationIcon = true,
+                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
+    val PARK_OVERVIEW =
+        ScreenParams(
+            Screen.PARK_OVERVIEW,
+            isBottomBarVisible = true,
+            BottomNavigationMenuType.DEFAULT,
+            isTopBarVisible = true,
+            TopAppBarManager(
+                "<Park Name>",
+                hasNavigationIcon = true,
+                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
+    val ADD_EVENT =
+        ScreenParams(
+            Screen.ADD_EVENT,
+            isBottomBarVisible = true,
+            BottomNavigationMenuType.DEFAULT,
+            isTopBarVisible = true,
+            TopAppBarManager(
+                "Event Creation",
+                hasNavigationIcon = true,
+                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
+    val EVENT_OVERVIEW =
+        ScreenParams(
+            Screen.EVENT_OVERVIEW,
+            isBottomBarVisible = true,
+            BottomNavigationMenuType.EVENT_OVERVIEW,
+            isTopBarVisible = true,
+            TopAppBarManager(
+                "<Event Name>",
+                hasNavigationIcon = true,
+                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
+  }
+}
+
+val LIST_OF_SCREENS =
+    listOf(
+        ScreenParams.AUTH,
+        ScreenParams.MAP,
+        ScreenParams.PROFILE,
+        ScreenParams.ADD_FRIEND,
+        ScreenParams.PARK_OVERVIEW,
+        ScreenParams.ADD_EVENT,
+        ScreenParams.EVENT_OVERVIEW)
 
 /**
  * Represents a top-level destination in the app's navigation.
@@ -46,6 +129,7 @@ val LIST_TOP_LEVEL_DESTINATION = listOf(TopLevelDestinations.MAP, TopLevelDestin
 open class NavigationActions(
     private val navController: NavHostController,
 ) {
+
   /**
    * Navigate to the specified [TopLevelDestination]
    *
@@ -97,5 +181,12 @@ open class NavigationActions(
    */
   open fun currentRoute(): String {
     return navController.currentDestination?.route.orEmpty()
+  }
+
+  /** Will update the currentScreenName to the screen name on each destination change */
+  open fun registerStringListenerOnDestinationChange(currentScreenName: MutableState<String?>) {
+    navController.addOnDestinationChangedListener { _, dest, _ ->
+      currentScreenName.value = dest.route
+    }
   }
 }

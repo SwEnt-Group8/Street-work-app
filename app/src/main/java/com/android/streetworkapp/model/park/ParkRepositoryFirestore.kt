@@ -15,6 +15,7 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
   }
 
   val PID_EMPTY = "Park ID cannot be empty."
+  val LID_EMPTY = "Location ID cannot be empty."
 
   /**
    * Get a new park ID.
@@ -49,7 +50,7 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
    * @return The park with the given location ID, or null if the park does not exist.
    */
   override suspend fun getParkByLocationId(locationId: String): Park? {
-    require(locationId.isNotEmpty()) { "Location ID cannot be empty." }
+    require(locationId.isNotEmpty()) { LID_EMPTY }
     return try {
       val document =
           db.collection(COLLECTION_PATH).whereEqualTo("location.id", locationId).get().await()
@@ -69,11 +70,35 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
    */
   override suspend fun createPark(park: Park) {
     require(park.pid.isNotEmpty()) { PID_EMPTY }
-    require(park.location.id.isNotEmpty()) { "Location ID cannot be empty." }
+    require(park.location.id.isNotEmpty()) { LID_EMPTY }
     try {
       db.collection(COLLECTION_PATH).document(park.pid).set(park).await()
     } catch (e: Exception) {
       Log.e("FirestoreError", "Error creating park: ${e.message}")
+    }
+  }
+
+  /**
+   * Get or create a park by its location.
+   *
+   * @param location The park location.
+   * @return The park with the given location, or a new park if it does not exist.
+   */
+  override suspend fun getOrCreateParkByLocation(location: ParkLocation): Park? {
+    require(location.id.isNotEmpty()) { LID_EMPTY }
+    return try {
+      val document =
+          db.collection(COLLECTION_PATH).whereEqualTo("location.id", location.id).get().await()
+      if (document.isEmpty) {
+        val park = createDefaultPark(getNewPid(), location)
+        createPark(park)
+        park
+      } else {
+        documentToPark(document.documents.first())
+      }
+    } catch (e: Exception) {
+      Log.e("FirestoreError", "Error getting or creating park by location: ${e.message}")
+      null
     }
   }
 

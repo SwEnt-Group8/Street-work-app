@@ -23,3 +23,6 @@ val Snowflake = Color(0xFFE0E0E0)
 val White = Color(0xFFFFFFFF)
 val LightGray = Color(0xFFDADCE0)
 val DarkGray = Color(0xFF3C4043)
+
+// Train with a friend Button in ProfileScreen :
+val ButtonRed = Color(0xFFA53A36)

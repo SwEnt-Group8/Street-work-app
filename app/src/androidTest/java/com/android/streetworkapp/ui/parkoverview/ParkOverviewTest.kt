@@ -1,12 +1,10 @@
 package com.android.streetworkapp.ui.parkoverview
 
-import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventList
@@ -16,11 +14,9 @@ import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.park.OccupancyBar
-import com.android.streetworkapp.ui.park.ParkOverview
 import com.android.streetworkapp.ui.park.ParkOverviewScreen
 import com.android.streetworkapp.ui.park.RatingComponent
 import com.google.firebase.Timestamp
-import io.mockk.verify
 import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Rule
@@ -29,7 +25,6 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
-import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
 class ParkOverviewTest {
@@ -201,21 +196,5 @@ class ParkOverviewTest {
     composeTestRule.setContent { OccupancyBar(occupancy = 1.0f) }
     composeTestRule.onNodeWithTag("occupancyBar").isDisplayed()
     composeTestRule.onNodeWithTag("occupancyText").assertTextEquals("100% Occupancy")
-  }
-
-  @Test
-  fun topBarAndParkOverviewScreenAreDisplayedInParkOverview() {
-    composeTestRule.setContent { ParkOverview(navigationActions, park, eventViewModel) }
-
-    composeTestRule.onNodeWithTag("ParkOverviewTopBar").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("parkOverviewScreen").assertIsDisplayed()
-  }
-
-  @Test
-  fun topBarArrowBackCallsNavigationActionsGoBack() {
-    composeTestRule.setContent { ParkOverview(navigationActions, park, eventViewModel) }
-
-    composeTestRule.onNodeWithTag("goBackButtonOverviewScreen").performClick()
-    verify(navigationActions).goBack()
   }
 }
