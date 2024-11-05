@@ -194,6 +194,8 @@ dependencies {
 
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.graphics)
+    // Image loading library
+    implementation(libs.coil.compose)
     // Material Design 3
     implementation(libs.compose.material3)
     // Integration with activities
