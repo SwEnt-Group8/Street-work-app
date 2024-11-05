@@ -1,16 +1,23 @@
 package com.android.streetworkapp.ui.navigation
 
+import androidx.compose.foundation.Image
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Place
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.MutableState
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavHostController
+import com.android.sample.R
 
 object Route {
   const val AUTH = "Auth"
   const val MAP = "Map"
   const val PROFILE = "Profile"
+  const val PROGRESSION = "Progression"
   const val UNK = "TBD" // TODO: not yet defined
 }
 
@@ -97,19 +104,20 @@ val LIST_OF_SCREENS =
  *
  * @property route The route associated with this destination.
  * @property icon The icon to display for this destination.
- * @property textId an identifier for this destination.
+ * @property textId an identifier for the destination.
  */
-data class TopLevelDestination(val route: String, val icon: ImageVector, val textId: String)
+data class TopLevelDestination(val route: String, val icon: ImageVector?, val imagePainter : Int?, val textId: String)
 
 // all data classes here are reachable through user actions (i.e not auth)
 object TopLevelDestinations {
-  val MAP = TopLevelDestination(route = Route.MAP, icon = Icons.Outlined.Place, textId = "Map")
+  val MAP = TopLevelDestination(route = Route.MAP, icon = Icons.Outlined.Place, imagePainter = null, textId = "Map")
   val PROFILE =
       TopLevelDestination(
-          route = Route.PROFILE, icon = Icons.Outlined.AccountCircle, textId = "Profile")
+          route = Route.PROFILE, icon = Icons.Outlined.AccountCircle, imagePainter = null, textId = "Profile")
+  val PROGRESSION = TopLevelDestination(route = Route.PROGRESSION, icon = null, imagePainter = R.drawable.trophy_24px , textId = "Progression")
 }
 
-val LIST_TOP_LEVEL_DESTINATION = listOf(TopLevelDestinations.MAP, TopLevelDestinations.PROFILE)
+val LIST_TOP_LEVEL_DESTINATION = listOf(TopLevelDestinations.PROGRESSION, TopLevelDestinations.MAP, TopLevelDestinations.PROFILE)
 
 open class NavigationActions(
     private val navController: NavHostController,
