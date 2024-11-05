@@ -27,6 +27,7 @@ import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
 import io.mockk.every
 import io.mockk.mockk
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -130,7 +131,7 @@ class BottomNavigationTest {
   }
 
   @Test
-  fun isDisplayedCorrectlyOnScreens() {
+  fun bottomBarDisplaysCorrectlyOnScreens() {
 
     val currentScreenParam =
         mutableStateOf(
@@ -145,15 +146,34 @@ class BottomNavigationTest {
           EventViewModel(mockk<EventRepositoryFirestore>()))
     }
 
+    val bottomNavTypeToTest =
+        BottomNavigationMenuType.entries.filter { it != BottomNavigationMenuType.NONE }
+
     for (screenParam in LIST_OF_SCREENS) {
       if (screenParam.screenName in TEST_SCREEN_EXCLUSION_LIST) continue
 
       currentScreenParam.value = screenParam // Update the state to recompose our UI
 
       composeTestRule.waitForIdle()
-      if (screenParam.isBottomBarVisible)
-          composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsDisplayed()
-      else composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsNotDisplayed()
+      if (screenParam.isBottomBarVisible) {
+        when (screenParam.bottomBarType) {
+          BottomNavigationMenuType.NONE ->
+              Assert.fail(
+                  "Invalid use of the bottomBar setup, if isBottomBarVisible is set to false its type should be set to NONE")
+          BottomNavigationMenuType.DEFAULT ->
+              composeTestRule
+                  .onNodeWithTag(BottomNavigationMenuType.DEFAULT.getTopLevelTestTag())
+                  .assertIsDisplayed()
+          BottomNavigationMenuType.EVENT_OVERVIEW ->
+              composeTestRule
+                  .onNodeWithTag(BottomNavigationMenuType.EVENT_OVERVIEW.getTopLevelTestTag())
+                  .assertIsDisplayed()
+        }
+      } else {
+        for (bottomNavType in bottomNavTypeToTest) composeTestRule
+            .onNodeWithTag(bottomNavType.getTopLevelTestTag())
+            .assertIsNotDisplayed()
+      }
     }
   }
 }

@@ -27,8 +27,11 @@ import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.authentication.SignInScreen
 import com.android.streetworkapp.ui.event.AddEventScreen
+import com.android.streetworkapp.ui.event.EventOverviewScreen
 import com.android.streetworkapp.ui.map.MapScreen
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenu
+import com.android.streetworkapp.ui.navigation.BottomNavigationMenuType
+import com.android.streetworkapp.ui.navigation.EventBottomBar
 import com.android.streetworkapp.ui.navigation.LIST_OF_SCREENS
 import com.android.streetworkapp.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.streetworkapp.ui.navigation.NavigationActions
@@ -116,7 +119,11 @@ fun StreetWorkApp(
       Event(
           eid = "event123",
           title = "Community Park Cleanup",
-          description = "Join us for a day of community service to clean up the local park!",
+          // description = "Join us for a day of community service to clean up the local park!",
+          description =
+              "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eget leo vitae enim facilisis fringilla. Morbi feugiat scelerisque nisl, vel vehicula sem malesuada et. Proin id arcu eget nisi congue facilisis. Integer feugiat, ex eu vestibulum sagittis, erat felis scelerisque dui, id varius turpis magna in nisi. Suspendisse potenti. Pellentesque quis posuere elit. Vivamus tincidunt dui vel risus dignissim, sit amet dignissim velit cursus. Nam sodales nulla non semper pharetra. Aliquam erat volutpat. Morbi pharetra odio id facilisis pulvinar. Mauris aliquet ipsum eu dolor ultrices, id sodales sapien dictum. Nam facilisis vestibulum viverra.\n" +
+                  "\n" +
+                  "Sed elementum risus in tempor accumsan. Integer egestas, eros at venenatis ultricies, quam nunc dictum urna, a aliquam odio erat at lacus. In lacinia mauris sit amet orci accumsan, in bibendum arcu condimentum. In ut lacus et ipsum tincidunt condimentum. Fusce non magna ut urna vestibulum gravida at ut felis. Nullam auctor dapibus sem, ut rhoncus turpis gravida non. Pellentesque elementum erat a libero luctus feugiat. Aenean tincidunt fermentum nisl, in rhoncus ex iaculis nec. Vestibulum gravida, est vel scelerisque varius, magna erat pharetra risus, a sollicitudin libero orci nec lectus. Fusce lobortis magna in arcu vehicula, sit amet fermentum leo interdum",
           participants = 15,
           maxParticipants = 50,
           date = Timestamp(Date()), // Current date and time
@@ -132,12 +139,24 @@ fun StreetWorkApp(
       },
       bottomBar = {
         screenParams
-            ?.isBottomBarVisible
-            ?.takeIf { it }
+            ?.takeIf { it.isBottomBarVisible }
             ?.let {
-              BottomNavigationMenu(
-                  onTabSelect = { destination -> navigationActions.navigateTo(destination) },
-                  tabList = LIST_TOP_LEVEL_DESTINATION)
+              when (it.bottomBarType) {
+                BottomNavigationMenuType.DEFAULT -> {
+                  BottomNavigationMenu(
+                      onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+                      tabList = LIST_TOP_LEVEL_DESTINATION)
+                }
+                BottomNavigationMenuType.EVENT_OVERVIEW -> {
+                  EventBottomBar(
+                      sampleEvent.participants,
+                      sampleEvent.maxParticipants) // TODO: modify to have the event that we'll have
+                  // selected
+                }
+                BottomNavigationMenuType
+                    .NONE -> {} // we shouldn't land here, tests will throw exception if this
+              // happens. (Still need to handle the case to compile though)
+              }
             }
       }) { innerPadding ->
         NavHost(
@@ -149,7 +168,6 @@ fun StreetWorkApp(
               ) {
                 composable(Screen.AUTH) { SignInScreen(navigationActions, userViewModel) }
               }
-
               navigation(
                   startDestination = Screen.MAP,
                   route = Route.MAP,
@@ -166,6 +184,16 @@ fun StreetWorkApp(
                 }
                 composable(Screen.ADD_EVENT) {
                   AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
+                }
+                composable(Screen.EVENT_OVERVIEW) {
+                  EventOverviewScreen(
+                      navigationActions,
+                      sampleEvent,
+                      testPark,
+                      innerPadding) // TODO: change to current park and current selected Event
+                  // Note: navigationActions is not used here atm but it will be useful to link
+                  // event to parks (ex: user clicks on event notif in social and wants to see the
+                  // park overview from here)
                 }
               }
 
