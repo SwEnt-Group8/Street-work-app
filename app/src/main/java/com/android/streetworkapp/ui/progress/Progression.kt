@@ -87,6 +87,9 @@ val sampleAchievements = listOf(
     )
 )
 
+//note: I haven' tested big values in the metrics tabs, the assumption was that those shouldn't overflow the boxes either way (unless we put some stupid score system)
+//I did test for the rest thought
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ProgressScreen(navigationActions: NavigationActions, paddingValues: PaddingValues = PaddingValues(0.dp)) {
@@ -95,7 +98,7 @@ fun ProgressScreen(navigationActions: NavigationActions, paddingValues: PaddingV
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(vertical = progressBarSize*0.8f),
+            .padding(vertical = progressBarSize*0.75f),
         horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
@@ -108,14 +111,14 @@ fun ProgressScreen(navigationActions: NavigationActions, paddingValues: PaddingV
                 color = Color.Gray
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(26.dp))
 
             CircularProgressBar(
                 progress = 0.75f,
                 progressBarSize
-            ) // Set progress as a decimal (e.g., 75% = 0.75)
+            )
 
-            Spacer(modifier = Modifier.height(60.dp))
+            Spacer(modifier = Modifier.height(55.dp))
         }
 
         item {
@@ -156,10 +159,9 @@ fun ProgressScreen(navigationActions: NavigationActions, paddingValues: PaddingV
     }
 }
 
-
 @Composable
 fun CircularProgressBar(
-    progress: Float, // Value between 0 and 1
+    progress: Float, //Value between 0 and 1
     size: Dp,
     strokeWidth: Dp = 12.dp,
 ) {
@@ -170,7 +172,7 @@ fun CircularProgressBar(
         Canvas(modifier = Modifier.size(size)) {
             val sweepAngle = 360 * progress
 
-            // Background Arc
+            //Background Arc
             drawArc(
                 color = Color(PROGRESSION_COLOR_GRAY),
                 startAngle = 0f,
@@ -179,7 +181,7 @@ fun CircularProgressBar(
                 style = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Round)
             )
 
-            // Foreground Arc
+            //Foreground Arc
             drawArc(
                 color = Color(PROGRESSION_COLOR_BLUE),
                 startAngle = -90f,
@@ -189,7 +191,7 @@ fun CircularProgressBar(
             )
         }
 
-        // Percentage Text
+        //Percentage Text
         Text(
             text = "${(progress * 100).toInt()}%",
             fontSize = 26.sp,
@@ -199,9 +201,6 @@ fun CircularProgressBar(
     }
 }
 
-/**
- * Cards under the progression bar (i.e Total score etc...)
- */
 @Composable
 fun MetricCard(label: String, value: String) {
     Box(modifier = Modifier.padding(vertical = 4.dp)) {
@@ -248,7 +247,7 @@ fun AchievementItem(achievement: Achievement) {
         Spacer(modifier = Modifier.width(16.dp))
 
         Column(modifier = Modifier.weight(1f)) {
-            // Achievement Title
+            //Achievement Title
             Text(
                 text = achievement.title,
                 fontSize = 16.sp,
@@ -256,7 +255,7 @@ fun AchievementItem(achievement: Achievement) {
                 color = Color.Black
             )
 
-            // Tags Row
+            //Tags Row
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalArrangement = Arrangement.spacedBy(5.dp),
@@ -276,36 +275,12 @@ fun AchievementItem(achievement: Achievement) {
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // Achievement Description
+            //Achievement Description
             Text(
                 text = achievement.description,
                 fontSize = 14.sp,
                 color = Color.Gray
             )
-        }
-    }
-}
-
-@Composable
-fun AchievementsList(achievements: List<Achievement>) {
-    Column(modifier = Modifier.fillMaxSize()) {
-        // "Achievements" Header
-        Text(
-            text = "Achievements",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black,
-            modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .align(Alignment.Start)
-        )
-
-        // LazyColumn for scrolling through achievements
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(achievements) { achievement ->
-                AchievementItem(achievement)
-                HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
-            }
         }
     }
 }
