@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.streetworkapp.model.parklocation.ParkLocation
 import kotlinx.coroutines.launch
 
 open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
@@ -79,6 +80,18 @@ open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
    * @param park The park to create.
    */
   fun createPark(park: Park) = viewModelScope.launch { repository.createPark(park) }
+
+  /**
+   * Get or create a park by its location.
+   *
+   * @param location The park location.
+   */
+  fun getOrCreateParkByLocation(location: ParkLocation) {
+    viewModelScope.launch {
+      val park = repository.getOrCreateParkByLocation(location)
+      _park.value = park
+    }
+  }
 
   /**
    * Update the name of a park.
