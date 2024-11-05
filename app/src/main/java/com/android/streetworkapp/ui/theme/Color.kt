@@ -26,3 +26,12 @@ val DarkGray = Color(0xFF3C4043)
 
 // Train with a friend Button in ProfileScreen :
 val ButtonRed = Color(0xFFA53A36)
+
+//FIGMA v2 colors
+object ColorPalette {
+    val PRIMARY_TEXT_COLOR = Color(0xFF333333) //Dark grey
+    val SECONDARY_TEXT_COLOR = Color(0xFF666666) //Medium Gray
+    val INTERACTION_COLOR_DARK = Color(0xFF007BFF) //Blue
+    val INTERACTION_COLOR_LIGHT = Color(0xFFBADBFF) //Light Blue
+    val BORDER_COLOR = Color(0xFFDDDDDD)
+}
