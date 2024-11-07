@@ -46,6 +46,7 @@ import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventOverviewUiState
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.Park
+import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.utils.toFormattedString
@@ -60,7 +61,8 @@ fun ParkOverviewScreen(
     park: Park,
     innerPadding: PaddingValues = PaddingValues(0.dp),
     navigationActions: NavigationActions = NavigationActions(rememberNavController()),
-    eventViewModel: EventViewModel
+    eventViewModel: EventViewModel,
+    parkViewModel: ParkViewModel
 ) {
   Box(modifier = Modifier.padding(innerPadding).fillMaxSize().testTag("parkOverviewScreen")) {
     Column {

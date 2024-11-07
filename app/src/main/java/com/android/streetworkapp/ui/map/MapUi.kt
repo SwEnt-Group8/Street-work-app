@@ -10,6 +10,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
@@ -31,7 +32,8 @@ fun MapScreen(
     parkLocationViewModel: ParkLocationViewModel,
     navigationActions: NavigationActions,
     callbackOnMapLoaded: () -> Unit = {},
-    innerPaddingValues: PaddingValues = PaddingValues(0.dp)
+    innerPaddingValues: PaddingValues = PaddingValues(0.dp),
+    parkViewModel: ParkViewModel
 ) {
 
   // hardcoded initial location values are used instead of the user's current location for now
