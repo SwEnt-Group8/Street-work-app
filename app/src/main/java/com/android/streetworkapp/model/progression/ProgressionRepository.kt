@@ -4,7 +4,7 @@ interface ProgressionRepository {
 
   fun getNewProgressionId(): String
 
-   fun getProgression(uid: String,onSuccess: (Progression) -> Unit, onFailure: (Exception) -> Unit)
+  fun getProgression(uid: String, onSuccess: (Progression) -> Unit, onFailure: (Exception) -> Unit)
 
   suspend fun updateProgressionWithAchievementAndGoal(
       progressionId: String,

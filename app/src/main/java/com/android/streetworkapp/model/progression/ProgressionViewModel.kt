@@ -3,8 +3,6 @@ package com.android.streetworkapp.model.progression
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.android.streetworkapp.model.event.EventOverviewUiState
 import com.android.streetworkapp.model.progression.MedalsAchievement.BRONZE
 import com.android.streetworkapp.model.progression.MedalsAchievement.GOLD
 import com.android.streetworkapp.model.progression.MedalsAchievement.NONE
@@ -16,7 +14,7 @@ import kotlinx.coroutines.launch
 
 open class ProgressionViewModel(private val repository: ProgressionRepository) : ViewModel() {
 
-  val _currentProgression = MutableStateFlow(Progression())
+  private val _currentProgression = MutableStateFlow(Progression())
   val currentProgression: StateFlow<Progression> = _currentProgression.asStateFlow()
 
   fun getNewProgressionId(): String {
@@ -26,34 +24,32 @@ open class ProgressionViewModel(private val repository: ProgressionRepository) :
   fun getCurrentProgression(uid: String) {
 
     repository.getProgression(
-      uid = uid,
-      onSuccess = {progression -> _currentProgression.value = progression },
-      onFailure = { Log.e("FirestoreError", "Error getting events: ${it.message}") })
+        uid = uid,
+        onSuccess = { progression -> _currentProgression.value = progression },
+        onFailure = { Log.e("FirestoreError", "Error getting events: ${it.message}") })
   }
 
-  fun createProgression(uid: String,progressionId: String) = viewModelScope.launch { repository.createProgression(uid,progressionId) }
+  fun createProgression(uid: String, progressionId: String) =
+      viewModelScope.launch { repository.createProgression(uid, progressionId) }
 
-  fun checkScore(score: Int) = viewModelScope.launch {
-    if (_currentProgression.value.currentGoal < score) {
+  fun checkScore(score: Int) =
+      viewModelScope.launch {
+        if (_currentProgression.value.currentGoal < score) {
 
-      _currentProgression.value.currentGoal *= 10
-      val newAchievements =
-          _currentProgression.value.achievements +
-              getMedalByScore(_currentProgression.value.currentGoal).name
+          val newAchievements =
+              _currentProgression.value.achievements +
+                  getMedalByScore(_currentProgression.value.currentGoal).name
 
-      _currentProgression.value.achievements = newAchievements
+          _currentProgression.value.currentGoal *= 10
 
-      repository.updateProgressionWithAchievementAndGoal(_currentProgression.value.progressionId,newAchievements,_currentProgression.value.currentGoal)
-    }
-  }
+          _currentProgression.value.achievements = newAchievements
 
-  fun test(score: Int) {
-
-    _currentProgression.value.currentGoal += score
-  }
-
-
-
+          repository.updateProgressionWithAchievementAndGoal(
+              _currentProgression.value.progressionId,
+              newAchievements,
+              _currentProgression.value.currentGoal)
+        }
+      }
 }
 
 fun getMedalByScore(score: Int): MedalsAchievement {
@@ -64,5 +60,3 @@ fun getMedalByScore(score: Int): MedalsAchievement {
     else -> NONE
   }
 }
-
-

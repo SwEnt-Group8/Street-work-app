@@ -1,8 +1,6 @@
 package com.android.streetworkapp.model.progression
 
 import android.util.Log
-import com.android.streetworkapp.model.event.Event
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -17,17 +15,21 @@ class ProgressionRepositoryFirestore(private val db: FirebaseFirestore) : Progre
     return db.collection(COLLECTION_PATH).document().id
   }
 
-  override fun getProgression(uid: String,onSuccess: (Progression) -> Unit, onFailure: (Exception) -> Unit) {
+  override fun getProgression(
+      uid: String,
+      onSuccess: (Progression) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
     try {
-      db.collection(COLLECTION_PATH).whereEqualTo("uid", uid).get()
+      db.collection(COLLECTION_PATH)
+          .whereEqualTo("uid", uid)
+          .get()
           .addOnSuccessListener { documents ->
-              val progression =
-                  documentToProgression(documents.documents[0])
+            val progression = documentToProgression(documents.documents[0])
 
-              onSuccess(progression)
+            onSuccess(progression)
           }
           .addOnFailureListener(onFailure)
-
     } catch (e: Exception) {
       Log.e("FirestoreError", "Error getting progression. Reason: ${e.message}")
     }
@@ -53,7 +55,7 @@ class ProgressionRepositoryFirestore(private val db: FirebaseFirestore) : Progre
     try {
       db.collection(COLLECTION_PATH)
           .document(progressionId)
-          .set(Progression(progressionId, uid))
+          .set(Progression(progressionId, uid, Ranks.BRONZE.score))
           .await()
     } catch (e: Exception) {
       Log.e("FirestoreError", "Error: ${e.message}")
@@ -64,9 +66,9 @@ class ProgressionRepositoryFirestore(private val db: FirebaseFirestore) : Progre
     return try {
       val progressionId = document.id
       val uid = document["uid"] as? String ?: ""
-      val currentGoal = document["currentGoal"] as? Int ?: 0
-      val eventsCreated = document["eventsCreated"] as? Int ?: 0
-      val eventsJoined = document["eventsJoined"] as? Int ?: 0
+      val currentGoal = (document["currentGoal"] as? Long)?.toInt() ?: 0
+      val eventsCreated = (document["eventsCreated"] as? Long)?.toInt() ?: 0
+      val eventsJoined = (document["eventsJoined"] as? Long)?.toInt() ?: 0
 
       val achievements =
           try {
