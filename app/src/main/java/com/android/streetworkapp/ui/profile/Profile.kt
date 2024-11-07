@@ -1,5 +1,6 @@
 package com.android.streetworkapp.ui.profile
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -21,6 +22,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,16 +60,17 @@ fun ProfileScreen(
 
   val bob = User("uid_Bob", "Bob", "bob@gmail.com", 64, emptyList())
 
-  val currentUser =
-      User("uid_current", "Current User", "user@gmail.com", 42424, listOf(alice.uid, bob.uid))
+  val currentUser = userViewModel.currentUser.collectAsState().value
 
-  val friendList = listOf(alice, bob)
-
+  val friendList = userViewModel.friends.collectAsState().value
+  Log.d("DEBUGSWENT", "")
   // fetch profile picture from firebase
   val photo = Firebase.auth.currentUser?.photoUrl
 
   // val friendList = emptyList()
-
+  if (currentUser != null) {
+    userViewModel.getFriendsByUid(currentUser.uid)
+  }
   Box(modifier = Modifier.testTag("ProfileScreen")) {
     Column(
         modifier = Modifier.fillMaxSize().padding(innerPaddingValues).testTag("ProfileColumn"),
@@ -96,16 +99,20 @@ fun ProfileScreen(
                 Column(modifier = Modifier.testTag("profileInfoColumn").padding(2.dp)) {
 
                   // name placeholder
-                  Text(
-                      text = currentUser.username,
-                      fontSize = 30.sp,
-                      modifier = Modifier.testTag("profileUsername").padding(2.dp))
+                  if (currentUser != null) {
+                    Text(
+                        text = currentUser.username,
+                        fontSize = 30.sp,
+                        modifier = Modifier.testTag("profileUsername").padding(2.dp))
+                  }
 
                   // score placeholder
-                  Text(
-                      text = "Score: ${currentUser.score}",
-                      fontSize = 20.sp,
-                      modifier = Modifier.testTag("profileScore").padding(2.dp))
+                  if (currentUser != null) {
+                    Text(
+                        text = "Score: ${currentUser.score}",
+                        fontSize = 20.sp,
+                        modifier = Modifier.testTag("profileScore").padding(2.dp))
+                  }
 
                   // button to add a new friend
                   Button(
@@ -128,6 +135,7 @@ fun ProfileScreen(
               }
 
           DisplayFriendList(friendList)
+          Log.d("DEBUGSWENT", "friendList: $friendList")
         }
   }
 }
@@ -138,14 +146,18 @@ fun ProfileScreen(
  * @param friends - The list of friends to display.
  */
 @Composable
-fun DisplayFriendList(friends: List<User>) {
+fun DisplayFriendList(friends: List<User?>) {
   return if (friends.isNotEmpty()) {
 
     // LazyColumn is scrollable
     LazyColumn(
         contentPadding = PaddingValues(vertical = 0.dp),
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).testTag("friendList")) {
-          items(friends) { friend -> DisplayFriend(friend) }
+          items(friends) { friend ->
+            if (friend != null) {
+              DisplayFriend(friend)
+            }
+          }
         }
   } else {
     Text(
