@@ -104,6 +104,11 @@ fun ProfileScreen(
   }
 }
 
+/**
+ * This function displays the user's username.
+ *
+ * @param user - The user whose username is to be displayed.
+ */
 @Composable
 fun DisplayUsername(user: User?) {
   if (user != null) {
@@ -119,7 +124,11 @@ fun DisplayUsername(user: User?) {
         modifier = Modifier.padding(top = 8.dp).testTag("profileUsername"))
   }
 }
-
+/**
+ * This function displays the user's score.
+ *
+ * @param user - The user whose score is to be displayed.
+ */
 @Composable
 fun DisplayScore(user: User?) {
   if (user != null) {
