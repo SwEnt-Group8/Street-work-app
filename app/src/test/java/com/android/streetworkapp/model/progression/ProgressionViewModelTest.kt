@@ -55,13 +55,9 @@ class ProgressionViewModelTest {
 
   @Test
   fun getMedalTest() = runTest {
-    assert(getMedalByScore(0)== MedalsAchievement.NONE)
-    assert(getMedalByScore(100)== MedalsAchievement.BRONZE)
-    assert(getMedalByScore(1000)== MedalsAchievement.SILVER)
-    assert(getMedalByScore(10000)== MedalsAchievement.GOLD)
+    assert(getMedalByScore(0) == MedalsAchievement.NONE)
+    assert(getMedalByScore(100) == MedalsAchievement.BRONZE)
+    assert(getMedalByScore(1000) == MedalsAchievement.SILVER)
+    assert(getMedalByScore(10000) == MedalsAchievement.GOLD)
   }
-
-
-
-
 }
