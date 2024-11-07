@@ -130,6 +130,10 @@ fun StreetWorkApp(
           owner = "ownerUserId",
           listParticipants = listOf("user1", "user2", "user3"),
           parkId = "park567")
+
+  parkViewModel.getParkByPid("123")
+  parkViewModel.setCurrentPark(parkViewModel.park.value)
+
   Scaffold(
       topBar = {
         screenParams
@@ -161,7 +165,7 @@ fun StreetWorkApp(
       }) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Route.AUTH) { // TODO: handle start destination based on signIn logic
+            startDestination = Route.MAP) { // TODO: handle start destination based on signIn logic
               navigation(
                   startDestination = Screen.AUTH,
                   route = Route.AUTH,
@@ -175,12 +179,13 @@ fun StreetWorkApp(
                 composable(Screen.MAP) {
                   MapScreen(
                       parkLocationViewModel,
+                      parkViewModel,
                       navigationActions,
                       mapCallbackOnMapLoaded,
                       innerPadding)
                 }
                 composable(Screen.PARK_OVERVIEW) {
-                  ParkOverviewScreen(testPark, innerPadding, navigationActions, eventViewModel)
+                  ParkOverviewScreen(parkViewModel, innerPadding, navigationActions, eventViewModel)
                 }
                 composable(Screen.ADD_EVENT) {
                   AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
@@ -188,9 +193,10 @@ fun StreetWorkApp(
                 composable(Screen.EVENT_OVERVIEW) {
                   EventOverviewScreen(
                       navigationActions,
-                      sampleEvent,
-                      testPark,
-                      innerPadding) // TODO: change to current park and current selected Event
+                      eventViewModel,
+                      parkViewModel,
+                      innerPadding,
+                      screenParams) // TODO: change to current park and current selected Event
                   // Note: navigationActions is not used here atm but it will be useful to link
                   // event to parks (ex: user clicks on event notif in social and wants to see the
                   // park overview from here)

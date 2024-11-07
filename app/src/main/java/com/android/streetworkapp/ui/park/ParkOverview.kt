@@ -29,6 +29,8 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -46,6 +48,7 @@ import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventOverviewUiState
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.Park
+import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.utils.toFormattedString
@@ -53,19 +56,28 @@ import com.android.streetworkapp.utils.toFormattedString
 /**
  * Display the overview of a park, including park details and a list of events.
  *
- * @param park The park data to display.
+ * @param parkViewModel The view model for the park.
+ * @param innerPadding The padding to apply to the screen.
+ * @param navigationActions The navigation actions to navigate to other screens.
+ * @param eventViewModel The view model for the events.
  */
 @Composable
 fun ParkOverviewScreen(
-    park: Park,
+    parkViewModel: ParkViewModel,
     innerPadding: PaddingValues = PaddingValues(0.dp),
     navigationActions: NavigationActions = NavigationActions(rememberNavController()),
     eventViewModel: EventViewModel
 ) {
+  val currentPark by parkViewModel.currentPark.observeAsState()
+
+  eventViewModel.getEvents(currentPark!!)
+
   Box(modifier = Modifier.padding(innerPadding).fillMaxSize().testTag("parkOverviewScreen")) {
     Column {
-      ImageTitle(image = null, title = park.name) // TODO: Fetch image from Firestore storage
-      ParkDetails(park = park)
+      parkViewModel.currentPark.value?.let {
+        ImageTitle(image = null, title = it.name)
+      } // TODO: Fetch image from Firestore storage
+      ParkDetails(park = parkViewModel.currentPark.value!!)
       EventItemList(eventViewModel, navigationActions) // TODO: Fetch events from Firestore
     }
     FloatingActionButton(
@@ -255,7 +267,7 @@ fun EventItem(event: Event, eventViewModel: EventViewModel, navigationActions: N
         Button(
             onClick = {
               eventViewModel.setCurrentEvent(event)
-              navigationActions.navigateTo(Screen.ADD_EVENT)
+              navigationActions.navigateTo(Screen.EVENT_OVERVIEW)
             },
             modifier = Modifier.size(width = 80.dp, height = 48.dp).testTag("eventButton"),
             colors = ButtonDefaults.buttonColors(),

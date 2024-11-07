@@ -1,6 +1,7 @@
 package com.android.streetworkapp.model.event
 
 import android.util.Log
+import com.android.streetworkapp.model.park.Park
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -39,16 +40,16 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
    * @param onSuccess The callback to execute on success.
    * @param onFailure The callback to execute on failure.
    */
-  override suspend fun getEvents(onSuccess: (List<Event>) -> Unit, onFailure: (Exception) -> Unit) {
+  override suspend fun getEvents(
+      park: Park,
+      onSuccess: (List<Event>) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
     try {
-      db.collection(COLLECTION_PATH)
-          .get()
-          .addOnSuccessListener { documents ->
-            val eventList = documents.documents.mapNotNull { documentToEvent(it) }
-            onSuccess(eventList)
-          }
-          .addOnFailureListener(onFailure)
+      val eventList = park.events.mapNotNull { getEventByEid(it) }
+      onSuccess(eventList)
     } catch (e: Exception) {
+      onFailure(e)
       Log.e("FirestoreError", "Error getting events: ${e.message}")
     }
   }

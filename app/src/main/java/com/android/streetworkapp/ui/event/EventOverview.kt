@@ -40,6 +40,7 @@ import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.navigation.ScreenParams
 import com.android.streetworkapp.ui.theme.Snowflake
 import com.android.streetworkapp.utils.toFormattedString
 import com.google.android.gms.maps.model.CameraPosition
@@ -67,11 +68,14 @@ fun EventOverviewScreen(
     navigationActions: NavigationActions,
     eventViewModel: EventViewModel,
     parkViewModel: ParkViewModel,
-    paddingValues: PaddingValues = PaddingValues(0.dp)
+    paddingValues: PaddingValues = PaddingValues(0.dp),
+    screenParams: ScreenParams?,
 ) {
 
   val event = eventViewModel.currentEvent.collectAsState().value!!
   val park = parkViewModel.currentPark.value!!
+
+  screenParams?.topAppBarManager?.setTopAppBarTitle(event.title)
 
   Box(modifier = Modifier.fillMaxSize().padding(paddingValues).testTag("eventOverviewScreen")) {
     Column(modifier = Modifier.fillMaxHeight().testTag("eventContent")) {

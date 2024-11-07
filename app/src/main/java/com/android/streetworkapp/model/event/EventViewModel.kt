@@ -3,6 +3,7 @@ package com.android.streetworkapp.model.event
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.streetworkapp.model.park.Park
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -19,6 +20,10 @@ open class EventViewModel(private val repository: EventRepository) : ViewModel()
   val currentEvent: StateFlow<Event?>
     get() = _currentEvent
 
+  private val _parkEventList = MutableStateFlow<List<Event>>(emptyList())
+  val parkeventList: StateFlow<List<Event>>
+    get() = _parkEventList
+
   fun setCurrentEvent(event: Event?) {
     _currentEvent.value = event
   }
@@ -29,6 +34,7 @@ open class EventViewModel(private val repository: EventRepository) : ViewModel()
       _currentEvent.value = fetchedEvent
     }
   }
+
   /**
    * Get a new event ID.
    *
@@ -39,9 +45,10 @@ open class EventViewModel(private val repository: EventRepository) : ViewModel()
   }
 
   /** Fetch all events from the database. */
-  fun getEvents() {
+  fun getEvents(park: Park) {
     viewModelScope.launch {
       repository.getEvents(
+          park,
           onSuccess = {
             if (it.isEmpty()) {
               _uiState.value = EventOverviewUiState.Empty

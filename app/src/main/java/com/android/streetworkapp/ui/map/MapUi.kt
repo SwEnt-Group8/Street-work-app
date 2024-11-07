@@ -10,6 +10,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.android.streetworkapp.model.park.ParkViewModel
+import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
@@ -29,6 +31,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 @Composable
 fun MapScreen(
     parkLocationViewModel: ParkLocationViewModel,
+    parkViewModel: ParkViewModel,
     navigationActions: NavigationActions,
     callbackOnMapLoaded: () -> Unit = {},
     innerPaddingValues: PaddingValues = PaddingValues(0.dp)
@@ -39,6 +42,7 @@ fun MapScreen(
 
   LaunchedEffect(initialLatLng) {
     parkLocationViewModel.findNearbyParks(initialLatLng.latitude, initialLatLng.longitude)
+    parkViewModel.getOrCreateParkByLocation(ParkLocation(0.0, 0.0, "default"))
   }
 
   val parks = parkLocationViewModel.parks.collectAsState().value
@@ -59,7 +63,6 @@ fun MapScreen(
                 contentDescription = "Marker",
                 state = MarkerState(position = LatLng(park.lat, park.lon)),
                 onClick = {
-                  // TODO: selectPark
                   navigationActions.navigateTo(Screen.PARK_OVERVIEW)
                   true
                 })
