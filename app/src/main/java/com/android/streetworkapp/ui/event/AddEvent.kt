@@ -1,5 +1,6 @@
 package com.android.streetworkapp.ui.event
 
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -33,6 +34,7 @@ import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -66,6 +68,7 @@ import java.util.concurrent.TimeUnit
  *
  * @param navigationActions used to navigate in the app
  */
+@SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEventScreen(
@@ -89,7 +92,7 @@ fun AddEventScreen(
           Timestamp(0, 0),
           "unknown")
 
-  val owner = userViewModel.currentUser.value?.uid
+  val owner = userViewModel.currentUser.collectAsState().value?.uid
   if (!owner.isNullOrEmpty()) {
     event.owner = owner
   }

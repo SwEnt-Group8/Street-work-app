@@ -1,5 +1,6 @@
 package com.android.streetworkapp.ui.profile
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -16,9 +17,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,7 +27,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -42,6 +39,11 @@ import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.runtime.collectAsState
 
 @Composable
 fun ProfileScreen(
@@ -52,16 +54,14 @@ fun ProfileScreen(
 
   val context = LocalContext.current
 
-  // Fake data extraction from the MVVM :
-  val alice =
-      User("uid_Alice", "Alice", "alice@gmail.com", 42, listOf("Z8qgzNOoQOR09x6QQYahcyzVXfE2"))
+    // Handling the MVVM calls for user :
+    val currentUser = userViewModel.currentUser.collectAsState().value
 
-  val bob = User("uid_Bob", "Bob", "bob@gmail.com", 64, emptyList())
+    val friendList = userViewModel.friends.collectAsState().value
 
-  val currentUser =
-      User("uid_current", "Current User", "user@gmail.com", 42424, listOf(alice.uid, bob.uid))
-
-  val friendList = listOf(alice, bob, alice, alice, bob, alice, bob, alice, bob, alice, bob)
+    if (currentUser != null) {
+        userViewModel.getFriendsByUid(currentUser.uid)
+    }
 
   // fetch profile picture from firebase
   val photo = Firebase.auth.currentUser?.photoUrl
@@ -85,17 +85,31 @@ fun ProfileScreen(
                       .clip(CircleShape)
                       .border(5.dp, Color.LightGray, CircleShape)
                       .testTag("profilePicture"))
-          // name placeholder
-          Text(
-              text = currentUser.username,
-              fontSize = 18.sp,
-              modifier = Modifier.padding(top = 8.dp).testTag("profileUsername"))
 
-          // Score Text
+        // username text
+        if (currentUser != null) {
+            Text(
+                text = currentUser.username,
+                fontSize = 18.sp,
+                modifier = Modifier.padding(top = 8.dp).testTag("profileUsername"))
+        } else {
+            Text(
+                text = "unknown user",
+                fontSize = 18.sp,
+                modifier = Modifier.padding(top = 8.dp).testTag("profileUsername"))
+        }
+        // score text
+        if (currentUser != null) {
           Text(
               text = "Score: ${currentUser.score}",
               fontSize = 18.sp,
               modifier = Modifier.padding(top = 4.dp).testTag("profileScore"))
+        } else {
+            Text(
+                text = "Score: 0",
+                fontSize = 18.sp,
+                modifier = Modifier.padding(top = 4.dp).testTag("profileScore"))
+        }
 
           Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             // Add Friend Button
@@ -106,6 +120,7 @@ fun ProfileScreen(
                 }
           }
           DisplayFriendList(friendList)
+        Log.d("SignInScreen", "friendList : ${friendList}")
         }
   }
 }
@@ -120,8 +135,10 @@ fun DisplayFriendList(friends: List<User>) {
   return if (friends.isNotEmpty()) {
     LazyColumn(modifier = Modifier.fillMaxSize().testTag("friendList")) {
       items(friends) { friend ->
-        DisplayFriendItem(friend)
-        HorizontalDivider(thickness = 1.dp, color = Color.Gray)
+        if (friend != null) {
+          DisplayFriendItem(friend)
+          HorizontalDivider(thickness = 1.dp, color = Color.Gray)
+        }
       }
     }
   } else {
