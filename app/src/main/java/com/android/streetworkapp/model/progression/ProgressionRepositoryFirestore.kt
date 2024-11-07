@@ -1,6 +1,5 @@
 package com.android.streetworkapp.model.progression
 
-import com.android.streetworkapp.model.user.User
 import com.google.firebase.firestore.FirebaseFirestore
 
 class ProgressionRepositoryFirestore(private val db: FirebaseFirestore) : ProgressionRepository {
@@ -9,7 +8,7 @@ class ProgressionRepositoryFirestore(private val db: FirebaseFirestore) : Progre
   }
 
   override fun getProgression(
-      user: User,
+      uid: String,
       onSuccess: (Progression) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
