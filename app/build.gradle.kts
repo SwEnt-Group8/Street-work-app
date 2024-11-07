@@ -161,6 +161,7 @@ dependencies {
     implementation (libs.androidx.material.icons.extended)
     implementation(libs.androidx.navigation.testing)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.runtime.livedata)
     testImplementation(libs.json)
     implementation(libs.okhttp)
     implementation(libs.androidx.core.ktx)
