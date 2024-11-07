@@ -92,7 +92,6 @@ class ProgressionRepositoryFirestore(private val db: FirebaseFirestore) : Progre
       val currentGoal = (document["currentGoal"] as? Long)?.toInt() ?: 0
       val eventsCreated = (document["eventsCreated"] as? Long)?.toInt() ?: 0
       val eventsJoined = (document["eventsJoined"] as? Long)?.toInt() ?: 0
-
       val achievements =
           try {
             (document["achievements"] as? List<*>)?.filterIsInstance<String>()
@@ -101,7 +100,6 @@ class ProgressionRepositoryFirestore(private val db: FirebaseFirestore) : Progre
             Log.e("FirestoreError", "Error retrieving achievements list", e)
             emptyList<String>()
           }
-
       Progression(progressionId, uid, currentGoal, eventsCreated, eventsJoined, achievements)
     } catch (e: Exception) {
       Log.e("FirestoreError", "Error converting document: ${e.message}")
