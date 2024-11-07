@@ -1,7 +1,10 @@
 package com.android.streetworkapp.model.progression
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.android.streetworkapp.model.event.EventOverviewUiState
 import com.android.streetworkapp.model.progression.MedalsAchievement.BRONZE
 import com.android.streetworkapp.model.progression.MedalsAchievement.GOLD
 import com.android.streetworkapp.model.progression.MedalsAchievement.NONE
@@ -13,20 +16,24 @@ import kotlinx.coroutines.launch
 
 open class ProgressionViewModel(private val repository: ProgressionRepository) : ViewModel() {
 
-  private val _currentProgression = MutableStateFlow(Progression())
+  val _currentProgression = MutableStateFlow(Progression())
   val currentProgression: StateFlow<Progression> = _currentProgression.asStateFlow()
 
   fun getNewProgressionId(): String {
     return repository.getNewProgressionId()
   }
 
-  suspend fun getCurrentProgression(uid: String) {
-    _currentProgression.value = repository.getProgression(uid)
+  fun getCurrentProgression(uid: String) {
+
+    repository.getProgression(
+      uid = uid,
+      onSuccess = {progression -> _currentProgression.value = progression },
+      onFailure = { Log.e("FirestoreError", "Error getting events: ${it.message}") })
   }
 
   fun createProgression(uid: String,progressionId: String) = viewModelScope.launch { repository.createProgression(uid,progressionId) }
 
-  suspend fun checkScore(score: Int) {
+  fun checkScore(score: Int) = viewModelScope.launch {
     if (_currentProgression.value.currentGoal < score) {
 
       _currentProgression.value.currentGoal *= 10
@@ -39,6 +46,14 @@ open class ProgressionViewModel(private val repository: ProgressionRepository) :
       repository.updateProgressionWithAchievementAndGoal(_currentProgression.value.progressionId,newAchievements,_currentProgression.value.currentGoal)
     }
   }
+
+  fun test(score: Int) {
+
+    _currentProgression.value.currentGoal += score
+  }
+
+
+
 }
 
 fun getMedalByScore(score: Int): MedalsAchievement {
@@ -49,3 +64,5 @@ fun getMedalByScore(score: Int): MedalsAchievement {
     else -> NONE
   }
 }
+
+

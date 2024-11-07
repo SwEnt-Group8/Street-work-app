@@ -1,6 +1,8 @@
 package com.android.streetworkapp.model.progression
 
 import android.util.Log
+import com.android.streetworkapp.model.event.Event
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -15,13 +17,19 @@ class ProgressionRepositoryFirestore(private val db: FirebaseFirestore) : Progre
     return db.collection(COLLECTION_PATH).document().id
   }
 
-  override suspend fun getProgression(uid: String): Progression {
-    return try {
-      val document = db.collection(COLLECTION_PATH).whereEqualTo("location.id", uid).get().await()
-      documentToProgression(document.documents.first())
+  override fun getProgression(uid: String,onSuccess: (Progression) -> Unit, onFailure: (Exception) -> Unit) {
+    try {
+      db.collection(COLLECTION_PATH).whereEqualTo("uid", uid).get()
+          .addOnSuccessListener { documents ->
+              val progression =
+                  documentToProgression(documents.documents[0])
+
+              onSuccess(progression)
+          }
+          .addOnFailureListener(onFailure)
+
     } catch (e: Exception) {
       Log.e("FirestoreError", "Error getting progression. Reason: ${e.message}")
-      Progression()
     }
   }
 
