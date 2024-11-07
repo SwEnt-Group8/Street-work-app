@@ -8,17 +8,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,6 +29,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -39,7 +40,6 @@ import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
-import com.android.streetworkapp.ui.theme.ButtonRed
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -61,72 +61,50 @@ fun ProfileScreen(
   val currentUser =
       User("uid_current", "Current User", "user@gmail.com", 42424, listOf(alice.uid, bob.uid))
 
-  val friendList = listOf(alice, bob)
+  val friendList = listOf(alice, bob, alice, alice, bob, alice, bob, alice, bob, alice, bob)
 
   // fetch profile picture from firebase
   val photo = Firebase.auth.currentUser?.photoUrl
 
-  // val friendList = emptyList()
-
-  Box(modifier = Modifier.testTag("ProfileScreen")) {
+  Box(modifier = Modifier.fillMaxWidth().padding(innerPaddingValues).testTag("ProfileScreen")) {
+    // Center Column for Profile Picture, Score, and Add Friend button
     Column(
-        modifier = Modifier.fillMaxSize().padding(innerPaddingValues).testTag("ProfileColumn"),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)) {
-          Row(
-              modifier = Modifier.fillMaxWidth().padding(innerPaddingValues).testTag("profileRow"),
-              horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
-              verticalAlignment = Alignment.Top) {
+        modifier = Modifier.fillMaxWidth().padding(top = 50.dp).testTag("profileColumn"),
+        horizontalAlignment = Alignment.CenterHorizontally) {
+          // display the profile picture
+          AsyncImage(
+              model =
+                  ImageRequest.Builder(LocalContext.current)
+                      .data(photo ?: R.drawable.profile)
+                      .placeholder(R.drawable.profile)
+                      .build(),
+              contentDescription = "user_profile_picture",
+              contentScale = ContentScale.Crop,
+              modifier =
+                  Modifier.size(180.dp)
+                      .clip(CircleShape)
+                      .border(5.dp, Color.LightGray, CircleShape)
+                      .testTag("profilePicture"))
+          // name placeholder
+          Text(
+              text = currentUser.username,
+              fontSize = 18.sp,
+              modifier = Modifier.padding(top = 8.dp).testTag("profileUsername"))
 
-                // display the profile picture
-                AsyncImage(
-                    model =
-                        ImageRequest.Builder(LocalContext.current)
-                            .data(photo ?: R.drawable.profile)
-                            .placeholder(R.drawable.profile)
-                            .build(),
-                    contentDescription = "user_profile_picture",
-                    contentScale = ContentScale.Crop,
-                    modifier =
-                        Modifier.size(180.dp)
-                            .clip(CircleShape)
-                            .border(5.dp, Color.LightGray, CircleShape)
-                            .testTag("profilePicture"))
+          // Score Text
+          Text(
+              text = "Score: ${currentUser.score}",
+              fontSize = 18.sp,
+              modifier = Modifier.padding(top = 4.dp).testTag("profileScore"))
 
-                Column(modifier = Modifier.testTag("profileInfoColumn").padding(2.dp)) {
-
-                  // name placeholder
-                  Text(
-                      text = currentUser.username,
-                      fontSize = 30.sp,
-                      modifier = Modifier.testTag("profileUsername").padding(2.dp))
-
-                  // score placeholder
-                  Text(
-                      text = "Score: ${currentUser.score}",
-                      fontSize = 20.sp,
-                      modifier = Modifier.testTag("profileScore").padding(2.dp))
-
-                  // button to add a new friend
-                  Button(
-                      onClick = { navigationActions.navigateTo(Screen.ADD_FRIEND) },
-                      modifier =
-                          Modifier.size(220.dp, 50.dp).testTag("profileAddButton").padding(2.dp)) {
-                        Text(text = "Add a new friend", fontSize = 17.sp)
-                      }
-
-                  // button to train with a friend
-                  Button(
-                      onClick = {
-                        Toast.makeText(context, "Not implemented yet", Toast.LENGTH_LONG).show()
-                      },
-                      colors = ButtonDefaults.buttonColors(ButtonRed),
-                      modifier = Modifier.size(220.dp, 50.dp).testTag("profileTrainButton")) {
-                        Text(text = "Train with a friend", fontSize = 17.sp)
-                      }
+          Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            // Add Friend Button
+            Button(
+                onClick = { navigationActions.navigateTo(Screen.ADD_FRIEND) },
+                modifier = Modifier.padding(horizontal = 4.dp).testTag("profileAddButton")) {
+                  Text(text = "Add friend")
                 }
-              }
-
+          }
           DisplayFriendList(friendList)
         }
   }
@@ -140,13 +118,12 @@ fun ProfileScreen(
 @Composable
 fun DisplayFriendList(friends: List<User>) {
   return if (friends.isNotEmpty()) {
-
-    // LazyColumn is scrollable
-    LazyColumn(
-        contentPadding = PaddingValues(vertical = 0.dp),
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).testTag("friendList")) {
-          items(friends) { friend -> DisplayFriend(friend) }
-        }
+    LazyColumn(modifier = Modifier.fillMaxSize().testTag("friendList")) {
+      items(friends) { friend ->
+        DisplayFriendItem(friend)
+        HorizontalDivider(thickness = 1.dp, color = Color.Gray)
+      }
+    }
   } else {
     Text(
         modifier = Modifier.testTag("emptyFriendListText"),
@@ -161,28 +138,50 @@ fun DisplayFriendList(friends: List<User>) {
  * @param friend - The friend to display.
  */
 @Composable
-fun DisplayFriend(friend: User) {
-  return Row(modifier = Modifier.fillMaxWidth().testTag("friendRow")) {
+fun DisplayFriendItem(friend: User) {
+  val context = LocalContext.current
+  Row(
+      modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("friendItem"),
+      verticalAlignment = Alignment.CenterVertically) {
+        // Friend's avatar
+        Image(
+            painter = painterResource(id = R.drawable.profile),
+            contentDescription = "${friend.username}'s avatar",
+            modifier =
+                Modifier.size(80.dp)
+                    .clip(CircleShape)
+                    .padding(end = 16.dp)
+                    .testTag("friendProfilePicture"),
+            contentScale = ContentScale.Fit)
 
-    // profile placeholder
-    Image(
-        painter = painterResource(id = R.drawable.profile),
-        contentDescription = "profile picture",
-        modifier = Modifier.size(75.dp).testTag("friendProfilePicture"))
+        // Friend's info (name, score, status)
+        Column(modifier = Modifier.weight(1f)) {
+          Text(
+              text = friend.username,
+              fontSize = 18.sp,
+              fontWeight = FontWeight.Bold,
+              modifier = Modifier.testTag("friendUsername"))
+          Text(
+              text = "Score: ${friend.score}",
+              fontSize = 14.sp,
+              color = Color.Gray,
+              modifier = Modifier.testTag("friendScore"))
+          Text(
+              text = "Definitely not a bot",
+              fontSize = 14.sp,
+              color = Color.Gray,
+              modifier = Modifier.testTag("friendStatus"))
+        }
 
-    Column(modifier = Modifier.fillMaxWidth()) {
-
-      // Small spacing between elements
-      Spacer(modifier = Modifier.height(8.dp))
-
-      // username
-      Text(fontSize = 22.sp, text = friend.username, modifier = Modifier.testTag("friendUsername"))
-
-      // score
-      Text(
-          text = "Score: ${friend.score}",
-          fontSize = 22.sp,
-          modifier = Modifier.testTag("friendScore"))
-    }
-  }
+        // Three-dot menu icon (Overflow menu)
+        IconButton(
+            modifier = Modifier.testTag("friendSettingButton"),
+            onClick = {
+              Toast.makeText(context, "Not implemented yet", Toast.LENGTH_SHORT).show()
+            }) {
+              Icon(
+                  painter = painterResource(id = R.drawable.more_vertical),
+                  contentDescription = "More options")
+            }
+      }
 }
