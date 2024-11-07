@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -39,6 +40,8 @@ import com.android.streetworkapp.ui.navigation.TopAppBarWrapper
 import com.android.streetworkapp.ui.park.ParkOverviewScreen
 import com.android.streetworkapp.ui.profile.AddFriendScreen
 import com.android.streetworkapp.ui.profile.ProfileScreen
+import com.android.streetworkapp.ui.progress.ProgressScreen
+import com.android.streetworkapp.ui.theme.ColorPalette
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.Date
@@ -124,6 +127,7 @@ fun StreetWorkApp(
           listParticipants = listOf("user1", "user2", "user3"),
           parkId = "park567")
   Scaffold(
+      containerColor = ColorPalette.PRINCIPLE_BACKGROUND_COLOR,
       topBar = {
         screenParams
             ?.isTopBarVisible
@@ -142,13 +146,20 @@ fun StreetWorkApp(
       }) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Route.AUTH) { // TODO: handle start destination based on signIn logic
+            startDestination = Route.PROGRESSION) { // TODO: handle start destination based on signIn logic
               navigation(
                   startDestination = Screen.AUTH,
                   route = Route.AUTH,
               ) {
                 composable(Screen.AUTH) { SignInScreen(navigationActions, userViewModel) }
               }
+
+            navigation(
+                startDestination = Screen.PROGRESSION,
+                route = Route.PROGRESSION
+            ) {
+                composable(Screen.PROGRESSION) { ProgressScreen(navigationActions, innerPadding) }
+            }
 
               navigation(
                   startDestination = Screen.MAP,
