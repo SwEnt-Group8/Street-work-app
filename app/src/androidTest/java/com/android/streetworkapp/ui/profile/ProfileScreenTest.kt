@@ -34,36 +34,25 @@ class ProfileScreenTest : TestCase() {
   @Test
   fun hasRequiredComponents() {
     composeTestRule.waitForIdle() // Wait for rendering
-    composeTestRule.onNodeWithTag("ProfileScreen").assertExists()
-    composeTestRule.onNodeWithTag("profileScore").assertExists()
-    composeTestRule.onNodeWithTag("profileAddButton").assertExists()
-    composeTestRule.onNodeWithTag("profileTrainButton").assertExists()
-    composeTestRule.onNodeWithTag("ProfileScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("profileScore").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("profileAddButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("profileTrainButton").assertIsDisplayed()
-
-    // Tests for new components
-    composeTestRule.onNodeWithTag("profileRow").assertExists()
-    composeTestRule.onNodeWithTag("profileInfoColumn").assertExists()
+    composeTestRule.onNodeWithTag("ProfileScreen").assertExists().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("profileScore").assertExists().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("profileAddButton").assertExists().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("profileColumn").assertExists()
 
     // test profile picture
-    composeTestRule.onNodeWithTag("profilePicture").assertExists()
-    composeTestRule.onNodeWithTag("profilePicture").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("profilePicture").assertExists().assertIsDisplayed()
   }
 
   @Test
   fun textCorrectlyDisplayed() {
     composeTestRule.waitForIdle() // Wait for rendering
     composeTestRule.onNodeWithTag("profileScore").assertTextEquals("Score: 42424")
-    composeTestRule.onNodeWithTag("profileAddButton").assertTextEquals("Add a new friend")
-    composeTestRule.onNodeWithTag("profileTrainButton").assertTextEquals("Train with a friend")
+    composeTestRule.onNodeWithTag("profileAddButton").assertTextEquals("Add friend")
   }
 
   @Test
   fun buttonWork() {
     composeTestRule.waitForIdle() // Wait for rendering
     composeTestRule.onNodeWithTag("profileAddButton").assertHasClickAction()
-    composeTestRule.onNodeWithTag("profileTrainButton").assertHasClickAction()
   }
 }

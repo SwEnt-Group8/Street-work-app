@@ -4,6 +4,8 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.filter
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
@@ -21,7 +23,7 @@ class ProfileFriendsListTest {
   @Test
   fun isFriendElementCorrectlyDisplayed() {
     val friend = User("uid-alice", "Alice", "alice@gmail.com", 42, emptyList())
-    composeTestRule.setContent { DisplayFriend(friend) }
+    composeTestRule.setContent { DisplayFriendItem(friend) }
 
     composeTestRule.onNodeWithTag("friendProfilePicture").assertExists().assertIsDisplayed()
 
@@ -36,6 +38,14 @@ class ProfileFriendsListTest {
         .assertExists()
         .assertIsDisplayed()
         .assertTextEquals("Score: ${friend.score}")
+
+    composeTestRule
+        .onNodeWithTag("friendStatus")
+        .assertExists()
+        .assertIsDisplayed()
+        .assertTextEquals("Definitely not a bot")
+
+    composeTestRule.onNodeWithTag("friendSettingButton").assertExists().assertIsDisplayed()
   }
 
   @Test
@@ -55,6 +65,7 @@ class ProfileFriendsListTest {
         .assertExists()
         .assertIsDisplayed()
         .onChildren()
+        .filter(hasTestTag("friendItem"))
         .assertCountEquals(friends.size)
   }
 
