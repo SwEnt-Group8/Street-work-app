@@ -28,6 +28,7 @@ class ProgressionRepositoryFirestore(private val db: FirebaseFirestore) : Progre
       onSuccess: (Progression) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
+    require(uid.isNotEmpty())
     try {
       db.collection(COLLECTION_PATH)
           .whereEqualTo("uid", uid)
@@ -55,6 +56,7 @@ class ProgressionRepositoryFirestore(private val db: FirebaseFirestore) : Progre
       achievements: List<String>,
       goal: Int
   ) {
+    require(progressionId.isNotEmpty())
     try {
       db.collection(COLLECTION_PATH)
           .document(progressionId)

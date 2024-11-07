@@ -29,6 +29,7 @@ open class ProgressionViewModel(private val repository: ProgressionRepository) :
    * @param uid: The uid (User Id)
    */
   fun getCurrentProgression(uid: String) {
+    require(uid.isNotEmpty())
 
     repository.getProgression(
         uid = uid,
