@@ -1,5 +1,6 @@
 package com.android.streetworkapp.model.progression
 
+/** A repository interface for Progression data. */
 interface ProgressionRepository {
 
   fun getNewProgressionId(): String

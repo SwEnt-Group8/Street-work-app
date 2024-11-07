@@ -17,10 +17,16 @@ open class ProgressionViewModel(private val repository: ProgressionRepository) :
   private val _currentProgression = MutableStateFlow(Progression())
   val currentProgression: StateFlow<Progression> = _currentProgression.asStateFlow()
 
+  /** Used to have a unique progressionId in the database. */
   fun getNewProgressionId(): String {
     return repository.getNewProgressionId()
   }
 
+  /**
+   * Fetch the progression linked to the given uid
+   *
+   * @param uid: The uid (User Id)
+   */
   fun getCurrentProgression(uid: String) {
 
     repository.getProgression(
@@ -29,9 +35,20 @@ open class ProgressionViewModel(private val repository: ProgressionRepository) :
         onFailure = { Log.e("FirestoreError", "Error getting events: ${it.message}") })
   }
 
+  /**
+   * Create the progression linked to the given uid
+   *
+   * @param uid: The uid (User Id)
+   * @param progressionId: The id of the "progression" object
+   */
   fun createProgression(uid: String, progressionId: String) =
       viewModelScope.launch { repository.createProgression(uid, progressionId) }
 
+  /**
+   * Check the score of the user. With enough points, the user wins medals.
+   *
+   * @param score: The current score of the user
+   */
   fun checkScore(score: Int) =
       viewModelScope.launch {
         if (_currentProgression.value.currentGoal < score) {
@@ -52,6 +69,11 @@ open class ProgressionViewModel(private val repository: ProgressionRepository) :
       }
 }
 
+/**
+ * Used to find the medal linked to a given score.
+ *
+ * @param score: The next goal score of the user
+ */
 fun getMedalByScore(score: Int): MedalsAchievement {
   return when (score) {
     Ranks.BRONZE.score -> BRONZE

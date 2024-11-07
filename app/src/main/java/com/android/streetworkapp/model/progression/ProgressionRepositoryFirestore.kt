@@ -11,10 +11,18 @@ class ProgressionRepositoryFirestore(private val db: FirebaseFirestore) : Progre
     private const val COLLECTION_PATH = "progressions"
   }
 
+  /** Used to have a unique progressionId in the database. */
   override fun getNewProgressionId(): String {
     return db.collection(COLLECTION_PATH).document().id
   }
 
+  /**
+   * Fetch the progression linked to the given uid
+   *
+   * @param uid: The uid (User Id)
+   * @param onSuccess The callback to execute on success.
+   * @param onFailure The callback to execute on failure.
+   */
   override fun getProgression(
       uid: String,
       onSuccess: (Progression) -> Unit,
@@ -35,6 +43,13 @@ class ProgressionRepositoryFirestore(private val db: FirebaseFirestore) : Progre
     }
   }
 
+  /**
+   * Used to change the next goal and to add new achievements.
+   *
+   * @param progressionId: the id of a progression object
+   * @param achievements The new list of achievements
+   * @param goal The current goal (a score)
+   */
   override suspend fun updateProgressionWithAchievementAndGoal(
       progressionId: String,
       achievements: List<String>,
@@ -50,6 +65,12 @@ class ProgressionRepositoryFirestore(private val db: FirebaseFirestore) : Progre
     }
   }
 
+  /**
+   * Used to create a new progression object in the database
+   *
+   * @param progressionId: the id of a progression object
+   * @param uid: The new list of achievements
+   */
   override suspend fun createProgression(uid: String, progressionId: String) {
     require(uid.isNotEmpty())
     try {
