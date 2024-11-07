@@ -60,10 +60,10 @@ class ProfileScreenTest {
 
   @Test
   fun hasRequiredComponents() {
-      // TODO verify that score still works in tests
+    // TODO verify that score still works in tests
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("ProfileScreen").assertExists().assertIsDisplayed()
-      composeTestRule.onNodeWithTag("profileScore").assertExists().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("profileScore").assertExists().assertIsDisplayed()
     composeTestRule.onNodeWithTag("profileAddButton").assertExists().assertIsDisplayed()
     composeTestRule.onNodeWithTag("profileColumn").assertExists()
 

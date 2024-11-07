@@ -17,8 +17,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,6 +31,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -39,11 +44,6 @@ import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.runtime.collectAsState
 
 @Composable
 fun ProfileScreen(
@@ -52,16 +52,14 @@ fun ProfileScreen(
     innerPaddingValues: PaddingValues = PaddingValues(0.dp)
 ) {
 
-  val context = LocalContext.current
+  // Handling the MVVM calls for user :
+  val currentUser = userViewModel.currentUser.collectAsState().value
 
-    // Handling the MVVM calls for user :
-    val currentUser = userViewModel.currentUser.collectAsState().value
+  val friendList = userViewModel.friends.collectAsState().value
 
-    val friendList = userViewModel.friends.collectAsState().value
-
-    if (currentUser != null) {
-        userViewModel.getFriendsByUid(currentUser.uid)
-    }
+  if (currentUser != null) {
+    userViewModel.getFriendsByUid(currentUser.uid)
+  }
 
   // fetch profile picture from firebase
   val photo = Firebase.auth.currentUser?.photoUrl
@@ -86,30 +84,30 @@ fun ProfileScreen(
                       .border(5.dp, Color.LightGray, CircleShape)
                       .testTag("profilePicture"))
 
-        // username text
-        if (currentUser != null) {
+          // username text
+          if (currentUser != null) {
             Text(
                 text = currentUser.username,
                 fontSize = 18.sp,
                 modifier = Modifier.padding(top = 8.dp).testTag("profileUsername"))
-        } else {
+          } else {
             Text(
                 text = "unknown user",
                 fontSize = 18.sp,
                 modifier = Modifier.padding(top = 8.dp).testTag("profileUsername"))
-        }
-        // score text
-        if (currentUser != null) {
-          Text(
-              text = "Score: ${currentUser.score}",
-              fontSize = 18.sp,
-              modifier = Modifier.padding(top = 4.dp).testTag("profileScore"))
-        } else {
+          }
+          // score text
+          if (currentUser != null) {
+            Text(
+                text = "Score: ${currentUser.score}",
+                fontSize = 18.sp,
+                modifier = Modifier.padding(top = 4.dp).testTag("profileScore"))
+          } else {
             Text(
                 text = "Score: 0",
                 fontSize = 18.sp,
                 modifier = Modifier.padding(top = 4.dp).testTag("profileScore"))
-        }
+          }
 
           Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             // Add Friend Button
@@ -120,7 +118,7 @@ fun ProfileScreen(
                 }
           }
           DisplayFriendList(friendList)
-        Log.d("SignInScreen", "friendList : ${friendList}")
+          Log.d("SignInScreen", "friendList : ${friendList}")
         }
   }
 }
@@ -131,7 +129,7 @@ fun ProfileScreen(
  * @param friends - The list of friends to display.
  */
 @Composable
-fun DisplayFriendList(friends: List<User>) {
+fun DisplayFriendList(friends: List<User?>) {
   return if (friends.isNotEmpty()) {
     LazyColumn(modifier = Modifier.fillMaxSize().testTag("friendList")) {
       items(friends) { friend ->
