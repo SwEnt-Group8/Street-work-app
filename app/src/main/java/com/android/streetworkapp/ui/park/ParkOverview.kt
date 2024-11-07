@@ -42,7 +42,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.rememberNavController
 import com.android.sample.R
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventOverviewUiState
@@ -65,7 +64,7 @@ import com.android.streetworkapp.utils.toFormattedString
 fun ParkOverviewScreen(
     parkViewModel: ParkViewModel,
     innerPadding: PaddingValues = PaddingValues(0.dp),
-    navigationActions: NavigationActions = NavigationActions(rememberNavController()),
+    navigationActions: NavigationActions,
     eventViewModel: EventViewModel
 ) {
   val currentPark by parkViewModel.currentPark.observeAsState()

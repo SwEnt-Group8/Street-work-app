@@ -1,7 +1,8 @@
 package com.android.streetworkapp.model.event
 
-import android.annotation.SuppressLint
 import androidx.test.core.app.ApplicationProvider
+import com.android.streetworkapp.model.park.Park
+import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
@@ -81,19 +82,35 @@ class EventRepositoryFirestoreTest {
     verify(documentRef).set(event)
   }
 
-  @SuppressLint("CheckResult")
   @Test
-  fun getEventByEid_calls_document() = runTest {
-    // Ensure that mockToDoQuerySnapshot is properly initialized and mocked
-    `when`(collection.get()).thenReturn(Tasks.forResult(query))
+  fun getEventByEid_calls_getdocument() = runTest {
+    `when`(collection.document(event.eid)).thenReturn(documentRef)
+    `when`(documentRef.get()).thenReturn(Tasks.forResult(document))
 
-    // Ensure the QuerySnapshot returns a list of mock DocumentSnapshots
-    `when`(query.documents).thenReturn(listOf())
+    eventRepository.getEventByEid(event.eid)
 
-    eventRepository.getEventByEid("123")
+    verify(documentRef, timeout(1000)).get()
+  }
 
-    // Verify that the 'documents' field was accessed
-    org.mockito.kotlin.verify(timeout(100)) { (query).documents }
-    verify(collection).document("123")
+  @Test
+  fun getEvents_calls_getDocument() = runTest {
+    val park =
+        Park(
+            pid = "123",
+            name = "EPFL Esplanade",
+            location = ParkLocation(0.0, 0.0, "321"),
+            imageReference = "parks/sample.png",
+            rating = 4.0f,
+            nbrRating = 102,
+            capacity = 10,
+            occupancy = 8,
+            events = listOf(event.eid))
+    whenever(db.collection("parks")).thenReturn(collection)
+    `when`(collection.document(event.eid)).thenReturn(documentRef)
+    `when`(documentRef.get()).thenReturn(Tasks.forResult(document))
+
+    eventRepository.getEvents(park, {}, { throw it })
+
+    verify(documentRef, timeout(1000)).get()
   }
 }

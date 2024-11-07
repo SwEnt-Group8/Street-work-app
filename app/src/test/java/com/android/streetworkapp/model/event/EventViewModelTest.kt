@@ -64,4 +64,11 @@ class EventViewModelTest {
     testDispatcher.scheduler.advanceUntilIdle()
     verify(repository).getEvents(any(), any(), any())
   }
+
+  @Test
+  fun getEventByEidCallsRepository() = runTest {
+    eventViewModel.getEventByEid(event.eid)
+    testDispatcher.scheduler.advanceUntilIdle()
+    verify(repository).getEventByEid(event.eid)
+  }
 }
