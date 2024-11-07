@@ -62,11 +62,11 @@ class ProfileScreenTest {
   fun hasRequiredComponents() {
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("ProfileScreen").assertExists()
-    //composeTestRule.onNodeWithTag("profileScore").assertExists()
+    // composeTestRule.onNodeWithTag("profileScore").assertExists()
     composeTestRule.onNodeWithTag("profileAddButton").assertExists()
     composeTestRule.onNodeWithTag("profileTrainButton").assertExists()
     composeTestRule.onNodeWithTag("ProfileScreen").assertIsDisplayed()
-    //composeTestRule.onNodeWithTag("profileScore").assertIsDisplayed()
+    // composeTestRule.onNodeWithTag("profileScore").assertIsDisplayed()
     composeTestRule.onNodeWithTag("profileAddButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("profileTrainButton").assertIsDisplayed()
 
