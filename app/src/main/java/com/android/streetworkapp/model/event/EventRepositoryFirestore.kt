@@ -68,7 +68,7 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
     }
   }
 
-  private fun documentToEvent(document: DocumentSnapshot): Event? {
+  fun documentToEvent(document: DocumentSnapshot): Event? {
     return if (document.exists()) {
       Event(
           eid = document.id,

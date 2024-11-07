@@ -113,4 +113,21 @@ class EventRepositoryFirestoreTest {
 
     verify(documentRef, timeout(1000)).get()
   }
+
+  @Test
+  fun documentToEvent_works() {
+    `when`(document.exists()).thenReturn(true)
+    `when`(document.id).thenReturn(event.eid)
+    `when`(document.get("date")).thenReturn(event.date)
+    `when`(document.get("title")).thenReturn(event.title)
+    `when`(document.get("owner")).thenReturn(event.owner)
+    `when`(document.get("participants")).thenReturn(event.participants.toLong())
+    `when`(document.get("description")).thenReturn(event.description)
+    `when`(document.get("capacity")).thenReturn(event.listParticipants)
+    `when`(document.get("maxParticipants")).thenReturn(event.maxParticipants.toLong())
+    `when`(document.get("parkId")).thenReturn(event.parkId)
+    `when`(document.get("listParticipants")).thenReturn(event.listParticipants)
+    val fetchedEvent = eventRepository.documentToEvent(document)
+    assertEquals(event, fetchedEvent)
+  }
 }
