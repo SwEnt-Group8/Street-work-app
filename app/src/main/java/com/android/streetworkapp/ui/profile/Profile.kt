@@ -122,17 +122,17 @@ fun DisplayUsername(user: User?) {
 
 @Composable
 fun DisplayScore(user: User?) {
-    if (user != null) {
-        Text(
-            text = "Score: ${user.score}",
-            fontSize = 18.sp,
-            modifier = Modifier.padding(top = 4.dp).testTag("profileScore"))
-    } else {
-        Text(
-            text = "Score: 0",
-            fontSize = 18.sp,
-            modifier = Modifier.padding(top = 4.dp).testTag("profileScore"))
-    }
+  if (user != null) {
+    Text(
+        text = "Score: ${user.score}",
+        fontSize = 18.sp,
+        modifier = Modifier.padding(top = 4.dp).testTag("profileScore"))
+  } else {
+    Text(
+        text = "Score: 0",
+        fontSize = 18.sp,
+        modifier = Modifier.padding(top = 4.dp).testTag("profileScore"))
+  }
 }
 
 /**
