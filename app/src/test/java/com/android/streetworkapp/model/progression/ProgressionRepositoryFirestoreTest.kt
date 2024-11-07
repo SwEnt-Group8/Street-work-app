@@ -15,6 +15,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
+import org.mockito.Mockito.timeout
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
@@ -80,6 +81,8 @@ class ProgressionRepositoryFirestoreTest {
     `when`(document["eventsJoined"]).thenReturn(0)
     `when`(document["achievements"]).thenReturn(emptyList<Achievement>())
 
+    `when`(collection.whereEqualTo("uid", "test")).thenReturn(collection)
+
     `when`(db.collection("progressions")).thenReturn(collection)
     `when`(collection.document("test")).thenReturn(documentRef)
 
@@ -92,5 +95,24 @@ class ProgressionRepositoryFirestoreTest {
     progressionRepository.getProgression("test", { p -> progression = p }, {})
 
     verify(collection).whereEqualTo("uid", "test")
+  }
+
+  @Test
+  fun getProgressionTest() = runTest {
+
+    // Ensure that mockToDoQuerySnapshot is properly initialized and mocked
+    `when`(collection.get()).thenReturn(Tasks.forResult(query))
+    `when`(collection.whereEqualTo("uid", "test")).thenReturn(collection)
+
+    // Ensure the QuerySnapshot returns a list of mock DocumentSnapshots
+    `when`(query.documents).thenReturn(listOf())
+
+    val onSuccess: (Progression) -> Unit = {}
+    val onFailure: (Exception) -> Unit = {}
+    progressionRepository.getProgression("test", onSuccess, onFailure)
+
+    // Verify that the 'documents' field was accessed
+    org.mockito.kotlin.verify(timeout(100)) { (query).documents }
+    verify(collection).get()
   }
 }
