@@ -45,8 +45,11 @@ class ProfileScreenTest : TestCase() {
 
     // Tests for new components
     composeTestRule.onNodeWithTag("profileRow").assertExists()
-    composeTestRule.onNodeWithTag("profilePicture").assertExists().assertIsDisplayed()
     composeTestRule.onNodeWithTag("profileInfoColumn").assertExists()
+
+    // test profile picture
+    composeTestRule.onNodeWithTag("profilePicture").assertExists()
+    composeTestRule.onNodeWithTag("profilePicture").assertIsDisplayed()
   }
 
   @Test
