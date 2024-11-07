@@ -107,7 +107,7 @@ fun ProgressScreen(navigationActions: NavigationActions, paddingValues: PaddingV
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(vertical = progressBarSize*0.75f),
+            .padding(PaddingValues(0.dp, progressBarSize*0.75f, 0.dp, 0.dp)),
         horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
@@ -223,12 +223,12 @@ fun CircularProgressBar(
 fun MetricCard(label: String, value: String) {
     Box(modifier = Modifier.padding(vertical = 4.dp)) {
         Column(
-            horizontalAlignment = Alignment.Start,
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.border(
                 width = 1.dp,
                 color = Color.LightGray,
                 shape = RoundedCornerShape(8.dp)
-            ).padding(top = 12.dp, bottom = 12.dp, start = 10.dp, end = 36.dp)
+            ).padding(horizontal = 23.dp, vertical = 8.dp)
         ) {
             Text(text = label, fontSize = 13.sp, color = ColorPalette.SECONDARY_TEXT_COLOR)
             Text(text = value, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = ColorPalette.PRIMARY_TEXT_COLOR)
