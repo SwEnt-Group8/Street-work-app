@@ -16,9 +16,37 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class ProfileFriendsListTest {
+class ProfileComponentsTest {
 
   @get:Rule val composeTestRule = createComposeRule()
+
+  @Test
+  fun isNullUserScoreCorrectlyDisplayed() {
+    val user = null
+    composeTestRule.setContent { DisplayScore(user) }
+    composeTestRule.onNodeWithTag("profileScore").assertTextEquals("unknown score")
+  }
+
+  @Test
+  fun isScoreCorrectlyDisplayed() {
+    val user = User("uid-alice", "Alice", "alice@gmail.com", 42, emptyList())
+    composeTestRule.setContent { DisplayScore(user) }
+    composeTestRule.onNodeWithTag("profileScore").assertTextEquals("Score: ${user.score}")
+  }
+
+  @Test
+  fun isNullUsernameCorrectlyDisplayed() {
+    val user = null
+    composeTestRule.setContent { DisplayUsername(user) }
+    composeTestRule.onNodeWithTag("profileUsername").assertTextEquals("unknown user")
+  }
+
+  @Test
+  fun isUsernameCorrectlyDisplayed() {
+    val user = User("uid-alice", "Alice", "alice@gmail.com", 42, emptyList())
+    composeTestRule.setContent { DisplayUsername(user) }
+    composeTestRule.onNodeWithTag("profileUsername").assertTextEquals(user.username)
+  }
 
   @Test
   fun isFriendElementCorrectlyDisplayed() {

@@ -129,7 +129,7 @@ fun DisplayScore(user: User?) {
         modifier = Modifier.padding(top = 4.dp).testTag("profileScore"))
   } else {
     Text(
-        text = "Score: 0",
+        text = "unknown score",
         fontSize = 18.sp,
         modifier = Modifier.padding(top = 4.dp).testTag("profileScore"))
   }
