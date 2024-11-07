@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.android.streetworkapp.model.progression.MedalsAchievement.BRONZE
 import com.android.streetworkapp.model.progression.MedalsAchievement.GOLD
 import com.android.streetworkapp.model.progression.MedalsAchievement.NONE
+import com.android.streetworkapp.model.progression.MedalsAchievement.PLATINUM
 import com.android.streetworkapp.model.progression.MedalsAchievement.SILVER
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -79,6 +80,7 @@ fun getMedalByScore(score: Int): MedalsAchievement {
     Ranks.BRONZE.score -> BRONZE
     Ranks.SILVER.score -> SILVER
     Ranks.GOLD.score -> GOLD
+    Ranks.PLATINUM.score -> PLATINUM
     else -> NONE
   }
 }
