@@ -47,9 +47,21 @@ class ProgressionViewModelTest {
   }
 
   @Test
-  fun checkScoreCallsRepository2() = runTest {
+  fun checkScoreCallsRepository() = runTest {
     progressionViewModel.checkScore(1000)
     testDispatcher.scheduler.advanceUntilIdle()
     verify(repository).updateProgressionWithAchievementAndGoal(any(), any(), any())
   }
+
+  @Test
+  fun getMedalTest() = runTest {
+    assert(getMedalByScore(0)== MedalsAchievement.NONE)
+    assert(getMedalByScore(100)== MedalsAchievement.BRONZE)
+    assert(getMedalByScore(1000)== MedalsAchievement.SILVER)
+    assert(getMedalByScore(10000)== MedalsAchievement.GOLD)
+  }
+
+
+
+
 }
