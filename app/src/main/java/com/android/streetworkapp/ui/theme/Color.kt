@@ -29,6 +29,7 @@ val ButtonRed = Color(0xFFA53A36)
 
 //FIGMA v2 colors
 object ColorPalette {
+    val PRINCIPLE_BACKGROUND_COLOR = Color(0xFFF9F9F9)
     val PRIMARY_TEXT_COLOR = Color(0xFF333333) //Dark grey
     val SECONDARY_TEXT_COLOR = Color(0xFF666666) //Medium Gray
     val INTERACTION_COLOR_DARK = Color(0xFF007BFF) //Blue
