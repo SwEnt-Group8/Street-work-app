@@ -137,12 +137,10 @@ class UserViewModelTest {
   fun loadCurrentUser_calls_repository_with_correct_uid_and_updates_currentUser() = runTest {
     val uid = "user123"
     val user = User(uid, "John Doe", "john@example.com", 100, emptyList())
-    whenever(repository.getUserByUid(uid)).thenReturn(user)
-    userViewModel.loadCurrentUser(uid)
+    userViewModel.loadCurrentUser(user)
     testDispatcher.scheduler.advanceUntilIdle()
     var observedUser: User? = null
     userViewModel.currentUser.observeForever { observedUser = it }
-    verify(repository).getUserByUid(uid)
     assertEquals(user, observedUser)
   }
 

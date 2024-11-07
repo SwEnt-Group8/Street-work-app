@@ -6,6 +6,7 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Route
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -27,29 +28,34 @@ class ProfileScreenTest : TestCase() {
     navigationActions = mock(NavigationActions::class.java)
     // Mock the current route to be the add profile screen
     `when`(navigationActions.currentRoute()).thenReturn(Route.PROFILE)
-    composeTestRule.setContent { ProfileScreen(navigationActions) }
+    composeTestRule.setContent { ProfileScreen(navigationActions, UserViewModel(mock())) }
   }
 
   @Test
   fun hasRequiredComponents() {
     composeTestRule.waitForIdle() // Wait for rendering
     composeTestRule.onNodeWithTag("ProfileScreen").assertExists()
-    composeTestRule.onNodeWithTag("ProfileColumn").assertExists()
     composeTestRule.onNodeWithTag("profileScore").assertExists()
     composeTestRule.onNodeWithTag("profileAddButton").assertExists()
     composeTestRule.onNodeWithTag("profileTrainButton").assertExists()
     composeTestRule.onNodeWithTag("ProfileScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("ProfileColumn").assertIsDisplayed()
     composeTestRule.onNodeWithTag("profileScore").assertIsDisplayed()
     composeTestRule.onNodeWithTag("profileAddButton").assertIsDisplayed()
-    // composeTestRule.onNodeWithTag("profileTrainButton").assertIsDisplayed() =>
-    // weirdly enough Train button dont display ?
+    composeTestRule.onNodeWithTag("profileTrainButton").assertIsDisplayed()
+
+    // Tests for new components
+    composeTestRule.onNodeWithTag("profileRow").assertExists()
+    composeTestRule.onNodeWithTag("profileInfoColumn").assertExists()
+
+    // test profile picture
+    composeTestRule.onNodeWithTag("profilePicture").assertExists()
+    composeTestRule.onNodeWithTag("profilePicture").assertIsDisplayed()
   }
 
   @Test
   fun textCorrectlyDisplayed() {
     composeTestRule.waitForIdle() // Wait for rendering
-    composeTestRule.onNodeWithTag("profileScore").assertTextEquals("Score: 42’424")
+    composeTestRule.onNodeWithTag("profileScore").assertTextEquals("Score: 42424")
     composeTestRule.onNodeWithTag("profileAddButton").assertTextEquals("Add a new friend")
     composeTestRule.onNodeWithTag("profileTrainButton").assertTextEquals("Train with a friend")
   }

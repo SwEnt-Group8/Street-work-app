@@ -114,7 +114,7 @@ class AddFriendScreenTest : TestCase() {
   @Test
   fun testButtonClick_withValidId() = runTest {
     // create fake user id
-    val uid = "user123"
+    val uid = ""
     val fake = "validID"
     // Simulate entering a valid ID inside text field
     composeTestRule.onNodeWithTag("inputID").performTextInput(fake)

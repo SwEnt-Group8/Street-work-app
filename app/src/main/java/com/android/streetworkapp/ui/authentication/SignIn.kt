@@ -49,7 +49,7 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
           onAuthComplete = { result ->
             user = result.user
             checkAndAddUser(user, userViewModel)
-
+            user?.let { firebaseUser -> userViewModel.getUserByUid(firebaseUser.uid) }
             Log.d("SignInScreen", "Sign-in successful user : $user")
             Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
             navigationActions.navigateTo(Screen.MAP)
@@ -59,6 +59,9 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
             Log.d("SignInScreen", "Sign-in failed : $it")
             Toast.makeText(context, "Login failed! : $it", Toast.LENGTH_LONG).show()
           })
+
+  // Observe the user data to check if the user already exists in the database
+  observeAndSetCurrentUser(user, userViewModel)
 
   Box(modifier = Modifier.fillMaxSize().testTag("loginScreenBoxContainer")) {
 
@@ -104,4 +107,33 @@ fun checkAndAddUser(user: FirebaseUser?, userViewModel: UserViewModel) {
       }
   userViewModel.user.observeForever(observer)
   userViewModel.getUserByUid(user.uid)
+}
+
+/**
+ * Observes the user data and adds the user if they don't exist.
+ *
+ * @param user The user to observe and add.
+ * @param userViewModel The [UserViewModel] to use for database operations.
+ */
+fun observeAndSetCurrentUser(user: FirebaseUser?, userViewModel: UserViewModel) {
+  val currentUser = userViewModel.user.value
+  user?.let { firebaseUser ->
+    if (currentUser == null) {
+      // If no existing data, set loggedInUser with default values and add the user
+      val newUser =
+          User(
+              uid = firebaseUser.uid,
+              username = firebaseUser.displayName ?: "Unknown",
+              email = firebaseUser.email ?: "No Email",
+              score = 0,
+              friends = emptyList())
+      userViewModel.addUser(newUser)
+      userViewModel.setCurrentUser(newUser)
+      Log.d("SignInScreen", "New user added: $newUser")
+    } else {
+      // Set loggedInUser with existing data
+      userViewModel.setCurrentUser(currentUser)
+      Log.d("SignInScreen", "Existing user loaded: $currentUser")
+    }
+  }
 }

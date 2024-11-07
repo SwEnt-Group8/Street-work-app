@@ -161,6 +161,7 @@ dependencies {
     implementation (libs.androidx.material.icons.extended)
     implementation(libs.androidx.navigation.testing)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.runtime.livedata)
     testImplementation(libs.json)
     implementation(libs.okhttp)
     implementation(libs.androidx.core.ktx)
@@ -194,6 +195,8 @@ dependencies {
 
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.graphics)
+    // Image loading library
+    implementation(libs.coil.compose)
     // Material Design 3
     implementation(libs.compose.material3)
     // Integration with activities

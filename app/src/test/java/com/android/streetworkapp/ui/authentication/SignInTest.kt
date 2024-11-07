@@ -1,9 +1,10 @@
-package com.android.streetworkapp.ui.authentication
-
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.MutableLiveData
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
+import com.android.streetworkapp.ui.authentication.checkAndAddUser
+import com.android.streetworkapp.ui.authentication.observeAndSetCurrentUser
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -14,24 +15,32 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito.*
+import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnit
-import org.mockito.junit.MockitoRule
 import org.mockito.kotlin.any
+import org.mockito.kotlin.spy
+import org.mockito.kotlin.verify
 
 @ExperimentalCoroutinesApi
 class SignInTest {
 
-  @get:Rule val mockitoRule: MockitoRule = MockitoJUnit.rule()
+  @get:Rule val mockitoRule = MockitoJUnit.rule()
   @get:Rule val instantExecutorRule = InstantTaskExecutorRule()
 
   private lateinit var userViewModel: UserViewModel
   @Mock lateinit var repository: UserRepository
   private val testDispatcher = StandardTestDispatcher()
+  @Mock private lateinit var firebaseUser: FirebaseUser
+  private val fakeUserLiveData = MutableLiveData<User?>()
 
   @Before
   fun setup() {
+    MockitoAnnotations.openMocks(this)
     Dispatchers.setMain(testDispatcher)
-    userViewModel = UserViewModel(repository)
+
+    // Create a spy on UserViewModel and set the MutableLiveData directly
+    userViewModel = spy(UserViewModel(repository))
+    `when`(userViewModel.user).thenReturn(fakeUserLiveData)
   }
 
   @After
@@ -41,17 +50,13 @@ class SignInTest {
 
   @Test
   fun checkAndAddUser_withExistingUser_doesNotAddUser() = runTest {
-    // Given a FirebaseUser
-    val firebaseUser =
-        mock(FirebaseUser::class.java).apply {
-          `when`(uid).thenReturn("user123")
-          `when`(displayName).thenReturn("John Doe")
-          `when`(email).thenReturn("john@example.com")
-        }
+    // Given a FirebaseUser and an existing user in the repository
+    `when`(firebaseUser.uid).thenReturn("user123")
+    `when`(firebaseUser.displayName).thenReturn("John Doe")
+    `when`(firebaseUser.email).thenReturn("john@example.com")
 
-    // Mock the repository to return an existing user (user already exists)
     val existingUser = User("user123", "John Doe", "john@example.com", 100, emptyList())
-    `when`(repository.getUserByUid("user123")).thenReturn(existingUser)
+    fakeUserLiveData.value = existingUser
 
     // Call the function
     checkAndAddUser(firebaseUser, userViewModel)
@@ -71,5 +76,44 @@ class SignInTest {
     // Verify that getUserByUid and addUser are not called
     verify(repository, never()).getUserByUid(any())
     verify(repository, never()).addUser(any())
+  }
+
+  @Test
+  fun `observeAndSetCurrentUser adds new user if user does not exist`() = runTest {
+    // Given a FirebaseUser and no user in the repository
+    `when`(firebaseUser.uid).thenReturn("newUser123")
+    `when`(firebaseUser.displayName).thenReturn("New User")
+    `when`(firebaseUser.email).thenReturn("newuser@example.com")
+    fakeUserLiveData.value = null // Simulate no user initially
+
+    // Call the observeAndSetCurrentUser function
+    observeAndSetCurrentUser(firebaseUser, userViewModel)
+
+    val expectedUser =
+        User(
+            uid = "newUser123",
+            username = "New User",
+            email = "newuser@example.com",
+            score = 0,
+            friends = emptyList())
+
+    // Verify that addUser and setCurrentUser were called with the expected user
+    verify(userViewModel).addUser(expectedUser)
+    verify(userViewModel).setCurrentUser(expectedUser)
+  }
+
+  @Test
+  fun `observeAndSetCurrentUser sets existing user if user already exists`() = runTest {
+    // Given a FirebaseUser and an existing user in the LiveData
+    val existingUser = User("user123", "Existing User", "existing@example.com", 100, emptyList())
+    fakeUserLiveData.value = existingUser
+    `when`(firebaseUser.uid).thenReturn("user123")
+
+    // Call the observeAndSetCurrentUser function
+    observeAndSetCurrentUser(firebaseUser, userViewModel)
+
+    // Verify that addUser was not called and setCurrentUser was called with the existing user
+    verify(userViewModel, never()).addUser(any())
+    verify(userViewModel).setCurrentUser(existingUser)
   }
 }

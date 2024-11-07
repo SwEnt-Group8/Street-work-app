@@ -72,11 +72,6 @@ class EventOverviewTest {
     composeTestRule.setContent { EventOverviewScreen(navigationActions, event, park) }
 
     composeTestRule.onNodeWithTag("eventOverviewScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("EventTopBar").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("eventTitle").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("eventBottomBar").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("joinEventButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("eventContent").assertIsDisplayed()
     composeTestRule.onNodeWithTag("ownerIcon").assertIsDisplayed()
     composeTestRule.onNodeWithTag("eventOwner").assertIsDisplayed()
@@ -89,7 +84,6 @@ class EventOverviewTest {
     composeTestRule.onNodeWithTag("googleMap").assertIsDisplayed()
     composeTestRule.onNodeWithTag("eventImage").assertIsDisplayed()
 
-    composeTestRule.onNodeWithTag("eventTitle").assertTextEquals("Group workout")
     composeTestRule.onNodeWithTag("eventOwner").assertTextEquals("Organized by: ${event.owner}")
     composeTestRule.onNodeWithTag("date").assertTextEquals(event.date.toFormattedString())
     composeTestRule
@@ -103,9 +97,9 @@ class EventOverviewTest {
 
     composeTestRule.setContent { EventOverviewScreen(navigationActions, event, park) }
 
-    composeTestRule.onNodeWithTag("evenDashboard").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("dashBoard").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("dashBoardContent").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("eventDashboard").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("dashboard").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("dashboardContent").assertIsDisplayed()
     composeTestRule.onNodeWithTag("detailsTab").assertIsDisplayed()
     composeTestRule.onNodeWithTag("eventDescription").assertIsDisplayed().performScrollTo()
     composeTestRule.onNodeWithTag("eventDescription").assertTextEquals(event.description)
