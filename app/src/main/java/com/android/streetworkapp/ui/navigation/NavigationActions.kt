@@ -28,6 +28,7 @@ object Screen {
   const val ADD_FRIEND = "AddFriend Screen"
   const val PARK_OVERVIEW = "Park Overview Screen"
   const val ADD_EVENT = "Add Event Screen"
+  const val EVENT_OVERVIEW = "Event Overview Screen"
   const val PROGRESSION = "Progression Screen"
   const val UNK = "TBD Screen" // TODO: not yet defined
 }
@@ -35,57 +36,82 @@ object Screen {
 data class ScreenParams(
     val screenName: String,
     val isBottomBarVisible: Boolean,
+    val bottomBarType: BottomNavigationMenuType,
     val isTopBarVisible: Boolean,
     val topAppBarManager: TopAppBarManager?
 ) {
-  companion object {
-    val AUTH = ScreenParams(Screen.AUTH, isBottomBarVisible = false, isTopBarVisible = false, null)
-    val MAP =
-        ScreenParams(
-            Screen.MAP, isBottomBarVisible = true, isTopBarVisible = true, TopAppBarManager("Map"))
-    val PROFILE =
-        ScreenParams(
-            Screen.PROFILE,
-            isBottomBarVisible = true,
-            isTopBarVisible = true,
-            TopAppBarManager("My Profile"))
-    val ADD_FRIEND =
-        ScreenParams(
-            Screen.ADD_FRIEND,
-            isBottomBarVisible = true,
-            isTopBarVisible = true,
-            TopAppBarManager(
-                "Add a new Friend",
-                hasNavigationIcon = true,
-                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
-    val PARK_OVERVIEW =
-        ScreenParams(
-            Screen.PARK_OVERVIEW,
-            isBottomBarVisible = true,
-            isTopBarVisible = true,
-            TopAppBarManager(
-                "Park Overview",
-                hasNavigationIcon = true,
-                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
-    val ADD_EVENT =
-        ScreenParams(
-            Screen.ADD_EVENT,
-            isBottomBarVisible = true,
-            isTopBarVisible = true,
-            TopAppBarManager(
-                "Event Creation",
-                hasNavigationIcon = true,
-                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
-    val PROGRESSION =
-          ScreenParams(
-              Screen.PROGRESSION,
-              isBottomBarVisible = true,
-              isTopBarVisible = true,
-              TopAppBarManager(
-                  "My Progress",
-                  hasNavigationIcon = false))
-
-  }
+    companion object {
+        val AUTH =
+            ScreenParams(
+                Screen.AUTH,
+                isBottomBarVisible = false,
+                BottomNavigationMenuType.NONE,
+                isTopBarVisible = false,
+                null)
+        val MAP =
+            ScreenParams(
+                Screen.MAP,
+                isBottomBarVisible = true,
+                BottomNavigationMenuType.DEFAULT,
+                isTopBarVisible = true,
+                TopAppBarManager("Map"))
+        val PROFILE =
+            ScreenParams(
+                Screen.PROFILE,
+                isBottomBarVisible = true,
+                BottomNavigationMenuType.DEFAULT,
+                isTopBarVisible = true,
+                TopAppBarManager("My Profile"))
+        val ADD_FRIEND =
+            ScreenParams(
+                Screen.ADD_FRIEND,
+                isBottomBarVisible = true,
+                BottomNavigationMenuType.DEFAULT,
+                isTopBarVisible = true,
+                TopAppBarManager(
+                    "Add a new Friend",
+                    hasNavigationIcon = true,
+                    navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
+        val PARK_OVERVIEW =
+            ScreenParams(
+                Screen.PARK_OVERVIEW,
+                isBottomBarVisible = true,
+                BottomNavigationMenuType.DEFAULT,
+                isTopBarVisible = true,
+                TopAppBarManager(
+                    "<Park Name>",
+                    hasNavigationIcon = true,
+                    navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
+        val ADD_EVENT =
+            ScreenParams(
+                Screen.ADD_EVENT,
+                isBottomBarVisible = true,
+                BottomNavigationMenuType.DEFAULT,
+                isTopBarVisible = true,
+                TopAppBarManager(
+                    "Event Creation",
+                    hasNavigationIcon = true,
+                    navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
+        val EVENT_OVERVIEW =
+            ScreenParams(
+                Screen.EVENT_OVERVIEW,
+                isBottomBarVisible = true,
+                BottomNavigationMenuType.EVENT_OVERVIEW,
+                isTopBarVisible = true,
+                TopAppBarManager(
+                    "<Event Name>",
+                    hasNavigationIcon = true,
+                    navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
+        val PROGRESSION =
+            ScreenParams(
+                Screen.PROGRESSION,
+                isBottomBarVisible = true,
+                BottomNavigationMenuType.DEFAULT,
+                isTopBarVisible = true,
+                TopAppBarManager(
+                    "My Progress",
+                    hasNavigationIcon = false))
+    }
 }
 
 val LIST_OF_SCREENS =
@@ -96,6 +122,7 @@ val LIST_OF_SCREENS =
         ScreenParams.ADD_FRIEND,
         ScreenParams.PARK_OVERVIEW,
         ScreenParams.ADD_EVENT,
+        ScreenParams.EVENT_OVERVIEW,
         ScreenParams.PROGRESSION
     )
 
