@@ -1,6 +1,7 @@
 package com.android.streetworkapp.model.progression
 
 import androidx.test.core.app.ApplicationProvider
+import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.CollectionReference
@@ -67,5 +68,29 @@ class ProgressionRepositoryFirestoreTest {
 
     progressionRepository.createProgression("test", "test")
     verify(documentRef).set(Progression("test", "test", Ranks.BRONZE.score))
+  }
+
+  @Test
+  fun documentToProgressionTest() = runTest {
+    `when`(document.exists()).thenReturn(true)
+    `when`(document.id).thenReturn("test")
+    `when`(document["uid"]).thenReturn("test")
+    `when`(document["currentGoal"]).thenReturn(100)
+    `when`(document["eventsCreated"]).thenReturn(0)
+    `when`(document["eventsJoined"]).thenReturn(0)
+    `when`(document["achievements"]).thenReturn(emptyList<Achievement>())
+
+    `when`(db.collection("progressions")).thenReturn(collection)
+    `when`(collection.document("test")).thenReturn(documentRef)
+
+    val taskCompletionSource = TaskCompletionSource<DocumentSnapshot>()
+    taskCompletionSource.setResult(document)
+    val task = taskCompletionSource.task
+    `when`(documentRef.get()).thenReturn(task)
+
+    var progression = Progression()
+    progressionRepository.getProgression("test", { p -> progression = p }, {})
+
+    verify(collection).whereEqualTo("uid", "test")
   }
 }
