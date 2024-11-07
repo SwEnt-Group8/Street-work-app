@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -36,7 +37,11 @@ import com.google.firebase.ktx.Firebase
 fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewModel) {
 
   // This part of the code handles google sign-in :
-  var user by remember { mutableStateOf(Firebase.auth.currentUser) }
+  var firebaseUser by remember { mutableStateOf(Firebase.auth.currentUser) }
+
+  val mvvm_user by userViewModel.currentUser.observeAsState()
+  val user_friends by userViewModel.friends.observeAsState()
+
   val token = stringResource(R.string.default_web_client_id)
   val context = LocalContext.current
 
@@ -47,21 +52,24 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
   val launcher =
       authService.rememberFirebaseAuthLauncher(
           onAuthComplete = { result ->
-            user = result.user
-            checkAndAddUser(user, userViewModel)
-            user?.let { firebaseUser -> userViewModel.getUserByUid(firebaseUser.uid) }
-            Log.d("SignInScreen", "Sign-in successful user : $user")
+            firebaseUser = result.user
+            checkAndAddUser(firebaseUser, userViewModel)
+            firebaseUser?.let { firebaseUser -> userViewModel.getUserByUid(firebaseUser.uid) }
+            Log.d("SignInScreen", "Sign-in successful user : $firebaseUser")
             Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
+            Log.d("SignInScreen", "current user : ${firebaseUser!!.displayName}")
+            Log.d("SignInScreen", "current user (mvvm) : $mvvm_user")
+            Log.d("SignInScreen", "current user friends : $user_friends")
             navigationActions.navigateTo(Screen.MAP)
           },
           onAuthError = {
-            user = null
+            firebaseUser = null
             Log.d("SignInScreen", "Sign-in failed : $it")
             Toast.makeText(context, "Login failed! : $it", Toast.LENGTH_LONG).show()
           })
 
   // Observe the user data to check if the user already exists in the database
-  observeAndSetCurrentUser(user, userViewModel)
+  // observeAndSetCurrentUser(user, userViewModel)
 
   Box(modifier = Modifier.fillMaxSize().testTag("loginScreenBoxContainer")) {
 
@@ -98,6 +106,7 @@ fun checkAndAddUser(user: FirebaseUser?, userViewModel: UserViewModel) {
         override fun onChanged(value: User?) {
           if (value == null) {
             // User doesn't exist, so add them
+            Log.d("SignInScreen", "User ${user.displayName} doesn't exist, adding user to database")
             val newUser = User(user.uid, user.displayName!!, user.email!!, 0, emptyList())
             userViewModel.addUser(newUser)
           }
@@ -106,7 +115,10 @@ fun checkAndAddUser(user: FirebaseUser?, userViewModel: UserViewModel) {
         }
       }
   userViewModel.user.observeForever(observer)
+  Log.d("SignInScreen", "MVVM - getting user by uid for user ${user.displayName}")
   userViewModel.getUserByUid(user.uid)
+  Log.d("SignInScreen", "MVVM - getting friends by uid for user ${user.displayName}")
+  userViewModel.getFriendsByUid(user.uid)
 }
 
 /**
@@ -116,10 +128,14 @@ fun checkAndAddUser(user: FirebaseUser?, userViewModel: UserViewModel) {
  * @param userViewModel The [UserViewModel] to use for database operations.
  */
 fun observeAndSetCurrentUser(user: FirebaseUser?, userViewModel: UserViewModel) {
+  Log.d("SignInScreen", "Entered observeAndSetCurrentUser")
   val currentUser = userViewModel.user.value
   user?.let { firebaseUser ->
     if (currentUser == null) {
       // If no existing data, set loggedInUser with default values and add the user
+      Log.d(
+          "SignInScreen",
+          "[observeAndSet] User ${user.displayName} doesn't exist, adding user to database")
       val newUser =
           User(
               uid = firebaseUser.uid,
@@ -133,6 +149,7 @@ fun observeAndSetCurrentUser(user: FirebaseUser?, userViewModel: UserViewModel) 
     } else {
       // Set loggedInUser with existing data
       userViewModel.setCurrentUser(currentUser)
+      userViewModel.getFriendsByUid(currentUser.uid)
       Log.d("SignInScreen", "Existing user loaded: $currentUser")
     }
   }
