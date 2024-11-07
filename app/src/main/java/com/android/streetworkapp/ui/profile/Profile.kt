@@ -111,6 +111,7 @@ fun ProfileScreen(
  */
 @Composable
 fun DisplayUsername(user: User?) {
+  val UNKNOWN_USER_MESSAGE = "unknown user"
   if (user != null) {
     Text(
         text = user.username,
@@ -119,11 +120,12 @@ fun DisplayUsername(user: User?) {
         modifier = Modifier.padding(top = 8.dp).testTag("profileUsername"))
   } else {
     Text(
-        text = "unknown user",
+        text = UNKNOWN_USER_MESSAGE,
         fontSize = 18.sp,
         modifier = Modifier.padding(top = 8.dp).testTag("profileUsername"))
   }
 }
+
 /**
  * This function displays the user's score.
  *
@@ -131,6 +133,7 @@ fun DisplayUsername(user: User?) {
  */
 @Composable
 fun DisplayScore(user: User?) {
+  val UNKNOWN_SCORE_MESSAGE = "unknown score"
   if (user != null) {
     Text(
         text = "Score: ${user.score}",
@@ -138,7 +141,7 @@ fun DisplayScore(user: User?) {
         modifier = Modifier.padding(top = 4.dp).testTag("profileScore"))
   } else {
     Text(
-        text = "unknown score",
+        text = UNKNOWN_SCORE_MESSAGE,
         fontSize = 18.sp,
         modifier = Modifier.padding(top = 4.dp).testTag("profileScore"))
   }
@@ -151,6 +154,8 @@ fun DisplayScore(user: User?) {
  */
 @Composable
 fun DisplayFriendList(friends: List<User?>) {
+  val NO_FRIENDS_MESSAGE = "You have no friends yet :("
+
   return if (friends.isNotEmpty()) {
     LazyColumn(modifier = Modifier.fillMaxSize().testTag("friendList")) {
       items(friends) { friend ->
@@ -164,7 +169,7 @@ fun DisplayFriendList(friends: List<User?>) {
     Text(
         modifier = Modifier.testTag("emptyFriendListText").padding(top = 25.dp),
         fontSize = 20.sp,
-        text = "You have no friends yet :(")
+        text = NO_FRIENDS_MESSAGE)
   }
 }
 
@@ -176,6 +181,9 @@ fun DisplayFriendList(friends: List<User?>) {
 @Composable
 fun DisplayFriendItem(friend: User) {
   val context = LocalContext.current
+
+  val DEFAULT_USER_STATUS = "Definitely not a bot"
+
   Row(
       modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("friendItem"),
       verticalAlignment = Alignment.CenterVertically) {
@@ -203,7 +211,7 @@ fun DisplayFriendItem(friend: User) {
               color = Color.Gray,
               modifier = Modifier.testTag("friendScore"))
           Text(
-              text = "Definitely not a bot",
+              text = DEFAULT_USER_STATUS,
               fontSize = 14.sp,
               color = Color.Gray,
               modifier = Modifier.testTag("friendStatus"))

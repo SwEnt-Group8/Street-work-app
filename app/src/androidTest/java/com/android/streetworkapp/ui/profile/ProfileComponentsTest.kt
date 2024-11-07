@@ -23,8 +23,9 @@ class ProfileComponentsTest {
   @Test
   fun isNullUserScoreCorrectlyDisplayed() {
     val user = null
+    val UNKNOWN_SCORE_MESSAGE = "unknown score"
     composeTestRule.setContent { DisplayScore(user) }
-    composeTestRule.onNodeWithTag("profileScore").assertTextEquals("unknown score")
+    composeTestRule.onNodeWithTag("profileScore").assertTextEquals(UNKNOWN_SCORE_MESSAGE)
   }
 
   @Test
@@ -37,8 +38,9 @@ class ProfileComponentsTest {
   @Test
   fun isNullUsernameCorrectlyDisplayed() {
     val user = null
+    val UNKNOWN_USER_MESSAGE = "unknown user"
     composeTestRule.setContent { DisplayUsername(user) }
-    composeTestRule.onNodeWithTag("profileUsername").assertTextEquals("unknown user")
+    composeTestRule.onNodeWithTag("profileUsername").assertTextEquals(UNKNOWN_USER_MESSAGE)
   }
 
   @Test
@@ -51,6 +53,8 @@ class ProfileComponentsTest {
   @Test
   fun isFriendElementCorrectlyDisplayed() {
     val friend = User("uid-alice", "Alice", "alice@gmail.com", 42, emptyList())
+    val DEFAULT_USER_STATUS = "Definitely not a bot"
+
     composeTestRule.setContent { DisplayFriendItem(friend) }
 
     composeTestRule.onNodeWithTag("friendProfilePicture").assertExists().assertIsDisplayed()
@@ -71,7 +75,7 @@ class ProfileComponentsTest {
         .onNodeWithTag("friendStatus")
         .assertExists()
         .assertIsDisplayed()
-        .assertTextEquals("Definitely not a bot")
+        .assertTextEquals(DEFAULT_USER_STATUS)
 
     composeTestRule.onNodeWithTag("friendSettingButton").assertExists().assertIsDisplayed()
   }
@@ -100,13 +104,15 @@ class ProfileComponentsTest {
   @Test
   fun isEmptyListCorrectlyDisplayed() {
     val friends = emptyList<User>()
+    val NO_FRIENDS_MESSAGE = "You have no friends yet :("
+
     composeTestRule.setContent { DisplayFriendList(friends) }
 
     composeTestRule
         .onNodeWithTag("emptyFriendListText")
         .assertExists()
         .assertIsDisplayed()
-        .assertTextEquals("You have no friends yet :(")
+        .assertTextEquals(NO_FRIENDS_MESSAGE)
 
     composeTestRule.onNodeWithTag("friendList").assertIsNotDisplayed()
   }
