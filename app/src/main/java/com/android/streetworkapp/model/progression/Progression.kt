@@ -3,6 +3,7 @@ package com.android.streetworkapp.model.progression
 import com.android.sample.R
 
 data class Progression(
+    val progressionId: String = "None",
     val uid: String = "None",
     var currentGoal: Int = Ranks.BRONZE.score,
     var eventsCreated: Int = 0,

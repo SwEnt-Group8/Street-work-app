@@ -1,6 +1,5 @@
 package com.android.streetworkapp.model.progression
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.streetworkapp.model.progression.MedalsAchievement.BRONZE
@@ -21,16 +20,13 @@ open class ProgressionViewModel(private val repository: ProgressionRepository) :
     return repository.getNewProgressionId()
   }
 
-  fun getCurrentProgression(uid: String) {
-    repository.getProgression(
-        uid = uid,
-        onSuccess = { _currentProgression.value = it },
-        onFailure = { Log.e("FirestoreError", "Error getting events: ${it.message}") })
+  suspend fun getCurrentProgression(uid: String) {
+    _currentProgression.value = repository.getProgression(uid)
   }
 
-  fun createProgression(uid: String) = viewModelScope.launch { repository.createProgression(uid) }
+  fun createProgression(uid: String,progressionId: String) = viewModelScope.launch { repository.createProgression(uid,progressionId) }
 
-  fun checkScore(score: Int) {
+  suspend fun checkScore(score: Int) {
     if (_currentProgression.value.currentGoal < score) {
 
       _currentProgression.value.currentGoal *= 10
@@ -40,7 +36,7 @@ open class ProgressionViewModel(private val repository: ProgressionRepository) :
 
       _currentProgression.value.achievements = newAchievements
 
-      repository.updateProgression(_currentProgression.value)
+      repository.updateProgressionWithAchievementAndGoal(_currentProgression.value.progressionId,newAchievements,_currentProgression.value.currentGoal)
     }
   }
 }

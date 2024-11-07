@@ -4,9 +4,13 @@ interface ProgressionRepository {
 
   fun getNewProgressionId(): String
 
-  fun getProgression(uid: String, onSuccess: (Progression) -> Unit, onFailure: (Exception) -> Unit)
+  suspend fun getProgression(uid: String): Progression
 
-  fun updateProgression(progression: Progression)
+  suspend fun updateProgressionWithAchievementAndGoal(
+      progressionId: String,
+      achievements: List<String>,
+      goal: Int
+  )
 
-  suspend fun createProgression(uid: String)
+  suspend fun createProgression(uid: String, progressionId: String)
 }
