@@ -83,19 +83,17 @@ class EventRepositoryFirestoreTest {
 
   @SuppressLint("CheckResult")
   @Test
-  fun getEvents_calls_collection_get() {
+  fun getEventByEid_calls_document() = runTest {
     // Ensure that mockToDoQuerySnapshot is properly initialized and mocked
     `when`(collection.get()).thenReturn(Tasks.forResult(query))
 
     // Ensure the QuerySnapshot returns a list of mock DocumentSnapshots
     `when`(query.documents).thenReturn(listOf())
 
-    val onSuccess: (List<Event>) -> Unit = {}
-    val onFailure: (Exception) -> Unit = {}
-    eventRepository.getEvents(onSuccess, onFailure)
+    eventRepository.getEventByEid("123")
 
     // Verify that the 'documents' field was accessed
     org.mockito.kotlin.verify(timeout(100)) { (query).documents }
-    verify(collection).get()
+    verify(collection).document("123")
   }
 }

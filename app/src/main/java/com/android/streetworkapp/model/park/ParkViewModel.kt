@@ -24,7 +24,7 @@ open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
    * @param park The park to set as the current park.
    */
   fun setCurrentPark(park: Park?) {
-    _currentPark.value = park
+    _currentPark.postValue(park)
   }
 
   /**

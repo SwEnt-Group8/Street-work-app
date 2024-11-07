@@ -70,7 +70,7 @@ fun ParkOverviewScreen(
 ) {
   val currentPark by parkViewModel.currentPark.observeAsState()
 
-  eventViewModel.getEvents(currentPark!!)
+  currentPark?.let { eventViewModel.getEvents(it) }
 
   Box(modifier = Modifier.padding(innerPadding).fillMaxSize().testTag("parkOverviewScreen")) {
     Column {
@@ -218,6 +218,7 @@ fun EventItemList(eventViewModel: EventViewModel, navigationActions: NavigationA
     when (uiState) {
       is EventOverviewUiState.NotEmpty -> {
         LazyColumn {
+          println("EventItemList: ${uiState.eventList}")
           items(uiState.eventList) { event -> EventItem(event, eventViewModel, navigationActions) }
         }
       }

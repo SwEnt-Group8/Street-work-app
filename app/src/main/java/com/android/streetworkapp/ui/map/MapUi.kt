@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.streetworkapp.model.park.ParkViewModel
-import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
@@ -42,7 +41,6 @@ fun MapScreen(
 
   LaunchedEffect(initialLatLng) {
     parkLocationViewModel.findNearbyParks(initialLatLng.latitude, initialLatLng.longitude)
-    parkViewModel.getOrCreateParkByLocation(ParkLocation(0.0, 0.0, "default"))
   }
 
   val parks = parkLocationViewModel.parks.collectAsState().value

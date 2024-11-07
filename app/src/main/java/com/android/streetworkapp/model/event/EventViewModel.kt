@@ -35,6 +35,10 @@ open class EventViewModel(private val repository: EventRepository) : ViewModel()
     }
   }
 
+  fun setUiState(state: EventOverviewUiState) {
+    _uiState.value = state
+  }
+
   /**
    * Get a new event ID.
    *
@@ -51,9 +55,11 @@ open class EventViewModel(private val repository: EventRepository) : ViewModel()
           park,
           onSuccess = {
             if (it.isEmpty()) {
-              _uiState.value = EventOverviewUiState.Empty
+              Log.d("EventViewModel", "No events found")
+              setUiState(EventOverviewUiState.Empty)
             } else {
-              _uiState.value = EventOverviewUiState.NotEmpty(it)
+              Log.d("EventViewModel", "lesgo it is not empty event: $it")
+              setUiState(EventOverviewUiState.NotEmpty(it))
             }
           },
           onFailure = { Log.e("FirestoreError", "Error getting events: ${it.message}") })
