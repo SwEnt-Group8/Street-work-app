@@ -1,26 +1,27 @@
 package com.android.streetworkapp.model.user
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 open class UserViewModel(private val repository: UserRepository) : ViewModel() {
 
-  // LiveData to hold the current user
-  private val _currentUser = MutableLiveData<User?>()
-  val currentUser: LiveData<User?>
+  // MutableStateFlow to hold the current values
+  private val _currentUser = MutableStateFlow<User?>(null)
+  val currentUser: StateFlow<User?>
     get() = _currentUser
 
-  private val _user = MutableLiveData<User?>()
-  val user: LiveData<User?>
+  private val _user = MutableStateFlow<User?>(null)
+  val user: StateFlow<User?>
     get() = _user
 
-  private val _friends = MutableLiveData<List<User>?>()
-  val friends: LiveData<List<User>?>
+  private val _friends = MutableStateFlow<List<User?>>(emptyList())
+  val friends: StateFlow<List<User?>>
     get() = _friends
 
   /**
@@ -41,7 +42,7 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
     if (user != null) {
       require(user.uid.isNotEmpty()) { "UID must not be empty" }
     }
-    viewModelScope.launch { _currentUser.setValue(user) }
+    viewModelScope.launch { _currentUser.value = user }
   }
 
   // Companion object to provide a factory for UserViewModel
@@ -73,9 +74,13 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @return The User object if found, or null if the user doesn't exist or an error occurs.
    */
   fun getUserByUid(uid: String) {
+    Log.d("DEBUGSWENT", "Getting user by uid: $uid")
     viewModelScope.launch {
       val user = repository.getUserByUid(uid)
-      _user.setValue(user)
+      Log.d("DEBUGSWENT", "Fetched user: $user")
+      if (user != null) {
+        _user.value = user
+      }
     }
   }
 
@@ -88,7 +93,7 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
   fun getUserByEmail(email: String) {
     viewModelScope.launch {
       val fetchedUser = repository.getUserByEmail(email)
-      _user.setValue(fetchedUser)
+      _user.value = fetchedUser
     }
   }
 
@@ -101,7 +106,7 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
   fun getUserByUserName(userName: String) {
     viewModelScope.launch {
       val fetchedUser = repository.getUserByUserName(userName)
-      _user.setValue(fetchedUser)
+      _user.value = fetchedUser
     }
   }
 
@@ -112,9 +117,13 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @return A list of User objects representing the user's friends.
    */
   fun getFriendsByUid(uid: String) {
+    Log.d("DEBUGSWENT", "Getting friends by uid: $uid")
     viewModelScope.launch {
       val fetchedFriends = repository.getFriendsByUid(uid)
-      _friends.setValue(fetchedFriends)
+      Log.d("DEBUGSWENT", "Fetched friends: $fetchedFriends")
+      if (fetchedFriends != null) {
+        _friends.value = fetchedFriends
+      }
     }
   }
 
