@@ -1,5 +1,4 @@
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.MutableLiveData
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
@@ -8,6 +7,7 @@ import com.android.streetworkapp.ui.authentication.observeAndSetCurrentUser
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.*
 import org.junit.After
 import org.junit.Before
@@ -31,16 +31,16 @@ class SignInTest {
   @Mock lateinit var repository: UserRepository
   private val testDispatcher = StandardTestDispatcher()
   @Mock private lateinit var firebaseUser: FirebaseUser
-  private val fakeUserLiveData = MutableLiveData<User?>()
+  private val fakeUserStateFlow = MutableStateFlow<User?>(null)
 
   @Before
   fun setup() {
     MockitoAnnotations.openMocks(this)
     Dispatchers.setMain(testDispatcher)
 
-    // Create a spy on UserViewModel and set the MutableLiveData directly
+    // Create a spy on UserViewModel and set the MutableStateFlow directly
     userViewModel = spy(UserViewModel(repository))
-    `when`(userViewModel.user).thenReturn(fakeUserLiveData)
+    `when`(userViewModel.user).thenReturn(fakeUserStateFlow)
   }
 
   @After
@@ -56,7 +56,7 @@ class SignInTest {
     `when`(firebaseUser.email).thenReturn("john@example.com")
 
     val existingUser = User("user123", "John Doe", "john@example.com", 100, emptyList())
-    fakeUserLiveData.value = existingUser
+    fakeUserStateFlow.value = existingUser
 
     // Call the function
     checkAndAddUser(firebaseUser, userViewModel)
@@ -84,7 +84,7 @@ class SignInTest {
     `when`(firebaseUser.uid).thenReturn("newUser123")
     `when`(firebaseUser.displayName).thenReturn("New User")
     `when`(firebaseUser.email).thenReturn("newuser@example.com")
-    fakeUserLiveData.value = null // Simulate no user initially
+    fakeUserStateFlow.value = null // Simulate no user initially
 
     // Call the observeAndSetCurrentUser function
     observeAndSetCurrentUser(firebaseUser, userViewModel)
@@ -106,7 +106,7 @@ class SignInTest {
   fun `observeAndSetCurrentUser sets existing user if user already exists`() = runTest {
     // Given a FirebaseUser and an existing user in the LiveData
     val existingUser = User("user123", "Existing User", "existing@example.com", 100, emptyList())
-    fakeUserLiveData.value = existingUser
+    fakeUserStateFlow.value = existingUser
     `when`(firebaseUser.uid).thenReturn("user123")
 
     // Call the observeAndSetCurrentUser function
