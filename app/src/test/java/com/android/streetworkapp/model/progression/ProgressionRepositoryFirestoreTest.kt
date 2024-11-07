@@ -116,19 +116,14 @@ class ProgressionRepositoryFirestoreTest {
     verify(collection).get()
   }
 
-
   @Test
   fun AchievementAndGoalTest() = runTest {
-
     `when`(collection.document("test")).thenReturn(documentRef)
-    //check .update("currentGoal", goal, "achievements", achievements)
-    `when`(documentRef.update("currentGoal", 0, "achievements", emptyList<Achievement>())).thenReturn(Tasks.forResult(null))
+    // check .update("currentGoal", goal, "achievements", achievements)
+    `when`(documentRef.update("currentGoal", 0, "achievements", emptyList<Achievement>()))
+        .thenReturn(Tasks.forResult(null))
 
-    progressionRepository.updateProgressionWithAchievementAndGoal("test", emptyList(),0)
+    progressionRepository.updateProgressionWithAchievementAndGoal("test", emptyList(), 0)
     verify(documentRef).update("currentGoal", 0, "achievements", emptyList<Achievement>())
-
   }
-
-
-
 }
