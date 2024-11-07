@@ -85,29 +85,10 @@ fun ProfileScreen(
                       .testTag("profilePicture"))
 
           // username text
-          if (currentUser != null) {
-            Text(
-                text = currentUser.username,
-                fontSize = 18.sp,
-                modifier = Modifier.padding(top = 8.dp).testTag("profileUsername"))
-          } else {
-            Text(
-                text = "unknown user",
-                fontSize = 18.sp,
-                modifier = Modifier.padding(top = 8.dp).testTag("profileUsername"))
-          }
+          DisplayUsername(currentUser)
+
           // score text
-          if (currentUser != null) {
-            Text(
-                text = "Score: ${currentUser.score}",
-                fontSize = 18.sp,
-                modifier = Modifier.padding(top = 4.dp).testTag("profileScore"))
-          } else {
-            Text(
-                text = "Score: 0",
-                fontSize = 18.sp,
-                modifier = Modifier.padding(top = 4.dp).testTag("profileScore"))
-          }
+          DisplayScore(currentUser)
 
           Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             // Add Friend Button
@@ -121,6 +102,37 @@ fun ProfileScreen(
           Log.d("SignInScreen", "friendList : ${friendList}")
         }
   }
+}
+
+@Composable
+fun DisplayUsername(user: User?) {
+  if (user != null) {
+    Text(
+        text = user.username,
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(top = 8.dp).testTag("profileUsername"))
+  } else {
+    Text(
+        text = "unknown user",
+        fontSize = 18.sp,
+        modifier = Modifier.padding(top = 8.dp).testTag("profileUsername"))
+  }
+}
+
+@Composable
+fun DisplayScore(user: User?) {
+    if (user != null) {
+        Text(
+            text = "Score: ${user.score}",
+            fontSize = 18.sp,
+            modifier = Modifier.padding(top = 4.dp).testTag("profileScore"))
+    } else {
+        Text(
+            text = "Score: 0",
+            fontSize = 18.sp,
+            modifier = Modifier.padding(top = 4.dp).testTag("profileScore"))
+    }
 }
 
 /**
@@ -141,7 +153,7 @@ fun DisplayFriendList(friends: List<User?>) {
     }
   } else {
     Text(
-        modifier = Modifier.testTag("emptyFriendListText"),
+        modifier = Modifier.testTag("emptyFriendListText").padding(top = 25.dp),
         fontSize = 20.sp,
         text = "You have no friends yet :(")
   }
