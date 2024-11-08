@@ -1,5 +1,6 @@
 package com.android.streetworkapp.model.park
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.streetworkapp.model.parklocation.ParkLocation
@@ -177,11 +178,9 @@ open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
    * @param uid The user ID of the person rating.
    * @param rating The rating to add.
    */
-  fun addRating(pid: String, uid: String, rating: Int) =
+  fun addRating(pid: String, uid: String, rating: Float) =
       viewModelScope.launch {
-        println("Adding rating")
         repository.addRating(pid, uid, rating)
-        println("Rating added")
         val updatedPark = repository.getParkByPid(pid)
         _currentPark.value = updatedPark
       }
