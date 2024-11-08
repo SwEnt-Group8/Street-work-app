@@ -85,7 +85,12 @@ class ProgressionRepositoryFirestore(private val db: FirebaseFirestore) : Progre
     }
   }
 
-  private fun documentToProgression(document: DocumentSnapshot): Progression {
+  /**
+   * Used to convert a document to a Progression Object
+   *
+   * @param document: the document to convert
+   */
+  fun documentToProgression(document: DocumentSnapshot): Progression {
     return try {
       val progressionId = document.id
       val uid = document["uid"] as? String ?: ""

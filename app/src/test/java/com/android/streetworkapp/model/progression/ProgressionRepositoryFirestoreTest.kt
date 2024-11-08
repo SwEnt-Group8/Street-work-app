@@ -51,6 +51,14 @@ class ProgressionRepositoryFirestoreTest {
     `when`(db.collection(any())).thenReturn(collection)
     `when`(collection.document(any())).thenReturn(documentRef)
     `when`(collection.document()).thenReturn(documentRef)
+
+    `when`(document.exists()).thenReturn(true)
+    `when`(document.id).thenReturn("test")
+    `when`(document["uid"]).thenReturn("test")
+    `when`(document["currentGoal"]).thenReturn(100)
+    `when`(document["eventsCreated"]).thenReturn(0)
+    `when`(document["eventsJoined"]).thenReturn(0)
+    `when`(document["achievements"]).thenReturn(emptyList<Achievement>())
   }
 
   @Test
@@ -72,15 +80,7 @@ class ProgressionRepositoryFirestoreTest {
   }
 
   @Test
-  fun documentToProgressionTest() = runTest {
-    `when`(document.exists()).thenReturn(true)
-    `when`(document.id).thenReturn("test")
-    `when`(document["uid"]).thenReturn("test")
-    `when`(document["currentGoal"]).thenReturn(100)
-    `when`(document["eventsCreated"]).thenReturn(0)
-    `when`(document["eventsJoined"]).thenReturn(0)
-    `when`(document["achievements"]).thenReturn(emptyList<Achievement>())
-
+  fun getProgressionWithCallbackTest() = runTest {
     `when`(collection.whereEqualTo("uid", "test")).thenReturn(collection)
 
     `when`(db.collection("progressions")).thenReturn(collection)
@@ -119,11 +119,29 @@ class ProgressionRepositoryFirestoreTest {
   @Test
   fun AchievementAndGoalTest() = runTest {
     `when`(collection.document("test")).thenReturn(documentRef)
-    // check .update("currentGoal", goal, "achievements", achievements)
     `when`(documentRef.update("currentGoal", 0, "achievements", emptyList<Achievement>()))
         .thenReturn(Tasks.forResult(null))
 
     progressionRepository.updateProgressionWithAchievementAndGoal("test", emptyList(), 0)
     verify(documentRef).update("currentGoal", 0, "achievements", emptyList<Achievement>())
+  }
+
+  @Test
+  fun documentToProgressionTest2() = runTest {
+    `when`(collection.whereEqualTo("uid", "test")).thenReturn(collection)
+
+    `when`(db.collection("progressions")).thenReturn(collection)
+    `when`(collection.document("test")).thenReturn(documentRef)
+
+    val taskCompletionSource = TaskCompletionSource<DocumentSnapshot>()
+    taskCompletionSource.setResult(document)
+    val task = taskCompletionSource.task
+    `when`(documentRef.get()).thenReturn(task)
+
+    val result = progressionRepository.documentToProgression(document)
+
+    assert(result.progressionId == "test")
+    assert(result.uid == "test")
+    assert(result.achievements == emptyList<Achievement>())
   }
 }
