@@ -25,7 +25,15 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of Sonar analysis (if we use Sonar Later)
-
+      - name: Download and Install Emulator v33.1.24
+        run: |
+          # Download emulator version 33.1.24
+          wget -q https://dl.google.com/android/repository/emulator-linux_x64-33.1.24.zip -O emulator.zip
+    
+          # Unzip and install
+          sudo rm -rf $ANDROID_HOME/emulator
+          sudo unzip -o emulator.zip -d $ANDROID_HOME
+          sudo chmod +x $ANDROID_HOME/emulator/emulator
 
       # Kernel-based Virtual Machine (KVM) is an open source virtualization technology built into Linux. Enabling it allows the Android emulator to run faster.
       - name: Enable KVM group perms
