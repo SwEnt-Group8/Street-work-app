@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 
 open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
 
-  // LiveData of the current park
+  // StateFlow of the current park
   private val _currentPark = MutableStateFlow<Park?>(null)
   val currentPark: StateFlow<Park?>
     get() = _currentPark
