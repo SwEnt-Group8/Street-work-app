@@ -227,7 +227,7 @@ class ParkViewModelTest {
     // Arrange
     val pid = "123"
     val uid = "user_001"
-    val rating = 4
+    val rating = 4.0f
 
     // Act
     parkViewModel.addRating(pid, uid, rating)
@@ -242,7 +242,7 @@ class ParkViewModelTest {
     // Arrange
     val pid = "123"
     val uid = "user_001"
-    val newRating = 4
+    val newRating = 4.0f
     val existingRating = 3.5f
     val existingNbrRating = 2
 

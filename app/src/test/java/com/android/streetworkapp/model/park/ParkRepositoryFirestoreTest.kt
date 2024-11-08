@@ -481,7 +481,7 @@ class ParkRepositoryFirestoreTest {
     // Arrange
     val pid = "123"
     val uid = "user_001"
-    val newRating = 4
+    val newRating = 4.0f
     val initialRating = 3.0f
     val initialNbrRating = 2
     val initialVotersUIDs = listOf("user_002")
