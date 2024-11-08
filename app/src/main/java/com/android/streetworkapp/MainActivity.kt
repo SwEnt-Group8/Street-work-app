@@ -10,7 +10,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -147,7 +146,8 @@ fun StreetWorkApp(
       }) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Route.PROGRESSION) { // TODO: handle start destination based on signIn logic
+            startDestination =
+                Route.PROGRESSION) { // TODO: handle start destination based on signIn logic
               navigation(
                   startDestination = Screen.AUTH,
                   route = Route.AUTH,
@@ -155,12 +155,9 @@ fun StreetWorkApp(
                 composable(Screen.AUTH) { SignInScreen(navigationActions, userViewModel) }
               }
 
-            navigation(
-                startDestination = Screen.PROGRESSION,
-                route = Route.PROGRESSION
-            ) {
+              navigation(startDestination = Screen.PROGRESSION, route = Route.PROGRESSION) {
                 composable(Screen.PROGRESSION) { ProgressScreen(navigationActions, innerPadding) }
-            }
+              }
 
               navigation(
                   startDestination = Screen.MAP,
@@ -179,16 +176,16 @@ fun StreetWorkApp(
                 composable(Screen.ADD_EVENT) {
                   AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
                 }
-                  composable(Screen.EVENT_OVERVIEW) {
-                      EventOverviewScreen(
-                          navigationActions,
-                          sampleEvent,
-                          testPark,
-                          innerPadding) // TODO: change to current park and current selected Event
-                      // Note: navigationActions is not used here atm but it will be useful to link
-                      // event to parks (ex: user clicks on event notif in social and wants to see the
-                      // park overview from here)
-                  }
+                composable(Screen.EVENT_OVERVIEW) {
+                  EventOverviewScreen(
+                      navigationActions,
+                      sampleEvent,
+                      testPark,
+                      innerPadding) // TODO: change to current park and current selected Event
+                  // Note: navigationActions is not used here atm but it will be useful to link
+                  // event to parks (ex: user clicks on event notif in social and wants to see the
+                  // park overview from here)
+                }
               }
 
               navigation(

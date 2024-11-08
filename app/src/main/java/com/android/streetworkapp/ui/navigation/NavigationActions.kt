@@ -1,15 +1,10 @@
 package com.android.streetworkapp.ui.navigation
 
-import androidx.compose.foundation.Image
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Place
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.MutableState
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavHostController
 import com.android.sample.R
 
@@ -40,78 +35,76 @@ data class ScreenParams(
     val isTopBarVisible: Boolean,
     val topAppBarManager: TopAppBarManager?
 ) {
-    companion object {
-        val AUTH =
-            ScreenParams(
-                Screen.AUTH,
-                isBottomBarVisible = false,
-                BottomNavigationMenuType.NONE,
-                isTopBarVisible = false,
-                null)
-        val MAP =
-            ScreenParams(
-                Screen.MAP,
-                isBottomBarVisible = true,
-                BottomNavigationMenuType.DEFAULT,
-                isTopBarVisible = true,
-                TopAppBarManager("Map"))
-        val PROFILE =
-            ScreenParams(
-                Screen.PROFILE,
-                isBottomBarVisible = true,
-                BottomNavigationMenuType.DEFAULT,
-                isTopBarVisible = true,
-                TopAppBarManager("My Profile"))
-        val ADD_FRIEND =
-            ScreenParams(
-                Screen.ADD_FRIEND,
-                isBottomBarVisible = true,
-                BottomNavigationMenuType.DEFAULT,
-                isTopBarVisible = true,
-                TopAppBarManager(
-                    "Add a new Friend",
-                    hasNavigationIcon = true,
-                    navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
-        val PARK_OVERVIEW =
-            ScreenParams(
-                Screen.PARK_OVERVIEW,
-                isBottomBarVisible = true,
-                BottomNavigationMenuType.DEFAULT,
-                isTopBarVisible = true,
-                TopAppBarManager(
-                    "<Park Name>",
-                    hasNavigationIcon = true,
-                    navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
-        val ADD_EVENT =
-            ScreenParams(
-                Screen.ADD_EVENT,
-                isBottomBarVisible = true,
-                BottomNavigationMenuType.DEFAULT,
-                isTopBarVisible = true,
-                TopAppBarManager(
-                    "Event Creation",
-                    hasNavigationIcon = true,
-                    navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
-        val EVENT_OVERVIEW =
-            ScreenParams(
-                Screen.EVENT_OVERVIEW,
-                isBottomBarVisible = true,
-                BottomNavigationMenuType.EVENT_OVERVIEW,
-                isTopBarVisible = true,
-                TopAppBarManager(
-                    "<Event Name>",
-                    hasNavigationIcon = true,
-                    navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
-        val PROGRESSION =
-            ScreenParams(
-                Screen.PROGRESSION,
-                isBottomBarVisible = true,
-                BottomNavigationMenuType.DEFAULT,
-                isTopBarVisible = true,
-                TopAppBarManager(
-                    "My Progress",
-                    hasNavigationIcon = false))
-    }
+  companion object {
+    val AUTH =
+        ScreenParams(
+            Screen.AUTH,
+            isBottomBarVisible = false,
+            BottomNavigationMenuType.NONE,
+            isTopBarVisible = false,
+            null)
+    val MAP =
+        ScreenParams(
+            Screen.MAP,
+            isBottomBarVisible = true,
+            BottomNavigationMenuType.DEFAULT,
+            isTopBarVisible = true,
+            TopAppBarManager("Map"))
+    val PROFILE =
+        ScreenParams(
+            Screen.PROFILE,
+            isBottomBarVisible = true,
+            BottomNavigationMenuType.DEFAULT,
+            isTopBarVisible = true,
+            TopAppBarManager("My Profile"))
+    val ADD_FRIEND =
+        ScreenParams(
+            Screen.ADD_FRIEND,
+            isBottomBarVisible = true,
+            BottomNavigationMenuType.DEFAULT,
+            isTopBarVisible = true,
+            TopAppBarManager(
+                "Add a new Friend",
+                hasNavigationIcon = true,
+                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
+    val PARK_OVERVIEW =
+        ScreenParams(
+            Screen.PARK_OVERVIEW,
+            isBottomBarVisible = true,
+            BottomNavigationMenuType.DEFAULT,
+            isTopBarVisible = true,
+            TopAppBarManager(
+                "<Park Name>",
+                hasNavigationIcon = true,
+                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
+    val ADD_EVENT =
+        ScreenParams(
+            Screen.ADD_EVENT,
+            isBottomBarVisible = true,
+            BottomNavigationMenuType.DEFAULT,
+            isTopBarVisible = true,
+            TopAppBarManager(
+                "Event Creation",
+                hasNavigationIcon = true,
+                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
+    val EVENT_OVERVIEW =
+        ScreenParams(
+            Screen.EVENT_OVERVIEW,
+            isBottomBarVisible = true,
+            BottomNavigationMenuType.EVENT_OVERVIEW,
+            isTopBarVisible = true,
+            TopAppBarManager(
+                "<Event Name>",
+                hasNavigationIcon = true,
+                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
+    val PROGRESSION =
+        ScreenParams(
+            Screen.PROGRESSION,
+            isBottomBarVisible = true,
+            BottomNavigationMenuType.DEFAULT,
+            isTopBarVisible = true,
+            TopAppBarManager("My Progress", hasNavigationIcon = false))
+  }
 }
 
 val LIST_OF_SCREENS =
@@ -123,8 +116,7 @@ val LIST_OF_SCREENS =
         ScreenParams.PARK_OVERVIEW,
         ScreenParams.ADD_EVENT,
         ScreenParams.EVENT_OVERVIEW,
-        ScreenParams.PROGRESSION
-    )
+        ScreenParams.PROGRESSION)
 
 /**
  * Represents a top-level destination in the app's navigation.
@@ -133,18 +125,34 @@ val LIST_OF_SCREENS =
  * @property icon The icon to display for this destination.
  * @property textId an identifier for the destination.
  */
-data class TopLevelDestination(val route: String, val icon: ImageVector?, val imagePainter : Int?, val textId: String)
+data class TopLevelDestination(
+    val route: String,
+    val icon: ImageVector?,
+    val imagePainter: Int?,
+    val textId: String
+)
 
 // all data classes here are reachable through user actions (i.e not auth)
 object TopLevelDestinations {
-  val MAP = TopLevelDestination(route = Route.MAP, icon = Icons.Outlined.Place, imagePainter = null, textId = "Map")
+  val MAP =
+      TopLevelDestination(
+          route = Route.MAP, icon = Icons.Outlined.Place, imagePainter = null, textId = "Map")
   val PROFILE =
       TopLevelDestination(
-          route = Route.PROFILE, icon = Icons.Outlined.AccountCircle, imagePainter = null, textId = "Profile")
-  val PROGRESSION = TopLevelDestination(route = Route.PROGRESSION, icon = null, imagePainter = R.drawable.trophy_24px , textId = "Progression")
+          route = Route.PROFILE,
+          icon = Icons.Outlined.AccountCircle,
+          imagePainter = null,
+          textId = "Profile")
+  val PROGRESSION =
+      TopLevelDestination(
+          route = Route.PROGRESSION,
+          icon = null,
+          imagePainter = R.drawable.trophy_24px,
+          textId = "Progression")
 }
 
-val LIST_TOP_LEVEL_DESTINATION = listOf(TopLevelDestinations.PROGRESSION, TopLevelDestinations.MAP, TopLevelDestinations.PROFILE)
+val LIST_TOP_LEVEL_DESTINATION =
+    listOf(TopLevelDestinations.PROGRESSION, TopLevelDestinations.MAP, TopLevelDestinations.PROFILE)
 
 open class NavigationActions(
     private val navController: NavHostController,
