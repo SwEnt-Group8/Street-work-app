@@ -28,7 +28,7 @@ fun TopAppBarWrapper(navigationActions: NavigationActions, topAppBarManager: Top
           if (it.hasNavigationIcon()) {
             IconButton(
                 onClick = { navigationActions.goBack() },
-                modifier = Modifier.testTag("goBackButton")) {
+                modifier = Modifier.testTag("goBackButtonTopAppBar")) {
                   Icon(it.getNavigationIcon(), contentDescription = "Back Icon")
                 }
           }
