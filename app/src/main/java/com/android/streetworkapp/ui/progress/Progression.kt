@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
@@ -31,6 +32,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -104,75 +106,85 @@ fun ProgressScreen(navigationActions: NavigationActions, paddingValues: PaddingV
         }
     }
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(PaddingValues(0.dp, progressBarSize*0.75f, 0.dp, 0.dp)),
-        horizontalAlignment = Alignment.CenterHorizontally
+    Box(modifier = Modifier.padding(paddingValues).testTag("progressionScreen")) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(PaddingValues(0.dp, progressBarSize * 0.15f, 0.dp, 0.dp)),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
 
-    ) {
-
-        item {
-            // Title Text Above the Progress Bar
-            Text(
-                text = "Progress to reach next level",
-                fontSize = 16.sp,
-                color = ColorPalette.SECONDARY_TEXT_COLOR
-            )
+            item {
+                // Title Text Above the Progress Bar
+                Text(
+                    text = "Progress to reach next level",
+                    fontSize = 16.sp,
+                    color = ColorPalette.SECONDARY_TEXT_COLOR
+                )
 
 
-            Spacer(modifier = Modifier.height(26.dp))
+                Spacer(modifier = Modifier.height(26.dp))
 
-            CircularProgressBar(
-                progress = 0.78f,
-                progressBarSize
-            )
+                CircularProgressBar(
+                    progress = 0.78f,
+                    progressBarSize
+                )
 
-            Spacer(modifier = Modifier.height(15.dp))
+                Spacer(modifier = Modifier.height(15.dp))
 
-            Text(
-                text = scoreText,
-                fontSize = 16.sp,
-                color = Color.Gray
-            )
+                Text(
+                    text = scoreText,
+                    fontSize = 16.sp,
+                    color = Color.Gray
+                )
 
-            Spacer(modifier = Modifier.height(55.dp))
-        }
-
-        item {
-            Text(
-                text = "Metrics",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = ColorPalette.PRIMARY_TEXT_COLOR
-            )
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
-            ) {
-                MetricCard(label = "Total score", value = "4'321") //TODO: format text pulled from db to this style
-                MetricCard(label = "Parks visited", value = "3")
-                MetricCard(label = "Friends added", value = "9")
+                Spacer(modifier = Modifier.height(40.dp))
             }
 
-            Spacer(modifier = Modifier.height(15.dp))
-        }
+            item {
+                Text(
+                    text = "Metrics",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = ColorPalette.PRIMARY_TEXT_COLOR
+                )
+                FlowRow(
+                    modifier = Modifier.testTag("metricCards"),
+                    horizontalArrangement = Arrangement.spacedBy(
+                        6.dp,
+                        Alignment.CenterHorizontally
+                    ),
+                ) {
+                    MetricCard(
+                        label = "Total score",
+                        value = "4'321"
+                    ) //TODO: format text pulled from db to this style
+                    MetricCard(label = "Parks visited", value = "3")
+                    MetricCard(label = "Friends added", value = "9")
+                }
 
-        item {
-            Text(
-                text = "Achievements",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black,
-                textAlign = TextAlign.Start,
-                modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .fillMaxWidth()
-            )
-        }
+                Spacer(modifier = Modifier.height(15.dp))
+            }
 
-        items(sampleAchievements) { achievement ->
-            AchievementItem(achievement)
-            HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
+            item {
+                Text(
+                    text = "Achievements",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .fillMaxWidth()
+                )
+            }
+
+            itemsIndexed(sampleAchievements) { index, achievement ->
+                Box(modifier = Modifier.testTag("achievementItem${index}")) {
+                    AchievementItem(achievement)
+                    HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
+                }
+            }
         }
     }
 }
@@ -185,7 +197,7 @@ fun CircularProgressBar(
 ) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier.size(size)
+        modifier = Modifier.size(size).testTag("circularProgressBar")
     ) {
         Canvas(modifier = Modifier.size(size)) {
             val sweepAngle = 360 * progress
