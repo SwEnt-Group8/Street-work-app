@@ -224,9 +224,10 @@ fun MetricCard(label: String, value: String) {
   Box(modifier = Modifier.padding(vertical = 4.dp)) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
         modifier =
             Modifier.border(width = 1.dp, color = Color.LightGray, shape = RoundedCornerShape(8.dp))
-                .padding(horizontal = 23.dp, vertical = 8.dp)) {
+                .size(120.dp, 50.dp)) {
           Text(text = label, fontSize = 13.sp, color = ColorPalette.SECONDARY_TEXT_COLOR)
           Text(
               text = value,
