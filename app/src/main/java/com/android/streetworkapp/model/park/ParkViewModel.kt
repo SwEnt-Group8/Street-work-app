@@ -1,21 +1,21 @@
 package com.android.streetworkapp.model.park
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.streetworkapp.model.parklocation.ParkLocation
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
 
   // LiveData of the current park
-  private val _currentPark = MutableLiveData<Park?>()
-  val currentPark: LiveData<Park?>
+  private val _currentPark = MutableStateFlow<Park?>(null)
+  val currentPark: StateFlow<Park?>
     get() = _currentPark
 
-  private val _park = MutableLiveData<Park?>()
-  val park: LiveData<Park?>
+  private val _park = MutableStateFlow<Park?>(null)
+  val park: StateFlow<Park?>
     get() = _park
 
   /**
@@ -35,7 +35,7 @@ open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
   fun loadCurrentPark(pid: String) {
     viewModelScope.launch {
       val fetchedPark = repository.getParkByPid(pid)
-      _currentPark.setValue(fetchedPark)
+      _currentPark.value = fetchedPark
     }
   }
 
@@ -57,7 +57,7 @@ open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
   fun getParkByPid(pid: String) {
     viewModelScope.launch {
       val fetchedPark = repository.getParkByPid(pid)
-      _park.setValue(fetchedPark)
+      _park.value = fetchedPark
     }
   }
 
@@ -70,7 +70,7 @@ open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
   fun getParkByLocationId(locationId: String) {
     viewModelScope.launch {
       val fetchedPark = repository.getParkByLocationId(locationId)
-      _park.setValue(fetchedPark)
+      _park.value = fetchedPark
     }
   }
 
