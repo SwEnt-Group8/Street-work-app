@@ -112,7 +112,7 @@ fun ProgressScreen(
   val progressBarSize = 145.dp
 
   val scoreText = buildAnnotatedString {
-    append("34")
+    append("780")
 
     withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) { append("/1000") }
   }
