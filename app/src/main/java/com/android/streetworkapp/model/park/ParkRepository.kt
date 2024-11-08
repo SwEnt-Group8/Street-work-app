@@ -33,7 +33,7 @@ interface ParkRepository {
 
   suspend fun deleteEventFromPark(pid: String, eid: String)
 
-  suspend fun addRating(pid: String, uid: String, rating: Int)
+  suspend fun addRating(pid: String, uid: String, rating: Float)
 
   suspend fun deleteParkByPid(pid: String)
 }
