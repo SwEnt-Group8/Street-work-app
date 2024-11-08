@@ -1,6 +1,5 @@
 package com.android.streetworkapp.model.park
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.streetworkapp.model.parklocation.ParkLocation
