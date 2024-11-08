@@ -295,6 +295,47 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
   }
 
   /**
+   * Add a rating to a park if the user has not already rated it.
+   *
+   * @param pid The park ID.
+   * @param uid The user ID of the person rating.
+   * @param rating The rating to add from 1 to 5.
+   */
+  override suspend fun addRating(pid: String, uid: String, rating: Int) {
+    require(pid.isNotEmpty()) { PID_EMPTY }
+    require(rating in 1..5) { "Rating must be between 1 and 5." }
+
+    try {
+      val parkRef = db.collection(COLLECTION_PATH).document(pid)
+      val document = parkRef.get().await()
+
+      // Convert the document snapshot to a Park object
+      val park = document.toObject(Park::class.java)
+
+      if (park != null) {
+        // Check if the user has already rated
+        if (uid !in park.votersUIDs) {
+          // Calculate the new average rating and update the rating count
+          val updatedNbrRating = park.nbrRating + 1
+          val updatedRating = (rating + park.nbrRating * park.rating) / updatedNbrRating
+
+          // Update the park object with the new values
+          park.rating = updatedRating
+          park.nbrRating = updatedNbrRating
+          park.votersUIDs += uid
+
+          // Save the updated park object back to Firestore
+          parkRef.set(park).await()
+        }
+      } else {
+        Log.e("FirestoreError", "Park not found with ID: $pid")
+      }
+    } catch (e: Exception) {
+      Log.e("FirestoreError", "Error adding rating to park: ${e.message}")
+    }
+  }
+
+  /**
    * Convert a Firestore document to a park object.
    *
    * @param document The Firestore document.
@@ -319,7 +360,25 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
             emptyList<String>()
           }
 
-      Park(pid, name, location, imageReference, rating, nbrRating, capacity, occupancy, events)
+      val votersUIDs =
+          try {
+            (document["votersUIDs"] as? List<*>)?.filterIsInstance<String>() ?: emptyList()
+          } catch (e: Exception) {
+            Log.e("FirestoreError", "Error retrieving votersUIDs list", e)
+            emptyList<String>()
+          }
+
+      Park(
+          pid,
+          name,
+          location,
+          imageReference,
+          rating,
+          nbrRating,
+          capacity,
+          occupancy,
+          events,
+          votersUIDs)
     } catch (e: Exception) {
       Log.e("FirestoreError", "Error converting document to park: ${e.message}")
       null
