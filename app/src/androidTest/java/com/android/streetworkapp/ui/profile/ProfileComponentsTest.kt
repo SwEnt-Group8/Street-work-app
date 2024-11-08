@@ -4,6 +4,8 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.filter
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
@@ -14,14 +16,46 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class ProfileFriendsListTest {
+class ProfileComponentsTest {
 
   @get:Rule val composeTestRule = createComposeRule()
 
   @Test
+  fun isNullUserScoreCorrectlyDisplayed() {
+    val user = null
+    val UNKNOWN_SCORE_MESSAGE = "unknown score"
+    composeTestRule.setContent { DisplayScore(user) }
+    composeTestRule.onNodeWithTag("profileScore").assertTextEquals(UNKNOWN_SCORE_MESSAGE)
+  }
+
+  @Test
+  fun isScoreCorrectlyDisplayed() {
+    val user = User("uid-alice", "Alice", "alice@gmail.com", 42, emptyList())
+    composeTestRule.setContent { DisplayScore(user) }
+    composeTestRule.onNodeWithTag("profileScore").assertTextEquals("Score: ${user.score}")
+  }
+
+  @Test
+  fun isNullUsernameCorrectlyDisplayed() {
+    val user = null
+    val UNKNOWN_USER_MESSAGE = "unknown user"
+    composeTestRule.setContent { DisplayUsername(user) }
+    composeTestRule.onNodeWithTag("profileUsername").assertTextEquals(UNKNOWN_USER_MESSAGE)
+  }
+
+  @Test
+  fun isUsernameCorrectlyDisplayed() {
+    val user = User("uid-alice", "Alice", "alice@gmail.com", 42, emptyList())
+    composeTestRule.setContent { DisplayUsername(user) }
+    composeTestRule.onNodeWithTag("profileUsername").assertTextEquals(user.username)
+  }
+
+  @Test
   fun isFriendElementCorrectlyDisplayed() {
     val friend = User("uid-alice", "Alice", "alice@gmail.com", 42, emptyList())
-    composeTestRule.setContent { DisplayFriend(friend) }
+    val DEFAULT_USER_STATUS = "Definitely not a bot"
+
+    composeTestRule.setContent { DisplayFriendItem(friend) }
 
     composeTestRule.onNodeWithTag("friendProfilePicture").assertExists().assertIsDisplayed()
 
@@ -36,6 +70,14 @@ class ProfileFriendsListTest {
         .assertExists()
         .assertIsDisplayed()
         .assertTextEquals("Score: ${friend.score}")
+
+    composeTestRule
+        .onNodeWithTag("friendStatus")
+        .assertExists()
+        .assertIsDisplayed()
+        .assertTextEquals(DEFAULT_USER_STATUS)
+
+    composeTestRule.onNodeWithTag("friendSettingButton").assertExists().assertIsDisplayed()
   }
 
   @Test
@@ -55,19 +97,22 @@ class ProfileFriendsListTest {
         .assertExists()
         .assertIsDisplayed()
         .onChildren()
+        .filter(hasTestTag("friendItem"))
         .assertCountEquals(friends.size)
   }
 
   @Test
   fun isEmptyListCorrectlyDisplayed() {
     val friends = emptyList<User>()
+    val NO_FRIENDS_MESSAGE = "You have no friends yet :("
+
     composeTestRule.setContent { DisplayFriendList(friends) }
 
     composeTestRule
         .onNodeWithTag("emptyFriendListText")
         .assertExists()
         .assertIsDisplayed()
-        .assertTextEquals("You have no friends yet :(")
+        .assertTextEquals(NO_FRIENDS_MESSAGE)
 
     composeTestRule.onNodeWithTag("friendList").assertIsNotDisplayed()
   }
