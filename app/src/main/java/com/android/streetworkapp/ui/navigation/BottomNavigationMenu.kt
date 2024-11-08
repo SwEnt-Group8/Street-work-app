@@ -45,7 +45,7 @@ fun BottomNavigationMenu(
   NavigationBar(modifier = Modifier.height(65.dp).testTag(BottomNavigationMenuType.DEFAULT.getTopLevelTestTag()), containerColor = ColorPalette.PRINCIPLE_BACKGROUND_COLOR) {
     tabList.forEach { topLevelDestination ->
       NavigationBarItem(
-          modifier = Modifier.testTag(BottomNavigationMenuType.DEFAULT.getTopLevelTestTag()),
+          modifier = Modifier.testTag("bottomNavigationItem"),
           icon = {
               topLevelDestination.imagePainter?.let {
                   Image(

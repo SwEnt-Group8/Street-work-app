@@ -28,6 +28,7 @@ import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.authentication.SignInScreen
 import com.android.streetworkapp.ui.event.AddEventScreen
+import com.android.streetworkapp.ui.event.EventOverviewScreen
 import com.android.streetworkapp.ui.map.MapScreen
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenu
 import com.android.streetworkapp.ui.navigation.LIST_OF_SCREENS
@@ -178,6 +179,16 @@ fun StreetWorkApp(
                 composable(Screen.ADD_EVENT) {
                   AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
                 }
+                  composable(Screen.EVENT_OVERVIEW) {
+                      EventOverviewScreen(
+                          navigationActions,
+                          sampleEvent,
+                          testPark,
+                          innerPadding) // TODO: change to current park and current selected Event
+                      // Note: navigationActions is not used here atm but it will be useful to link
+                      // event to parks (ex: user clicks on event notif in social and wants to see the
+                      // park overview from here)
+                  }
               }
 
               navigation(

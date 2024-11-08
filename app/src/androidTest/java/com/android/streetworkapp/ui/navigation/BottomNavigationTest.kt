@@ -27,6 +27,7 @@ import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
 import io.mockk.every
 import io.mockk.mockk
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -40,120 +41,139 @@ val TEST_SCREEN_EXCLUSION_LIST = listOf<String>(Screen.ADD_EVENT)
 @RunWith(AndroidJUnit4::class)
 class BottomNavigationTest {
 
-  private lateinit var parkLocationRepository: OverpassParkLocationRepository
-  private lateinit var parkLocationViewModel: ParkLocationViewModel
+    private lateinit var parkLocationRepository: OverpassParkLocationRepository
+    private lateinit var parkLocationViewModel: ParkLocationViewModel
 
-  @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-  @Composable
-  fun BottomNavigationTest() {
-    Scaffold(
-        bottomBar = {
-          BottomNavigationMenu(onTabSelect = {}, tabList = LIST_TOP_LEVEL_DESTINATION)
-        }) {
-          Text("test")
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+    @Composable
+    fun BottomNavigationTest() {
+        Scaffold(
+            bottomBar = {
+                BottomNavigationMenu(onTabSelect = {}, tabList = LIST_TOP_LEVEL_DESTINATION)
+            }) {
+            Text("test")
         }
-  }
-
-  @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-  @Composable
-  fun EmptyBottomNavigationTest() {
-    Scaffold(bottomBar = { BottomNavigationMenu(onTabSelect = {}, tabList = listOf()) }) {
-      Text("test")
     }
-  }
 
-  @get:Rule val composeTestRule = createComposeRule()
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+    @Composable
+    fun EmptyBottomNavigationTest() {
+        Scaffold(bottomBar = { BottomNavigationMenu(onTabSelect = {}, tabList = listOf()) }) {
+            Text("test")
+        }
+    }
 
-  @Before
-  fun setUp() {
-    val mockParkList =
-        listOf(
-            ParkLocation(lat = 46.518659400000004, lon = 6.566561505148001, id = "1"),
-            ParkLocation(lat = 34.052235, lon = -118.243683, id = "2"),
-            ParkLocation(lat = 51.507351, lon = -0.127758, id = "3"),
-            ParkLocation(lat = 35.676192, lon = 139.650311, id = "4"),
-            ParkLocation(lat = -33.868820, lon = 151.209290, id = "5"))
+    @get:Rule val composeTestRule = createComposeRule()
 
-    parkLocationRepository = mockk<OverpassParkLocationRepository>()
-    every {
-      parkLocationRepository.search(
-          any<Double>(),
-          any<Double>(),
-          any<(List<ParkLocation>) -> Unit>(),
-          any<(Exception) -> Unit>())
-    } answers
-        {
-          val onSuccess = this.args[2] as (List<ParkLocation>) -> Unit
-          onSuccess(mockParkList) // Invoke onSuccess with the custom list
+    @Before
+    fun setUp() {
+        val mockParkList =
+            listOf(
+                ParkLocation(lat = 46.518659400000004, lon = 6.566561505148001, id = "1"),
+                ParkLocation(lat = 34.052235, lon = -118.243683, id = "2"),
+                ParkLocation(lat = 51.507351, lon = -0.127758, id = "3"),
+                ParkLocation(lat = 35.676192, lon = 139.650311, id = "4"),
+                ParkLocation(lat = -33.868820, lon = 151.209290, id = "5"))
+
+        parkLocationRepository = mockk<OverpassParkLocationRepository>()
+        every {
+            parkLocationRepository.search(
+                any<Double>(),
+                any<Double>(),
+                any<(List<ParkLocation>) -> Unit>(),
+                any<(Exception) -> Unit>())
+        } answers
+                {
+                    val onSuccess = this.args[2] as (List<ParkLocation>) -> Unit
+                    onSuccess(mockParkList) // Invoke onSuccess with the custom list
+                }
+
+        parkLocationViewModel = ParkLocationViewModel(parkLocationRepository)
+    }
+
+    @Test
+    fun printComposeHierarchy() {
+        composeTestRule.setContent { BottomNavigationTest() }
+        composeTestRule.onRoot().printToLog("BottomNavigationTest")
+    }
+
+    @Test
+    fun displayAllComponents() {
+        composeTestRule.setContent { BottomNavigationTest() }
+        composeTestRule.onNodeWithTag("bottomNavigationMenu").assertExists().assertIsDisplayed()
+        composeTestRule
+            .onAllNodesWithTag("bottomNavigationItem")
+            .assertCountEquals(LIST_TOP_LEVEL_DESTINATION.size)
+
+        val navItems = composeTestRule.onAllNodesWithTag("bottomNavigationItem")
+
+        for (i in LIST_TOP_LEVEL_DESTINATION.indices) {
+            navItems[i].assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun menuItemsAreClickable() {
+        composeTestRule.setContent { BottomNavigationTest() }
+        val navItems = composeTestRule.onAllNodesWithTag("bottomNavigationItem")
+
+        for (i in LIST_TOP_LEVEL_DESTINATION.indices) {
+            navItems[i].performClick()
+        }
+    }
+
+    @Test
+    fun displayNoComponents() {
+        composeTestRule.setContent { EmptyBottomNavigationTest() }
+        composeTestRule.onNodeWithTag("bottomNavigationMenu").assertExists().assertIsDisplayed()
+        composeTestRule.onAllNodesWithTag("bottomNavigationItem").assertCountEquals(0)
+        composeTestRule.onAllNodesWithTag("bottomNavIcon").assertCountEquals(0)
+    }
+
+    @Test
+    fun bottomBarDisplaysCorrectlyOnScreens() {
+
+        val currentScreenParam =
+            mutableStateOf(
+                LIST_OF_SCREENS.first()) // can't call setContent twice per test so we use this instead
+        composeTestRule.setContent {
+            StreetWorkApp(
+                parkLocationViewModel,
+                { navigateTo(currentScreenParam.value.screenName) },
+                {},
+                UserViewModel(mockk<UserRepositoryFirestore>()),
+                ParkViewModel(mockk<ParkRepositoryFirestore>()),
+                EventViewModel(mockk<EventRepositoryFirestore>()))
         }
 
-    parkLocationViewModel = ParkLocationViewModel(parkLocationRepository)
-  }
+        val bottomNavTypeToTest =
+            BottomNavigationMenuType.entries.filter { it != BottomNavigationMenuType.NONE }
 
-  @Test
-  fun printComposeHierarchy() {
-    composeTestRule.setContent { BottomNavigationTest() }
-    composeTestRule.onRoot().printToLog("BottomNavigationTest")
-  }
+        for (screenParam in LIST_OF_SCREENS) {
+            if (screenParam.screenName in TEST_SCREEN_EXCLUSION_LIST) continue
 
-  @Test
-  fun displayAllComponents() {
-    composeTestRule.setContent { BottomNavigationTest() }
-    composeTestRule.onNodeWithTag("bottomNavigationMenu").assertExists().assertIsDisplayed()
-    composeTestRule
-        .onAllNodesWithTag("bottomNavigationItem")
-        .assertCountEquals(LIST_TOP_LEVEL_DESTINATION.size)
+            currentScreenParam.value = screenParam // Update the state to recompose our UI
 
-    val navItems = composeTestRule.onAllNodesWithTag("bottomNavigationItem")
-
-    for (i in LIST_TOP_LEVEL_DESTINATION.indices) {
-      navItems[i].assertIsDisplayed()
+            composeTestRule.waitForIdle()
+            if (screenParam.isBottomBarVisible) {
+                when (screenParam.bottomBarType) {
+                    BottomNavigationMenuType.NONE ->
+                        Assert.fail(
+                            "Invalid use of the bottomBar setup, if isBottomBarVisible is set to false its type should be set to NONE")
+                    BottomNavigationMenuType.DEFAULT ->
+                        composeTestRule
+                            .onNodeWithTag(BottomNavigationMenuType.DEFAULT.getTopLevelTestTag())
+                            .assertIsDisplayed()
+                    BottomNavigationMenuType.EVENT_OVERVIEW ->
+                        composeTestRule
+                            .onNodeWithTag(BottomNavigationMenuType.EVENT_OVERVIEW.getTopLevelTestTag())
+                            .assertIsDisplayed()
+                }
+            } else {
+                for (bottomNavType in bottomNavTypeToTest) composeTestRule
+                    .onNodeWithTag(bottomNavType.getTopLevelTestTag())
+                    .assertIsNotDisplayed()
+            }
+        }
     }
-  }
-
-  @Test
-  fun menuItemsAreClickable() {
-    composeTestRule.setContent { BottomNavigationTest() }
-    val navItems = composeTestRule.onAllNodesWithTag("bottomNavigationItem")
-
-    for (i in LIST_TOP_LEVEL_DESTINATION.indices) {
-      navItems[i].performClick()
-    }
-  }
-
-  @Test
-  fun displayNoComponents() {
-    composeTestRule.setContent { EmptyBottomNavigationTest() }
-    composeTestRule.onNodeWithTag("bottomNavigationMenu").assertExists().assertIsDisplayed()
-    composeTestRule.onAllNodesWithTag("bottomNavigationItem").assertCountEquals(0)
-    composeTestRule.onAllNodesWithTag("bottomNavIcon").assertCountEquals(0)
-  }
-
-  @Test
-  fun isDisplayedCorrectlyOnScreens() {
-
-    val currentScreenParam =
-        mutableStateOf(
-            LIST_OF_SCREENS.first()) // can't call setContent twice per test so we use this instead
-    composeTestRule.setContent {
-      StreetWorkApp(
-          parkLocationViewModel,
-          { navigateTo(currentScreenParam.value.screenName) },
-          {},
-          UserViewModel(mockk<UserRepositoryFirestore>()),
-          ParkViewModel(mockk<ParkRepositoryFirestore>()),
-          EventViewModel(mockk<EventRepositoryFirestore>()))
-    }
-
-    for (screenParam in LIST_OF_SCREENS) {
-      if (screenParam.screenName in TEST_SCREEN_EXCLUSION_LIST) continue
-
-      currentScreenParam.value = screenParam // Update the state to recompose our UI
-
-      composeTestRule.waitForIdle()
-      if (screenParam.isBottomBarVisible)
-          composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsDisplayed()
-      else composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsNotDisplayed()
-    }
-  }
 }

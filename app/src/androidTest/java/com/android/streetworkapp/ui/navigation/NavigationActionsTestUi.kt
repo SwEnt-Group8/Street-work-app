@@ -19,7 +19,7 @@ class NavigationActionsTestUi {
     val invalidRouteName = "nEzUaeB16f"
     val topLevelDestWithInvalidRouteName =
         TopLevelDestination(
-            invalidRouteName, Icons.Outlined.Lock, "dummy") // dummy top level dest for testing
+            invalidRouteName, Icons.Outlined.Lock, null, "dummy") // dummy top level dest for testing
     composeTestRule.setContent {
       StreetWorkAppMain { navigateTo(topLevelDestWithInvalidRouteName) }
     }
