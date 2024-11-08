@@ -18,7 +18,15 @@ open class ProgressionViewModel(private val repository: ProgressionRepository) :
   private val _currentProgression = MutableStateFlow(Progression())
   val currentProgression: StateFlow<Progression> = _currentProgression.asStateFlow()
 
-  /** Used to have a unique progressionId in the database. */
+  companion object {
+    private const val ERROR_UID_EMPTY = "The uid must not be empty."
+  }
+
+  /**
+   * Used to have a unique progressionId in the database.
+   *
+   * @return progressionId: The progression id
+   */
   fun getNewProgressionId(): String {
     return repository.getNewProgressionId()
   }
@@ -29,7 +37,7 @@ open class ProgressionViewModel(private val repository: ProgressionRepository) :
    * @param uid: The uid (User Id)
    */
   fun getCurrentProgression(uid: String) {
-    require(uid.isNotEmpty())
+    require(uid.isNotEmpty()) { ERROR_UID_EMPTY }
 
     repository.getProgression(
         uid = uid,

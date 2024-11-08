@@ -1,5 +1,6 @@
 package com.android.streetworkapp.model.progression
 
+import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -55,10 +56,10 @@ class ProgressionViewModelTest {
 
   @Test
   fun getMedalTest() = runTest {
-    assert(getMedalByScore(0) == MedalsAchievement.NONE)
-    assert(getMedalByScore(100) == MedalsAchievement.BRONZE)
-    assert(getMedalByScore(1000) == MedalsAchievement.SILVER)
-    assert(getMedalByScore(10000) == MedalsAchievement.GOLD)
-    assert(getMedalByScore(100000) == MedalsAchievement.PLATINUM)
+    assertEquals(MedalsAchievement.NONE, getMedalByScore(0))
+    assertEquals(MedalsAchievement.BRONZE, getMedalByScore(100))
+    assertEquals(MedalsAchievement.SILVER, getMedalByScore(1000))
+    assertEquals(MedalsAchievement.GOLD, getMedalByScore(10000))
+    assertEquals(MedalsAchievement.PLATINUM, getMedalByScore(100000))
   }
 }

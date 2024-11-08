@@ -9,6 +9,8 @@ class ProgressionRepositoryFirestore(private val db: FirebaseFirestore) : Progre
 
   companion object {
     private const val COLLECTION_PATH = "progressions"
+    private const val ERROR_UID_EMPTY = "The uid must not be empty."
+    private const val ERROR_PID_EMPTY = "The progression id must not be empty."
   }
 
   /** Used to have a unique progressionId in the database. */
@@ -28,7 +30,7 @@ class ProgressionRepositoryFirestore(private val db: FirebaseFirestore) : Progre
       onSuccess: (Progression) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    require(uid.isNotEmpty())
+    require(uid.isNotEmpty()) { ERROR_UID_EMPTY }
     try {
       db.collection(COLLECTION_PATH)
           .whereEqualTo("uid", uid)
@@ -56,7 +58,7 @@ class ProgressionRepositoryFirestore(private val db: FirebaseFirestore) : Progre
       achievements: List<String>,
       goal: Int
   ) {
-    require(progressionId.isNotEmpty())
+    require(progressionId.isNotEmpty()) { ERROR_PID_EMPTY }
     try {
       db.collection(COLLECTION_PATH)
           .document(progressionId)
@@ -74,7 +76,7 @@ class ProgressionRepositoryFirestore(private val db: FirebaseFirestore) : Progre
    * @param uid: The new list of achievements
    */
   override suspend fun createProgression(uid: String, progressionId: String) {
-    require(uid.isNotEmpty())
+    require(uid.isNotEmpty()) { ERROR_UID_EMPTY }
     try {
       db.collection(COLLECTION_PATH)
           .document(progressionId)
