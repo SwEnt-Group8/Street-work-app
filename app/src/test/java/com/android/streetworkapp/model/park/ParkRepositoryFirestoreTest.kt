@@ -475,4 +475,59 @@ class ParkRepositoryFirestoreTest {
     assertEquals(5, park?.occupancy)
     assertEquals(listOf("event1", "event2"), park?.events)
   }
+
+  @Test
+  fun addRatingWithNewUserUpdatesRatingSuccessfully() = runTest {
+    // Arrange
+    val pid = "123"
+    val uid = "user_001"
+    val newRating = 4
+    val initialRating = 3.0f
+    val initialNbrRating = 2
+    val initialVotersUIDs = listOf("user_002")
+
+    // Set up initial Park data as a DocumentSnapshot mock
+    whenever(document.exists()).thenReturn(true)
+    whenever(document.toObject(Park::class.java))
+        .thenReturn(
+            Park(
+                pid = pid,
+                name = "Sample Park",
+                location = ParkLocation(0.0, 0.0, "321"),
+                imageReference = "parks/sample.png",
+                rating = initialRating,
+                nbrRating = initialNbrRating,
+                capacity = 10,
+                occupancy = 5,
+                events = listOf("event1", "event2"),
+                votersUIDs = initialVotersUIDs))
+
+    // Mock Firestore interactions
+    whenever(db.collection("parks")).thenReturn(collection)
+    whenever(collection.document(pid)).thenReturn(documentRef)
+    whenever(documentRef.get()).thenReturn(Tasks.forResult(document))
+
+    // Calculate the expected updated values
+    val updatedNbrRating = initialNbrRating + 1
+    val updatedRating = (newRating + initialRating * initialNbrRating) / updatedNbrRating
+    val updatedVotersUIDs = initialVotersUIDs + uid
+
+    // Act
+    parkRepository.addRating(pid, uid, newRating)
+
+    // Verify that the Firestore update was called with the correct values
+    verify(documentRef)
+        .set(
+            Park(
+                pid = pid,
+                name = "Sample Park",
+                location = ParkLocation(0.0, 0.0, "321"),
+                imageReference = "parks/sample.png",
+                rating = updatedRating,
+                nbrRating = updatedNbrRating,
+                capacity = 10,
+                occupancy = 5,
+                events = listOf("event1", "event2"),
+                votersUIDs = updatedVotersUIDs))
+  }
 }
