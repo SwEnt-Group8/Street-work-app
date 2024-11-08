@@ -1,5 +1,7 @@
 package com.android.streetworkapp.model.park
 
+import com.android.streetworkapp.model.parklocation.ParkLocation
+
 /** A repository interface for park data. */
 interface ParkRepository {
 
@@ -10,6 +12,8 @@ interface ParkRepository {
   suspend fun getParkByLocationId(locationId: String): Park?
 
   suspend fun createPark(park: Park)
+
+  suspend fun getOrCreateParkByLocation(location: ParkLocation): Park?
 
   suspend fun updateName(pid: String, name: String)
 

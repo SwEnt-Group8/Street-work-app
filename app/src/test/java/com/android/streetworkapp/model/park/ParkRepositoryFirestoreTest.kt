@@ -434,4 +434,45 @@ class ParkRepositoryFirestoreTest {
       runBlocking { parkRepository.updateCapacity("123", 0) }
     }
   }
+
+  @Test
+  fun getOrCreateParkByLocationWithExistingLocationReturnsPark() = runTest {
+    `when`(document.exists()).thenReturn(true)
+    `when`(document.id).thenReturn("123")
+    `when`(document["name"]).thenReturn("Sample Park")
+    `when`(document["location"]).thenReturn(ParkLocation(0.0, 0.0, "321"))
+    `when`(document["imageReference"]).thenReturn("parks/sample.png")
+    `when`(document["rating"]).thenReturn(4.0)
+    `when`(document["nbrRating"]).thenReturn(2L)
+    `when`(document["capacity"]).thenReturn(10L)
+    `when`(document["occupancy"]).thenReturn(5L)
+    `when`(document["events"]).thenReturn(listOf("event1", "event2"))
+
+    // Mock Firestore interactions
+    `when`(db.collection("parks")).thenReturn(collection)
+    `when`(collection.whereEqualTo("location.id", "321")).thenReturn(collection)
+
+    // Use TaskCompletionSource to create a controllable Task
+    val querySnapshot = mock(QuerySnapshot::class.java)
+    val taskCompletionSource = TaskCompletionSource<QuerySnapshot>()
+    taskCompletionSource.setResult(querySnapshot)
+    val task = taskCompletionSource.task
+    `when`(collection.get()).thenReturn(task)
+    `when`(querySnapshot.documents).thenReturn(listOf(document))
+
+    // Call the repository method
+    val park = parkRepository.getOrCreateParkByLocation(ParkLocation(0.0, 0.0, "321"))
+
+    // Assert the result contains expected values
+    assertNotNull(park)
+    assertEquals("123", park?.pid)
+    assertEquals("Sample Park", park?.name)
+    assertEquals(ParkLocation(0.0, 0.0, "321"), park?.location)
+    assertEquals("parks/sample.png", park?.imageReference)
+    assertEquals(4.0f, park?.rating)
+    assertEquals(2, park?.nbrRating)
+    assertEquals(10, park?.capacity)
+    assertEquals(5, park?.occupancy)
+    assertEquals(listOf("event1", "event2"), park?.events)
+  }
 }

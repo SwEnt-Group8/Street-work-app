@@ -36,7 +36,8 @@ import com.google.firebase.ktx.Firebase
 fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewModel) {
 
   // This part of the code handles google sign-in :
-  var user by remember { mutableStateOf(Firebase.auth.currentUser) }
+  var firebaseUser by remember { mutableStateOf(Firebase.auth.currentUser) }
+
   val token = stringResource(R.string.default_web_client_id)
   val context = LocalContext.current
 
@@ -47,15 +48,15 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
   val launcher =
       authService.rememberFirebaseAuthLauncher(
           onAuthComplete = { result ->
-            user = result.user
-            checkAndAddUser(user, userViewModel)
-
-            Log.d("SignInScreen", "Sign-in successful user : $user")
+            firebaseUser = result.user
+            checkAndAddUser(firebaseUser, userViewModel)
+            firebaseUser?.let { firebaseUser -> userViewModel.getUserByUid(firebaseUser.uid) }
             Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
             navigationActions.navigateTo(Screen.MAP)
+            userViewModel.getUserByUid(firebaseUser?.uid ?: "")
           },
           onAuthError = {
-            user = null
+            firebaseUser = null
             Log.d("SignInScreen", "Sign-in failed : $it")
             Toast.makeText(context, "Login failed! : $it", Toast.LENGTH_LONG).show()
           })
@@ -90,18 +91,46 @@ fun checkAndAddUser(user: FirebaseUser?, userViewModel: UserViewModel) {
   Log.d("SignInScreen", "Entered checkAndAddUser")
   if (user == null) return
   // Observe _user for the result of fetchUserByUid
-  val observer =
-      object : androidx.lifecycle.Observer<User?> {
-        override fun onChanged(value: User?) {
-          if (value == null) {
-            // User doesn't exist, so add them
-            val newUser = User(user.uid, user.displayName!!, user.email!!, 0, emptyList())
-            userViewModel.addUser(newUser)
-          }
-          // Remove the observer after one-time use
-          userViewModel.user.removeObserver(this)
-        }
-      }
-  userViewModel.user.observeForever(observer)
+
+  // userViewModel.user.observeForever(observer)
   userViewModel.getUserByUid(user.uid)
+  userViewModel.getFriendsByUid(user.uid)
+  userViewModel.setCurrentUser(
+      User(
+          uid = user.uid,
+          username = user.displayName ?: "Unknown",
+          email = user.email ?: "No Email",
+          score = 0,
+          friends = emptyList()))
+}
+
+/**
+ * Observes the user data and adds the user if they don't exist.
+ *
+ * @param user The user to observe and add.
+ * @param userViewModel The [UserViewModel] to use for database operations.
+ */
+fun observeAndSetCurrentUser(user: FirebaseUser?, userViewModel: UserViewModel) {
+  val currentUser = userViewModel.user.value
+  user?.let { firebaseUser ->
+    if (currentUser == null) {
+      // If no existing data, set loggedInUser with default values and add the user
+      Log.d(
+          "SignInScreen",
+          "[observeAndSet] User ${user.displayName} doesn't exist, adding user to database")
+      val newUser =
+          User(
+              uid = firebaseUser.uid,
+              username = firebaseUser.displayName ?: "Unknown",
+              email = firebaseUser.email ?: "No Email",
+              score = 0,
+              friends = emptyList())
+      userViewModel.addUser(newUser)
+      userViewModel.setCurrentUser(newUser)
+    } else {
+      // Set loggedInUser with existing data
+      userViewModel.setCurrentUser(currentUser)
+      userViewModel.getFriendsByUid(currentUser.uid)
+    }
+  }
 }

@@ -117,6 +117,7 @@ val LIST_OF_SCREENS =
         ScreenParams.ADD_EVENT,
         ScreenParams.EVENT_OVERVIEW,
         ScreenParams.PROGRESSION)
+        ScreenParams.EVENT_OVERVIEW)
 
 /**
  * Represents a top-level destination in the app's navigation.
