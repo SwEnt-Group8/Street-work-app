@@ -301,9 +301,9 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
    * @param uid The user ID of the person rating.
    * @param rating The rating to add from 1 to 5.
    */
-  override suspend fun addRating(pid: String, uid: String, rating: Int) {
+  override suspend fun addRating(pid: String, uid: String, rating: Float) {
     require(pid.isNotEmpty()) { PID_EMPTY }
-    require(rating in 1..5) { INVALID_RATING_MESSAGE }
+    require(rating in 1.0f..5.0f) { INVALID_RATING_MESSAGE }
 
     try {
       val parkRef = db.collection(COLLECTION_PATH).document(pid)
