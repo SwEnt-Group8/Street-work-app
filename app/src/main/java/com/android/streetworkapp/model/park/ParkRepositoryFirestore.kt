@@ -12,10 +12,10 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
 
   companion object {
     private const val COLLECTION_PATH = "parks"
+    private const val INVALID_RATING_MESSAGE = "Rating must be between 1 and 5."
+    private const val PID_EMPTY = "Park ID cannot be empty."
+    private const val LID_EMPTY = "Location ID cannot be empty."
   }
-
-  val PID_EMPTY = "Park ID cannot be empty."
-  val LID_EMPTY = "Location ID cannot be empty."
 
   /**
    * Get a new park ID.
@@ -142,7 +142,7 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
    */
   override suspend fun addRating(pid: String, rating: Int) {
     require(pid.isNotEmpty()) { PID_EMPTY }
-    require(rating in 1..5) { "Rating must be between 1 and 5." }
+    require(rating in 1..5) { INVALID_RATING_MESSAGE }
     try {
       val document = db.collection(COLLECTION_PATH).document(pid).get().await()
       val currentRating = document.getDouble("rating") ?: 0.0
@@ -168,7 +168,7 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
    */
   override suspend fun deleteRating(pid: String, rating: Int) {
     require(pid.isNotEmpty()) { PID_EMPTY }
-    require(rating in 1..5) { "Rating must be between 1 and 5." }
+    require(rating in 1..5) { INVALID_RATING_MESSAGE }
     try {
       val document = db.collection(COLLECTION_PATH).document(pid).get().await()
       val currentRating = document.getDouble("rating") ?: 0.0
@@ -303,7 +303,7 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
    */
   override suspend fun addRating(pid: String, uid: String, rating: Int) {
     require(pid.isNotEmpty()) { PID_EMPTY }
-    require(rating in 1..5) { "Rating must be between 1 and 5." }
+    require(rating in 1..5) { INVALID_RATING_MESSAGE }
 
     try {
       val parkRef = db.collection(COLLECTION_PATH).document(pid)
