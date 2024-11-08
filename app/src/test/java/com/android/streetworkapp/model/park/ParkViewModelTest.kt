@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.android.streetworkapp.model.parklocation.ParkLocation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -175,13 +176,11 @@ class ParkViewModelTest {
   }
 
   @Test
-  fun setCurrentParkUpdatesCurrentPark() {
+  fun setCurrentParkUpdatesCurrentPark() = runTest {
     val park = createPark()
     parkViewModel.setCurrentPark(park)
 
-    var observedPark: Park? = null
-    parkViewModel.currentPark.observeForever { observedPark = it }
-
+    val observedPark = parkViewModel.currentPark.first()
     assertEquals(park, observedPark)
   }
 
@@ -193,9 +192,7 @@ class ParkViewModelTest {
     parkViewModel.getParkByPid("123")
     testDispatcher.scheduler.advanceUntilIdle()
 
-    var observedPark: Park? = null
-    parkViewModel.park.observeForever { observedPark = it }
-
+    val observedPark = parkViewModel.park.first()
     verify(repository).getParkByPid("123")
     assertEquals(park, observedPark)
   }
@@ -207,8 +204,8 @@ class ParkViewModelTest {
     whenever(repository.getParkByPid(pid)).thenReturn(park)
     parkViewModel.loadCurrentPark(pid)
     testDispatcher.scheduler.advanceUntilIdle()
-    var observedPark: Park? = null
-    parkViewModel.currentPark.observeForever { observedPark = it }
+
+    val observedPark = parkViewModel.currentPark.first()
     verify(repository).getParkByPid(pid)
     assertEquals(park, observedPark)
   }
