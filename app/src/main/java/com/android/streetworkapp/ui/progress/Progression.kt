@@ -37,7 +37,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -47,12 +46,11 @@ import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.theme.ColorPalette
 
 object ProgressionScreenSettings {
-    val PROGRESSION_COLOR_BLUE = Color(0xFF007BFF)
-    val PROGRESSION_COLOR_GRAY = Color(0xFFDDDDDD)
-    val progressBarSize = 145.dp
-    val columnPadding = PaddingValues(0.dp, progressBarSize * 0.15f, 0.dp, 0.dp)
+  val PROGRESSION_COLOR_BLUE = Color(0xFF007BFF)
+  val PROGRESSION_COLOR_GRAY = Color(0xFFDDDDDD)
+  val progressBarSize = 145.dp
+  val columnPadding = PaddingValues(0.dp, progressBarSize * 0.15f, 0.dp, 0.dp)
 }
-
 
 data class Achievement(
     val icon: Int, // Resource ID for the icon
@@ -125,7 +123,9 @@ fun ProgressScreen(
     LazyColumn(
         modifier =
             Modifier.fillMaxSize()
-                .padding(PaddingValues(0.dp, ProgressionScreenSettings.progressBarSize * 0.15f, 0.dp, 0.dp)),
+                .padding(
+                    PaddingValues(
+                        0.dp, ProgressionScreenSettings.progressBarSize * 0.15f, 0.dp, 0.dp)),
         horizontalAlignment = Alignment.CenterHorizontally) {
           item {
             // Title Text Above the Progress Bar
@@ -265,8 +265,7 @@ fun AchievementItem(achievement: Achievement) {
               text = achievement.title,
               fontSize = 16.sp,
               fontWeight = FontWeight.Bold,
-              color = ColorPalette.PRIMARY_TEXT_COLOR
-              )
+              color = ColorPalette.PRIMARY_TEXT_COLOR)
 
           // Tags Row
           FlowRow(
@@ -279,9 +278,9 @@ fun AchievementItem(achievement: Achievement) {
                       fontSize = 12.sp,
                       color = ColorPalette.SECONDARY_TEXT_COLOR,
                       modifier =
-                          Modifier.background(ColorPalette.BORDER_COLOR, shape = RoundedCornerShape(4.dp))
-                              .padding(horizontal = 8.dp, vertical = 2.dp)
-                    )
+                          Modifier.background(
+                                  ColorPalette.BORDER_COLOR, shape = RoundedCornerShape(4.dp))
+                              .padding(horizontal = 8.dp, vertical = 2.dp))
                 }
               }
 
