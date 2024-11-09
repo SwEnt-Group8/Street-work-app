@@ -1,9 +1,12 @@
 package com.android.streetworkapp.ui.navigation
 
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -15,6 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import com.android.streetworkapp.ui.theme.ColorPalette
 
 enum class BottomNavigationMenuType {
   NONE,
@@ -43,13 +49,25 @@ fun BottomNavigationMenu(
 ) {
 
   NavigationBar(
-      modifier = Modifier.testTag(BottomNavigationMenuType.DEFAULT.getTopLevelTestTag()),
-      containerColor = Color.Gray) {
+      modifier =
+          Modifier.height(65.dp).testTag(BottomNavigationMenuType.DEFAULT.getTopLevelTestTag()),
+      containerColor = ColorPalette.PRINCIPLE_BACKGROUND_COLOR) {
         tabList.forEach { topLevelDestination ->
           NavigationBarItem(
               modifier = Modifier.testTag("bottomNavigationItem"),
               icon = {
-                Icon(topLevelDestination.icon, contentDescription = topLevelDestination.textId)
+                topLevelDestination.imagePainter?.let {
+                  Image(
+                      painter = painterResource(id = topLevelDestination.imagePainter),
+                      contentDescription = topLevelDestination.textId,
+                      modifier =
+                          Modifier.size(
+                              24.dp) // default icon size for material, keeping the same to match
+                      )
+                }
+                topLevelDestination.icon?.let {
+                  Icon(topLevelDestination.icon, contentDescription = topLevelDestination.textId)
+                }
               },
               selected = false,
               onClick = { onTabSelect(topLevelDestination) })

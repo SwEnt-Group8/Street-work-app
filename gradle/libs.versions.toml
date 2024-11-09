@@ -1,5 +1,6 @@
 [versions]
 # Plugins
+coilCompose = "2.0.0-rc01"
 coreTesting = "2.2.0"
 gms = "4.4.2"
 agp = "8.3.0"
@@ -58,6 +59,7 @@ runtimeLivedata = "1.7.5"
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "coreTesting" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 json = { module = "org.json:json", version.ref = "json" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

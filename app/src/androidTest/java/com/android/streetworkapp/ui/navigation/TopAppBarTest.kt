@@ -147,7 +147,7 @@ class TopAppBarTest {
         composeTestRule.onNodeWithTag("topAppBar").assertIsDisplayed()
         screenParam.topAppBarManager?.let { topAppBarManager ->
           if (topAppBarManager.hasNavigationIcon())
-              composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
+              composeTestRule.onNodeWithTag("goBackButtonTopAppBar").assertIsDisplayed()
         }
       } else composeTestRule.onNodeWithTag("topAppBar").assertIsNotDisplayed()
     }
