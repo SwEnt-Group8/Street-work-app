@@ -111,7 +111,6 @@ open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
   fun updateImageReference(pid: String, imageReference: String) =
       viewModelScope.launch { repository.updateImageReference(pid, imageReference) }
 
-
   /**
    * Delete a rating from a park.
    *

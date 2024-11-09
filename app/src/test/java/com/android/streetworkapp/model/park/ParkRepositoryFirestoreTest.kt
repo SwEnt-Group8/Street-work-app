@@ -526,5 +526,4 @@ class ParkRepositoryFirestoreTest {
     // Assert
     verify(documentRef).update(mapOf("rating" to newRating, "nbrRating" to newNbrRating))
   }
-
 }
