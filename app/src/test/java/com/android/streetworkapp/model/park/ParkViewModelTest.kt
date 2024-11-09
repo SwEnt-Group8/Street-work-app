@@ -11,10 +11,12 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.kotlin.whenever
 
@@ -104,15 +106,6 @@ class ParkViewModelTest {
     parkViewModel.updateImageReference(pid, imageReference)
     testDispatcher.scheduler.advanceUntilIdle()
     verify(repository).updateImageReference(pid, imageReference)
-  }
-
-  @Test
-  fun addRatingCallsRepositoryWithCorrectPidAndRating() = runTest {
-    val pid = "123"
-    val rating = 4
-    parkViewModel.addRating(pid, rating)
-    testDispatcher.scheduler.advanceUntilIdle()
-    verify(repository).addRating(pid, rating)
   }
 
   @Test
@@ -218,5 +211,64 @@ class ParkViewModelTest {
     parkViewModel.getOrCreateParkByLocation(parkLocation)
     testDispatcher.scheduler.advanceUntilIdle()
     verify(repository).getOrCreateParkByLocation(parkLocation)
+  }
+
+  @Test
+  fun addRatingCallsRepositoryWithCorrectParameters() = runTest {
+    // Arrange
+    val pid = "123"
+    val uid = "user_001"
+    val rating = 4.0f
+
+    // Act
+    parkViewModel.addRating(pid, uid, rating)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    // Assert
+    verify(repository).addRating(pid, uid, rating)
+  }
+
+  @Test
+  fun addRatingUpdatesRatingCorrectly() = runTest {
+    // Arrange
+    val pid = "123"
+    val uid = "user_001"
+    val newRating = 4.0f
+    val existingRating = 3.5f
+    val existingNbrRating = 2
+
+    // Set up initial park data with an average rating and number of raters
+    val park =
+        createPark(pid = pid).apply {
+          this.rating = existingRating
+          this.nbrRating = existingNbrRating
+          this.votersUIDs = mutableListOf("user_002") // Assume "user_002" already rated
+        }
+
+    // Mock the repository methods
+    whenever(repository.getParkByPid(pid)).thenReturn(park)
+    whenever(repository.addRating(pid, uid, newRating)).thenAnswer {
+      // Update the park object as if the rating was added
+      val updatedNbrRating = park.nbrRating + 1
+      val updatedRating = (newRating + park.nbrRating * park.rating) / updatedNbrRating
+      park.rating = updatedRating
+      park.nbrRating = updatedNbrRating
+      park.votersUIDs += uid
+      null
+    }
+
+    // Act
+    parkViewModel.addRating(pid, uid, newRating)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    // Calculate the expected new rating using the formula
+    val expectedNbrRating = existingNbrRating + 1
+    val expectedRating = (newRating + (existingNbrRating * existingRating)) / expectedNbrRating
+
+    // Assert that the rating and number of ratings were updated correctly in the ViewModel's
+    // currentPark
+    assertEquals(expectedRating, parkViewModel.currentPark.first()?.rating)
+    assertEquals(expectedNbrRating, parkViewModel.currentPark.first()?.nbrRating)
+    assertTrue(parkViewModel.currentPark.first()?.votersUIDs?.contains(uid) ?: false)
   }
 }

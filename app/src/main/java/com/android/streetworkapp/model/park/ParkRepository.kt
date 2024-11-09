@@ -19,8 +19,6 @@ interface ParkRepository {
 
   suspend fun updateImageReference(pid: String, imageReference: String)
 
-  suspend fun addRating(pid: String, rating: Int)
-
   suspend fun deleteRating(pid: String, rating: Int)
 
   suspend fun updateCapacity(pid: String, capacity: Int)
@@ -32,6 +30,8 @@ interface ParkRepository {
   suspend fun addEventToPark(pid: String, eid: String)
 
   suspend fun deleteEventFromPark(pid: String, eid: String)
+
+  suspend fun addRating(pid: String, uid: String, rating: Float)
 
   suspend fun deleteParkByPid(pid: String)
 }

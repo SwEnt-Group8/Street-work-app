@@ -112,15 +112,6 @@ open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
       viewModelScope.launch { repository.updateImageReference(pid, imageReference) }
 
   /**
-   * Add a rating to a park.
-   *
-   * @param pid The park ID.
-   * @param rating The rating to add.
-   */
-  fun addRating(pid: String, rating: Int) =
-      viewModelScope.launch { repository.addRating(pid, rating) }
-
-  /**
    * Delete a rating from a park.
    *
    * @param pid The park ID.
@@ -169,6 +160,20 @@ open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
    */
   fun deleteEventFromPark(pid: String, eid: String) =
       viewModelScope.launch { repository.deleteEventFromPark(pid, eid) }
+
+  /**
+   * Add a rating to a park, ensuring that the user has not already rated it.
+   *
+   * @param pid The park ID.
+   * @param uid The user ID of the person rating.
+   * @param rating The rating to add.
+   */
+  fun addRating(pid: String, uid: String, rating: Float) =
+      viewModelScope.launch {
+        repository.addRating(pid, uid, rating)
+        val updatedPark = repository.getParkByPid(pid)
+        _currentPark.value = updatedPark
+      }
 
   /**
    * Delete a park by its ID.
