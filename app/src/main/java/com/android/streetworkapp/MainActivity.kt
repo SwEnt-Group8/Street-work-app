@@ -168,7 +168,7 @@ fun StreetWorkApp(
       }) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Route.AUTH) { // TODO: handle start destination based on signIn logic
+            startDestination = Route.MAP) { // TODO: handle start destination based on signIn logic
               navigation(
                   startDestination = Screen.AUTH,
                   route = Route.AUTH,
@@ -197,15 +197,7 @@ fun StreetWorkApp(
                   AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
                 }
                 composable(Screen.EVENT_OVERVIEW) {
-                  EventOverviewScreen(
-                      navigationActions,
-                      eventViewModel,
-                      parkViewModel,
-                      innerPadding,
-                      screenParams) // TODO: change to current park and current selected Event
-                  // Note: navigationActions is not used here atm but it will be useful to link
-                  // event to parks (ex: user clicks on event notif in social and wants to see the
-                  // park overview from here)
+                  EventOverviewScreen(eventViewModel, parkViewModel, innerPadding)
                 }
               }
 

@@ -28,9 +28,9 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -51,6 +51,9 @@ import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.utils.toFormattedString
+import kotlinx.coroutines.Delay
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.delay
 
 /**
  * Display the overview of a park, including park details and a list of events.
@@ -67,16 +70,18 @@ fun ParkOverviewScreen(
     navigationActions: NavigationActions,
     eventViewModel: EventViewModel
 ) {
-  val currentPark by parkViewModel.currentPark.observeAsState()
+    LaunchedEffect(parkViewModel.currentPark) {
+        delay(3000)
+    }
+  val currentPark = parkViewModel.currentPark.collectAsState()
 
-  currentPark?.let { eventViewModel.getEvents(it) }
+  currentPark.value?.let { eventViewModel.getEvents(it) }
 
   Box(modifier = Modifier.padding(innerPadding).fillMaxSize().testTag("parkOverviewScreen")) {
     Column {
-      parkViewModel.currentPark.value?.let {
-        ImageTitle(image = null, title = it.name)
-      } // TODO: Fetch image from Firestore storage
-      ParkDetails(park = parkViewModel.currentPark.value!!)
+      ImageTitle(image = null, title = currentPark.value?.name ?: "Unknown Park")
+      // TODO: Fetch image from Firestore storage
+      currentPark.value?.let { ParkDetails(park = it) }
       EventItemList(eventViewModel, navigationActions) // TODO: Fetch events from Firestore
     }
     FloatingActionButton(

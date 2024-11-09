@@ -61,6 +61,7 @@ fun MapScreen(
                 contentDescription = "Marker",
                 state = MarkerState(position = LatLng(park.lat, park.lon)),
                 onClick = {
+                  parkViewModel.getOrCreateParkByLocation(park)
                   navigationActions.navigateTo(Screen.PARK_OVERVIEW)
                   true
                 })

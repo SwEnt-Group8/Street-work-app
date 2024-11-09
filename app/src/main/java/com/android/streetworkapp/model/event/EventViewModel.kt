@@ -20,10 +20,6 @@ open class EventViewModel(private val repository: EventRepository) : ViewModel()
   val currentEvent: StateFlow<Event?>
     get() = _currentEvent
 
-  private val _parkEventList = MutableStateFlow<List<Event>>(emptyList())
-  val parkeventList: StateFlow<List<Event>>
-    get() = _parkEventList
-
   fun setCurrentEvent(event: Event?) {
     _currentEvent.value = event
   }

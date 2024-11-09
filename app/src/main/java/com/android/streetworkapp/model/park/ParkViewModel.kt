@@ -24,7 +24,7 @@ open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
    * @param park The park to set as the current park.
    */
   fun setCurrentPark(park: Park?) {
-    _currentPark.postValue(park)
+    _currentPark.value = park
   }
 
   /**
@@ -57,7 +57,7 @@ open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
   fun getParkByPid(pid: String) {
     viewModelScope.launch {
       val fetchedPark = repository.getParkByPid(pid)
-      _park.value = fetchedPark
+      _currentPark.value = fetchedPark
     }
   }
 
@@ -89,7 +89,7 @@ open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
   fun getOrCreateParkByLocation(location: ParkLocation) {
     viewModelScope.launch {
       val park = repository.getOrCreateParkByLocation(location)
-      _park.value = park
+      _currentPark.value = park
     }
   }
 

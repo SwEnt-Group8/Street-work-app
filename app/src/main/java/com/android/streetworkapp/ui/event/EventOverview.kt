@@ -39,8 +39,6 @@ import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkViewModel
-import com.android.streetworkapp.ui.navigation.NavigationActions
-import com.android.streetworkapp.ui.navigation.ScreenParams
 import com.android.streetworkapp.ui.theme.Snowflake
 import com.android.streetworkapp.utils.toFormattedString
 import com.google.android.gms.maps.model.CameraPosition
@@ -65,17 +63,13 @@ private val uiState: MutableStateFlow<DashboardState> = MutableStateFlow(Dashboa
  */
 @Composable
 fun EventOverviewScreen(
-    navigationActions: NavigationActions,
     eventViewModel: EventViewModel,
     parkViewModel: ParkViewModel,
-    paddingValues: PaddingValues = PaddingValues(0.dp),
-    screenParams: ScreenParams?,
+    paddingValues: PaddingValues = PaddingValues(0.dp)
 ) {
 
   val event = eventViewModel.currentEvent.collectAsState().value!!
-  val park = parkViewModel.currentPark.value!!
-
-  screenParams?.topAppBarManager?.setTopAppBarTitle(event.title)
+  val park = parkViewModel.currentPark.collectAsState()
 
   Box(modifier = Modifier.fillMaxSize().padding(paddingValues).testTag("eventOverviewScreen")) {
     Column(modifier = Modifier.fillMaxHeight().testTag("eventContent")) {
@@ -104,7 +98,7 @@ fun EventOverviewScreen(
 
       Spacer(modifier = Modifier.height(16.dp))
 
-      EventMap(park)
+        park.value?.let { EventMap(it) }
     }
   }
 }
