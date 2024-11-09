@@ -111,14 +111,6 @@ open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
   fun updateImageReference(pid: String, imageReference: String) =
       viewModelScope.launch { repository.updateImageReference(pid, imageReference) }
 
-  /**
-   * Add a rating to a park.
-   *
-   * @param pid The park ID.
-   * @param rating The rating to add.
-   */
-  fun addRating(pid: String, rating: Int) =
-      viewModelScope.launch { repository.addRating(pid, rating) }
 
   /**
    * Delete a rating from a park.
