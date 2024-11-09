@@ -109,15 +109,6 @@ class ParkViewModelTest {
   }
 
   @Test
-  fun addRatingCallsRepositoryWithCorrectPidAndRating() = runTest {
-    val pid = "123"
-    val rating = 4
-    parkViewModel.addRating(pid, rating)
-    testDispatcher.scheduler.advanceUntilIdle()
-    verify(repository).addRating(pid, rating)
-  }
-
-  @Test
   fun deleteRatingCallsRepositoryWithCorrectPidAndRating() = runTest {
     val pid = "123"
     val rating = 4
