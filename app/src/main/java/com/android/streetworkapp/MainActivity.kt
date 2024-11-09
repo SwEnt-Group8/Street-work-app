@@ -42,6 +42,8 @@ import com.android.streetworkapp.ui.navigation.TopAppBarWrapper
 import com.android.streetworkapp.ui.park.ParkOverviewScreen
 import com.android.streetworkapp.ui.profile.AddFriendScreen
 import com.android.streetworkapp.ui.profile.ProfileScreen
+import com.android.streetworkapp.ui.progress.ProgressScreen
+import com.android.streetworkapp.ui.theme.ColorPalette
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.Date
@@ -131,6 +133,7 @@ fun StreetWorkApp(
           listParticipants = listOf("user1", "user2", "user3"),
           parkId = "park567")
   Scaffold(
+      containerColor = ColorPalette.PRINCIPLE_BACKGROUND_COLOR,
       topBar = {
         screenParams
             ?.isTopBarVisible
@@ -167,6 +170,9 @@ fun StreetWorkApp(
                   route = Route.AUTH,
               ) {
                 composable(Screen.AUTH) { SignInScreen(navigationActions, userViewModel) }
+              }
+              navigation(startDestination = Screen.PROGRESSION, route = Route.PROGRESSION) {
+                composable(Screen.PROGRESSION) { ProgressScreen(navigationActions, innerPadding) }
               }
               navigation(
                   startDestination = Screen.MAP,

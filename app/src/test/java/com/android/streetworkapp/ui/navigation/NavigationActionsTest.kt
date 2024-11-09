@@ -104,6 +104,7 @@ class NavigationActionsTest {
         TopLevelDestination(
             Route.AUTH,
             Icons.Outlined.AccountBox,
+            null,
             "Auth") // dummy top lvl dest, it shouldn't exist for the Auth route but we need it for
     // the test
 
