@@ -135,32 +135,6 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
   }
 
   /**
-   * Add a rating to a park.
-   *
-   * @param pid The park ID.
-   * @param rating The rating to add from 1 to 5.
-   */
-  override suspend fun addRating(pid: String, rating: Int) {
-    require(pid.isNotEmpty()) { PID_EMPTY }
-    require(rating in 1..5) { INVALID_RATING_MESSAGE }
-    try {
-      val document = db.collection(COLLECTION_PATH).document(pid).get().await()
-      val currentRating = document.getDouble("rating") ?: 0.0
-      val currentNbrRating = document.getLong("nbrRating")?.toInt() ?: 0
-
-      val newNbrRating = currentNbrRating + 1
-      val newRating = ((currentRating * currentNbrRating) + rating) / newNbrRating
-
-      db.collection(COLLECTION_PATH)
-          .document(pid)
-          .update(mapOf("rating" to newRating, "nbrRating" to newNbrRating))
-          .await()
-    } catch (e: Exception) {
-      Log.e("FirestoreError", "Error adding rating to park: ${e.message}")
-    }
-  }
-
-  /**
    * Delete a rating from a park.
    *
    * @param pid The park ID.
