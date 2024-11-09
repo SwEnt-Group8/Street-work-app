@@ -192,7 +192,7 @@ class ParkViewModelTest {
     parkViewModel.getParkByPid("123")
     testDispatcher.scheduler.advanceUntilIdle()
 
-    val observedPark = parkViewModel.park.first()
+    val observedPark = parkViewModel.currentPark.first()
     verify(repository).getParkByPid("123")
     assertEquals(park, observedPark)
   }

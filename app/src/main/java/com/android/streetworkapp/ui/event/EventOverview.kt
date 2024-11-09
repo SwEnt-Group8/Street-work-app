@@ -98,7 +98,7 @@ fun EventOverviewScreen(
 
       Spacer(modifier = Modifier.height(16.dp))
 
-        park.value?.let { EventMap(it) }
+      park.value?.let { EventMap(it) }
     }
   }
 }

@@ -133,9 +133,6 @@ fun StreetWorkApp(
           listParticipants = listOf("user1", "user2", "user3"),
           parkId = "park567")
 
-  // parkViewModel.getParkByPid("123")
-  // parkViewModel.setCurrentPark(parkViewModel.park.value)
-
   Scaffold(
       containerColor = ColorPalette.PRINCIPLE_BACKGROUND_COLOR,
       topBar = {
@@ -168,7 +165,7 @@ fun StreetWorkApp(
       }) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Route.MAP) { // TODO: handle start destination based on signIn logic
+            startDestination = Route.AUTH) { // TODO: handle start destination based on signIn logic
               navigation(
                   startDestination = Screen.AUTH,
                   route = Route.AUTH,

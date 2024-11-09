@@ -89,7 +89,7 @@ open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
   fun getOrCreateParkByLocation(location: ParkLocation) {
     viewModelScope.launch {
       val park = repository.getOrCreateParkByLocation(location)
-      _currentPark.value = park
+      _park.value = park
     }
   }
 

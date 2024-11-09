@@ -28,7 +28,6 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -51,9 +50,6 @@ import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.utils.toFormattedString
-import kotlinx.coroutines.Delay
-import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.delay
 
 /**
  * Display the overview of a park, including park details and a list of events.
@@ -70,10 +66,9 @@ fun ParkOverviewScreen(
     navigationActions: NavigationActions,
     eventViewModel: EventViewModel
 ) {
-    LaunchedEffect(parkViewModel.currentPark) {
-        delay(3000)
-    }
   val currentPark = parkViewModel.currentPark.collectAsState()
+
+  parkViewModel.park.collectAsState().value?.pid?.let { parkViewModel.getParkByPid(it) }
 
   currentPark.value?.let { eventViewModel.getEvents(it) }
 
@@ -222,7 +217,6 @@ fun EventItemList(eventViewModel: EventViewModel, navigationActions: NavigationA
     when (uiState) {
       is EventOverviewUiState.NotEmpty -> {
         LazyColumn {
-          println("EventItemList: ${uiState.eventList}")
           items(uiState.eventList) { event -> EventItem(event, eventViewModel, navigationActions) }
         }
       }
