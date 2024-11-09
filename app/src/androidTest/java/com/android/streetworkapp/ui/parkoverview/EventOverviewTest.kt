@@ -89,10 +89,7 @@ class EventOverviewTest {
   fun everyImmutableComposableAreDisplayed() = runTest {
     eventViewModel.setCurrentEvent(event)
     parkViewModel.setCurrentPark(park)
-    composeTestRule.setContent {
-      EventOverviewScreen(
-          navigationActions, eventViewModel, parkViewModel, screenParams = screenParams)
-    }
+    composeTestRule.setContent { EventOverviewScreen(eventViewModel, parkViewModel) }
 
     composeTestRule.onNodeWithTag("eventOverviewScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("eventContent").assertIsDisplayed()
@@ -119,10 +116,7 @@ class EventOverviewTest {
   fun everythingIsDisplayedInDashBoard() = runTest {
     eventViewModel.setCurrentEvent(event)
     parkViewModel.setCurrentPark(park)
-    composeTestRule.setContent {
-      EventOverviewScreen(
-          navigationActions, eventViewModel, parkViewModel, screenParams = screenParams)
-    }
+    composeTestRule.setContent { EventOverviewScreen(eventViewModel, parkViewModel) }
 
     composeTestRule.onNodeWithTag("eventDashboard").assertIsDisplayed()
     composeTestRule.onNodeWithTag("dashboard").assertIsDisplayed()
