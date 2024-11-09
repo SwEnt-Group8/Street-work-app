@@ -46,8 +46,13 @@ import com.android.sample.R
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.theme.ColorPalette
 
-val PROGRESSION_COLOR_BLUE = Color(0xFF007BFF)
-val PROGRESSION_COLOR_GRAY = Color(0xFFDDDDDD)
+object ProgressionScreenSettings {
+    val PROGRESSION_COLOR_BLUE = Color(0xFF007BFF)
+    val PROGRESSION_COLOR_GRAY = Color(0xFFDDDDDD)
+    val progressBarSize = 145.dp
+    val columnPadding = PaddingValues(0.dp, progressBarSize * 0.15f, 0.dp, 0.dp)
+}
+
 
 data class Achievement(
     val icon: Int, // Resource ID for the icon
@@ -109,7 +114,6 @@ fun ProgressScreen(
     navigationActions: NavigationActions,
     paddingValues: PaddingValues = PaddingValues(0.dp)
 ) {
-  val progressBarSize = 145.dp
 
   val scoreText = buildAnnotatedString {
     append("780")
@@ -121,7 +125,7 @@ fun ProgressScreen(
     LazyColumn(
         modifier =
             Modifier.fillMaxSize()
-                .padding(PaddingValues(0.dp, progressBarSize * 0.15f, 0.dp, 0.dp)),
+                .padding(PaddingValues(0.dp, ProgressionScreenSettings.progressBarSize * 0.15f, 0.dp, 0.dp)),
         horizontalAlignment = Alignment.CenterHorizontally) {
           item {
             // Title Text Above the Progress Bar
@@ -132,7 +136,7 @@ fun ProgressScreen(
 
             Spacer(modifier = Modifier.height(26.dp))
 
-            CircularProgressBar(progress = 0.78f, progressBarSize)
+            CircularProgressBar(progress = 0.78f, ProgressionScreenSettings.progressBarSize)
 
             Spacer(modifier = Modifier.height(15.dp))
 
@@ -191,11 +195,10 @@ fun CircularProgressBar(
       contentAlignment = Alignment.Center,
       modifier = Modifier.size(size).testTag("circularProgressBar")) {
         Canvas(modifier = Modifier.size(size)) {
-          val sweepAngle = 360 * progress
 
           // Background Arc
           drawArc(
-              color = PROGRESSION_COLOR_GRAY,
+              color = ProgressionScreenSettings.PROGRESSION_COLOR_GRAY,
               startAngle = 0f,
               sweepAngle = 360f,
               useCenter = false,
@@ -203,9 +206,9 @@ fun CircularProgressBar(
 
           // Foreground Arc
           drawArc(
-              color = PROGRESSION_COLOR_BLUE,
+              color = ProgressionScreenSettings.PROGRESSION_COLOR_BLUE,
               startAngle = -90f,
-              sweepAngle = sweepAngle,
+              sweepAngle = 360 * progress,
               useCenter = false,
               style = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Round))
         }
