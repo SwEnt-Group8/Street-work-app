@@ -164,7 +164,8 @@ fun StreetWorkApp(
       }) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Route.AUTH) { // TODO: handle start destination based on signIn logic
+            startDestination =
+                Route.PROGRESSION) { // TODO: handle start destination based on signIn logic
               navigation(
                   startDestination = Screen.AUTH,
                   route = Route.AUTH,
