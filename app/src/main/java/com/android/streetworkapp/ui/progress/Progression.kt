@@ -37,6 +37,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -45,7 +46,6 @@ import com.android.sample.R
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.theme.ColorPalette
 
-// TODO: we need to define a global color palette somewhere
 val PROGRESSION_COLOR_BLUE = Color(0xFF007BFF)
 val PROGRESSION_COLOR_GRAY = Color(0xFFDDDDDD)
 
@@ -262,7 +262,8 @@ fun AchievementItem(achievement: Achievement) {
               text = achievement.title,
               fontSize = 16.sp,
               fontWeight = FontWeight.Bold,
-              color = ColorPalette.PRIMARY_TEXT_COLOR)
+              color = ColorPalette.PRIMARY_TEXT_COLOR
+              )
 
           // Tags Row
           FlowRow(
@@ -275,8 +276,9 @@ fun AchievementItem(achievement: Achievement) {
                       fontSize = 12.sp,
                       color = ColorPalette.SECONDARY_TEXT_COLOR,
                       modifier =
-                          Modifier.background(Color(0xFFE0E0E0), shape = RoundedCornerShape(4.dp))
-                              .padding(horizontal = 8.dp, vertical = 2.dp))
+                          Modifier.background(ColorPalette.BORDER_COLOR, shape = RoundedCornerShape(4.dp))
+                              .padding(horizontal = 8.dp, vertical = 2.dp)
+                    )
                 }
               }
 
