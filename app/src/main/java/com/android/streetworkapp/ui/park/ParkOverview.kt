@@ -29,7 +29,6 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -74,7 +73,7 @@ fun ParkOverviewScreen(
 
   Box(modifier = Modifier.padding(innerPadding).fillMaxSize().testTag("parkOverviewScreen")) {
     Column {
-      ImageTitle(image = null, title = currentPark.value?.name ?: "Unknown Park")
+      ImageTitle(image = null, title = currentPark.value?.name ?: "loading...")
       // TODO: Fetch image from Firestore storage
       currentPark.value?.let { ParkDetails(park = it) }
       EventItemList(eventViewModel, navigationActions) // TODO: Fetch events from Firestore

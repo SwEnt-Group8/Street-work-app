@@ -72,14 +72,14 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
     return if (document.exists()) {
       Event(
           eid = document.id,
-          title = document.get("title") as String,
-          description = document.get("description") as String,
-          participants = (document.get("participants") as Long).toInt(),
-          maxParticipants = (document.get("maxParticipants") as Long).toInt(),
-          date = document.get("date") as Timestamp,
-          owner = document.get("owner") as String,
-          listParticipants = document.get("listParticipants") as List<String>,
-          parkId = document.get("parkId") as String)
+          title = document["title"] as String,
+          description = document["description"] as String,
+          participants = (document["participants"] as Long).toInt(),
+          maxParticipants = (document["maxParticipants"] as Long).toInt(),
+          date = document["date"] as Timestamp,
+          owner = document["owner"] as String,
+          listParticipants = document["listParticipants"] as List<String>,
+          parkId = document["parkId"] as String)
     } else {
       null
     }

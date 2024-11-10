@@ -105,18 +105,6 @@ fun StreetWorkApp(
   screenParams = LIST_OF_SCREENS.find { currentScreenName.value == it.screenName }
 
   // Park with no events
-  val testPark =
-      Park(
-          pid = "123",
-          name = "Sample Park",
-          location = ParkLocation(0.0, 0.0, "321"),
-          imageReference = "parks/sample.png",
-          rating = 4.0f,
-          nbrRating = 2,
-          capacity = 10,
-          occupancy = 5,
-          events = emptyList())
-
   val sampleEvent =
       Event(
           eid = "event123",
