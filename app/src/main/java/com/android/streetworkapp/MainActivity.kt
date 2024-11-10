@@ -17,11 +17,9 @@ import androidx.navigation.navigation
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
 import com.android.streetworkapp.model.event.EventViewModel
-import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkRepositoryFirestore
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
-import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
 import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
