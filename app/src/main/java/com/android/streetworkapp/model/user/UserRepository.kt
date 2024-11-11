@@ -14,6 +14,8 @@ interface UserRepository {
 
   suspend fun addUser(user: User)
 
+  suspend fun getOrAddUserByUid(uid: String): User
+
   suspend fun updateUserScore(uid: String, newScore: Int)
 
   suspend fun increaseUserScore(uid: String, points: Int)
