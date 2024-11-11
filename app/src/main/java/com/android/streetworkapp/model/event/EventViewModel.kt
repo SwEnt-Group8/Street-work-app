@@ -51,10 +51,8 @@ open class EventViewModel(private val repository: EventRepository) : ViewModel()
           park,
           onSuccess = {
             if (it.isEmpty()) {
-              Log.d("EventViewModel", "No events found")
               setUiState(EventOverviewUiState.Empty)
             } else {
-              Log.d("EventViewModel", "lesgo it is not empty event: $it")
               setUiState(EventOverviewUiState.NotEmpty(it))
             }
           },

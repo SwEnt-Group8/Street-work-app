@@ -78,9 +78,10 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
           maxParticipants = (document["maxParticipants"] as Long).toInt(),
           date = document["date"] as Timestamp,
           owner = document["owner"] as String,
-          listParticipants = document["listParticipants"] as List<String>,
+          listParticipants = (document["listParticipants"] as List<*>).filterIsInstance<String>(),
           parkId = document["parkId"] as String)
     } else {
+      Log.e("FirestoreError", "Error converting document to event: Document does not exist.")
       null
     }
   }

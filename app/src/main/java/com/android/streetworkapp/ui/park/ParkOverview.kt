@@ -2,7 +2,6 @@ package com.android.streetworkapp.ui.park
 
 // Portions of this code were generated with the help of GitHub Copilot.
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -76,14 +75,10 @@ fun ParkOverviewScreen(
       ImageTitle(image = null, title = currentPark.value?.name ?: "loading...")
       // TODO: Fetch image from Firestore storage
       currentPark.value?.let { ParkDetails(park = it) }
-      EventItemList(eventViewModel, navigationActions) // TODO: Fetch events from Firestore
+      EventItemList(eventViewModel, navigationActions)
     }
     FloatingActionButton(
-        onClick = {
-          navigationActions.navigateTo(Screen.ADD_EVENT)
-
-          Log.d("ParkOverviewScreen", "Create event button clicked") // TODO: Handle button click
-        },
+        onClick = { navigationActions.navigateTo(Screen.ADD_EVENT) },
         modifier =
             Modifier.align(Alignment.BottomCenter)
                 .padding(40.dp)
