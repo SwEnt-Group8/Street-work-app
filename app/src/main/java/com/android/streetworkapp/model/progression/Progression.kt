@@ -26,13 +26,13 @@ data class Progression(
  *
  * @param icon The icon.
  * @param title The title of this progression.
- * @param tag The tags linked to this achievement.
+ * @param tags The tags linked to this achievement.
  * @param description A description of the achievement.
  */
 data class Achievement(
     val icon: Int,
     val title: String,
-    val tag: List<String>,
+    val tags: List<String>,
     val description: String
 )
 
