@@ -25,6 +25,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,6 +44,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
+import com.android.streetworkapp.model.progression.Achievement
+import com.android.streetworkapp.model.progression.MedalsAchievement
+import com.android.streetworkapp.model.progression.ProgressionViewModel
+import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.theme.ColorPalette
 
@@ -52,56 +58,6 @@ object ProgressionScreenSettings {
   val columnPadding = PaddingValues(0.dp, progressBarSize * 0.15f, 0.dp, 0.dp)
 }
 
-data class Achievement(
-    val icon: Int, // Resource ID for the icon
-    val title: String,
-    val tags: List<String>,
-    val description: String
-)
-
-val sampleAchievements =
-    listOf(
-        Achievement(
-            icon = R.drawable.park_default, // Replace with actual resource ID
-            title = "Novice Explorer",
-            tags = listOf("Exploration", "Beginner"),
-            description = "Granted for completing your first adventure in the wild."),
-        Achievement(
-            icon = R.drawable.park_default, // Replace with actual resource ID
-            title =
-                "First Place First Place First Place First Place First Place First Place First Place First Place",
-            tags =
-                listOf(
-                    "Victory",
-                    "Competition",
-                    "Gold",
-                    "Gold",
-                    "Victory",
-                    "Competition",
-                    "Gold",
-                    "Gold",
-                    "Victory",
-                    "Competition",
-                    "Gold",
-                    "Gold"),
-            description =
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."),
-        Achievement(
-            icon = R.drawable.park_default, // Replace with actual resource ID
-            title = "Novice Explorer",
-            tags = listOf("Exploration", "Beginner"),
-            description = "Granted for completing your first adventure in the wild."),
-        Achievement(
-            icon = R.drawable.park_default, // Replace with actual resource ID
-            title = "Master of the Craft",
-            tags = listOf("Crafting", "Expert"),
-            description = "Recognized for mastering a complex crafting skill."),
-        Achievement(
-            icon = R.drawable.park_default, // Replace with actual resource ID
-            title = "Team Player",
-            tags = listOf("Collaboration", "Teamwork"),
-            description = "Earned by contributing significantly to a team project."))
-
 // note: I haven' tested big values in the metrics tabs, the assumption was that those shouldn't
 // overflow the boxes either way (unless we put some stupid score system)
 // I did test for the rest thought
@@ -109,14 +65,29 @@ val sampleAchievements =
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ProgressScreen(
-    navigationActions: NavigationActions,
+    navigationActions: NavigationActions, //Note: not used yet
+    userViewModel: UserViewModel,
+    progressionViewModel: ProgressionViewModel,
     paddingValues: PaddingValues = PaddingValues(0.dp)
 ) {
 
-  val scoreText = buildAnnotatedString {
-    append("780")
+  val currentUser by userViewModel.currentUser.collectAsState()
+  val currentProgression by progressionViewModel.currentProgression.collectAsState()
 
-    withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) { append("/1000") }
+    currentUser?.uid?.let { progressionViewModel.getCurrentProgression(it) }
+
+    val progressionPercentage = //in case of error set it to 0, otherwise score/currentGoal
+        (if (currentUser == null || currentProgression.currentGoal == 0)
+            0f
+        else
+            currentUser?.score?.div(currentProgression.currentGoal.toFloat()))
+        ?: 0f
+
+
+    val scoreText = buildAnnotatedString {
+    append("${currentUser?.score}")
+
+    withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) { append("/${currentProgression.currentGoal}") }
   }
 
   Box(modifier = Modifier.padding(paddingValues).testTag("progressionScreen")) {
@@ -124,8 +95,7 @@ fun ProgressScreen(
         modifier =
             Modifier.fillMaxSize()
                 .padding(
-                    PaddingValues(
-                        0.dp, ProgressionScreenSettings.progressBarSize * 0.15f, 0.dp, 0.dp)),
+                    ProgressionScreenSettings.columnPadding),
         horizontalAlignment = Alignment.CenterHorizontally) {
           item {
             // Title Text Above the Progress Bar
@@ -136,7 +106,7 @@ fun ProgressScreen(
 
             Spacer(modifier = Modifier.height(26.dp))
 
-            CircularProgressBar(progress = 0.78f, ProgressionScreenSettings.progressBarSize)
+            CircularProgressBar(progress = progressionPercentage, ProgressionScreenSettings.progressBarSize)
 
             Spacer(modifier = Modifier.height(15.dp))
 
@@ -157,9 +127,9 @@ fun ProgressScreen(
             ) {
               MetricCard(
                   label = "Total score",
-                  value = "4'321") // TODO: format text pulled from db to this style
-              MetricCard(label = "Parks visited", value = "3")
-              MetricCard(label = "Friends added", value = "9")
+                  value = "${currentUser?.score}")
+              MetricCard(label = "Parks visited", value = "<tbi>") //TODO: to be implemented when Park visited metric will be done
+              MetricCard(label = "Friends added", value = "${currentUser?.friends?.size}")
             }
 
             Spacer(modifier = Modifier.height(15.dp))
@@ -175,9 +145,10 @@ fun ProgressScreen(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).fillMaxWidth())
           }
 
-          itemsIndexed(sampleAchievements) { index, achievement ->
+          itemsIndexed(currentProgression.achievements) { index, achievementName ->
+            val achievementEnum = enumValueOf<MedalsAchievement>(achievementName)
             Box(modifier = Modifier.testTag("achievementItem${index}")) {
-              AchievementItem(achievement)
+              AchievementItem(achievementEnum.achievement)
               HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
             }
           }
@@ -272,7 +243,7 @@ fun AchievementItem(achievement: Achievement) {
               horizontalArrangement = Arrangement.spacedBy(4.dp),
               verticalArrangement = Arrangement.spacedBy(5.dp),
               modifier = Modifier.padding(top = 4.dp)) {
-                achievement.tags.forEach { tag ->
+                achievement.tag.forEach { tag ->
                   Text(
                       text = tag,
                       fontSize = 12.sp,
