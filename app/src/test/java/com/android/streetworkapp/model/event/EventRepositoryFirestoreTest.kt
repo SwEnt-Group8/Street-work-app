@@ -1,7 +1,8 @@
 package com.android.streetworkapp.model.event
 
-import android.annotation.SuppressLint
 import androidx.test.core.app.ApplicationProvider
+import com.android.streetworkapp.model.park.Park
+import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
@@ -81,21 +82,52 @@ class EventRepositoryFirestoreTest {
     verify(documentRef).set(event)
   }
 
-  @SuppressLint("CheckResult")
   @Test
-  fun getEvents_calls_collection_get() {
-    // Ensure that mockToDoQuerySnapshot is properly initialized and mocked
-    `when`(collection.get()).thenReturn(Tasks.forResult(query))
+  fun getEventByEid_calls_getdocument() = runTest {
+    `when`(collection.document(event.eid)).thenReturn(documentRef)
+    `when`(documentRef.get()).thenReturn(Tasks.forResult(document))
 
-    // Ensure the QuerySnapshot returns a list of mock DocumentSnapshots
-    `when`(query.documents).thenReturn(listOf())
+    eventRepository.getEventByEid(event.eid)
 
-    val onSuccess: (List<Event>) -> Unit = {}
-    val onFailure: (Exception) -> Unit = {}
-    eventRepository.getEvents(onSuccess, onFailure)
+    verify(documentRef, timeout(1000)).get()
+  }
 
-    // Verify that the 'documents' field was accessed
-    org.mockito.kotlin.verify(timeout(100)) { (query).documents }
-    verify(collection).get()
+  @Test
+  fun getEvents_calls_getDocument() = runTest {
+    val park =
+        Park(
+            pid = "123",
+            name = "EPFL Esplanade",
+            location = ParkLocation(0.0, 0.0, "321"),
+            imageReference = "parks/sample.png",
+            rating = 4.0f,
+            nbrRating = 102,
+            capacity = 10,
+            occupancy = 8,
+            events = listOf(event.eid))
+    whenever(db.collection("parks")).thenReturn(collection)
+    `when`(collection.document(event.eid)).thenReturn(documentRef)
+    `when`(documentRef.get()).thenReturn(Tasks.forResult(document))
+
+    eventRepository.getEvents(park, {}, { throw it })
+
+    verify(documentRef, timeout(1000)).get()
+  }
+
+  @Test
+  fun documentToEvent_works() {
+    `when`(document.exists()).thenReturn(true)
+    `when`(document.id).thenReturn(event.eid)
+    `when`(document.get("date")).thenReturn(event.date)
+    `when`(document.get("title")).thenReturn(event.title)
+    `when`(document.get("owner")).thenReturn(event.owner)
+    `when`(document.get("participants")).thenReturn(event.participants.toLong())
+    `when`(document.get("description")).thenReturn(event.description)
+    `when`(document.get("capacity")).thenReturn(event.listParticipants)
+    `when`(document.get("maxParticipants")).thenReturn(event.maxParticipants.toLong())
+    `when`(document.get("parkId")).thenReturn(event.parkId)
+    `when`(document.get("listParticipants")).thenReturn(event.listParticipants)
+    val fetchedEvent = eventRepository.documentToEvent(document)
+    assertEquals(event, fetchedEvent)
   }
 }

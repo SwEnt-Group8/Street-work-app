@@ -6,6 +6,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.printToLog
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.streetworkapp.model.park.ParkRepository
+import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
@@ -23,6 +25,8 @@ import org.mockito.Mockito.`when`
 class MapUiTest {
   private lateinit var parkLocationRepository: ParkLocationRepository
   private lateinit var parkLocationViewModel: ParkLocationViewModel
+  private lateinit var parkRepository: ParkRepository
+  private lateinit var parkViewModel: ParkViewModel
   private lateinit var navigationActions: NavigationActions
 
   @get:Rule val composeTestRule = createComposeRule()
@@ -31,12 +35,16 @@ class MapUiTest {
   fun setUp() {
     parkLocationRepository = OverpassParkLocationRepository(OkHttpClient())
     parkLocationViewModel = ParkLocationViewModel(parkLocationRepository)
+    parkRepository = mock(ParkRepository::class.java)
+    parkViewModel = ParkViewModel(parkRepository)
     navigationActions = mock(NavigationActions::class.java)
   }
 
   @Test
   fun printComposeHierarchy() {
-    composeTestRule.setContent { MapScreen(parkLocationViewModel, navigationActions) }
+    composeTestRule.setContent {
+      MapScreen(parkLocationViewModel, parkViewModel, navigationActions)
+    }
     composeTestRule.onRoot().printToLog("MapScreen")
   }
 
@@ -44,7 +52,9 @@ class MapUiTest {
   fun displayAllComponents() {
     `when`(navigationActions.currentRoute()).thenReturn(Screen.MAP)
 
-    composeTestRule.setContent { MapScreen(parkLocationViewModel, navigationActions) }
+    composeTestRule.setContent {
+      MapScreen(parkLocationViewModel, parkViewModel, navigationActions)
+    }
 
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("googleMap").assertIsDisplayed()

@@ -5,18 +5,25 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventList
 import com.android.streetworkapp.model.event.EventRepository
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.Park
+import com.android.streetworkapp.model.park.ParkRepository
+import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.navigation.Route
+import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.park.OccupancyBar
 import com.android.streetworkapp.ui.park.ParkOverviewScreen
 import com.android.streetworkapp.ui.park.RatingComponent
 import com.google.firebase.Timestamp
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Rule
@@ -25,6 +32,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
+import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
 class ParkOverviewTest {
@@ -34,6 +42,7 @@ class ParkOverviewTest {
   private lateinit var invalidRatingPark: Park
   private lateinit var invalidOccupancyPark: Park
   private lateinit var eventViewModel: EventViewModel
+  private lateinit var parkViewModel: ParkViewModel
 
   private val eventList =
       EventList(
@@ -51,7 +60,7 @@ class ParkOverviewTest {
   // Mocks
   private lateinit var navigationActions: NavigationActions
   private lateinit var eventRepository: EventRepository
-
+  private lateinit var parkRepository: ParkRepository
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
@@ -59,6 +68,10 @@ class ParkOverviewTest {
     navigationActions = mock(NavigationActions::class.java)
     eventRepository = mock(EventRepository::class.java)
     eventViewModel = EventViewModel(eventRepository)
+    parkRepository = mock(ParkRepository::class.java)
+    parkViewModel = ParkViewModel(parkRepository)
+
+    `when`(navigationActions.currentRoute()).thenReturn(Route.MAP)
 
     // Park with events
     park =
@@ -86,7 +99,11 @@ class ParkOverviewTest {
 
   @Test
   fun parkOverviewScreenHasRequiredComponents() {
-    composeTestRule.setContent { ParkOverviewScreen(park, eventViewModel = eventViewModel) }
+    parkViewModel.setCurrentPark(park)
+    composeTestRule.setContent {
+      ParkOverviewScreen(
+          parkViewModel, eventViewModel = eventViewModel, navigationActions = navigationActions)
+    }
     composeTestRule.onNodeWithTag("parkOverviewScreen").isDisplayed()
     composeTestRule.onNodeWithTag("imageTitle").isDisplayed()
     composeTestRule.onNodeWithTag("title").isDisplayed()
@@ -107,21 +124,29 @@ class ParkOverviewTest {
 
   @Test
   fun parkOverviewScreenDisplaysCorrectParkDetails() {
-    composeTestRule.setContent { ParkOverviewScreen(park, eventViewModel = eventViewModel) }
+    parkViewModel.setCurrentPark(park)
+    composeTestRule.setContent {
+      ParkOverviewScreen(
+          parkViewModel, eventViewModel = eventViewModel, navigationActions = navigationActions)
+    }
     composeTestRule.onNodeWithTag("title").assertTextEquals("EPFL Esplanade")
     composeTestRule.onNodeWithTag("nbrReview").assertTextEquals("(102)")
     composeTestRule.onNodeWithTag("occupancyText").assertTextEquals("80% Occupancy")
   }
 
   @Test
-  fun parkOverviewScreenDisplaysCorrectEvent() {
-    `when`(eventRepository.getEvents(any(), any())).then {
-      it.getArgument<(List<Event>) -> Unit>(0)(listOf(eventList.events.first()))
+  fun parkOverviewScreenDisplaysCorrectEvent() = runTest {
+    `when`(eventRepository.getEvents(any(), any(), any())).then {
+      it.getArgument<(List<Event>) -> Unit>(1)(listOf(eventList.events.first()))
     }
 
-    eventViewModel.getEvents()
+    parkViewModel.setCurrentPark(park)
 
-    composeTestRule.setContent { ParkOverviewScreen(park, eventViewModel = eventViewModel) }
+    composeTestRule.setContent {
+      ParkOverviewScreen(
+          parkViewModel, eventViewModel = eventViewModel, navigationActions = navigationActions)
+    }
+
     composeTestRule.onNodeWithTag("createEventButton").assertTextEquals("Create an event")
     composeTestRule.onNodeWithTag("eventItem").assertTextContains("Group workout")
     composeTestRule
@@ -133,11 +158,20 @@ class ParkOverviewTest {
     composeTestRule
         .onNodeWithTag("eventButtonText", useUnmergedTree = true)
         .assertTextContains("About")
+    composeTestRule.onNodeWithTag("eventButton").performClick()
+
+    assertEquals(eventList.events.first(), eventViewModel.currentEvent.value)
+
+    verify(navigationActions).navigateTo(Screen.EVENT_OVERVIEW)
   }
 
   @Test
   fun parkOverviewScreenDisplaysTextWhenNoEvent() {
-    composeTestRule.setContent { ParkOverviewScreen(noEventPark, eventViewModel = eventViewModel) }
+    parkViewModel.setCurrentPark(noEventPark)
+    composeTestRule.setContent {
+      ParkOverviewScreen(
+          parkViewModel, eventViewModel = eventViewModel, navigationActions = navigationActions)
+    }
     composeTestRule.onNodeWithTag("noEventText").isDisplayed()
     composeTestRule.onNodeWithTag("noEventText").assertTextEquals("No event is planned yet")
   }
@@ -154,18 +188,22 @@ class ParkOverviewTest {
 
   @Test
   fun parkOverviewScreenInvalidRatingTriggersException() {
+    parkViewModel.setCurrentPark(invalidRatingPark)
     assertThrows(IllegalArgumentException::class.java) {
       composeTestRule.setContent {
-        ParkOverviewScreen(invalidRatingPark, eventViewModel = eventViewModel)
+        ParkOverviewScreen(
+            parkViewModel, eventViewModel = eventViewModel, navigationActions = navigationActions)
       }
     }
   }
 
   @Test
   fun parkOverviewScreenInvalidOccupancyTriggersException() {
+    parkViewModel.setCurrentPark(invalidOccupancyPark)
     assertThrows(IllegalArgumentException::class.java) {
       composeTestRule.setContent {
-        ParkOverviewScreen(invalidOccupancyPark, eventViewModel = eventViewModel)
+        ParkOverviewScreen(
+            parkViewModel, eventViewModel = eventViewModel, navigationActions = navigationActions)
       }
     }
   }
