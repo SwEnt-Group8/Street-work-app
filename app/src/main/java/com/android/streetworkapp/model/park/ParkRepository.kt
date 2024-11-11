@@ -15,7 +15,7 @@ interface ParkRepository {
 
   suspend fun getOrCreateParkByLocation(location: ParkLocation): Park?
 
-  suspend fun updateName(pid: String, name: String)
+  fun updateName(pid: String, name: String)
 
   suspend fun updateImageReference(pid: String, imageReference: String)
 

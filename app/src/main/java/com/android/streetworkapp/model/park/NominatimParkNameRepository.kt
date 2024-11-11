@@ -7,7 +7,7 @@ import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import org.json.JSONObject
+import org.json.JSONArray
 
 class NominatimParkNameRepository(val client: OkHttpClient) : ParkNameRepository {
 
@@ -34,7 +34,7 @@ class NominatimParkNameRepository(val client: OkHttpClient) : ParkNameRepository
             .addQueryParameter("format", "json")
             .build()
 
-    val request = Request.Builder().url(url).header("User-Agent", "test/5.0").build()
+    val request = Request.Builder().url(url).header("User-Agent", "testtest/5.0").build()
 
     client
         .newCall(request)
@@ -45,16 +45,18 @@ class NominatimParkNameRepository(val client: OkHttpClient) : ParkNameRepository
               }
 
               override fun onResponse(call: Call, response: Response) {
-                response.body?.let { decodeRoadJson(it.string()) }?.let { onSuccess(it) }
+
+                onSuccess(decodeRoadJson(response.body!!.string()))
               }
             })
   }
 
   fun decodeRoadJson(json: String): String {
     require(json.isNotEmpty())
-    val jsonObject = JSONObject(json)
-    val array = jsonObject.getJSONArray("address")
-    val roadName = array.getString(0)
-    return roadName
+    val jsonArray = JSONArray(json)
+    val jsonObject = jsonArray.getJSONObject(0)
+    val address = jsonObject.getJSONObject("address")
+    val road = address.getString("road")
+    return road
   }
 }

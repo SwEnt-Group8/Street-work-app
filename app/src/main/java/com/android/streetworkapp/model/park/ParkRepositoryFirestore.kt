@@ -108,11 +108,11 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
    * @param pid The park ID.
    * @param name The new name.
    */
-  override suspend fun updateName(pid: String, name: String) {
+  override fun updateName(pid: String, name: String) {
     require(pid.isNotEmpty()) { PID_EMPTY }
     require(name.isNotEmpty()) { "Name cannot be empty." }
     try {
-      db.collection(COLLECTION_PATH).document(pid).update("name", name).await()
+      db.collection(COLLECTION_PATH).document(pid).update("name", name)
     } catch (e: Exception) {
       Log.e("FirestoreError", "Error updating park name: ${e.message}")
     }

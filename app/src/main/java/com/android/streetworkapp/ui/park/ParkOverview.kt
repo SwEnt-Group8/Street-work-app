@@ -70,6 +70,8 @@ fun ParkOverviewScreen(
 
   currentPark.value?.let { eventViewModel.getEvents(it) }
 
+  parkViewModel.updateCurrentParkNameNominatim()
+
   Box(modifier = Modifier.padding(innerPadding).fillMaxSize().testTag("parkOverviewScreen")) {
     Column {
       ImageTitle(image = null, title = currentPark.value?.name ?: "loading...")

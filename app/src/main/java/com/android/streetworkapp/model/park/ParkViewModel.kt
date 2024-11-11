@@ -7,7 +7,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
+open class ParkViewModel(
+    private val repository: ParkRepository,
+    private val nameRepository: ParkNameRepository
+) : ViewModel() {
 
   // StateFlow of the current park
   private val _currentPark = MutableStateFlow<Park?>(null)
@@ -17,6 +20,10 @@ open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
   private val _park = MutableStateFlow<Park?>(null)
   val park: StateFlow<Park?>
     get() = _park
+
+  private val _parkLocation = MutableStateFlow<ParkLocation>(ParkLocation())
+  val parkLocation: StateFlow<ParkLocation>
+    get() = _parkLocation
 
   /**
    * Set the current park.
@@ -101,6 +108,22 @@ open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
    */
   fun updateName(pid: String, name: String) =
       viewModelScope.launch { repository.updateName(pid, name) }
+
+  /** Update the name of the current park using the nominatim API. */
+  fun updateCurrentParkNameNominatim() =
+      viewModelScope.launch {
+        if (_currentPark.value?.name?.contains("Default Park") == true) {
+          nameRepository.convertLocationIdToParkName(
+              _parkLocation.value.id,
+              { name -> _currentPark.value?.let { repository.updateName(it.pid, name) } },
+              {})
+        }
+      }
+
+  /** Set parkLocation */
+  fun setParkLocation(parkLocation: ParkLocation) {
+    _parkLocation.value = parkLocation
+  }
 
   /**
    * Update the image reference of a park.
