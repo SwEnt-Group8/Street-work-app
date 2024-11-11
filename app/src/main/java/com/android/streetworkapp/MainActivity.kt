@@ -17,11 +17,9 @@ import androidx.navigation.navigation
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
 import com.android.streetworkapp.model.event.EventViewModel
-import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkRepositoryFirestore
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
-import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
 import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
@@ -105,18 +103,6 @@ fun StreetWorkApp(
   screenParams = LIST_OF_SCREENS.find { currentScreenName.value == it.screenName }
 
   // Park with no events
-  val testPark =
-      Park(
-          pid = "123",
-          name = "Sample Park",
-          location = ParkLocation(0.0, 0.0, "321"),
-          imageReference = "parks/sample.png",
-          rating = 4.0f,
-          nbrRating = 2,
-          capacity = 10,
-          occupancy = 5,
-          events = emptyList())
-
   val sampleEvent =
       Event(
           eid = "event123",
@@ -132,6 +118,7 @@ fun StreetWorkApp(
           owner = "ownerUserId",
           listParticipants = listOf("user1", "user2", "user3"),
           parkId = "park567")
+
   Scaffold(
       containerColor = ColorPalette.PRINCIPLE_BACKGROUND_COLOR,
       topBar = {
@@ -181,25 +168,19 @@ fun StreetWorkApp(
                 composable(Screen.MAP) {
                   MapScreen(
                       parkLocationViewModel,
+                      parkViewModel,
                       navigationActions,
                       mapCallbackOnMapLoaded,
                       innerPadding)
                 }
                 composable(Screen.PARK_OVERVIEW) {
-                  ParkOverviewScreen(testPark, innerPadding, navigationActions, eventViewModel)
+                  ParkOverviewScreen(parkViewModel, innerPadding, navigationActions, eventViewModel)
                 }
                 composable(Screen.ADD_EVENT) {
                   AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
                 }
                 composable(Screen.EVENT_OVERVIEW) {
-                  EventOverviewScreen(
-                      navigationActions,
-                      sampleEvent,
-                      testPark,
-                      innerPadding) // TODO: change to current park and current selected Event
-                  // Note: navigationActions is not used here atm but it will be useful to link
-                  // event to parks (ex: user clicks on event notif in social and wants to see the
-                  // park overview from here)
+                  EventOverviewScreen(eventViewModel, parkViewModel, innerPadding)
                 }
               }
 
