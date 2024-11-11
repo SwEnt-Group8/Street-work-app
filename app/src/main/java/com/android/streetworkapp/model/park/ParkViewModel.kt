@@ -6,10 +6,11 @@ import com.android.streetworkapp.model.parklocation.ParkLocation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
 
 open class ParkViewModel(
     private val repository: ParkRepository,
-    private val nameRepository: ParkNameRepository
+    private val nameRepository: ParkNameRepository = NominatimParkNameRepository(OkHttpClient())
 ) : ViewModel() {
 
   // StateFlow of the current park
@@ -112,6 +113,9 @@ open class ParkViewModel(
   /** Update the name of the current park using the nominatim API. */
   fun updateCurrentParkNameNominatim() =
       viewModelScope.launch {
+
+        // Only true when we have never updated the park name with nominatim to reduce calls to the
+        // API
         if (_currentPark.value?.name?.contains("Default Park") == true) {
           nameRepository.convertLocationIdToParkName(
               _parkLocation.value.id,
@@ -120,7 +124,11 @@ open class ParkViewModel(
         }
       }
 
-  /** Set parkLocation */
+  /**
+   * Set the new parkLocation
+   *
+   * @param parkLocation: a ParkLocation object
+   */
   fun setParkLocation(parkLocation: ParkLocation) {
     _parkLocation.value = parkLocation
   }
