@@ -74,7 +74,7 @@ fun ProgressScreen(
   val currentUser by userViewModel.currentUser.collectAsState()
   val currentProgression by progressionViewModel.currentProgression.collectAsState()
 
-    currentUser?.uid?.let { progressionViewModel.getCurrentProgression(it) }
+  currentUser?.uid?.let { progressionViewModel.getCurrentProgression(it) }
 
     val progressionPercentage = //in case of error set it to 0, otherwise score/currentGoal
         (if (currentUser == null || currentProgression.currentGoal == 0)
@@ -84,7 +84,7 @@ fun ProgressScreen(
         ?: 0f
 
 
-    val scoreText = buildAnnotatedString {
+    val scoreTextUnderCircularProgressBar = buildAnnotatedString {
     append("${currentUser?.score}")
 
     withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) { append("/${currentProgression.currentGoal}") }
@@ -110,7 +110,7 @@ fun ProgressScreen(
 
             Spacer(modifier = Modifier.height(15.dp))
 
-            Text(text = scoreText, fontSize = 16.sp, color = Color.Gray)
+            Text(text = scoreTextUnderCircularProgressBar, modifier = Modifier.testTag("scoreTextUnderCircularProgressBar"), fontSize = 16.sp, color = Color.Gray)
 
             Spacer(modifier = Modifier.height(40.dp))
           }
@@ -127,9 +127,11 @@ fun ProgressScreen(
             ) {
               MetricCard(
                   label = "Total score",
-                  value = "${currentUser?.score}")
-              MetricCard(label = "Parks visited", value = "<tbi>") //TODO: to be implemented when Park visited metric will be done
-              MetricCard(label = "Friends added", value = "${currentUser?.friends?.size}")
+                  value = "${currentUser?.score}",
+                  testTagPrefix = "metricCardScore"
+              )
+              MetricCard(label = "Parks visited", value = "<tbi>", testTagPrefix = "metricCardParksVisited") //TODO: to be implemented when Park visited metric will be done
+              MetricCard(label = "Friends added", value = "${currentUser?.friends?.size}", testTagPrefix = "metricCardFriendsAdded")
             }
 
             Spacer(modifier = Modifier.height(15.dp))
@@ -187,6 +189,7 @@ fun CircularProgressBar(
         // Percentage Text
         Text(
             text = "${(progress * 100).toInt()}%",
+            modifier = Modifier.testTag("percentageInsideCircularProgressBar"),
             fontSize = 26.sp,
             fontWeight = FontWeight.Bold,
             color = ColorPalette.PRIMARY_TEXT_COLOR)
@@ -194,7 +197,7 @@ fun CircularProgressBar(
 }
 
 @Composable
-fun MetricCard(label: String, value: String) {
+fun MetricCard(label: String, value: String, testTagPrefix: String) {
   Box(modifier = Modifier.padding(vertical = 4.dp)) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -205,6 +208,7 @@ fun MetricCard(label: String, value: String) {
           Text(text = label, fontSize = 13.sp, color = ColorPalette.SECONDARY_TEXT_COLOR)
           Text(
               text = value,
+              modifier = Modifier.testTag(testTagPrefix + "Value"),
               fontSize = 15.sp,
               fontWeight = FontWeight.Bold,
               color = ColorPalette.PRIMARY_TEXT_COLOR)
@@ -243,7 +247,7 @@ fun AchievementItem(achievement: Achievement) {
               horizontalArrangement = Arrangement.spacedBy(4.dp),
               verticalArrangement = Arrangement.spacedBy(5.dp),
               modifier = Modifier.padding(top = 4.dp)) {
-                achievement.tag.forEach { tag ->
+                achievement.tags.forEach { tag ->
                   Text(
                       text = tag,
                       fontSize = 12.sp,
