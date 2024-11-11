@@ -66,7 +66,7 @@ fun ParkOverviewScreen(
 ) {
   val currentPark = parkViewModel.currentPark.collectAsState()
 
-  parkViewModel.park.collectAsState().value?.pid?.let { parkViewModel.getParkByPid(it) }
+  parkViewModel.park.collectAsState().value?.pid?.let { parkViewModel.loadCurrentPark(it) }
 
   currentPark.value?.let { eventViewModel.getEvents(it) }
 
