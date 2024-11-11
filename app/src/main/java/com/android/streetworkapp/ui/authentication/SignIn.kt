@@ -53,7 +53,6 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
             firebaseUser?.let { firebaseUser -> userViewModel.getUserByUid(firebaseUser.uid) }
             Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
             navigationActions.navigateTo(Screen.MAP)
-            userViewModel.getUserByUid(firebaseUser?.uid ?: "")
           },
           onAuthError = {
             firebaseUser = null
