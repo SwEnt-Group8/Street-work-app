@@ -14,6 +14,8 @@ import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
+import com.android.streetworkapp.model.progression.ProgressionRepositoryFirestore
+import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
 import io.mockk.every
@@ -79,7 +81,9 @@ class TopAppBarTest {
           {},
           UserViewModel(mockk<UserRepositoryFirestore>()),
           ParkViewModel(mockk<ParkRepositoryFirestore>()),
-          EventViewModel(mockk<EventRepositoryFirestore>()))
+          EventViewModel(mockk<EventRepositoryFirestore>()),
+          ProgressionViewModel(mockk<ProgressionRepositoryFirestore>())
+      )
     }
 
     for (screenParam in LIST_OF_SCREENS) {

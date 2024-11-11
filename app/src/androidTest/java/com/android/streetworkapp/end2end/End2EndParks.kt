@@ -34,6 +34,7 @@ import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
+import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.Route
 import io.mockk.every
@@ -106,7 +107,9 @@ class End2EndParks {
           { idlingResource.decrement() },
           UserViewModel(mockk()),
           ParkViewModel(mockk()),
-          EventViewModel(mockk()))
+          EventViewModel(mockk()),
+          ProgressionViewModel(mockk())
+      )
       // setup so as we're already on the MAP route
     }
 
