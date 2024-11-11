@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,14 +53,24 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
             firebaseUser = result.user
             checkAndAddUser(firebaseUser, userViewModel)
             firebaseUser?.let { firebaseUser -> userViewModel.getUserByUid(firebaseUser.uid) }
-            Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
-            navigationActions.navigateTo(Screen.MAP)
           },
           onAuthError = {
             firebaseUser = null
             Log.d("SignInScreen", "Sign-in failed : $it")
             Toast.makeText(context, "Login failed! : $it", Toast.LENGTH_LONG).show()
           })
+
+  val user by userViewModel.user.collectAsState()
+
+  // Wait for the user to be fetched from database before setting it
+  // as the current user and navigating to the map screen
+  LaunchedEffect(user) {
+    user?.let {
+      userViewModel.setCurrentUser(it)
+      Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
+      navigationActions.navigateTo(Screen.MAP)
+    }
+  }
 
   Box(modifier = Modifier.fillMaxSize().testTag("loginScreenBoxContainer")) {
 
