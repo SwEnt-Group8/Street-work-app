@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
@@ -97,64 +98,96 @@ fun ProgressScreen(
                 .padding(
                     ProgressionScreenSettings.columnPadding),
         horizontalAlignment = Alignment.CenterHorizontally) {
-          item {
+        item {
             // Title Text Above the Progress Bar
             Text(
                 text = "Progress to reach next level",
                 fontSize = 16.sp,
-                color = ColorPalette.SECONDARY_TEXT_COLOR)
+                color = ColorPalette.SECONDARY_TEXT_COLOR
+            )
 
             Spacer(modifier = Modifier.height(26.dp))
 
-            CircularProgressBar(progress = progressionPercentage, ProgressionScreenSettings.progressBarSize)
+            CircularProgressBar(
+                progress = progressionPercentage,
+                ProgressionScreenSettings.progressBarSize
+            )
 
             Spacer(modifier = Modifier.height(15.dp))
 
-            Text(text = scoreTextUnderCircularProgressBar, modifier = Modifier.testTag("scoreTextUnderCircularProgressBar"), fontSize = 16.sp, color = Color.Gray)
+            Text(
+                text = scoreTextUnderCircularProgressBar,
+                modifier = Modifier.testTag("scoreTextUnderCircularProgressBar"),
+                fontSize = 16.sp,
+                color = Color.Gray
+            )
 
             Spacer(modifier = Modifier.height(40.dp))
-          }
+        }
 
-          item {
+        item {
             Text(
                 text = "Metrics",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = ColorPalette.PRIMARY_TEXT_COLOR)
+                color = ColorPalette.PRIMARY_TEXT_COLOR
+            )
             FlowRow(
                 modifier = Modifier.testTag("metricCards"),
                 horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
             ) {
-              MetricCard(
-                  label = "Total score",
-                  value = "${currentUser?.score}",
-                  testTagPrefix = "metricCardScore"
-              )
-              MetricCard(label = "Parks visited", value = "<tbi>", testTagPrefix = "metricCardParksVisited") //TODO: to be implemented when Park visited metric will be done
-              MetricCard(label = "Friends added", value = "${currentUser?.friends?.size}", testTagPrefix = "metricCardFriendsAdded")
+                MetricCard(
+                    label = "Total score",
+                    value = "${currentUser?.score}",
+                    testTagPrefix = "metricCardScore"
+                )
+                MetricCard(
+                    label = "Parks visited",
+                    value = "<tbi>",
+                    testTagPrefix = "metricCardParksVisited"
+                ) //TODO: to be implemented when Park visited metric will be done
+                MetricCard(
+                    label = "Friends added",
+                    value = "${currentUser?.friends?.size}",
+                    testTagPrefix = "metricCardFriendsAdded"
+                )
             }
 
             Spacer(modifier = Modifier.height(15.dp))
-          }
+        }
 
-          item {
+        item {
             Text(
                 text = "Achievements",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black,
                 textAlign = TextAlign.Start,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).fillMaxWidth())
-          }
-
-          itemsIndexed(currentProgression.achievements) { index, achievementName ->
-            val achievementEnum = enumValueOf<MedalsAchievement>(achievementName)
-            Box(modifier = Modifier.testTag("achievementItem${index}")) {
-              AchievementItem(achievementEnum.achievement)
-              HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
-            }
-          }
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).fillMaxWidth()
+            )
         }
+
+        if (currentProgression.achievements.isEmpty()) {
+            item {
+                    Text(
+                        text = "You don't have any achievements yet!",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = ColorPalette.SECONDARY_TEXT_COLOR,
+                        modifier = Modifier.padding(top = 10.dp).testTag("emptyAchievementsText")
+
+                    )
+            }
+        } else {
+            itemsIndexed(currentProgression.achievements) { index, achievementName ->
+                val achievementEnum = enumValueOf<MedalsAchievement>(achievementName)
+                Box(modifier = Modifier.testTag("achievementItem${index}")) {
+                    AchievementItem(achievementEnum.achievement)
+                    HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
+                }
+            }
+        }
+    }
   }
 }
 

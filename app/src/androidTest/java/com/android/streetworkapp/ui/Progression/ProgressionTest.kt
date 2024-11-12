@@ -1,11 +1,9 @@
 package com.android.streetworkapp.ui.Progression
 
-import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onChild
 import androidx.compose.ui.test.onNodeWithTag
 import com.android.streetworkapp.model.progression.MedalsAchievement
 import com.android.streetworkapp.model.progression.Progression
@@ -79,7 +77,7 @@ class ProgressionTest {
   }
 
   @Test
-  fun screenDisplaysCorrectElementsOnTypicalInput() {
+  fun screenDisplaysCorrectElementsOnTypicalInputWithNonEmptyAchievements() {
 
     val mockedProgression = Progression(
       progressionId = "prog123456",
@@ -106,10 +104,35 @@ class ProgressionTest {
     //composeTestRule.onNodeWithTag("metricCardParksVisitedValue").assertTextEquals(INPUT_VALUE) TODO: commented out as it is not yet implemented
     composeTestRule.onNodeWithTag("metricCardFriendsAddedValue").assertTextEquals("${mockedUser.friends.size}")
 
+    composeTestRule.onNodeWithTag("emptyAchievementsText").assertIsNotDisplayed()
 
     mockedProgression.achievements.forEachIndexed { index, achievementName -> //only one achievement for now, but since we'll scale things later I make the test easily scalable
       val achievement = enumValueOf<MedalsAchievement>(achievementName).achievement
       val achievementItem = composeTestRule.onNodeWithTag("achievementItem${index}")
     }
+  }
+
+  @Test
+  fun screenDisplaysEmptyAchievementsTextIfNoAchievements() {
+    val mockedProgression = Progression(
+      progressionId = "prog123456",
+      uid = mockedUser.uid,
+      currentGoal = Ranks.BRONZE.score,
+      eventsCreated = 0,
+      eventsJoined = 0,
+      achievements = emptyList()
+    )
+
+    val getProgressionOnSuccessSlot = slot<(Progression) -> Unit>()
+    every {
+      progressionRepository.getProgression(any(), capture(getProgressionOnSuccessSlot), any())
+    } answers {
+      getProgressionOnSuccessSlot.captured(mockedProgression)
+    }
+
+    composeTestRule.setContent { ProgressScreen(navigationActions, userViewModel, progressionViewModel ) }
+
+    composeTestRule.onNodeWithTag("emptyAchievementsText").assertIsDisplayed()
+
   }
 }
