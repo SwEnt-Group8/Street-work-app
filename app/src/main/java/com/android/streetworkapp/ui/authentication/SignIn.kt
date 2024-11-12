@@ -92,6 +92,8 @@ fun checkAndAddUser(user: FirebaseUser?, userViewModel: UserViewModel) {
   if (user == null) return
   // Observe _user for the result of fetchUserByUid
 
+  //TODO: if user is not in db yet, create him and create his progression with createProgression
+
   // userViewModel.user.observeForever(observer)
   userViewModel.getUserByUid(user.uid)
   userViewModel.getFriendsByUid(user.uid)
