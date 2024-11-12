@@ -62,19 +62,18 @@ open class ProgressionViewModel(private val repository: ProgressionRepository) :
   fun checkScore(score: Int) =
       viewModelScope.launch {
         if (_currentProgression.value.currentGoal < score) {
+            val unlockedAchievement = getMedalByScore(_currentProgression.value.currentGoal)
+            val nextMedalName = enumValues<MedalsAchievement>().getOrNull(unlockedAchievement.ordinal + 1)?.name
+            nextMedalName?.let { // if this executes this means that the user is not at the highest rank
+                val newAchievements =
+                    _currentProgression.value.achievements + unlockedAchievement.name
+                currentProgression.value.currentGoal = enumValueOf<Ranks>(it).score
 
-          val newAchievements =
-              _currentProgression.value.achievements +
-                  getMedalByScore(_currentProgression.value.currentGoal).name
-
-          _currentProgression.value.currentGoal *= 10
-
-          _currentProgression.value.achievements = newAchievements
-
-          repository.updateProgressionWithAchievementAndGoal(
-              _currentProgression.value.progressionId,
-              newAchievements,
-              _currentProgression.value.currentGoal)
+                repository.updateProgressionWithAchievementAndGoal(
+                    _currentProgression.value.progressionId,
+                    newAchievements,
+                    _currentProgression.value.currentGoal)
+            }
         }
       }
 }
