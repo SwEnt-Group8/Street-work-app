@@ -2,7 +2,6 @@ package com.android.streetworkapp.ui.park
 
 // Portions of this code were generated with the help of GitHub Copilot.
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -55,6 +54,7 @@ import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventOverviewUiState
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.Park
+import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.theme.ColorPalette
@@ -63,30 +63,36 @@ import com.android.streetworkapp.utils.toFormattedString
 /**
  * Display the overview of a park, including park details and a list of events.
  *
- * @param park The park data to display.
+ * @param parkViewModel The view model for the park.
+ * @param innerPadding The padding to apply to the screen.
+ * @param navigationActions The navigation actions to navigate to other screens.
+ * @param eventViewModel The view model for the events.
  */
 @Composable
 fun ParkOverviewScreen(
-    park: Park,
+    parkViewModel: ParkViewModel,
     innerPadding: PaddingValues = PaddingValues(0.dp),
     navigationActions: NavigationActions = NavigationActions(rememberNavController()),
     eventViewModel: EventViewModel
 ) {
+  val currentPark = parkViewModel.currentPark.collectAsState()
+
+  parkViewModel.park.collectAsState().value?.pid?.let { parkViewModel.loadCurrentPark(it) }
+
+  currentPark.value?.let { eventViewModel.getEvents(it) }
+
   val showRatingDialog = remember { mutableStateOf(false) }
 
   Box(modifier = Modifier.padding(innerPadding).fillMaxSize().testTag("parkOverviewScreen")) {
     Column {
-      ImageTitle(image = null, title = park.name) // TODO: Fetch image from Firestore storage
-      ParkDetails(park = park, showRatingDialog)
-      RatingDialog(showRatingDialog)
-      EventItemList(eventViewModel) // TODO: Fetch events from Firestore
+      ImageTitle(image = null, title = currentPark.value?.name ?: "loading...")
+      // TODO: Fetch image from Firestore storage
+      currentPark.value?.let { ParkDetails(park = it, showRatingDialog) }
+        RatingDialog(showRatingDialog)
+      EventItemList(eventViewModel, navigationActions)
     }
     FloatingActionButton(
-        onClick = {
-          navigationActions.navigateTo(Screen.ADD_EVENT)
-
-          Log.d("ParkOverviewScreen", "Create event button clicked") // TODO: Handle button click
-        },
+        onClick = { navigationActions.navigateTo(Screen.ADD_EVENT) },
         modifier =
             Modifier.align(Alignment.BottomCenter)
                 .padding(40.dp)
@@ -307,7 +313,7 @@ fun OccupancyBar(occupancy: Float) {
  * @param eventList The list of events to display.
  */
 @Composable
-fun EventItemList(eventViewModel: EventViewModel) {
+fun EventItemList(eventViewModel: EventViewModel, navigationActions: NavigationActions) {
   val uiState = eventViewModel.uiState.collectAsState().value
 
   Column(modifier = Modifier.testTag("eventItemList")) {
@@ -319,7 +325,9 @@ fun EventItemList(eventViewModel: EventViewModel) {
 
     when (uiState) {
       is EventOverviewUiState.NotEmpty -> {
-        LazyColumn { items(uiState.eventList) { event -> EventItem(event = event) } }
+        LazyColumn {
+          items(uiState.eventList) { event -> EventItem(event, eventViewModel, navigationActions) }
+        }
       }
       is EventOverviewUiState.Empty -> {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -341,7 +349,7 @@ fun EventItemList(eventViewModel: EventViewModel) {
  * @param event The event data to display.
  */
 @Composable
-fun EventItem(event: Event) {
+fun EventItem(event: Event, eventViewModel: EventViewModel, navigationActions: NavigationActions) {
   ListItem(
       modifier = Modifier.padding(0.dp).testTag("eventItem"),
       headlineContent = { Text(text = event.title) },
@@ -366,7 +374,8 @@ fun EventItem(event: Event) {
       trailingContent = {
         Button(
             onClick = {
-              Log.d("EventItem", "About event button clicked") // TODO: Handle button click
+              eventViewModel.setCurrentEvent(event)
+              navigationActions.navigateTo(Screen.EVENT_OVERVIEW)
             },
             modifier = Modifier.size(width = 80.dp, height = 48.dp).testTag("eventButton"),
             colors = ButtonDefaults.buttonColors(),

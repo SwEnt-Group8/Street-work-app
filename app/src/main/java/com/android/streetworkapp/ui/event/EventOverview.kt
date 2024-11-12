@@ -36,8 +36,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.android.sample.R
 import com.android.streetworkapp.model.event.Event
+import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.Park
-import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.ui.theme.Snowflake
 import com.android.streetworkapp.utils.toFormattedString
 import com.google.android.gms.maps.model.CameraPosition
@@ -57,16 +58,18 @@ private val uiState: MutableStateFlow<DashboardState> = MutableStateFlow(Dashboa
  * of the event. The user can also choose to join the event.
  *
  * @param navigationActions The navigation actions.
- * @param event The event to display.
- * @param park The park where the event takes place.
+ * @param eventViewModel The event to display.
+ * @param parkViewModel The park where the event takes place.
  */
 @Composable
 fun EventOverviewScreen(
-    navigationActions: NavigationActions,
-    event: Event,
-    park: Park,
+    eventViewModel: EventViewModel,
+    parkViewModel: ParkViewModel,
     paddingValues: PaddingValues = PaddingValues(0.dp)
 ) {
+
+  val event = eventViewModel.currentEvent.collectAsState().value!!
+  val park = parkViewModel.currentPark.collectAsState()
 
   Box(modifier = Modifier.fillMaxSize().padding(paddingValues).testTag("eventOverviewScreen")) {
     Column(modifier = Modifier.fillMaxHeight().testTag("eventContent")) {
@@ -95,7 +98,7 @@ fun EventOverviewScreen(
 
       Spacer(modifier = Modifier.height(16.dp))
 
-      EventMap(park)
+      park.value?.let { EventMap(it) }
     }
   }
 }

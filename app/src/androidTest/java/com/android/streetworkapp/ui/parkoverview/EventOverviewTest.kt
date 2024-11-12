@@ -9,12 +9,19 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventList
+import com.android.streetworkapp.model.event.EventRepository
+import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.Park
+import com.android.streetworkapp.model.park.ParkRepository
+import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.ui.event.EventOverviewScreen
+import com.android.streetworkapp.ui.navigation.LIST_OF_SCREENS
 import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.navigation.ScreenParams
 import com.android.streetworkapp.utils.toFormattedString
 import com.google.firebase.Timestamp
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -24,6 +31,11 @@ class EventOverviewTest {
   private lateinit var park: Park
   private lateinit var navigationActions: NavigationActions
   private lateinit var event: Event
+  private lateinit var eventRepository: EventRepository
+  private lateinit var eventViewModel: EventViewModel
+  private lateinit var parkRepository: ParkRepository
+  private lateinit var parkViewModel: ParkViewModel
+  private lateinit var screenParams: ScreenParams
 
   // cannot be tested right now
   // private lateinit var fullevent: Event
@@ -32,6 +44,13 @@ class EventOverviewTest {
 
   @Before
   fun setUp() {
+    eventRepository = mock(EventRepository::class.java)
+    eventViewModel = EventViewModel(eventRepository)
+    parkRepository = mock(ParkRepository::class.java)
+    parkViewModel = ParkViewModel(parkRepository)
+
+    screenParams = LIST_OF_SCREENS.last()
+
     navigationActions = mock(NavigationActions::class.java)
     val eventList =
         EventList(
@@ -67,9 +86,10 @@ class EventOverviewTest {
   }
 
   @Test
-  fun everyImmutableComposableAreDisplayed() {
-
-    composeTestRule.setContent { EventOverviewScreen(navigationActions, event, park) }
+  fun everyImmutableComposableAreDisplayed() = runTest {
+    eventViewModel.setCurrentEvent(event)
+    parkViewModel.setCurrentPark(park)
+    composeTestRule.setContent { EventOverviewScreen(eventViewModel, parkViewModel) }
 
     composeTestRule.onNodeWithTag("eventOverviewScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("eventContent").assertIsDisplayed()
@@ -93,9 +113,10 @@ class EventOverviewTest {
   }
 
   @Test
-  fun everythingIsDisplayedInDashBoard() {
-
-    composeTestRule.setContent { EventOverviewScreen(navigationActions, event, park) }
+  fun everythingIsDisplayedInDashBoard() = runTest {
+    eventViewModel.setCurrentEvent(event)
+    parkViewModel.setCurrentPark(park)
+    composeTestRule.setContent { EventOverviewScreen(eventViewModel, parkViewModel) }
 
     composeTestRule.onNodeWithTag("eventDashboard").assertIsDisplayed()
     composeTestRule.onNodeWithTag("dashboard").assertIsDisplayed()
