@@ -66,7 +66,7 @@ fun BottomNavigationMenu(
                       )
                 }
                 topLevelDestination.icon?.let {
-                  Icon(topLevelDestination.icon, contentDescription = topLevelDestination.textId)
+                  Icon(topLevelDestination.icon, contentDescription = topLevelDestination.textId, tint = Color.Black) //same here as in the trophy xml, will need to modify this once we setup light/dark mode
                 }
               },
               selected = false,
