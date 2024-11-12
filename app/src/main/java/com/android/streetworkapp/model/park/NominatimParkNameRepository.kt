@@ -45,7 +45,6 @@ class NominatimParkNameRepository(val client: OkHttpClient) : ParkNameRepository
               }
 
               override fun onResponse(call: Call, response: Response) {
-
                 onSuccess(decodeRoadJson(response.body!!.string()))
               }
             })
