@@ -129,7 +129,8 @@ open class ParkViewModel(
    *
    * @param parkLocation: a ParkLocation object
    */
-  fun setParkLocation(parkLocation: ParkLocation) {
+  fun setParkLocation(parkLocation: ParkLocation?) {
+    require(parkLocation != null) { "ParkLocation can not be null" }
     _parkLocation.value = parkLocation
   }
 
