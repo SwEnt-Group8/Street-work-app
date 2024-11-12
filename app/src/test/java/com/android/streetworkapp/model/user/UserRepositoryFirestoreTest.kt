@@ -671,4 +671,94 @@ class UserRepositoryFirestoreTest {
 
     assertNull(user) // Should return null due to exception
   }
+
+  @Test
+  fun getOrAddUserByUid_withValidUid_returnsUser() = runTest {
+    // Setup the DocumentSnapshot
+    `when`(document.exists()).thenReturn(true)
+    `when`(document.id).thenReturn("123")
+    `when`(document.getString("username")).thenReturn("John Doe")
+    `when`(document.getString("email")).thenReturn("john.doe@example.com")
+    `when`(document.getLong("score")).thenReturn(100L)
+    `when`(document.get("friends")).thenReturn(listOf("friend1", "friend2"))
+
+    // Mock Firestore interactions
+    `when`(db.collection("users")).thenReturn(collection)
+    `when`(collection.document("123")).thenReturn(documentRef)
+
+    // Use TaskCompletionSource to create a controllable Task
+    val taskCompletionSource = TaskCompletionSource<DocumentSnapshot>()
+    taskCompletionSource.setResult(document)
+    val task = taskCompletionSource.task
+    `when`(documentRef.get()).thenReturn(task)
+
+    // Call the repository method
+    val user =
+        userRepository.getOrAddUserByUid(
+            "123",
+            User("123", "John Doe", "john.doe@example.com", 100, listOf("friend1", "friend2")))
+
+    // Assert the result is not null and contains expected values
+    assertNotNull(user)
+    assertEquals("123", user?.uid)
+    assertEquals("John Doe", user?.username)
+    assertEquals("john.doe@example.com", user?.email)
+    assertEquals(100, user?.score)
+    assertEquals(listOf("friend1", "friend2"), user?.friends)
+  }
+
+  @Test
+  fun getOrAddUserByUid_withInvalidUid_createUser() = runTest {
+    // Setup the DocumentSnapshot to simulate non-existence
+    `when`(document.exists()).thenReturn(false)
+
+    // Mock Firestore interactions
+    `when`(db.collection("users")).thenReturn(collection)
+    `when`(collection.document("invalid")).thenReturn(documentRef)
+
+    // Use TaskCompletionSource to create a controllable Task for non-existing user
+    val taskCompletionSource = TaskCompletionSource<DocumentSnapshot>()
+    taskCompletionSource.setResult(document)
+    val task = taskCompletionSource.task
+    `when`(documentRef.get()).thenReturn(task)
+
+    // Mock the set operation to add a new user
+    `when`(documentRef.set(any(User::class.java))).thenReturn(Tasks.forResult(null))
+
+    // Call the repository method
+    val newUser = User("invalid", "New User", "new.user@example.com", 0, emptyList())
+    val user = userRepository.getOrAddUserByUid("invalid", newUser)
+
+    // Assert the result is not null and contains expected values
+    assertNotNull(user)
+    assertEquals("invalid", user?.uid)
+    assertEquals("New User", user?.username)
+    assertEquals("new.user@example.com", user?.email)
+    assertEquals(0, user?.score)
+    assertTrue(user?.friends?.isEmpty() == true)
+
+    // Verify that the set method was called to create a new user
+    verify(documentRef).set(newUser)
+  }
+
+  @Test
+  fun getOrAddUserByUid_withException_returnsNull() = runTest {
+    // Mock Firestore interactions to throw an exception
+    whenever(db.collection("users")).thenReturn(collection)
+    whenever(collection.document("123")).thenReturn(documentRef)
+
+    val taskCompletionSource = TaskCompletionSource<DocumentSnapshot>()
+    taskCompletionSource.setException(Exception("Firestore exception"))
+    val task = taskCompletionSource.task
+    whenever(documentRef.get()).thenReturn(task)
+
+    // Call the method under test
+    val user =
+        userRepository.getOrAddUserByUid(
+            "123",
+            User("123", "John Doe", "john.doe@example.com", 100, listOf("friend1", "friend2")))
+
+    // Assert that the method returns null
+    assertNull(user)
+  }
 }
