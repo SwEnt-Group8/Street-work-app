@@ -5,6 +5,7 @@ import okhttp3.OkHttpClient
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 
@@ -63,5 +64,12 @@ class NominatimParkNameRepositoryTest {
             "]"
     val name = NominatimParkNameRepository(okHttpClient).decodeRoadJson(string)
     assert(name == "Avenue des Désertes")
+  }
+
+  @Test
+  fun nominatimCallsNewCall() {
+    val nominatim = NominatimParkNameRepository(okHttpClient)
+    nominatim.convertLocationIdToParkName("test", {}, {})
+    verify(okHttpClient).newCall(any())
   }
 }
