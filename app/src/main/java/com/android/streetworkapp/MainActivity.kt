@@ -87,7 +87,13 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
   val progressionViewModel = ProgressionViewModel(progressionRepository)
 
   StreetWorkApp(
-      parkLocationViewModel, testInvokation, {}, userViewModel, parkViewModel, eventViewModel, progressionViewModel)
+      parkLocationViewModel,
+      testInvokation,
+      {},
+      userViewModel,
+      parkViewModel,
+      eventViewModel,
+      progressionViewModel)
 }
 
 @Composable
@@ -179,7 +185,10 @@ fun StreetWorkApp(
                 composable(Screen.AUTH) { SignInScreen(navigationActions, userViewModel) }
               }
               navigation(startDestination = Screen.PROGRESSION, route = Route.PROGRESSION) {
-                composable(Screen.PROGRESSION) { ProgressScreen(navigationActions, userViewModel, progressionViewModel, innerPadding) }
+                composable(Screen.PROGRESSION) {
+                  ProgressScreen(
+                      navigationActions, userViewModel, progressionViewModel, innerPadding)
+                }
               }
               navigation(
                   startDestination = Screen.MAP,

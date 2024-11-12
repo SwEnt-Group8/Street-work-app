@@ -82,8 +82,7 @@ class TopAppBarTest {
           UserViewModel(mockk<UserRepositoryFirestore>()),
           ParkViewModel(mockk<ParkRepositoryFirestore>()),
           EventViewModel(mockk<EventRepositoryFirestore>()),
-          ProgressionViewModel(mockk<ProgressionRepositoryFirestore>())
-      )
+          ProgressionViewModel(mockk<ProgressionRepositoryFirestore>()))
     }
 
     for (screenParam in LIST_OF_SCREENS) {

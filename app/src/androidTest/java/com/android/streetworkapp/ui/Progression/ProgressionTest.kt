@@ -25,27 +25,23 @@ import org.junit.Test
 
 class ProgressionTest {
 
-  @MockK
-  private lateinit var navigationActions: NavigationActions
+  @MockK private lateinit var navigationActions: NavigationActions
 
-  @MockK
-  private lateinit var userRepository: UserRepositoryFirestore
+  @MockK private lateinit var userRepository: UserRepositoryFirestore
   private lateinit var userViewModel: UserViewModel
 
-  @MockK
-  private lateinit var progressionRepository: ProgressionRepositoryFirestore
+  @MockK private lateinit var progressionRepository: ProgressionRepositoryFirestore
   private lateinit var progressionViewModel: ProgressionViewModel
-
 
   @get:Rule val composeTestRule = createComposeRule()
 
-  private val mockedUser = User(
-    uid = "123456",
-    username = "john_doe",
-    email = "john.doe@example.com",
-    score = Ranks.BRONZE.score + (Ranks.SILVER.score - Ranks.BRONZE.score) / 2,
-    friends = listOf("friend_1", "friend_2", "friend_3")
-  )
+  private val mockedUser =
+      User(
+          uid = "123456",
+          username = "john_doe",
+          email = "john.doe@example.com",
+          score = Ranks.BRONZE.score + (Ranks.SILVER.score - Ranks.BRONZE.score) / 2,
+          friends = listOf("friend_1", "friend_2", "friend_3"))
 
   @Before
   fun setUp() {
@@ -55,18 +51,21 @@ class ProgressionTest {
     userViewModel.setCurrentUser(mockedUser)
 
     progressionViewModel = ProgressionViewModel(progressionRepository)
-
   }
 
   @Test
   fun isScreenDisplayed() {
-    composeTestRule.setContent { ProgressScreen(navigationActions, userViewModel, progressionViewModel ) }
+    composeTestRule.setContent {
+      ProgressScreen(navigationActions, userViewModel, progressionViewModel)
+    }
     composeTestRule.onNodeWithTag("progressionScreen").assertIsDisplayed()
   }
 
   @Test
   fun areAllComponentsDisplayed() {
-    composeTestRule.setContent { ProgressScreen(navigationActions, userViewModel, progressionViewModel ) }
+    composeTestRule.setContent {
+      ProgressScreen(navigationActions, userViewModel, progressionViewModel)
+    }
     composeTestRule.onNodeWithTag("progressionScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("circularProgressBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("percentageInsideCircularProgressBar").assertIsDisplayed()
@@ -79,34 +78,44 @@ class ProgressionTest {
   @Test
   fun screenDisplaysCorrectElementsOnTypicalInputWithNonEmptyAchievements() {
 
-    val mockedProgression = Progression(
-      progressionId = "prog123456",
-      uid = mockedUser.uid,
-      currentGoal = Ranks.SILVER.score,
-      eventsCreated = 9,
-      eventsJoined = 14,
-      achievements = listOf(MedalsAchievement.BRONZE.toString())
-    )
+    val mockedProgression =
+        Progression(
+            progressionId = "prog123456",
+            uid = mockedUser.uid,
+            currentGoal = Ranks.SILVER.score,
+            eventsCreated = 9,
+            eventsJoined = 14,
+            achievements = listOf(MedalsAchievement.BRONZE.toString()))
 
     val getProgressionOnSuccessSlot = slot<(Progression) -> Unit>()
     every {
       progressionRepository.getProgression(any(), capture(getProgressionOnSuccessSlot), any())
-    } answers {
-      getProgressionOnSuccessSlot.captured(mockedProgression)
+    } answers { getProgressionOnSuccessSlot.captured(mockedProgression) }
+
+    composeTestRule.setContent {
+      ProgressScreen(navigationActions, userViewModel, progressionViewModel)
     }
 
-    composeTestRule.setContent { ProgressScreen(navigationActions, userViewModel, progressionViewModel ) }
-
-    composeTestRule.onNodeWithTag("percentageInsideCircularProgressBar").assertTextEquals("${(mockedUser.score / mockedProgression.currentGoal.toFloat() * 100).toInt()}%")
-    composeTestRule.onNodeWithTag("scoreTextUnderCircularProgressBar").assertTextEquals("${mockedUser.score}/${mockedProgression.currentGoal}")
+    composeTestRule
+        .onNodeWithTag("percentageInsideCircularProgressBar")
+        .assertTextEquals(
+            "${(mockedUser.score / mockedProgression.currentGoal.toFloat() * 100).toInt()}%")
+    composeTestRule
+        .onNodeWithTag("scoreTextUnderCircularProgressBar")
+        .assertTextEquals("${mockedUser.score}/${mockedProgression.currentGoal}")
 
     composeTestRule.onNodeWithTag("metricCardScoreValue").assertTextEquals("${mockedUser.score}")
-    //composeTestRule.onNodeWithTag("metricCardParksVisitedValue").assertTextEquals(INPUT_VALUE) TODO: commented out as it is not yet implemented
-    composeTestRule.onNodeWithTag("metricCardFriendsAddedValue").assertTextEquals("${mockedUser.friends.size}")
+    // composeTestRule.onNodeWithTag("metricCardParksVisitedValue").assertTextEquals(INPUT_VALUE)
+    // TODO: commented out as it is not yet implemented
+    composeTestRule
+        .onNodeWithTag("metricCardFriendsAddedValue")
+        .assertTextEquals("${mockedUser.friends.size}")
 
     composeTestRule.onNodeWithTag("emptyAchievementsText").assertIsNotDisplayed()
 
-    mockedProgression.achievements.forEachIndexed { index, achievementName -> //only one achievement for now, but since we'll scale things later I make the test easily scalable
+    mockedProgression.achievements.forEachIndexed { index, achievementName
+      -> // only one achievement for now, but since we'll scale things later I make the test easily
+         // scalable
       val achievement = enumValueOf<MedalsAchievement>(achievementName).achievement
       val achievementItem = composeTestRule.onNodeWithTag("achievementItem${index}")
     }
@@ -114,25 +123,24 @@ class ProgressionTest {
 
   @Test
   fun screenDisplaysEmptyAchievementsTextIfNoAchievements() {
-    val mockedProgression = Progression(
-      progressionId = "prog123456",
-      uid = mockedUser.uid,
-      currentGoal = Ranks.BRONZE.score,
-      eventsCreated = 0,
-      eventsJoined = 0,
-      achievements = emptyList()
-    )
+    val mockedProgression =
+        Progression(
+            progressionId = "prog123456",
+            uid = mockedUser.uid,
+            currentGoal = Ranks.BRONZE.score,
+            eventsCreated = 0,
+            eventsJoined = 0,
+            achievements = emptyList())
 
     val getProgressionOnSuccessSlot = slot<(Progression) -> Unit>()
     every {
       progressionRepository.getProgression(any(), capture(getProgressionOnSuccessSlot), any())
-    } answers {
-      getProgressionOnSuccessSlot.captured(mockedProgression)
+    } answers { getProgressionOnSuccessSlot.captured(mockedProgression) }
+
+    composeTestRule.setContent {
+      ProgressScreen(navigationActions, userViewModel, progressionViewModel)
     }
 
-    composeTestRule.setContent { ProgressScreen(navigationActions, userViewModel, progressionViewModel ) }
-
     composeTestRule.onNodeWithTag("emptyAchievementsText").assertIsDisplayed()
-
   }
 }

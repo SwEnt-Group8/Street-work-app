@@ -146,8 +146,7 @@ class BottomNavigationTest {
           UserViewModel(mockk<UserRepositoryFirestore>()),
           ParkViewModel(mockk<ParkRepositoryFirestore>()),
           EventViewModel(mockk<EventRepositoryFirestore>()),
-          ProgressionViewModel(mockk<ProgressionRepositoryFirestore>())
-      )
+          ProgressionViewModel(mockk<ProgressionRepositoryFirestore>()))
     }
 
     val bottomNavTypeToTest =
