@@ -88,7 +88,7 @@ fun ParkOverviewScreen(
       ImageTitle(image = null, title = currentPark.value?.name ?: "loading...")
       // TODO: Fetch image from Firestore storage
       currentPark.value?.let { ParkDetails(park = it, showRatingDialog) }
-        RatingDialog(showRatingDialog)
+      RatingDialog(showRatingDialog)
       EventItemList(eventViewModel, navigationActions)
     }
     FloatingActionButton(
@@ -217,7 +217,7 @@ fun RatingButton(showRatingDialog: MutableState<Boolean>) {
 @Composable
 fun RatingDialog(showDialog: MutableState<Boolean>) {
   // Star rating is 1-5 stars
-  var starRating = remember { mutableIntStateOf(3) }
+  val starRating = remember { mutableIntStateOf(3) }
 
   if (showDialog.value) {
     AlertDialog(
@@ -310,7 +310,8 @@ fun OccupancyBar(occupancy: Float) {
 /**
  * Display a list of events or a message if no there is no events.
  *
- * @param eventList The list of events to display.
+ * @param eventViewModel The event MVVM.
+ * @param navigationActions The navigation actions to navigate to other screens.
  */
 @Composable
 fun EventItemList(eventViewModel: EventViewModel, navigationActions: NavigationActions) {
