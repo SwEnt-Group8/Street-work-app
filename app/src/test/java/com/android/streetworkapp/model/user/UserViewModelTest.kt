@@ -176,4 +176,25 @@ class UserViewModelTest {
     verify(repository).getFriendsByUid(uid)
     assertEquals(friends, observedFriends)
   }
+
+  @Test
+  fun getOrAddUserByUid_calls_repository_with_correct_uid_and_user() = runTest {
+    val uid = "user123"
+    val user = User(uid, "John Doe", "john@example.com", 100, emptyList())
+    whenever(repository.getOrAddUserByUid(uid, user)).thenReturn(user)
+    userViewModel.getOrAddUserByUid(uid, user)
+    testDispatcher.scheduler.advanceUntilIdle()
+    verify(repository).getOrAddUserByUid(uid, user)
+  }
+
+  @Test
+  fun getOrAddUserByUid_update_user() = runTest {
+    val uid = "user123"
+    val user = User(uid, "John Doe", "john@example.com", 100, emptyList())
+    whenever(repository.getOrAddUserByUid(uid, user)).thenReturn(user)
+    userViewModel.getOrAddUserByUid(uid, user)
+    testDispatcher.scheduler.advanceUntilIdle()
+    val observedUser = userViewModel.user.first()
+    assertEquals(user, observedUser)
+  }
 }
