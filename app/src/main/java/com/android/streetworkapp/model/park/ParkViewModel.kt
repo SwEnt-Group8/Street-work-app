@@ -1,5 +1,6 @@
 package com.android.streetworkapp.model.park
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.streetworkapp.model.parklocation.ParkLocation
@@ -120,7 +121,7 @@ open class ParkViewModel(
           nameRepository.convertLocationIdToParkName(
               _parkLocation.value.id,
               { name -> _currentPark.value?.let { repository.updateName(it.pid, name) } },
-              {})
+              { Log.e("Error", "The update of the park name has failed.") })
         }
       }
 

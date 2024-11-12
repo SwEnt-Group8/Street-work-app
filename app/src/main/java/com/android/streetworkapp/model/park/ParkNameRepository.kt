@@ -1,7 +1,7 @@
 package com.android.streetworkapp.model.park
 
 /** A repository interface for park names. */
-interface ParkNameRepository {
+fun interface ParkNameRepository {
 
   fun convertLocationIdToParkName(
       locationId: String,
