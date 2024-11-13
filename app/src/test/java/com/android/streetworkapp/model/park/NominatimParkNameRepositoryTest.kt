@@ -71,7 +71,7 @@ class NominatimParkNameRepositoryTest {
     val string = "Query took took long"
 
     val name = NominatimParkNameRepository(okHttpClient).decodeRoadJson(string, "test")
-    assert(name == "Default Park: test")
+    assert(name == "Default Park test")
   }
 
   @Test
