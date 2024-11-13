@@ -23,15 +23,22 @@ import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.Route
+import com.android.streetworkapp.utils.GoogleAuthService
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.spyk
+import okhttp3.internal.wait
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.mockStatic
+import org.mockito.Mockito.`when`
 
 class End2EndGeneral {
     @MockK
@@ -45,10 +52,13 @@ class End2EndGeneral {
     @MockK
     private lateinit var parkLocationRepository: OverpassParkLocationRepository
 
+    private lateinit var mockedFirebaseUser : FirebaseUser
+
     @get:Rule
     val composeTestRule = createComposeRule()
 
     private val mockedUserUid = "123456"
+
 
     private val mockedFriendsForMockedUser =
         spyk(listOf<User>( //needed to wrap it into a spyk, otherwise couldn't return it in coEvery...
@@ -112,10 +122,9 @@ class End2EndGeneral {
             onSuccess(mockedUserProgression)
         }
 
-        //TODO: setup E2E for login purposes
         composeTestRule.setContent {
             StreetWorkApp(ParkLocationViewModel(parkLocationRepository),
-                {navigateTo(Route.MAP)},
+                { navigateTo(Route.MAP) },
                 {},
                 userViewModel,
                 ParkViewModel(mockk<ParkRepositoryFirestore>()),
@@ -123,8 +132,9 @@ class End2EndGeneral {
             )
         }
     }
+
     /**
-     * Tests everything included up to M2 except for everything that involves clicking on a park
+     * Tests everything included up to M2 except for everything that involves parks
      */
     @Test
     fun e2eNavigationAndDisplaysCorrectDetailsExceptForParks() {
@@ -163,6 +173,7 @@ class End2EndGeneral {
         //perform add friend request
         composeTestRule.onNodeWithTag("inputID").performTextInput(dummyFriendId)
         composeTestRule.onNodeWithTag("RequestButton").performClick()
+
         //change to user repo
         coVerify { userRepository.addFriend(mockedUser.uid, dummyFriendId) }
         //the behavior of adding friends will very likely change in the future, thus the test doesn't go into more depth
