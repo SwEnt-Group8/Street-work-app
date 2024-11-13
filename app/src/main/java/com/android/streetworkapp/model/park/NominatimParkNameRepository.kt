@@ -59,7 +59,7 @@ class NominatimParkNameRepository(val client: OkHttpClient) : ParkNameRepository
       val road = address.getString("road")
       return road
     } catch (_: Exception) {
-      return "Default Park: $locationId"
+      return "Default Park $locationId"
     }
   }
 }
