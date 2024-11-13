@@ -120,25 +120,19 @@ class BottomNavigationTest {
   fun displayAllComponents() {
     composeTestRule.setContent { BottomNavigationTest() }
     composeTestRule.onNodeWithTag("bottomNavigationMenu").assertExists().assertIsDisplayed()
-    composeTestRule
-        .onAllNodesWithTag("bottomNavigationItem")
-        .assertCountEquals(LIST_TOP_LEVEL_DESTINATION.size)
 
-    val navItems = composeTestRule.onAllNodesWithTag("bottomNavigationItem")
-
-    for (i in LIST_TOP_LEVEL_DESTINATION.indices) {
-      navItems[i].assertIsDisplayed()
+    for (topLevelDest in LIST_TOP_LEVEL_DESTINATION) {
+      composeTestRule.onNodeWithTag("bottomNavigationItem${topLevelDest.route}").assertIsDisplayed()
     }
   }
 
   @Test
   fun menuItemsAreClickable() {
     composeTestRule.setContent { BottomNavigationTest() }
-    val navItems = composeTestRule.onAllNodesWithTag("bottomNavigationItem")
 
-    for (i in LIST_TOP_LEVEL_DESTINATION.indices) {
-      navItems[i].performClick()
-    }
+      for (topLevelDest in LIST_TOP_LEVEL_DESTINATION) {
+          composeTestRule.onNodeWithTag("bottomNavigationItem${topLevelDest.route}").performClick()
+      }
   }
 
   @Test
