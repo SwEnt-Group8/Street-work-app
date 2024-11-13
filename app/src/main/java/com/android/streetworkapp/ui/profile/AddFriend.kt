@@ -31,6 +31,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.sample.R
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.theme.ColorPalette
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,6 +82,7 @@ fun AddFriendScreen(
                   Toast.makeText(context, "Friend request sent.", Toast.LENGTH_SHORT).show()
                 }
               },
+              colors = ColorPalette.BUTTON_COLOR,
               modifier = Modifier.size(220.dp, 50.dp).testTag("RequestButton")) {
                 Text(text = "Send request", fontSize = 17.sp)
               }

@@ -21,8 +21,6 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -87,19 +85,21 @@ fun ParkOverviewScreen(
     Column {
       ImageTitle(image = null, title = currentPark.value?.name ?: "loading...")
       // TODO: Fetch image from Firestore storage
-      currentPark.value?.let { ParkDetails(park = it, showRatingDialog) }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+          ParkDetails(park = currentPark.value, showRatingDialog)
+          Button(
+              onClick = { navigationActions.navigateTo(Screen.ADD_EVENT) },
+              modifier = Modifier.size(width = 150.dp, height = 40.dp).testTag("createEventButton"),
+              colors = ColorPalette.BUTTON_COLOR) {
+                Text("Create an event")
+              }
+      }
       RatingDialog(showRatingDialog)
+      HorizontalDivider(modifier = Modifier.fillMaxWidth())
       EventItemList(eventViewModel, navigationActions)
-    }
-    FloatingActionButton(
-        onClick = { navigationActions.navigateTo(Screen.ADD_EVENT) },
-        modifier =
-            Modifier.align(Alignment.BottomCenter)
-                .padding(40.dp)
-                .size(width = 150.dp, height = 40.dp)
-                .testTag("createEventButton"),
-    ) {
-      Text("Create an event")
     }
   }
 }
@@ -144,22 +144,20 @@ fun ImageTitle(image: Painter?, title: String) {
  * @param park The park data to display.
  */
 @Composable
-fun ParkDetails(park: Park, showRatingDialog: MutableState<Boolean>) {
-  Column(modifier = Modifier.testTag("parkDetails")) {
+fun ParkDetails(park: Park?, showRatingDialog: MutableState<Boolean>) {
+  Column(modifier = Modifier.testTag("parkDetails").padding(bottom = 16.dp, end = 48.dp)) {
     Text(
-        text = "Details",
+        text = "Park rating",
         fontSize = 24.sp,
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(start = 16.dp, top = 6.dp, bottom = 2.dp))
 
-    Row(modifier = Modifier.fillMaxWidth()) {
-      RatingComponent(rating = park.rating.toInt(), park.nbrRating) // Round the rating
+    Row {
+      park?.rating?.let { RatingComponent(rating = it.toInt(), park.nbrRating) } // Round the rating
 
       // TODO: Check if the user has already rated the park and hide the button if true
       RatingButton(showRatingDialog)
     }
-
-    OccupancyBar(occupancy = (park.occupancy.toFloat() / park.capacity.toFloat()))
   }
 }
 
@@ -179,7 +177,7 @@ fun RatingComponent(rating: Int, nbrReview: Int) {
           Icon(
               imageVector = Icons.Default.Star,
               contentDescription = "Star",
-              tint = if (i <= rating) Color(0xFF6650a4) else Color.Gray,
+              tint = if (i <= rating) ColorPalette.INTERACTION_COLOR_DARK else Color.Gray,
               modifier = Modifier.size(24.dp))
         }
         Text(
@@ -379,7 +377,7 @@ fun EventItem(event: Event, eventViewModel: EventViewModel, navigationActions: N
               navigationActions.navigateTo(Screen.EVENT_OVERVIEW)
             },
             modifier = Modifier.size(width = 80.dp, height = 48.dp).testTag("eventButton"),
-            colors = ButtonDefaults.buttonColors(),
+            colors = ColorPalette.BUTTON_COLOR,
             contentPadding = PaddingValues(0.dp)) {
               Text("About", modifier = Modifier.testTag("eventButtonText"))
             }
