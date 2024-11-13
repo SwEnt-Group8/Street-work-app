@@ -178,6 +178,15 @@ class ParkViewModelTest {
   }
 
   @Test
+  fun setParkLocationUpdatesParkLocation() = runTest {
+    val parkLocation = ParkLocation()
+    parkViewModel.setParkLocation(parkLocation)
+
+    val observedPark = parkViewModel.parkLocation.first()
+    assertEquals(parkLocation, observedPark)
+  }
+
+  @Test
   fun getParkByPidUpdatesPark() = runTest {
     val park = createPark()
     whenever(repository.getParkByPid("123")).thenReturn(park)
