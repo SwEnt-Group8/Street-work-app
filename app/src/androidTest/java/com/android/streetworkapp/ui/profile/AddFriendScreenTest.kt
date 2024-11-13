@@ -71,13 +71,13 @@ class AddFriendScreenTest : TestCase() {
 
     composeTestRule.onNodeWithTag("addFriendScreen").assertExists()
     composeTestRule.onNodeWithTag("AddFriendColumn").assertExists()
-    composeTestRule.onNodeWithTag("NFCButton").assertExists()
+    composeTestRule.onNodeWithTag("BluetoothButton").assertExists()
     composeTestRule.onNodeWithTag("inputID").assertExists()
     composeTestRule.onNodeWithTag("RequestButton").assertExists()
 
     composeTestRule.onNodeWithTag("addFriendScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("AddFriendColumn").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("NFCButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("BluetoothButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputID").assertIsDisplayed()
     composeTestRule.onNodeWithTag("RequestButton").assertIsDisplayed()
   }
