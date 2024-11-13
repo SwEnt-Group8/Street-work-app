@@ -62,16 +62,15 @@ class NominatimParkNameRepositoryTest {
             "    ]\n" +
             "  }\n" +
             "]"
-    val name = NominatimParkNameRepository(okHttpClient).decodeRoadJson(string,"test")
+    val name = NominatimParkNameRepository(okHttpClient).decodeRoadJson(string, "test")
     assert(name == "Avenue des Désertes")
   }
-
 
   @Test
   fun decodeJSONRoadWorksNominatimTookTooLongString() {
     val string = "Query took took long"
 
-    val name = NominatimParkNameRepository(okHttpClient).decodeRoadJson(string,"test")
+    val name = NominatimParkNameRepository(okHttpClient).decodeRoadJson(string, "test")
     assert(name == "Default Park: test")
   }
 
