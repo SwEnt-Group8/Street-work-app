@@ -18,7 +18,6 @@ import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.ui.navigation.Screen
-import com.android.streetworkapp.ui.park.OccupancyBar
 import com.android.streetworkapp.ui.park.ParkOverviewScreen
 import com.android.streetworkapp.ui.park.RatingComponent
 import com.google.firebase.Timestamp
@@ -198,19 +197,5 @@ class ParkOverviewTest {
     composeTestRule.setContent { RatingComponent(rating = 5, nbrReview = 20) }
     composeTestRule.onNodeWithTag("ratingComponent").isDisplayed()
     composeTestRule.onNodeWithTag("nbrReview").assertTextEquals("(20)")
-  }
-
-  @Test
-  fun occupancyBarWithMinOccupancy() {
-    composeTestRule.setContent { OccupancyBar(occupancy = 0.0f) }
-    composeTestRule.onNodeWithTag("occupancyBar").isDisplayed()
-    composeTestRule.onNodeWithTag("occupancyText").assertTextEquals("0% Occupancy")
-  }
-
-  @Test
-  fun occupancyBarWithMaxOccupancy() {
-    composeTestRule.setContent { OccupancyBar(occupancy = 1.0f) }
-    composeTestRule.onNodeWithTag("occupancyBar").isDisplayed()
-    composeTestRule.onNodeWithTag("occupancyText").assertTextEquals("100% Occupancy")
   }
 }

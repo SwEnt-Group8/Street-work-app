@@ -99,7 +99,8 @@ fun EventDetails(event: Event) {
 
     Row(
         modifier = Modifier.padding(top = 16.dp).fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center) {
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically) {
           Icon(
               Icons.Outlined.AccountCircle,
               contentDescription = "User",
@@ -109,7 +110,8 @@ fun EventDetails(event: Event) {
 
     Row(
         modifier = Modifier.padding(top = 16.dp).fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center) {
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically) {
           Icon(
               Icons.Filled.DateRange,
               contentDescription = "Date",

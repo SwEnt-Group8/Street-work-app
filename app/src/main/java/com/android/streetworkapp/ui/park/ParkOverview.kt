@@ -280,29 +280,6 @@ fun InteractiveRatingComponent(rating: MutableState<Int>) {
 }
 
 /**
- * Display a progress bar showing the park's occupancy.
- *
- * @param occupancy The park's occupancy percentage from 0 to 1.
- */
-@Composable
-fun OccupancyBar(occupancy: Float) {
-  require(occupancy in 0f..1f) { "Occupancy must be between 0 and 1" }
-  Row(
-      modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp).testTag("occupancyBar"),
-      verticalAlignment = Alignment.CenterVertically) {
-        LinearProgressIndicator(
-            progress = { occupancy },
-            modifier = Modifier.weight(1f),
-        )
-        Text(
-            text = "${(occupancy * 100).toInt()}% Occupancy",
-            modifier = Modifier.padding(start = 8.dp).testTag("occupancyText"),
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Light)
-      }
-}
-
-/**
  * Display a list of events or a message if no there is no events.
  *
  * @param eventViewModel The event MVVM.
