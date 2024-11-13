@@ -42,7 +42,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun getNewUid_returnsUniqueId() {
+  fun getNewUidReturnsUniqueId() {
     `when`(db.collection("users")).thenReturn(collection)
     `when`(collection.document()).thenReturn(documentRef)
     `when`(documentRef.id).thenReturn("uniqueId")
@@ -52,7 +52,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun getUserByUid_withValidUid_returnsUser() = runTest {
+  fun getUserByUidWithValidUidReturnsUser() = runTest {
     // Setup the DocumentSnapshot
     `when`(document.exists()).thenReturn(true)
     `when`(document.id).thenReturn("123")
@@ -87,7 +87,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun getUserByUid_withInvalidUid_returnsNull() = runBlocking {
+  fun getUserByUidWithInvalidUidReturnsNull() = runBlocking {
     `when`(db.collection("users")).thenReturn(collection)
     `when`(collection.document("invalid")).thenReturn(documentRef)
     `when`(documentRef.get()).thenReturn(Tasks.forException(Exception("User not found")))
@@ -97,7 +97,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun getFriendsByUid_withValidUid_returnsListOfFriends() = runTest {
+  fun getFriendsByUidWithValidUidReturnsListOfFriends() = runTest {
     // Mock User DocumentSnapshot
     val userDocument = mock<DocumentSnapshot>()
     whenever(userDocument.exists()).thenReturn(true)
@@ -170,7 +170,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun getUserByEmail_withValidEmail_returnsUser() = runBlocking {
+  fun getUserByEmailWithValidEmailReturnsUser() = runBlocking {
     // Setup the DocumentSnapshot
     `when`(document.exists()).thenReturn(true)
     `when`(document.id).thenReturn("123")
@@ -197,7 +197,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun getUserByEmail_withInvalidEmail_returnsNull() = runBlocking {
+  fun getUserByEmailWithInvalidEmailReturnsNull() = runBlocking {
     val querySnapshot = mock(QuerySnapshot::class.java)
     `when`(querySnapshot.documents).thenReturn(emptyList())
 
@@ -212,7 +212,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun getUserByUserName_withValidUserName_returnsUser(): Unit = runBlocking {
+  fun getUserByUserNameWithValidUserNameReturnsUser(): Unit = runBlocking {
     `when`(document.exists()).thenReturn(true)
     `when`(document.id).thenReturn("123")
     `when`(document.getString("username")).thenReturn("John Doe")
@@ -239,7 +239,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun getUserByUserName_withInvalidUserName_returnsNull(): Unit = runBlocking {
+  fun getUserByUserNameWithInvalidUserNameReturnsNull(): Unit = runBlocking {
     val querySnapshot = mock(QuerySnapshot::class.java)
     `when`(querySnapshot.documents).thenReturn(emptyList())
 
@@ -254,7 +254,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun addUser_withValidUser_addsUserSuccessfully(): Unit = runBlocking {
+  fun addUserWithValidUserAddsUserSuccessfully(): Unit = runBlocking {
     val user =
         User(
             uid = "123",
@@ -272,7 +272,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun updateUserScore_withValidUid_updatesScoreSuccessfully(): Unit = runBlocking {
+  fun updateUserScoreWithValidUidUpdatesScoreSuccessfully(): Unit = runBlocking {
     `when`(db.collection("users")).thenReturn(collection)
     `when`(collection.document("123")).thenReturn(documentRef)
     `when`(documentRef.update("score", 200)).thenReturn(Tasks.forResult(null))
@@ -282,7 +282,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun increaseUserScore_withValidUidAndPoints_increasesScoreSuccessfully() = runTest {
+  fun increaseUserScoreWithValidUidAndPointsIncreasesScoreSuccessfully() = runTest {
     whenever(db.collection("users")).thenReturn(collection)
     whenever(collection.document("123")).thenReturn(documentRef)
     whenever(documentRef.update(eq("score"), any())).thenReturn(Tasks.forResult(null))
@@ -293,7 +293,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun increaseUserScore_withEmptyUid_throwsIllegalArgumentException() = runTest {
+  fun increaseUserScoreWithEmptyUidThrowsIllegalArgumentException() = runTest {
     val exception =
         assertThrows(IllegalArgumentException::class.java) {
           runBlocking { userRepository.increaseUserScore("", 10) }
@@ -302,7 +302,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun increaseUserScore_withNegativePoints_throwsIllegalArgumentException() = runTest {
+  fun increaseUserScoreWithNegativePointsThrowsIllegalArgumentException() = runTest {
     val exception =
         assertThrows(IllegalArgumentException::class.java) {
           runBlocking { userRepository.increaseUserScore("123", -10) }
@@ -311,7 +311,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun increaseUserScore_withException_logsError() = runTest {
+  fun increaseUserScoreWithExceptionLogsError() = runTest {
     whenever(db.collection("users")).thenReturn(collection)
     whenever(collection.document("123")).thenReturn(documentRef)
     val taskCompletionSource = TaskCompletionSource<Void>()
@@ -325,7 +325,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun addFriend_withValidUids_addsFriendSuccessfully(): Unit = runBlocking {
+  fun addFriendWithValidUidsAddsFriendSuccessfully(): Unit = runBlocking {
     val userRef = mock<DocumentReference>()
     val friendRef = mock<DocumentReference>()
 
@@ -348,7 +348,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun removeFriend_withValidUids_removesFriendSuccessfully() = runTest {
+  fun removeFriendWithValidUidsRemovesFriendSuccessfully() = runTest {
     val userRef = mock<DocumentReference>()
     val friendRef = mock<DocumentReference>()
 
@@ -379,7 +379,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun deleteUserByUid_withValidId_deletesUserSuccessfully(): Unit = runBlocking {
+  fun deleteUserByUidWithValidIdDeletesUserSuccessfully(): Unit = runBlocking {
     `when`(db.collection("users")).thenReturn(collection)
     `when`(collection.document("123")).thenReturn(documentRef)
     `when`(documentRef.delete()).thenReturn(Tasks.forResult(null))
@@ -389,7 +389,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun getUserByUid_withException_returnsNull() = runTest {
+  fun getUserByUidWithExceptionReturnsNull() = runTest {
     // Mock Firestore interactions to throw an exception
     whenever(db.collection("users")).thenReturn(collection)
     whenever(collection.document("123")).thenReturn(documentRef)
@@ -407,7 +407,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun getUserByEmail_withException_returnsNull() = runTest {
+  fun getUserByEmailWithExceptionReturnsNull() = runTest {
     // Mock Firestore interactions to throw an exception
     val query = mock<Query>()
     whenever(db.collection("users")).thenReturn(collection)
@@ -426,7 +426,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun getFriendsByUid_withException_returnsNull() = runTest {
+  fun getFriendsByUidWithExceptionReturnsNull() = runTest {
     // Mock Firestore interactions to throw an exception when fetching user document
     whenever(db.collection("users")).thenReturn(collection)
     whenever(collection.document("user123")).thenReturn(documentRef)
@@ -444,7 +444,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun addUser_withException_logsError() = runTest {
+  fun addUserWithExceptionLogsError() = runTest {
     // Prepare a user object
     val user =
         User(
@@ -472,7 +472,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun updateUserScore_withException_logsError() = runTest {
+  fun updateUserScoreWithExceptionLogsError() = runTest {
     // Mock Firestore interactions to throw an exception
     whenever(db.collection("users")).thenReturn(collection)
     whenever(collection.document("123")).thenReturn(documentRef)
@@ -490,7 +490,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun addFriend_withException_logsError() = runTest {
+  fun addFriendWithExceptionLogsError() = runTest {
     // Mock Firestore interactions to throw an exception during batch commit
     val userRef = mock<DocumentReference>()
     val friendRef = mock<DocumentReference>()
@@ -515,7 +515,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun removeFriend_withException_logsError() = runTest {
+  fun removeFriendWithExceptionLogsError() = runTest {
     // Mock Firestore interactions to throw an exception during batch commit
     val userRef = mock<DocumentReference>()
     val friendRef = mock<DocumentReference>()
@@ -540,7 +540,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun deleteUserByUid_withException_logsError() = runTest {
+  fun deleteUserByUidWithExceptionLogsError() = runTest {
     // Mock Firestore interactions to throw an exception
     whenever(db.collection("users")).thenReturn(collection)
     whenever(collection.document("123")).thenReturn(documentRef)
@@ -558,7 +558,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun `documentToUser with valid document returns User`() {
+  fun documentToUserWithValidDocumentReturnsUser() {
     // Mock the DocumentSnapshot
     whenever(document.id).thenReturn("user123")
     whenever(document.getString("username")).thenReturn("John Doe")
@@ -579,7 +579,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun `documentToUser with missing name returns null`() {
+  fun documentToUserWithMissingNameReturnsNull() {
     whenever(document.id).thenReturn("user123")
     whenever(document.getString("username")).thenReturn(null) // Missing name
     whenever(document.getString("email")).thenReturn("john@example.com")
@@ -592,7 +592,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun `documentToUser with missing email returns null`() {
+  fun documentToUserWithMissingEmailReturnsNull() {
     whenever(document.id).thenReturn("user123")
     whenever(document.getString("username")).thenReturn("John Doe")
     whenever(document.getString("email")).thenReturn(null) // Missing email
@@ -605,7 +605,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun `documentToUser with missing score sets score to zero`() {
+  fun documentToUserWithMissingScoreSetsScoreToZero() {
     whenever(document.id).thenReturn("user123")
     whenever(document.getString("username")).thenReturn("John Doe")
     whenever(document.getString("email")).thenReturn("john@example.com")
@@ -619,7 +619,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun `documentToUser with missing friends sets empty friends list`() {
+  fun documentToUserWithMissingFriendsSetsEmptyFriendsList() {
     whenever(document.id).thenReturn("user123")
     whenever(document.getString("username")).thenReturn("John Doe")
     whenever(document.getString("email")).thenReturn("john@example.com")
@@ -633,7 +633,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun `documentToUser with friends of incorrect type sets empty friends list`() {
+  fun documentToUserWithFriendsOfIncorrectTypeSetsEmptyFriendsList() {
     whenever(document.id).thenReturn("user123")
     whenever(document.getString("username")).thenReturn("John Doe")
     whenever(document.getString("email")).thenReturn("john@example.com")
@@ -647,7 +647,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun `documentToUser with exception when getting friends sets empty friends list`() {
+  fun documentToUserWithExceptionWhenGettingFriendsSetsEmptyFriendsList() {
     whenever(document.id).thenReturn("user123")
     whenever(document.getString("username")).thenReturn("John Doe")
     whenever(document.getString("email")).thenReturn("john@example.com")
@@ -662,7 +662,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun `documentToUser with exception when getting fields returns null`() {
+  fun documentToUserWithExceptionWhenGettingFieldsReturnsNull() {
     whenever(document.id).thenReturn("user123")
     // Simulate exception when accessing 'name' field
     whenever(document.getString("username")).thenThrow(RuntimeException("Test exception"))
@@ -673,7 +673,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun getOrAddUserByUid_withValidUid_returnsUser() = runTest {
+  fun getOrAddUserByUidWithValidUidReturnsUser() = runTest {
     // Setup the DocumentSnapshot
     `when`(document.exists()).thenReturn(true)
     `when`(document.id).thenReturn("123")
@@ -708,7 +708,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun getOrAddUserByUid_withInvalidUid_createUser() = runTest {
+  fun getOrAddUserByUidWithInvalidUidCreateUser() = runTest {
     // Setup the DocumentSnapshot to simulate non-existence
     `when`(document.exists()).thenReturn(false)
 
@@ -742,7 +742,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun getOrAddUserByUid_withException_returnsNull() = runTest {
+  fun getOrAddUserByUidWithExceptionReturnsNull() = runTest {
     // Mock Firestore interactions to throw an exception
     whenever(db.collection("users")).thenReturn(collection)
     whenever(collection.document("123")).thenReturn(documentRef)
