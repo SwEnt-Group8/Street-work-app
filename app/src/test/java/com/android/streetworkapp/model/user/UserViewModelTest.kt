@@ -37,7 +37,7 @@ class UserViewModelTest {
   }
 
   @Test
-  fun getNewUid_calls_repository_and_returns_uid() {
+  fun getNewUidCallsRepositoryAndReturnsUid() {
     whenever(repository.getNewUid()).thenReturn("uniqueId")
     val uid = userViewModel.getNewUid()
     assertEquals("uniqueId", uid)
@@ -45,7 +45,7 @@ class UserViewModelTest {
   }
 
   @Test
-  fun getUserById_calls_repository_with_correct_uid() = runTest {
+  fun getUserByIdCallsRepositoryWithCorrectUid() = runTest {
     val uid = "user123"
     val user = User(uid, "John Doe", "john@example.com", 100, emptyList())
     whenever(repository.getUserByUid(uid)).thenReturn(user)
@@ -55,7 +55,7 @@ class UserViewModelTest {
   }
 
   @Test
-  fun getUserByEmail_calls_repository_with_correct_email() = runTest {
+  fun getUserByEmailCallsRepositoryWithCorrectEmail() = runTest {
     val email = "john@example.com"
     val user = User("user123", "John Doe", email, 100, emptyList())
     whenever(repository.getUserByEmail(email)).thenReturn(user)
@@ -65,7 +65,7 @@ class UserViewModelTest {
   }
 
   @Test
-  fun getUserByUserName_calls_repository_with_correct_username() = runTest {
+  fun getUserByUserNameCallsRepositoryWithCorrectUsername() = runTest {
     val userName = "John Doe"
     val user = User("user123", userName, "john@example.com", 0, emptyList())
     whenever(repository.getUserByUserName(userName)).thenReturn(user)
@@ -75,7 +75,7 @@ class UserViewModelTest {
   }
 
   @Test
-  fun getFriendsByUid_calls_repository_with_correct_uid() = runTest {
+  fun getFriendsByUidCallsRepositoryWithCorrectUid() = runTest {
     val uid = "user123"
     val friends =
         listOf(
@@ -88,7 +88,7 @@ class UserViewModelTest {
   }
 
   @Test
-  fun addUser_calls_repository_with_correct_user() = runTest {
+  fun addUserCallsRepositoryWithCorrectUser() = runTest {
     val user = User("user123", "John Doe", "john@example.com", 100, emptyList())
     userViewModel.addUser(user)
     testDispatcher.scheduler.advanceUntilIdle()
@@ -96,7 +96,7 @@ class UserViewModelTest {
   }
 
   @Test
-  fun updateUserScore_calls_repository_with_correct_uid_and_score_and_increment() = runTest {
+  fun updateUserScoreCallsRepositoryWithCorrectUidAndScoreAndIncrement() = runTest {
     val uid = "user123"
     val newScore = 200
     val incrScore = 50
@@ -109,7 +109,7 @@ class UserViewModelTest {
   }
 
   @Test
-  fun addFriend_calls_repository_with_correct_uids() = runTest {
+  fun addFriendCallsRepositoryWithCorrectUids() = runTest {
     val uid = "user123"
     val friendUid = "friend123"
     userViewModel.addFriend(uid, friendUid)
@@ -118,7 +118,7 @@ class UserViewModelTest {
   }
 
   @Test
-  fun removeFriend_calls_repository_with_correct_uids() = runTest {
+  fun removeFriendCallsRepositoryWithCorrectUids() = runTest {
     val uid = "user123"
     val friendUid = "friend123"
     userViewModel.removeFriend(uid, friendUid)
@@ -127,7 +127,7 @@ class UserViewModelTest {
   }
 
   @Test
-  fun deleteUserByUid_calls_repository_with_correct_id() = runTest {
+  fun deleteUserByUidCallsRepositoryWithCorrectId() = runTest {
     val uid = "user123"
     userViewModel.deleteUserByUid(uid)
     testDispatcher.scheduler.advanceUntilIdle()
@@ -135,7 +135,7 @@ class UserViewModelTest {
   }
 
   @Test
-  fun loadCurrentUser_calls_repository_with_correct_uid_and_updates_currentUser() = runTest {
+  fun loadCurrentUserCallsRepositoryWithCorrectUidAndUpdatesCurrentUser() = runTest {
     val user = User("user123", "John Doe", "john@example.com", 100, emptyList())
     userViewModel.loadCurrentUser(user)
     testDispatcher.scheduler.advanceUntilIdle()
@@ -144,7 +144,7 @@ class UserViewModelTest {
   }
 
   @Test
-  fun setCurrentUser_updates_currentUser() = runTest {
+  fun setCurrentUserUpdatesCurrentUser() = runTest {
     val user = User("user123", "John Doe", "john@example.com", 100, emptyList())
     userViewModel.setCurrentUser(user)
     val observedUser = userViewModel.currentUser.first()
@@ -152,7 +152,7 @@ class UserViewModelTest {
   }
 
   @Test
-  fun getUser_updates_user() = runTest {
+  fun getUserUpdatesUser() = runTest {
     val user = User("user123", "Jane Doe", "jane@example.com", 50, emptyList())
     whenever(repository.getUserByEmail("jane@example.com")).thenReturn(user)
     userViewModel.getUserByEmail("jane@example.com")
@@ -163,7 +163,7 @@ class UserViewModelTest {
   }
 
   @Test
-  fun getFriendsByUid_updates_friends() = runTest {
+  fun getFriendsByUidUpdatesFriends() = runTest {
     val uid = "user123"
     val friends =
         listOf(
@@ -178,7 +178,7 @@ class UserViewModelTest {
   }
 
   @Test
-  fun getOrAddUserByUid_calls_repository_with_correct_uid_and_user() = runTest {
+  fun getOrAddUserByUidCallsRepositoryWithCorrectUidAndUser() = runTest {
     val uid = "user123"
     val user = User(uid, "John Doe", "john@example.com", 100, emptyList())
     whenever(repository.getOrAddUserByUid(uid, user)).thenReturn(user)
@@ -188,7 +188,7 @@ class UserViewModelTest {
   }
 
   @Test
-  fun getOrAddUserByUid_update_user() = runTest {
+  fun getOrAddUserByUidUpdateUser() = runTest {
     val uid = "user123"
     val user = User(uid, "John Doe", "john@example.com", 100, emptyList())
     whenever(repository.getOrAddUserByUid(uid, user)).thenReturn(user)
