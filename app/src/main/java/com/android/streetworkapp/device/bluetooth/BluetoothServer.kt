@@ -5,10 +5,8 @@ import android.bluetooth.le.AdvertiseCallback
 import android.bluetooth.le.AdvertiseData
 import android.bluetooth.le.AdvertiseSettings
 import android.content.Context
-import android.os.Build
 import android.os.ParcelUuid
 import android.util.Log
-import androidx.annotation.RequiresApi
 
 /**
  * BluetoothServer class that starts a GATT server with a UID characteristic and advertises the
@@ -40,7 +38,6 @@ class BluetoothServer(private val context: Context) {
    *
    * @param uid The UID to broadcast.
    */
-  @RequiresApi(Build.VERSION_CODES.S)
   fun startGattServer(uid: String) {
     if (!bluetoothAdapter.isEnabled) {
       Log.e(BluetoothConstants.TAG, "Bluetooth is not enabled.")
@@ -84,7 +81,6 @@ class BluetoothServer(private val context: Context) {
   }
 
   /** Stops the GATT server. */
-  @RequiresApi(Build.VERSION_CODES.S)
   fun stopGattServer() {
     try {
       gattServer?.close()
@@ -112,7 +108,6 @@ class BluetoothServer(private val context: Context) {
          * @param offset The offset.
          * @param characteristic The characteristic to read.
          */
-        @RequiresApi(Build.VERSION_CODES.S)
         override fun onCharacteristicReadRequest(
             device: BluetoothDevice,
             requestId: Int,

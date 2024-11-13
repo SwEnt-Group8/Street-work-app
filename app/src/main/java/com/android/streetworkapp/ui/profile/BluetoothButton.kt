@@ -1,8 +1,6 @@
 package com.android.streetworkapp.ui.profile
 
-import android.os.Build
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -14,7 +12,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.streetworkapp.device.bluetooth.BluetoothServer
 
-@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun BluetoothButton(
     bluetoothController: BluetoothServer,
