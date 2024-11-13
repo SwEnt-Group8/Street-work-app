@@ -14,6 +14,8 @@ import com.android.streetworkapp.model.park.ParkRepositoryFirestore
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
+import com.android.streetworkapp.model.progression.MedalsAchievement
+import com.android.streetworkapp.model.progression.Progression
 import com.android.streetworkapp.model.progression.ProgressionRepositoryFirestore
 import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.progression.Ranks
@@ -78,22 +80,37 @@ class End2EndGeneral {
             uid = mockedUserUid,
             username = "John Doe",
             email = "john.doe@example.com",
-            score = Ranks.BRONZE.score + (Ranks.SILVER.score - Ranks.BRONZE.score) / 2,
+            score = Ranks.SILVER.score + (Ranks.GOLD.score - Ranks.SILVER.score) / 2,
             friends = listOf("friend_1", "friend_2", "friend_3"))
 
     //for the input text field in add friend testing
-    private val dummyFriendId = "friendid123"
+    private val dummyFriendId = "friendId123"
+
+    private val mockedUserProgression = Progression(
+        progressionId = "prog123456",
+        uid = mockedUser.uid,
+        currentGoal = Ranks.BRONZE.score,
+        eventsCreated = 0,
+        eventsJoined = 0,
+        achievements = listOf(MedalsAchievement.BRONZE.name)
+    )
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         userViewModel = UserViewModel(userRepository)
 
-
         userViewModel.setCurrentUser(mockedUser)
         progressionViewModel = ProgressionViewModel(progressionRepository)
 
+        //mock the needed functions for the userRepository
         coEvery { userRepository.getFriendsByUid(mockedUser.uid) } returns mockedFriendsForMockedUser
+
+        //mock the needed functions for the progressionRepository
+        coEvery { progressionRepository.getProgression(any(), captureLambda<(Progression) -> Unit>(), any()) } answers {
+            val onSuccess = firstArg<(Progression) -> Unit>()
+            onSuccess(mockedUserProgression)
+        }
 
         //TODO: setup E2E for login purposes
         composeTestRule.setContent {
@@ -119,7 +136,13 @@ class End2EndGeneral {
         composeTestRule.onNodeWithTag("bottomNavigationItem${Route.PROGRESSION}").performClick()
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithTag("progressionScreen").assertIsDisplayed()
-        //do more tests here for progression
+        composeTestRule.onNodeWithTag("percentageInsideCircularProgressBar").assertTextEquals("${(mockedUser.score/mockedUserProgression.currentGoal.toFloat()*100).toInt()}")
+        composeTestRule.onNodeWithTag("scoreTextUnderCircularProgressBar").assertTextEquals("${mockedUser.score}/${mockedUserProgression.currentGoal}")
+
+        //checking that each achievements exists in the lazy column
+        mockedUserProgression.achievements.forEachIndexed{ index, _ ->
+            composeTestRule.onNodeWithTag("achievementItem${index}").assertExists()
+        }
 
         //navigate to Profile screen
         composeTestRule.onNodeWithTag("bottomNavigationItem${Route.PROFILE}").performClick()
@@ -138,9 +161,10 @@ class End2EndGeneral {
 
         composeTestRule.onNodeWithTag("addFriendScreen").assertIsDisplayed()
         //perform add friend request
-        composeTestRule.onNodeWithTag("inputID").performTextInput("friendid123")
+        composeTestRule.onNodeWithTag("inputID").performTextInput(dummyFriendId)
         composeTestRule.onNodeWithTag("RequestButton").performClick()
         //change to user repo
         coVerify { userRepository.addFriend(mockedUser.uid, dummyFriendId) }
+        //the behavior of adding friends will very likely change in the future, thus the test doesn't go into more depth
     }
 }
