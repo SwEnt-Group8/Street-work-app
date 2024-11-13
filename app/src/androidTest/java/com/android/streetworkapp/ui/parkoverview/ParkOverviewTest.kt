@@ -103,7 +103,7 @@ class ParkOverviewTest {
       ParkOverviewScreen(
           parkViewModel, eventViewModel = eventViewModel, navigationActions = navigationActions)
     }
-      composeTestRule.waitForIdle()
+    composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("parkOverviewScreen").isDisplayed()
     composeTestRule.onNodeWithTag("imageTitle").isDisplayed()
     composeTestRule.onNodeWithTag("title").isDisplayed()
@@ -133,7 +133,7 @@ class ParkOverviewTest {
       ParkOverviewScreen(
           parkViewModel, eventViewModel = eventViewModel, navigationActions = navigationActions)
     }
-      composeTestRule.waitForIdle()
+    composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("createEventButton").assertTextEquals("Create an event")
     composeTestRule.onNodeWithTag("eventItem").assertTextContains("Group workout")
     composeTestRule
@@ -159,7 +159,7 @@ class ParkOverviewTest {
       ParkOverviewScreen(
           parkViewModel, eventViewModel = eventViewModel, navigationActions = navigationActions)
     }
-      composeTestRule.waitForIdle()
+    composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("noEventText").isDisplayed()
     composeTestRule.onNodeWithTag("noEventText").assertTextEquals("No event is planned yet")
   }

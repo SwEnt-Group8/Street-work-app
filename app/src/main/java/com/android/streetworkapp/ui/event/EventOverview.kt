@@ -116,16 +116,14 @@ fun EventDetails(event: Event) {
               Icons.Filled.DateRange,
               contentDescription = "Date",
               modifier = Modifier.testTag("dateIcon"))
-          Text(
-              event.date.toFormattedString(),
-              modifier = Modifier.padding(start = 8.dp).testTag("date"))
+          Text(event.date.toFormattedString(), modifier = Modifier.padding(8.dp).testTag("date"))
           Icon(
               Icons.TwoTone.Face,
               contentDescription = "participants",
               modifier = Modifier.padding(start = 64.dp).testTag("participantsIcon"))
           Text(
               "Participants: ${event.participants}/${event.maxParticipants}",
-              modifier = Modifier.testTag("participants"))
+              modifier = Modifier.padding(8.dp).testTag("participants"))
         }
   }
 }
