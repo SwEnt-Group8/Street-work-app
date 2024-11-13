@@ -1,6 +1,9 @@
 package com.android.streetworkapp.ui.profile
 
+import android.os.Build
+import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,6 +18,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,9 +34,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.sample.R
+import com.android.streetworkapp.device.bluetooth.BluetoothClient
+import com.android.streetworkapp.device.bluetooth.BluetoothConstants
+import com.android.streetworkapp.device.bluetooth.BluetoothServer
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 
+@RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddFriendScreen(
@@ -46,6 +55,29 @@ fun AddFriendScreen(
   val currentUser = userViewModel.currentUser.collectAsState().value
   val uid = currentUser?.uid ?: ""
 
+  // Instantiate BluetoothClient
+  val bluetoothClient = remember { BluetoothClient(context) }
+  val bluetoothServer = remember { BluetoothServer(context) }
+
+  // Start scanning for GATT servers on screen load
+  LaunchedEffect(Unit) {
+    bluetoothClient.startGattClient { receivedUid ->
+      Log.d(BluetoothConstants.TAG, "UID received on client: $receivedUid")
+      // Handle the received UID by adding it to the friend list
+      userViewModel.addFriend(uid, receivedUid)
+      Toast.makeText(context, "Received UID: $receivedUid", Toast.LENGTH_SHORT).show()
+    }
+  }
+
+  // Ensure GATT client is stopped when leaving the screen
+  DisposableEffect(Unit) {
+    onDispose {
+      bluetoothClient.stopGattClient()
+      bluetoothServer.stopGattServer()
+      Log.d(BluetoothConstants.TAG, "Bluetooth client and server stopped.")
+    }
+  }
+
   Box(modifier = Modifier.testTag("addFriendScreen")) {
     Column(
         modifier = Modifier.fillMaxSize().padding(innerPaddingValues).testTag("AddFriendColumn"),
@@ -56,8 +88,7 @@ fun AddFriendScreen(
               contentDescription = "profile picture",
               modifier = Modifier.size(200.dp))
 
-          // button to activate NFC (don't work)
-          NfcButton()
+          BluetoothButton(bluetoothServer, uid)
 
           // write friend ID
           OutlinedTextField(
