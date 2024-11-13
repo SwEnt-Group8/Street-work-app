@@ -45,17 +45,21 @@ class NominatimParkNameRepository(val client: OkHttpClient) : ParkNameRepository
               }
 
               override fun onResponse(call: Call, response: Response) {
-                onSuccess(decodeRoadJson(response.body!!.string()))
+                onSuccess(decodeRoadJson(response.body!!.string(), locationId))
               }
             })
   }
 
-  fun decodeRoadJson(json: String): String {
+  fun decodeRoadJson(json: String, locationId: String): String {
     require(json.isNotEmpty())
-    val jsonArray = JSONArray(json)
-    val jsonObject = jsonArray.getJSONObject(0)
-    val address = jsonObject.getJSONObject("address")
-    val road = address.getString("road")
-    return road
+    try {
+      val jsonArray = JSONArray(json)
+      val jsonObject = jsonArray.getJSONObject(0)
+      val address = jsonObject.getJSONObject("address")
+      val road = address.getString("road")
+      return road
+    } catch (_: Exception) {
+      return "Default Park: $locationId"
+    }
   }
 }
