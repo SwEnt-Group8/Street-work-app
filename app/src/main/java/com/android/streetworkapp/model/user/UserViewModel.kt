@@ -135,6 +135,19 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
   fun addUser(user: User) = viewModelScope.launch { repository.addUser(user) }
 
   /**
+   * Retrieves a user from Firestore based on the provided ID, or adds it if they don't exist.
+   *
+   * @param uid The unique ID of the user to retrieve or add.
+   * @param user The User object to add if the user doesn't exist.
+   */
+  fun getOrAddUserByUid(uid: String, user: User) {
+    viewModelScope.launch {
+      val fetchedUser = repository.getOrAddUserByUid(uid, user)
+      _user.value = fetchedUser
+    }
+  }
+
+  /**
    * Updates the user's score in Firestore.
    *
    * @param uid The unique ID of the user whose score is being updated.
