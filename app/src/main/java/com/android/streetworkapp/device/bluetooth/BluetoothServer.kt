@@ -42,7 +42,6 @@ class BluetoothServer(private val context: Context) {
    */
   @RequiresApi(Build.VERSION_CODES.S)
   fun startGattServer(uid: String) {
-    Log.d("DEBUGSWENT", "uid: $uid")
     if (!bluetoothAdapter.isEnabled) {
       Log.e(BluetoothConstants.TAG, "Bluetooth is not enabled.")
       return
