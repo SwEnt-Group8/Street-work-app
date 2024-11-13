@@ -86,7 +86,7 @@ class AddFriendScreenTest : TestCase() {
   fun textCorrectlyDisplayed() {
     composeTestRule.waitForIdle() // Wait for rendering
 
-    composeTestRule.onNodeWithTag("NFCButton").assertTextEquals("Activate NFC")
+    composeTestRule.onNodeWithTag("BluetoothButton").assertTextEquals("Broadcast UID")
     composeTestRule.onNodeWithTag("RequestButton").assertTextEquals("Send request")
   }
 
@@ -94,7 +94,7 @@ class AddFriendScreenTest : TestCase() {
   fun buttonWork() {
     composeTestRule.waitForIdle() // Wait for rendering
 
-    composeTestRule.onNodeWithTag("NFCButton").assertHasClickAction()
+    composeTestRule.onNodeWithTag("BluetoothButton").assertHasClickAction()
     composeTestRule.onNodeWithTag("RequestButton").assertHasClickAction()
   }
 
