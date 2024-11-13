@@ -99,7 +99,10 @@ fun StreetWorkApp(
   } // not using by here since I want to pass the mutableState to a fn
   var screenParams by remember { mutableStateOf<ScreenParams?>(null) }
 
-  navigationActions.registerStringListenerOnDestinationChange(currentScreenName)
+  var firstTimeLoaded by remember { mutableStateOf<Boolean>(true) }
+
+
+    navigationActions.registerStringListenerOnDestinationChange(currentScreenName)
   screenParams = LIST_OF_SCREENS.find { currentScreenName.value == it.screenName }
 
   // Park with no events
@@ -198,7 +201,10 @@ fun StreetWorkApp(
                 }
               }
             }
-        navigationActions.apply(navTestInvokation)
+      if (firstTimeLoaded) {
+          firstTimeLoaded = false
+          navigationActions.apply(navTestInvokation)
+      }
       }
 }
 
