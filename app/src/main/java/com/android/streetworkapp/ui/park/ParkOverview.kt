@@ -78,6 +78,8 @@ fun ParkOverviewScreen(
 
   currentPark.value?.let { eventViewModel.getEvents(it) }
 
+  parkViewModel.updateCurrentParkNameNominatim()
+
   val showRatingDialog = remember { mutableStateOf(false) }
 
   Box(modifier = Modifier.padding(innerPadding).fillMaxSize().testTag("parkOverviewScreen")) {
