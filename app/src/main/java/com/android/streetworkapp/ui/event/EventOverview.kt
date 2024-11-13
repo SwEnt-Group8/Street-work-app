@@ -1,6 +1,7 @@
 package com.android.streetworkapp.ui.event
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,7 +28,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.Park
@@ -85,31 +89,42 @@ fun EventOverviewScreen(
 @Composable
 fun EventDetails(event: Event) {
   Column {
-    Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-      Icon(
-          Icons.Outlined.AccountCircle,
-          contentDescription = "User",
-          modifier = Modifier.padding(horizontal = 8.dp).testTag("ownerIcon"))
-      Text("Organized by: ${event.owner}", modifier = Modifier.testTag("eventOwner"))
-    }
-
-    Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-      Icon(
-          Icons.Filled.DateRange,
-          contentDescription = "Date",
-          modifier = Modifier.padding(horizontal = 8.dp).testTag("dateIcon"))
-      Text(event.date.toFormattedString(), modifier = Modifier.testTag("date"))
-    }
-
-    Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-      Icon(
-          Icons.TwoTone.Face,
-          contentDescription = "participants",
-          modifier = Modifier.padding(horizontal = 8.dp).testTag("participantsIcon"))
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
       Text(
-          "Participants: ${event.participants}/${event.maxParticipants}",
-          modifier = Modifier.testTag("participants"))
+          event.title,
+          modifier = Modifier.testTag("eventTitle"),
+          fontSize = 24.sp,
+          style = TextStyle(textDecoration = TextDecoration.Underline))
     }
+
+    Row(
+        modifier = Modifier.padding(top = 16.dp).fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center) {
+          Icon(
+              Icons.Outlined.AccountCircle,
+              contentDescription = "User",
+              modifier = Modifier.padding(horizontal = 8.dp).testTag("ownerIcon"))
+          Text("Organized by: ${event.owner}", modifier = Modifier.testTag("eventOwner"))
+        }
+
+    Row(
+        modifier = Modifier.padding(top = 16.dp).fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center) {
+          Icon(
+              Icons.Filled.DateRange,
+              contentDescription = "Date",
+              modifier = Modifier.testTag("dateIcon"))
+          Text(
+              event.date.toFormattedString(),
+              modifier = Modifier.padding(start = 8.dp).testTag("date"))
+          Icon(
+              Icons.TwoTone.Face,
+              contentDescription = "participants",
+              modifier = Modifier.padding(start = 64.dp).testTag("participantsIcon"))
+          Text(
+              "Participants: ${event.participants}/${event.maxParticipants}",
+              modifier = Modifier.testTag("participants"))
+        }
   }
 }
 

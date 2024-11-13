@@ -85,17 +85,14 @@ fun ParkOverviewScreen(
     Column {
       ImageTitle(image = null, title = currentPark.value?.name ?: "loading...")
       // TODO: Fetch image from Firestore storage
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-          ParkDetails(park = currentPark.value, showRatingDialog)
-          Button(
-              onClick = { navigationActions.navigateTo(Screen.ADD_EVENT) },
-              modifier = Modifier.size(width = 150.dp, height = 40.dp).testTag("createEventButton"),
-              colors = ColorPalette.BUTTON_COLOR) {
-                Text("Create an event")
-              }
+      Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        ParkDetails(park = currentPark.value, showRatingDialog)
+        Button(
+            onClick = { navigationActions.navigateTo(Screen.ADD_EVENT) },
+            modifier = Modifier.size(width = 150.dp, height = 40.dp).testTag("createEventButton"),
+            colors = ColorPalette.BUTTON_COLOR) {
+              Text("Create an event")
+            }
       }
       RatingDialog(showRatingDialog)
       HorizontalDivider(modifier = Modifier.fillMaxWidth())
