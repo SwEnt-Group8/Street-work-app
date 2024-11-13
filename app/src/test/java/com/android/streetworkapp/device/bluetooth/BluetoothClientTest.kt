@@ -1,7 +1,6 @@
 package com.android.streetworkapp.device.bluetooth
 
 import android.Manifest
-import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
@@ -35,10 +34,11 @@ class BluetoothClientTest {
   @Test
   fun `startGattClient - should not start scan if permissions are missing`() {
     whenever(ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN))
-      .thenReturn(PackageManager.PERMISSION_DENIED)
+        .thenReturn(PackageManager.PERMISSION_DENIED)
 
-    bluetoothClient.startGattClient { /* onUidReceived callback */ }
+    bluetoothClient.startGattClient { /* onUidReceived callback */}
 
-    verify(bluetoothLeScanner, never()).startScan(any<List<ScanFilter>>(), any(), any<ScanCallback>())
+    verify(bluetoothLeScanner, never())
+        .startScan(any<List<ScanFilter>>(), any(), any<ScanCallback>())
   }
 }
