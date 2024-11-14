@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.click
+import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -144,6 +145,11 @@ class End2EndCreateEvent {
 
     // find a marker on the map and click it
     val uiDevice = UiDevice.getInstance(getInstrumentation())
+
+    composeTestRule.waitUntil {
+      uiDevice.findObject(UiSelector().descriptionContains("Marker1")).exists()
+    }
+
     val marker = uiDevice.findObject(UiSelector().descriptionContains("Marker1"))
 
     try {
@@ -184,6 +190,8 @@ class End2EndCreateEvent {
 
     // verify that the event is properly displayed on the park overview screen
     composeTestRule.onNodeWithTag("parkOverviewScreen").assertIsDisplayed()
+
+    composeTestRule.waitUntil { composeTestRule.onNodeWithTag("eventButton").isDisplayed() }
 
     composeTestRule.onNodeWithText(testEvent.title).assertIsDisplayed()
 
