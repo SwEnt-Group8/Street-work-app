@@ -33,6 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -240,12 +241,15 @@ fun AchievementItem(achievement: Achievement) {
       modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp, horizontal = 16.dp),
       verticalAlignment = Alignment.CenterVertically) {
         Box(
-            modifier = Modifier.size(48.dp).background(Color.LightGray, shape = CircleShape),
+            modifier =
+                Modifier.size(64.dp).background(ColorPalette.BORDER_COLOR, shape = CircleShape),
             contentAlignment = Alignment.Center) {
               Image(
                   painter = painterResource(id = achievement.icon),
                   contentDescription = achievement.title,
-                  modifier = Modifier.size(64.dp).clip(CircleShape) // Clip the image to be circular
+                  contentScale = ContentScale.FillBounds,
+                  modifier =
+                      Modifier.fillMaxSize().clip(CircleShape) // Clip the image to be circular
                   )
             }
 

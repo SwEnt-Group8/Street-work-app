@@ -44,9 +44,26 @@ enum class Ranks(val score: Int) {
 }
 
 enum class MedalsAchievement(val achievement: Achievement) {
-  NONE(Achievement(R.drawable.place_holder, "No medal", emptyList(), "No medal")),
-  BRONZE(Achievement(R.drawable.place_holder, "Bronze medal", emptyList(), "First medal")),
-  SILVER(Achievement(R.drawable.place_holder, "Silver medal", emptyList(), "Second medal")),
-  GOLD(Achievement(R.drawable.place_holder, "Gold medal", emptyList(), "Third medal")),
-  PLATINUM(Achievement(R.drawable.place_holder, "Platinum medal", emptyList(), "Last medal"))
+  NONE(Achievement(R.drawable.place_holder_achievement_icon, "No medal", emptyList(), "No medal")),
+  BRONZE(
+      Achievement(
+          R.drawable.place_holder_achievement_icon,
+          "Bronze medal",
+          listOf("Bronze"),
+          "First medal")),
+  SILVER(
+      Achievement(
+          R.drawable.place_holder_achievement_icon,
+          "Silver medal",
+          listOf("Silver"),
+          "Second medal")),
+  GOLD(
+      Achievement(
+          R.drawable.place_holder_achievement_icon, "Gold medal", listOf("Gold"), "Third medal")),
+  PLATINUM(
+      Achievement(
+          R.drawable.place_holder_achievement_icon,
+          "Platinum medal",
+          listOf("Platinum"),
+          "Last medal"))
 }
