@@ -14,7 +14,7 @@ import com.android.streetworkapp.ui.theme.ColorPalette
 fun NfcButton() {
   Button(
       onClick = {},
-      modifier = Modifier.size(220.dp, 50.dp).testTag("NFCButton"),
+      modifier = Modifier.size(220.dp, 40.dp).testTag("NFCButton"),
       colors = ColorPalette.BUTTON_COLOR) {
         Text(text = "Activate NFC", fontSize = 17.sp)
       }

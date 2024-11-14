@@ -83,7 +83,7 @@ fun AddFriendScreen(
                 }
               },
               colors = ColorPalette.BUTTON_COLOR,
-              modifier = Modifier.size(220.dp, 50.dp).testTag("RequestButton")) {
+              modifier = Modifier.size(220.dp, 40.dp).testTag("RequestButton")) {
                 Text(text = "Send request", fontSize = 17.sp)
               }
         }
