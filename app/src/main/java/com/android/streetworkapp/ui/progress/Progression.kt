@@ -73,7 +73,7 @@ fun ProgressScreen(
   val currentUser by userViewModel.currentUser.collectAsState()
   val currentProgression by progressionViewModel.currentProgression.collectAsState()
 
-  currentUser?.uid?.let { progressionViewModel.getCurrentProgression(it) }
+  currentUser?.uid?.let { progressionViewModel.getOrAddProgression(it) }
 
   val progressionPercentage = // in case of error set it to 0, otherwise score/currentGoal
       (if (currentUser == null || currentProgression.currentGoal == 0) 0f

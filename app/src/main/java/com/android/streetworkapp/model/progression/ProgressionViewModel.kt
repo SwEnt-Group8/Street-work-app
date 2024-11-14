@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 open class ProgressionViewModel(private val repository: ProgressionRepository) : ViewModel() {
 
-  private val _currentProgression = MutableStateFlow(Progression())
+  private val _currentProgression = MutableStateFlow<Progression>(Progression())
   val currentProgression: StateFlow<Progression> = _currentProgression.asStateFlow()
 
   companion object {
@@ -29,6 +29,13 @@ open class ProgressionViewModel(private val repository: ProgressionRepository) :
    */
   fun getNewProgressionId(): String {
     return repository.getNewProgressionId()
+  }
+
+  fun getOrAddProgression(uid: String) {
+    viewModelScope.launch {
+      val temp = repository.getOrAddProgression(uid)
+      _currentProgression.value = temp
+    }
   }
 
   /**
