@@ -2,6 +2,9 @@ package com.android.streetworkapp.ui.park
 
 // Portions of this code were generated with the help of GitHub Copilot.
 
+import android.content.Context
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -39,6 +42,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -52,10 +56,14 @@ import com.android.streetworkapp.model.event.EventOverviewUiState
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkViewModel
+import com.android.streetworkapp.model.user.User
+import com.android.streetworkapp.model.user.UserRepositoryFirestore
+import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.utils.toFormattedString
+import com.google.firebase.firestore.FirebaseFirestore
 
 /**
  * Display the overview of a park, including park details and a list of events.
@@ -64,19 +72,27 @@ import com.android.streetworkapp.utils.toFormattedString
  * @param innerPadding The padding to apply to the screen.
  * @param navigationActions The navigation actions to navigate to other screens.
  * @param eventViewModel The view model for the events.
+ * @param userViewModel The view model for the user.
  */
 @Composable
 fun ParkOverviewScreen(
     parkViewModel: ParkViewModel,
     innerPadding: PaddingValues = PaddingValues(0.dp),
     navigationActions: NavigationActions = NavigationActions(rememberNavController()),
-    eventViewModel: EventViewModel
+    eventViewModel: EventViewModel,
+    userViewModel: UserViewModel =
+        UserViewModel(UserRepositoryFirestore(FirebaseFirestore.getInstance()))
 ) {
-  val currentPark = parkViewModel.currentPark.collectAsState()
 
+  // MVVM calls for park state :
+  val currentPark = parkViewModel.currentPark.collectAsState()
   parkViewModel.park.collectAsState().value?.pid?.let { parkViewModel.loadCurrentPark(it) }
 
+  // MVVM calls for event state of the park :
   currentPark.value?.let { eventViewModel.getEvents(it) }
+
+  // MVVM calls for user state :
+  val currentUser = userViewModel.currentUser.collectAsState().value
 
   parkViewModel.updateCurrentParkNameNominatim()
 
@@ -87,7 +103,7 @@ fun ParkOverviewScreen(
       ImageTitle(image = null, title = currentPark.value?.name ?: "loading...")
       // TODO: Fetch image from Firestore storage
       Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        ParkDetails(park = currentPark.value, showRatingDialog)
+        ParkDetails(park = currentPark.value, showRatingDialog, currentUser)
         Button(
             onClick = { navigationActions.navigateTo(Screen.ADD_EVENT) },
             modifier = Modifier.size(width = 150.dp, height = 40.dp).testTag("createEventButton"),
@@ -95,7 +111,7 @@ fun ParkOverviewScreen(
               Text("Create an event")
             }
       }
-      RatingDialog(showRatingDialog)
+      RatingDialog(showRatingDialog, currentPark.value, currentUser, parkViewModel)
       HorizontalDivider(modifier = Modifier.fillMaxWidth())
       EventItemList(eventViewModel, navigationActions)
     }
@@ -140,9 +156,11 @@ fun ImageTitle(image: Painter?, title: String) {
  * Display the details of a park, including the park's rating and occupancy.
  *
  * @param park The park data to display.
+ * @param showRatingDialog The state to show the rating dialog.
+ * @param user The user who is viewing the park.
  */
 @Composable
-fun ParkDetails(park: Park?, showRatingDialog: MutableState<Boolean>) {
+fun ParkDetails(park: Park?, showRatingDialog: MutableState<Boolean>, user: User?) {
   Column(modifier = Modifier.testTag("parkDetails").padding(bottom = 16.dp, end = 48.dp)) {
     Text(
         text = "Park rating",
@@ -153,8 +171,7 @@ fun ParkDetails(park: Park?, showRatingDialog: MutableState<Boolean>) {
     Row {
       park?.rating?.let { RatingComponent(rating = it.toInt(), park.nbrRating) } // Round the rating
 
-      // TODO: Check if the user has already rated the park and hide the button if true
-      RatingButton(showRatingDialog)
+      if (shouldRatingButtonBeVisible(park, user)) RatingButton(showRatingDialog)
     }
   }
 }
@@ -167,6 +184,7 @@ fun ParkDetails(park: Park?, showRatingDialog: MutableState<Boolean>) {
  */
 @Composable
 fun RatingComponent(rating: Int, nbrReview: Int) {
+  Log.d("ParkOverview", "RatingComponent: rating=$rating ; nbrReview=$nbrReview")
   require(rating in 1..5) { "Rating must be between 1 and 5" }
   Row(
       modifier = Modifier.padding(start = 16.dp).testTag("ratingComponent"),
@@ -206,14 +224,23 @@ fun RatingButton(showRatingDialog: MutableState<Boolean>) {
 
 /**
  * Display a dialog to rate the park. Ues the starRating variable to store the "live" rating value.
- * Used to submit the rating to the MVVM.
+ * Used to submit the rating to the park MVVM.
  *
  * @param showDialog The state to show the dialog.
+ * @param park The park to rate.
+ * @param user The user who is rating the park.
+ * @param parkViewModel The park view model.
  */
 @Composable
-fun RatingDialog(showDialog: MutableState<Boolean>) {
+fun RatingDialog(
+    showDialog: MutableState<Boolean>,
+    park: Park? = null,
+    user: User? = null,
+    parkViewModel: ParkViewModel? = null
+) {
   // Star rating is 1-5 stars
   val starRating = remember { mutableIntStateOf(3) }
+  val context = LocalContext.current
 
   if (showDialog.value) {
     AlertDialog(
@@ -222,7 +249,9 @@ fun RatingDialog(showDialog: MutableState<Boolean>) {
         confirmButton = {
           TextButton(
               onClick = {
-                // TODO Handle confirmation action with park MVVM
+                // Handle confirmation action with park MVVM
+                Log.d("ParkOverview", "RatingDialog: Submitting rating")
+                handleRating(context, park, user, starRating.intValue, parkViewModel)
                 showDialog.value = false
               },
               modifier = Modifier.testTag("submitRatingButton")) {
@@ -251,6 +280,65 @@ fun RatingDialog(showDialog: MutableState<Boolean>) {
                 dismissOnClickOutside = true) // Makes dialog dismissible by clicking outside
         )
   }
+}
+
+/**
+ * Verifies that the current state is correct and then rates the park.
+ *
+ * @param context The context of the application.
+ * @param park The park to rate.
+ * @param user The user who is rating the park.
+ * @param starRating The rating value.
+ * @param parkViewModel The park view model.
+ */
+fun handleRating(
+    context: Context?,
+    park: Park?,
+    user: User?,
+    starRating: Int,
+    parkViewModel: ParkViewModel?
+) {
+  Log.d("ParkOverview", "handleRating: {park=$park ; user=$user ; rating=$starRating")
+
+  when {
+    user == null -> {
+      if (context != null)
+          Toast.makeText(context, "User not found, could not rate park", Toast.LENGTH_SHORT).show()
+    }
+    park == null -> {
+      if (context != null)
+          Toast.makeText(context, "Park not found, could not rate park", Toast.LENGTH_SHORT).show()
+    }
+    starRating < 1 || starRating > 5 -> {
+      if (context != null)
+          Toast.makeText(context, "Invalid rating value, could not rate park", Toast.LENGTH_SHORT)
+              .show()
+    }
+    parkViewModel == null -> {
+      if (context != null)
+          Toast.makeText(context, "Error with view model, could not rate park", Toast.LENGTH_SHORT)
+              .show()
+    }
+    else -> {
+      Log.d("ParkOverview", "handleRating: Adding rating to park")
+      if (context != null) Toast.makeText(context, "Rating submitted", Toast.LENGTH_SHORT).show()
+      parkViewModel.addRating(park.pid, user.uid, starRating.toFloat())
+    }
+  }
+}
+
+/**
+ * Defines whether a user can see the rating button depending on whether he already has rated a
+ * park.
+ *
+ * @param park The park to check.
+ * @param user The user to check.
+ * @return True if the user has rated the park, false otherwise.
+ */
+fun shouldRatingButtonBeVisible(park: Park?, user: User?): Boolean {
+  val res = park != null && user != null && !park.votersUIDs.contains(user.uid)
+  Log.d("ParkOverview", "shouldRatingButtonBeVisible: for $user at $park => $res")
+  return res
 }
 
 /**

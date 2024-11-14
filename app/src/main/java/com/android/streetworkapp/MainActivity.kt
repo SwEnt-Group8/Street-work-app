@@ -179,7 +179,8 @@ fun StreetWorkApp(
                       innerPadding)
                 }
                 composable(Screen.PARK_OVERVIEW) {
-                  ParkOverviewScreen(parkViewModel, innerPadding, navigationActions, eventViewModel)
+                  ParkOverviewScreen(
+                      parkViewModel, innerPadding, navigationActions, eventViewModel, userViewModel)
                 }
                 composable(Screen.ADD_EVENT) {
                   AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
