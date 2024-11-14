@@ -36,9 +36,9 @@ class LoginTest : TestCase() {
     composeTestRule.onNodeWithTag("loginTitle").assertExists().assertIsDisplayed()
     composeTestRule.onNodeWithTag("loginButton").assertExists().assertIsDisplayed()
     composeTestRule
-      .onNodeWithTag("loginButtonIcon", useUnmergedTree = true)
-      .assertExists()
-      .assertIsDisplayed()
+        .onNodeWithTag("loginButtonIcon", useUnmergedTree = true)
+        .assertExists()
+        .assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("loginButtonText", useUnmergedTree = true).assertIsDisplayed()
 
@@ -54,8 +54,8 @@ class LoginTest : TestCase() {
     composeTestRule.onNodeWithTag("loginTitle").assertTextEquals("Welcome to the Street Work'App")
     composeTestRule.onNodeWithTag("loginButton").assertTextEquals("Sign in with Google")
     composeTestRule
-      .onNodeWithTag("loginButtonText", useUnmergedTree = true)
-      .assertTextEquals("Sign in with Google")
+        .onNodeWithTag("loginButtonText", useUnmergedTree = true)
+        .assertTextEquals("Sign in with Google")
 
     // UX - Button click action :
     composeTestRule.onNodeWithTag("loginButton").assertHasClickAction()
