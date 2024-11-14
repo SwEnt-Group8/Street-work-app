@@ -54,6 +54,7 @@ fun MapManager(
     }
   }
 
+  // update userLocation each update
   val locationCallback = remember {
     object : LocationCallback() {
       override fun onLocationResult(locationResult: LocationResult) {
