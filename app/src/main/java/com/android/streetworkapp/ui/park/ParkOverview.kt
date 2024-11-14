@@ -309,7 +309,7 @@ fun handleRating(
   } else if (starRating < 1 || starRating > 5) {
     Toast.makeText(context, "Invalid rating value, could not rate park", Toast.LENGTH_SHORT).show()
   } else if (parkViewModel == null) {
-      Toast.makeText(context, "Error with view model, could not rate park", Toast.LENGTH_SHORT).show()
+    Toast.makeText(context, "Error with view model, could not rate park", Toast.LENGTH_SHORT).show()
   } else {
     Log.d("ParkOverview", "handleRating: Adding rating to park")
     Toast.makeText(context, "Rating submitted", Toast.LENGTH_SHORT).show()
