@@ -5,7 +5,6 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -101,11 +100,15 @@ fun AddFriendScreen(
 
   Box(modifier = Modifier.testTag("addFriendScreen")) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(innerPaddingValues).testTag("AddFriendColumn"),
+        modifier =
+            Modifier.fillMaxSize()
+                .padding(innerPaddingValues)
+                .padding(vertical = 24.dp)
+                .testTag("AddFriendColumn"),
         horizontalAlignment = Alignment.CenterHorizontally) {
           Column(
               modifier =
-                  Modifier.align(Alignment.Start).padding(horizontal = 16.dp, vertical = 4.dp)) {
+                  Modifier.align(Alignment.Start).padding(horizontal = 16.dp, vertical = 8.dp)) {
                 // Title
                 Text(
                     text = "Instructions",
@@ -121,7 +124,7 @@ fun AddFriendScreen(
               }
           Box(
               modifier =
-                  Modifier.padding(horizontal = 8.dp)
+                  Modifier.padding(horizontal = 8.dp, vertical = 16.dp)
                       .border(
                           width = 1.dp,
                           color = Color.Gray,
@@ -156,7 +159,7 @@ fun AddFriendScreen(
           Image(
               painter = painterResource(id = R.drawable.bluetooth),
               contentDescription = "Bluetooth Icon",
-              modifier = Modifier.size(150.dp).testTag("bluetoothIcon"))
+              modifier = Modifier.size(150.dp).testTag("bluetoothIcon").padding(vertical = 16.dp))
 
           BluetoothButton(bluetoothServer, uid)
         }
