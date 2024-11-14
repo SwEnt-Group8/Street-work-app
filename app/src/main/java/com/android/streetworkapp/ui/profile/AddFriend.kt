@@ -39,6 +39,7 @@ import com.android.streetworkapp.device.bluetooth.BluetoothConstants
 import com.android.streetworkapp.device.bluetooth.BluetoothServer
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.theme.ColorPalette
 
 @RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -112,7 +113,8 @@ fun AddFriendScreen(
                   Toast.makeText(context, "Friend request sent.", Toast.LENGTH_SHORT).show()
                 }
               },
-              modifier = Modifier.size(220.dp, 50.dp).testTag("RequestButton")) {
+              colors = ColorPalette.BUTTON_COLOR,
+              modifier = Modifier.size(220.dp, 40.dp).testTag("RequestButton")) {
                 Text(text = "Send request", fontSize = 17.sp)
               }
         }
