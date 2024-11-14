@@ -21,6 +21,8 @@ import com.android.streetworkapp.model.park.ParkRepositoryFirestore
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
+import com.android.streetworkapp.model.progression.ProgressionRepositoryFirestore
+import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.authentication.SignInScreen
@@ -78,8 +80,18 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
   val eventRepository = EventRepositoryFirestore(firestoreDB)
   val eventViewModel = EventViewModel(eventRepository)
 
+  // Instantiate progression repository
+  val progressionRepository = ProgressionRepositoryFirestore(firestoreDB)
+  val progressionViewModel = ProgressionViewModel(progressionRepository)
+
   StreetWorkApp(
-      parkLocationViewModel, testInvokation, {}, userViewModel, parkViewModel, eventViewModel)
+      parkLocationViewModel,
+      testInvokation,
+      {},
+      userViewModel,
+      parkViewModel,
+      eventViewModel,
+      progressionViewModel)
 }
 
 @Composable
@@ -89,7 +101,8 @@ fun StreetWorkApp(
     mapCallbackOnMapLoaded: () -> Unit = {},
     userViewModel: UserViewModel,
     parkViewModel: ParkViewModel,
-    eventViewModel: EventViewModel
+    eventViewModel: EventViewModel,
+    progressionViewModel: ProgressionViewModel
 ) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
@@ -162,7 +175,10 @@ fun StreetWorkApp(
                 composable(Screen.AUTH) { SignInScreen(navigationActions, userViewModel) }
               }
               navigation(startDestination = Screen.PROGRESSION, route = Route.PROGRESSION) {
-                composable(Screen.PROGRESSION) { ProgressScreen(navigationActions, innerPadding) }
+                composable(Screen.PROGRESSION) {
+                  ProgressScreen(
+                      navigationActions, userViewModel, progressionViewModel, innerPadding)
+                }
               }
               navigation(
                   startDestination = Screen.MAP,

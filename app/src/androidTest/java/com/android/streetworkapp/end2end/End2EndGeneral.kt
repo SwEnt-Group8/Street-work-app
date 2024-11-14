@@ -8,8 +8,10 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import com.android.streetworkapp.StreetWorkApp
+import com.android.streetworkapp.model.event.EventRepository
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
 import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.park.ParkRepositoryFirestore
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
@@ -53,22 +55,19 @@ import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class End2EndGeneral {
     @Mock
     private lateinit var userRepository: UserRepository
-    @InjectMocks
-    private lateinit var userViewModel: UserViewModel
-
     @Mock
     private lateinit var progressionRepository: ProgressionRepository
 
     @InjectMocks
+    private lateinit var userViewModel: UserViewModel
+    @InjectMocks
     private lateinit var progressionViewModel: ProgressionViewModel
-
-    @Mock
-    private lateinit var parkLocationRepository: ParkLocationRepository
 
 
     @get:Rule
@@ -115,7 +114,7 @@ class End2EndGeneral {
     private val mockedUserProgression = Progression(
         progressionId = "prog123456",
         uid = mockedUser.uid,
-        currentGoal = Ranks.BRONZE.score,
+        currentGoal = Ranks.GOLD.score,
         eventsCreated = 0,
         eventsJoined = 0,
         achievements = listOf(MedalsAchievement.BRONZE.name)
@@ -127,12 +126,13 @@ class End2EndGeneral {
         userViewModel.setCurrentUser(mockedUser)
 
         composeTestRule.setContent {
-            StreetWorkApp(ParkLocationViewModel(parkLocationRepository),
+            StreetWorkApp(ParkLocationViewModel(mock(ParkLocationRepository::class.java)),
                 { navigateTo(Route.MAP) },
                 {},
                 userViewModel,
-                ParkViewModel(mockk<ParkRepositoryFirestore>()),
-                EventViewModel(mockk<EventRepositoryFirestore>())
+                ParkViewModel(mock(ParkRepository::class.java)),
+                EventViewModel(mock(EventRepository::class.java)),
+                progressionViewModel
             )
         }
     }
@@ -143,15 +143,15 @@ class End2EndGeneral {
     @Test
     fun e2eNavigationAndDisplaysCorrectDetailsExceptForParks() = runTest {
 
+        //mock the mockedUser's progression
         doAnswer { invocation ->
-            // Capture the callback argument from the method invocation
             val onSuccessCallback = invocation.getArgument<(Progression) -> Unit>(1)
-            // Invoke the callback with the mocked Progression object
             onSuccessCallback.invoke(mockedUserProgression)
         }.`when`(progressionRepository).getProgression(eq(mockedUser.uid), any<(Progression) -> Unit>(), any())
 
+        //mock the mockedUser's friends
         whenever(userRepository.getFriendsByUid(mockedUser.uid)).thenReturn(mockedFriendsForMockedUser)
-        
+
 
         composeTestRule.waitForIdle()
         //already on map here
@@ -161,7 +161,7 @@ class End2EndGeneral {
         composeTestRule.onNodeWithTag("bottomNavigationItem${Route.PROGRESSION}").performClick()
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithTag("progressionScreen").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("percentageInsideCircularProgressBar").assertTextEquals("${(mockedUser.score/mockedUserProgression.currentGoal.toFloat()*100).toInt()}")
+        composeTestRule.onNodeWithTag("percentageInsideCircularProgressBar").assertTextEquals("${(mockedUser.score/mockedUserProgression.currentGoal.toFloat()*100).toInt()}%")
         composeTestRule.onNodeWithTag("scoreTextUnderCircularProgressBar").assertTextEquals("${mockedUser.score}/${mockedUserProgression.currentGoal}")
 
         //checking that each achievements exists in the lazy column
@@ -189,8 +189,6 @@ class End2EndGeneral {
         composeTestRule.onNodeWithTag("inputID").performTextInput(dummyFriendId)
         composeTestRule.onNodeWithTag("RequestButton").performClick()
 
-        //change to user repo
-        coVerify { userRepository.addFriend(mockedUser.uid, dummyFriendId) }
-        //the behavior of adding friends will very likely change in the future, thus the test doesn't go into more depth
+        verify(userRepository).addFriend(mockedUser.uid, dummyFriendId) //the behavior of adding friends will very likely change in the future, thus the test doesn't go into more depth
     }
 }
