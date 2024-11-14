@@ -42,7 +42,6 @@ import com.android.streetworkapp.device.bluetooth.BluetoothServer
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_DARK
-import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_LIGHT
 import com.android.streetworkapp.ui.theme.ColorPalette.PRIMARY_TEXT_COLOR
 import com.android.streetworkapp.ui.theme.ColorPalette.PRINCIPLE_BACKGROUND_COLOR
 import com.android.streetworkapp.ui.theme.ColorPalette.SECONDARY_TEXT_COLOR
