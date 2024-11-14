@@ -10,7 +10,11 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import com.android.streetworkapp.model.park.Park
+import com.android.streetworkapp.model.parklocation.ParkLocation
+import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.ui.park.InteractiveRatingComponent
+import com.android.streetworkapp.ui.park.ParkDetails
 import com.android.streetworkapp.ui.park.RatingButton
 import com.android.streetworkapp.ui.park.RatingDialog
 import org.junit.Rule
@@ -107,5 +111,61 @@ class ParkRatingTest {
       composeTestRule.waitForIdle()
       assert(starRating.intValue == index)
     }
+  }
+
+  // New tests after MVVM link :
+
+  // 1 - Is the button correctly hidden / shown depending on user and park state :
+
+  @Test
+  fun isRatingButtonCorrectlyDisplayedWhenNoRating() {
+    val showRatingDialog = mutableStateOf(false)
+    // default park constructor
+    val emptyPark =
+        Park("", "", ParkLocation(0.0, 0.0, ""), "", 1f, 1, 10, 0, emptyList(), emptyList())
+
+    val user = User("uid", "username", "email", 0, emptyList())
+
+    composeTestRule.setContent { ParkDetails(emptyPark, showRatingDialog, user) }
+
+    // User not null and has not rated the emptyPark (empty votersUID list).
+    composeTestRule.onNodeWithTag("ratingButton").assertIsDisplayed()
+  }
+
+  @Test
+  fun isRatingButtonCorrectlyDisplayedWhenRating() {
+    val showRatingDialog = mutableStateOf(false)
+    val user = User("uid", "username", "email", 0, emptyList())
+
+    // default park constructor
+    val emptyPark =
+        Park("", "", ParkLocation(0.0, 0.0, ""), "", 1f, 1, 10, 0, emptyList(), emptyList())
+
+    // Set the user as having rated the emptyPark.
+    emptyPark.votersUIDs = listOf(user.uid)
+
+    composeTestRule.setContent { ParkDetails(emptyPark, showRatingDialog, user) }
+
+    // User not null and has rated the emptyPark => should not be displayed.
+    emptyPark.votersUIDs = listOf(user.uid)
+
+    composeTestRule.waitForIdle()
+    assert(emptyPark.votersUIDs.contains(user.uid))
+    composeTestRule.onNodeWithTag("ratingButton").assertIsNotDisplayed()
+  }
+
+  @Test
+  fun isRatingButtonCorrectlyDisplayedWhenNoUser() {
+    val showRatingDialog = mutableStateOf(false)
+    val user: User? = null
+
+    // default park constructor
+    val emptyPark =
+        Park("", "", ParkLocation(0.0, 0.0, ""), "", 1f, 1, 10, 0, emptyList(), emptyList())
+
+    composeTestRule.setContent { ParkDetails(emptyPark, showRatingDialog, user) }
+
+    // User null => should not be displayed.
+    composeTestRule.onNodeWithTag("ratingButton").assertIsNotDisplayed()
   }
 }

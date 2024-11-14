@@ -60,11 +60,13 @@ import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.user.User
+import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.utils.toFormattedString
+import com.google.firebase.firestore.FirebaseFirestore
 
 /**
  * Display the overview of a park, including park details and a list of events.
@@ -81,7 +83,8 @@ fun ParkOverviewScreen(
     innerPadding: PaddingValues = PaddingValues(0.dp),
     navigationActions: NavigationActions = NavigationActions(rememberNavController()),
     eventViewModel: EventViewModel,
-    userViewModel: UserViewModel
+    userViewModel: UserViewModel =
+        UserViewModel(UserRepositoryFirestore(FirebaseFirestore.getInstance()))
 ) {
 
   // MVVM calls for park state :
@@ -187,6 +190,7 @@ fun ParkDetails(park: Park, showRatingDialog: MutableState<Boolean>, user: User?
  */
 @Composable
 fun RatingComponent(rating: Int, nbrReview: Int) {
+  Log.d("ParkOverview", "RatingComponent: rating=$rating ; nbrReview=$nbrReview")
   require(rating in 1..5) { "Rating must be between 1 and 5" }
   Row(
       modifier = Modifier.padding(start = 16.dp).testTag("ratingComponent"),
@@ -294,7 +298,7 @@ fun RatingDialog(
  * @param parkViewModel The park view model.
  */
 fun handleRating(
-    context: Context,
+    context: Context?,
     park: Park?,
     user: User?,
     starRating: Int,
@@ -303,16 +307,22 @@ fun handleRating(
   Log.d("ParkOverview", "handleRating: {park=$park ; user=$user ; rating=$starRating")
 
   if (user == null) {
-    Toast.makeText(context, "User not found, could not rate park", Toast.LENGTH_SHORT).show()
+    if (context != null)
+        Toast.makeText(context, "User not found, could not rate park", Toast.LENGTH_SHORT).show()
   } else if (park == null) {
-    Toast.makeText(context, "Park not found, could not rate park", Toast.LENGTH_SHORT).show()
+    if (context != null)
+        Toast.makeText(context, "Park not found, could not rate park", Toast.LENGTH_SHORT).show()
   } else if (starRating < 1 || starRating > 5) {
-    Toast.makeText(context, "Invalid rating value, could not rate park", Toast.LENGTH_SHORT).show()
+    if (context != null)
+        Toast.makeText(context, "Invalid rating value, could not rate park", Toast.LENGTH_SHORT)
+            .show()
   } else if (parkViewModel == null) {
-    Toast.makeText(context, "Error with view model, could not rate park", Toast.LENGTH_SHORT).show()
+    if (context != null)
+        Toast.makeText(context, "Error with view model, could not rate park", Toast.LENGTH_SHORT)
+            .show()
   } else {
     Log.d("ParkOverview", "handleRating: Adding rating to park")
-    Toast.makeText(context, "Rating submitted", Toast.LENGTH_SHORT).show()
+    if (context != null) Toast.makeText(context, "Rating submitted", Toast.LENGTH_SHORT).show()
     parkViewModel.addRating(park.pid, user.uid, starRating.toFloat())
   }
 }
