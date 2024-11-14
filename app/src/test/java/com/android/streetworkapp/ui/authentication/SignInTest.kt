@@ -1,4 +1,4 @@
-package com.android.streetworkapp.model.user
+package com.android.streetworkapp.ui.authentication
 
 import com.google.firebase.auth.FirebaseUser
 import org.junit.Assert.assertEquals
@@ -7,7 +7,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
 
-class UserUtilsTest {
+class SignInTest {
 
   private lateinit var firebaseUser: FirebaseUser
 
