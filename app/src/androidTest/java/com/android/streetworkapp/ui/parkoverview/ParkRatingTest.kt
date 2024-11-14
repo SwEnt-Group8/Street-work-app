@@ -1,5 +1,6 @@
 package com.android.streetworkapp.ui.parkoverview
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,6 +18,7 @@ import com.android.streetworkapp.ui.park.InteractiveRatingComponent
 import com.android.streetworkapp.ui.park.ParkDetails
 import com.android.streetworkapp.ui.park.RatingButton
 import com.android.streetworkapp.ui.park.RatingDialog
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -24,10 +26,15 @@ class ParkRatingTest {
 
   @get:Rule val composeTestRule = createComposeRule()
 
+  private lateinit var showRatingDialog: MutableState<Boolean>
+
+  @Before
+  fun setUp() {
+    showRatingDialog = mutableStateOf(false)
+  }
+
   @Test
   fun isRatingButtonCorrect() {
-    val showRatingDialog = mutableStateOf(false)
-
     composeTestRule.setContent {
       RatingButton(showRatingDialog)
       RatingDialog(showRatingDialog)
@@ -44,8 +51,6 @@ class ParkRatingTest {
 
   @Test
   fun isRatingDialogCorrectlyDisplayed() {
-    val showRatingDialog = mutableStateOf(false)
-
     composeTestRule.setContent { RatingDialog(showRatingDialog) }
 
     val dialog = composeTestRule.onNodeWithTag("ratingDialog")
@@ -119,7 +124,6 @@ class ParkRatingTest {
 
   @Test
   fun isRatingButtonCorrectlyDisplayedWhenNoRating() {
-    val showRatingDialog = mutableStateOf(false)
     // default park constructor
     val emptyPark =
         Park("", "", ParkLocation(0.0, 0.0, ""), "", 1f, 1, 10, 0, emptyList(), emptyList())
@@ -134,7 +138,6 @@ class ParkRatingTest {
 
   @Test
   fun isRatingButtonCorrectlyDisplayedWhenRating() {
-    val showRatingDialog = mutableStateOf(false)
     val user = User("uid", "username", "email", 0, emptyList())
 
     // default park constructor
@@ -156,7 +159,6 @@ class ParkRatingTest {
 
   @Test
   fun isRatingButtonCorrectlyDisplayedWhenNoUser() {
-    val showRatingDialog = mutableStateOf(false)
     val user: User? = null
 
     // default park constructor
