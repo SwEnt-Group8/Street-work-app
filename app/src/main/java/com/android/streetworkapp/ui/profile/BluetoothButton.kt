@@ -26,7 +26,7 @@ fun BluetoothButton(
   Button(
       onClick = {
         bluetoothController.startGattServer(uid) // Start GATT server to send UID
-        Toast.makeText(context, "Send friend request", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "Friend request sent", Toast.LENGTH_SHORT).show()
       },
       colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
       modifier = Modifier.width(220.dp).height(50.dp).testTag("BluetoothButton")) {

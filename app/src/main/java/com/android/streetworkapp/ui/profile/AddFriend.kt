@@ -62,13 +62,13 @@ fun AddFriendScreen(
   val bluetoothServer = remember { BluetoothServer(context) }
 
   var showRequestDialog by remember { mutableStateOf(false) }
-  var receivedUid2 by remember { mutableStateOf("") }
+  var receivedRequestUid by remember { mutableStateOf("") }
 
   // Start scanning for GATT servers on screen load
   LaunchedEffect(Unit) {
     bluetoothClient.startGattClient { receivedUid ->
       userViewModel.getUserByUid(receivedUid)
-      receivedUid2 = receivedUid
+      receivedRequestUid = receivedUid
       Log.d(BluetoothConstants.TAG, "UID received on client: $receivedUid")
       showRequestDialog = true
     }
@@ -87,7 +87,7 @@ fun AddFriendScreen(
     FriendRequestDialog(
         username = user.username,
         onAccept = {
-          userViewModel.addFriend(uid, receivedUid2)
+          userViewModel.addFriend(uid, receivedRequestUid)
           Toast.makeText(context, "Friend added.", Toast.LENGTH_SHORT).show()
           showRequestDialog = false
         },
