@@ -26,7 +26,6 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 
-
 @RunWith(AndroidJUnit4::class)
 class MapUiTest {
   private lateinit var parkLocationRepository: ParkLocationRepository

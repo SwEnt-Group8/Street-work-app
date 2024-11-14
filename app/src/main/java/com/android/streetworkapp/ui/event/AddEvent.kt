@@ -1,6 +1,5 @@
 package com.android.streetworkapp.ui.event
 
-import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
