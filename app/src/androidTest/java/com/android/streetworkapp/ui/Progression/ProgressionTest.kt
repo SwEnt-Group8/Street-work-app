@@ -115,7 +115,7 @@ class ProgressionTest {
 
     mockedProgression.achievements.forEachIndexed { index, achievementName
       -> // only one type of achievement for now, but since we'll scale things later I make the test
-         // easily
+      // easily
       // scalable
       val achievement = enumValueOf<MedalsAchievement>(achievementName).achievement
       val achievementItem = composeTestRule.onNodeWithTag("achievementItem${index}")
