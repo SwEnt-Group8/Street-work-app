@@ -160,7 +160,7 @@ fun ImageTitle(image: Painter?, title: String) {
  * @param user The user who is viewing the park.
  */
 @Composable
-fun ParkDetails(park: Park, showRatingDialog: MutableState<Boolean>, user: User?) {
+fun ParkDetails(park: Park?, showRatingDialog: MutableState<Boolean>, user: User?) {
   Column(modifier = Modifier.testTag("parkDetails").padding(bottom = 16.dp, end = 48.dp)) {
     Text(
         text = "Park rating",
@@ -329,8 +329,8 @@ fun handleRating(
  * @param user The user to check.
  * @return True if the user has rated the park, false otherwise.
  */
-fun shouldRatingButtonBeVisible(park: Park, user: User?): Boolean {
-  val res = user != null && !park.votersUIDs.contains(user.uid)
+fun shouldRatingButtonBeVisible(park: Park?, user: User?): Boolean {
+  val res = park != null && user != null && !park.votersUIDs.contains(user.uid)
   Log.d("ParkOverview", "shouldRatingButtonBeVisible: for $user at $park => $res")
   return res
 }
