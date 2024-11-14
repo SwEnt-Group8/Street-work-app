@@ -93,6 +93,8 @@ fun ParkOverviewScreen(
   // MVVM calls for user state :
   val currentUser = userViewModel.currentUser.collectAsState().value
 
+  parkViewModel.updateCurrentParkNameNominatim()
+
   val showRatingDialog = remember { mutableStateOf(false) }
 
   Box(modifier = Modifier.padding(innerPadding).fillMaxSize().testTag("parkOverviewScreen")) {

@@ -74,7 +74,7 @@ data class ScreenParams(
             BottomNavigationMenuType.DEFAULT,
             isTopBarVisible = true,
             TopAppBarManager(
-                "<Park Name>",
+                "Park",
                 hasNavigationIcon = true,
                 navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
     val ADD_EVENT =
