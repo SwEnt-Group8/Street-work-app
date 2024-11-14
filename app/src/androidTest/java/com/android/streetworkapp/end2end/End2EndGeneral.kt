@@ -13,13 +13,16 @@ import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.ParkRepositoryFirestore
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
+import com.android.streetworkapp.model.parklocation.ParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
 import com.android.streetworkapp.model.progression.MedalsAchievement
 import com.android.streetworkapp.model.progression.Progression
+import com.android.streetworkapp.model.progression.ProgressionRepository
 import com.android.streetworkapp.model.progression.ProgressionRepositoryFirestore
 import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.progression.Ranks
 import com.android.streetworkapp.model.user.User
+import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.Route
@@ -32,36 +35,49 @@ import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.spyk
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import okhttp3.internal.wait
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.ArgumentCaptor
+import org.mockito.InjectMocks
+import org.mockito.Mock
+import org.mockito.Mockito.doAnswer
+import org.mockito.Mockito.doReturn
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.mockStatic
+import org.mockito.Mockito.spy
 import org.mockito.Mockito.`when`
+import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.whenever
 
 class End2EndGeneral {
-    @MockK
-    private lateinit var userRepository: UserRepositoryFirestore
+    @Mock
+    private lateinit var userRepository: UserRepository
+    @InjectMocks
     private lateinit var userViewModel: UserViewModel
 
-    @MockK
-    private lateinit var progressionRepository: ProgressionRepositoryFirestore
+    @Mock
+    private lateinit var progressionRepository: ProgressionRepository
+
+    @InjectMocks
     private lateinit var progressionViewModel: ProgressionViewModel
 
-    @MockK
-    private lateinit var parkLocationRepository: OverpassParkLocationRepository
+    @Mock
+    private lateinit var parkLocationRepository: ParkLocationRepository
 
-    private lateinit var mockedFirebaseUser : FirebaseUser
 
     @get:Rule
     val composeTestRule = createComposeRule()
 
     private val mockedUserUid = "123456"
 
-
     private val mockedFriendsForMockedUser =
-        spyk(listOf<User>( //needed to wrap it into a spyk, otherwise couldn't return it in coEvery...
+        (listOf( //needed to wrap it into a spyk, otherwise couldn't return it in coEvery...
             User(
                 uid = "434356",
                 username = "David Miller",
@@ -82,8 +98,8 @@ class End2EndGeneral {
                 email = "alice.johnson@example.com",
                 score = Ranks.BRONZE.score / 2,
                 friends = listOf(mockedUserUid)
-            ))
-        )
+            )))
+
 
     private val mockedUser =
         User(
@@ -107,20 +123,8 @@ class End2EndGeneral {
 
     @Before
     fun setUp() {
-        MockKAnnotations.init(this, relaxed = true)
-        userViewModel = UserViewModel(userRepository)
-
+        MockitoAnnotations.openMocks(this)
         userViewModel.setCurrentUser(mockedUser)
-        progressionViewModel = ProgressionViewModel(progressionRepository)
-
-        //mock the needed functions for the userRepository
-        coEvery { userRepository.getFriendsByUid(mockedUser.uid) } returns mockedFriendsForMockedUser
-
-        //mock the needed functions for the progressionRepository
-        coEvery { progressionRepository.getProgression(any(), captureLambda<(Progression) -> Unit>(), any()) } answers {
-            val onSuccess = firstArg<(Progression) -> Unit>()
-            onSuccess(mockedUserProgression)
-        }
 
         composeTestRule.setContent {
             StreetWorkApp(ParkLocationViewModel(parkLocationRepository),
@@ -137,7 +141,18 @@ class End2EndGeneral {
      * Tests everything included up to M2 except for everything that involves parks
      */
     @Test
-    fun e2eNavigationAndDisplaysCorrectDetailsExceptForParks() {
+    fun e2eNavigationAndDisplaysCorrectDetailsExceptForParks() = runTest {
+
+        doAnswer { invocation ->
+            // Capture the callback argument from the method invocation
+            val onSuccessCallback = invocation.getArgument<(Progression) -> Unit>(1)
+            // Invoke the callback with the mocked Progression object
+            onSuccessCallback.invoke(mockedUserProgression)
+        }.`when`(progressionRepository).getProgression(eq(mockedUser.uid), any<(Progression) -> Unit>(), any())
+
+        whenever(userRepository.getFriendsByUid(mockedUser.uid)).thenReturn(mockedFriendsForMockedUser)
+        
+
         composeTestRule.waitForIdle()
         //already on map here
         composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
