@@ -19,6 +19,8 @@ import androidx.core.content.ContextCompat
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
+import com.android.streetworkapp.utils.LocationService
+import com.android.streetworkapp.utils.PermissionManager
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -44,11 +46,18 @@ fun MapScreen(
 ) {
 
   val context = LocalContext.current
+  // call utils for location management
+  val locationService = LocationService(context)
+  val permissionManager = PermissionManager(context)
   // Initiate initial fail-safe value
   var initialLatLng = remember { mutableStateOf(LatLng(46.518659400000004, 6.566561505148001)) }
 
   // Check the localisation permission and Update the current location
-  MapManager(userLocation = initialLatLng, onUserLocationChange = { initialLatLng = it })
+  MapManager(
+      userLocation = initialLatLng,
+      onUserLocationChange = { initialLatLng = it },
+      permissionManager,
+      locationService)
 
   // Update nearby park everytime initialLatLng changes
   LaunchedEffect(initialLatLng.value) {
@@ -62,15 +71,6 @@ fun MapScreen(
     // Create a CameraPositionState to control the camera position
     val cameraPositionState = rememberCameraPositionState {
       position = CameraPosition.Builder().target(initialLatLng.value).zoom(12f).build()
-    }
-
-    // Update camera position whenever initialLatLng changes
-    LaunchedEffect(initialLatLng.value) {
-      cameraPositionState.position =
-          CameraPosition.Builder()
-              .target(initialLatLng.value)
-              .zoom(12f) // Maybe change the zoom or keep the zoom of user
-              .build()
     }
 
     // Display the Google Map
