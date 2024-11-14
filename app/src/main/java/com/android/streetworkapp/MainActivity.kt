@@ -198,9 +198,7 @@ fun StreetWorkApp(
                   ProfileScreen(navigationActions, userViewModel, innerPadding)
                 }
                 // screen for adding friend
-                composable(Screen.ADD_FRIEND) {
-                  AddFriendScreen(userViewModel, innerPadding)
-                }
+                composable(Screen.ADD_FRIEND) { AddFriendScreen(userViewModel, innerPadding) }
               }
             }
         navigationActions.apply(navTestInvokation)

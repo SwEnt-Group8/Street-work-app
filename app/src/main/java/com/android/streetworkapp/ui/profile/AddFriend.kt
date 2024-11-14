@@ -103,17 +103,17 @@ fun AddFriendScreen(
                 .testTag("AddFriendColumn"),
         horizontalAlignment = Alignment.CenterHorizontally) {
           Column(
-              modifier = Modifier
-                  .align(Alignment.Start)
-                  .padding(horizontal = 16.dp, vertical = 8.dp)
-                  .testTag("InstructionsContainer")) {
+              modifier =
+                  Modifier.align(Alignment.Start)
+                      .padding(horizontal = 16.dp, vertical = 8.dp)
+                      .testTag("InstructionsContainer")) {
                 // Title
                 Text(
                     text = "Instructions",
-                    modifier = Modifier
-                            .align(Alignment.Start)
+                    modifier =
+                        Modifier.align(Alignment.Start)
                             .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .testTag("InstructionsTitle"),
+                            .testTag("InstructionsTitle"),
                     style =
                         TextStyle(
                             fontSize = 18.sp,
