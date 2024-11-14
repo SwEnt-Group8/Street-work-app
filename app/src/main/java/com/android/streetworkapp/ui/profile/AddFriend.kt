@@ -54,11 +54,10 @@ fun AddFriendScreen(
     userViewModel: UserViewModel,
     innerPaddingValues: PaddingValues = PaddingValues(0.dp)
 ) {
-  // variable for outlined text
-  var id by remember { mutableStateOf("") }
   // context for Toast
   val context = LocalContext.current
   val currentUser = userViewModel.currentUser.collectAsState().value
+  val user = userViewModel.user.collectAsState().value
   val uid = currentUser?.uid ?: ""
 
   // Instantiate BluetoothClient
@@ -66,15 +65,15 @@ fun AddFriendScreen(
   val bluetoothServer = remember { BluetoothServer(context) }
 
   var showRequestDialog by remember { mutableStateOf(false) }
-  var receivedUid by remember { mutableStateOf("") }
+  var receivedUid2 by remember { mutableStateOf("") }
 
   // Start scanning for GATT servers on screen load
   LaunchedEffect(Unit) {
     bluetoothClient.startGattClient { receivedUid ->
+      userViewModel.getUserByUid(receivedUid)
+      receivedUid2 = receivedUid
       Log.d(BluetoothConstants.TAG, "UID received on client: $receivedUid")
-      // Handle the received UID by adding it to the friend list
-      userViewModel.addFriend(uid, receivedUid)
-      Toast.makeText(context, "Received UID: $receivedUid", Toast.LENGTH_SHORT).show()
+      showRequestDialog = true
     }
   }
 
@@ -87,11 +86,11 @@ fun AddFriendScreen(
     }
   }
 
-  if (showRequestDialog) {
+  if (showRequestDialog && user != null) {
     FriendRequestDialog(
-        username = receivedUid,
+        username = user.username,
         onAccept = {
-          userViewModel.addFriend(uid, receivedUid)
+          userViewModel.addFriend(uid, receivedUid2)
           Toast.makeText(context, "Friend added.", Toast.LENGTH_SHORT).show()
           showRequestDialog = false
         },
@@ -174,18 +173,10 @@ fun FriendRequestDialog(username: String, onAccept: () -> Unit, onRefuse: () -> 
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.testTag("dialogTitle")) {
-              Image(
-                  painter = painterResource(id = R.drawable.phone),
-                  contentDescription = "Phone Icon",
-                  modifier =
-                      Modifier.size(24.dp)
-                          .padding(end = 8.dp)
-                          .background(INTERACTION_COLOR_LIGHT, shape = CircleShape)
-                          .testTag("phoneIcon"))
               Text("Friend request from $username", color = PRIMARY_TEXT_COLOR)
             }
       },
-      text = { Text("Do you want to add $username?", color = SECONDARY_TEXT_COLOR) },
+      text = { Text("Do you want to add $username as a friend ?", color = SECONDARY_TEXT_COLOR) },
       confirmButton = {
         Button(
             onClick = onAccept,
@@ -197,7 +188,7 @@ fun FriendRequestDialog(username: String, onAccept: () -> Unit, onRefuse: () -> 
       dismissButton = {
         Button(
             onClick = onRefuse,
-            colors = ButtonDefaults.buttonColors(containerColor = SECONDARY_TEXT_COLOR),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
             modifier = Modifier.testTag("refuseButton")) {
               Text("Refuse", color = PRIMARY_TEXT_COLOR)
             }
