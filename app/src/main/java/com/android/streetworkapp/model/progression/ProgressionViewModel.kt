@@ -32,10 +32,7 @@ open class ProgressionViewModel(private val repository: ProgressionRepository) :
   }
 
   fun getOrAddProgression(uid: String) {
-    viewModelScope.launch {
-      val temp = repository.getOrAddProgression(uid)
-      _currentProgression.value = temp
-    }
+    viewModelScope.launch { _currentProgression.value = repository.getOrAddProgression(uid) }
   }
 
   /**
