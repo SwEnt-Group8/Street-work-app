@@ -167,6 +167,6 @@ class End2EndGeneral {
         .addFriend(
             mockedUser.uid,
             dummyFriendId) // the behavior of adding friends will very likely change in the future,
-                           // thus the test doesn't go into more depth
+    // thus the test doesn't go into more depth
   }
 }
