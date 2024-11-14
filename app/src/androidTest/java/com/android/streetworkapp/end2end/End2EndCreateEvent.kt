@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.click
-import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -46,7 +45,7 @@ class End2EndCreateEvent {
 
   @get:Rule val composeTestRule = createComposeRule()
 
-    //repositories and viewmodels tested in this end2end test
+  // repositories and viewmodels tested in this end2end test
   private lateinit var firestoreDB: FirebaseFirestore
   private lateinit var parkLocationRepository: OverpassParkLocationRepository
   private lateinit var parkNameRepository: NominatimParkNameRepository
@@ -57,7 +56,7 @@ class End2EndCreateEvent {
   private lateinit var parkViewModel: ParkViewModel
   private lateinit var eventViewModel: EventViewModel
 
-  //mock event
+  // mock event
   private lateinit var testEvent: Event
 
   // mocked repository not used in this test
@@ -75,7 +74,7 @@ class End2EndCreateEvent {
     // Instantiate fire store database and associated user repository :
     firestoreDB = FirebaseFirestore.getInstance()
 
-      //delete all data in the testParks collection for consistency
+    // delete all data in the testParks collection for consistency
     val eventsCollection = firestoreDB.collection("testParks")
 
     eventsCollection
@@ -97,7 +96,7 @@ class End2EndCreateEvent {
     parkNameRepository = NominatimParkNameRepository(OkHttpClient())
     eventRepository = EventRepositoryFirestore(firestoreDB)
     userRepository = mock(UserRepository::class.java)
-      parkRepository = ParkRepositoryFirestore(firestoreDB, testing = true)
+    parkRepository = ParkRepositoryFirestore(firestoreDB, testing = true)
 
     // viewmodels
     parkLocationViewModel = ParkLocationViewModel(parkLocationRepository)
@@ -126,19 +125,24 @@ class End2EndCreateEvent {
     }
   }
 
+  /**
+   * This end to end test simulates a user flow where the user creates an event and then displays it
+   * in the park overview screen. We also verify that the event is properly displayed in the event
+   * overview screen.
+   */
   @Test
   fun e2eCanCreateEventAndDisplayIt() {
-      // Wait for the map to be loaded
+    // Wait for the map to be loaded
     composeTestRule.waitUntil(100000) { mapISLoaded }
     composeTestRule.waitForIdle()
 
-      //test the map screen
+    // test the map screen
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("googleMap").assertIsDisplayed()
 
-      //find a marker on the map and click it
+    // find a marker on the map and click it
     val uiDevice = UiDevice.getInstance(getInstrumentation())
     val marker = uiDevice.findObject(UiSelector().descriptionContains("Marker1"))
 
@@ -148,14 +152,15 @@ class End2EndCreateEvent {
       throw e
     }
 
-      //UiDevice does not seem to navigate properly to the next screen, so we manually set the current screen to Park Overview
+    // UiDevice does not seem to navigate properly to the next screen, so we manually set the
+    // current screen to Park Overview
     currentScreen = Screen.PARK_OVERVIEW
 
     composeTestRule.waitForIdle()
 
     composeTestRule.onNodeWithTag("parkOverviewScreen").assertIsDisplayed()
 
-      //create an event
+    // create an event
     composeTestRule.onNodeWithTag("createEventButton").assertIsDisplayed().performClick()
 
     composeTestRule.waitForIdle()
@@ -177,7 +182,7 @@ class End2EndCreateEvent {
 
     composeTestRule.waitForIdle()
 
-      //verify that the event is properly displayed on the park overview screen
+    // verify that the event is properly displayed on the park overview screen
     composeTestRule.onNodeWithTag("parkOverviewScreen").assertIsDisplayed()
 
     composeTestRule.onNodeWithText(testEvent.title).assertIsDisplayed()
@@ -186,7 +191,7 @@ class End2EndCreateEvent {
 
     composeTestRule.waitForIdle()
 
-      //navigate to the event overview screen and verify that the event is properly displayed
+    // navigate to the event overview screen and verify that the event is properly displayed
     composeTestRule.onNodeWithTag("eventOverviewScreen").assertIsDisplayed()
 
     composeTestRule
