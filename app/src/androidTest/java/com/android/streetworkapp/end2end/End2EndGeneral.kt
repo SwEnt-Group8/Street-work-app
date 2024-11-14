@@ -1,5 +1,6 @@
 package com.android.streetworkapp.end2end
 
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -61,12 +62,6 @@ class End2EndGeneral {
               username = "Jane Smith",
               email = "jane.smith@example.com",
               score = Ranks.GOLD.score + (Ranks.PLATINUM.score - Ranks.GOLD.score) / 3,
-              friends = listOf(mockedUserUid)),
-          User(
-              uid = "966245",
-              username = "Alice Johnson",
-              email = "alice.johnson@example.com",
-              score = Ranks.BRONZE.score / 2,
               friends = listOf(mockedUserUid))))
 
   private val mockedUser =
@@ -75,7 +70,7 @@ class End2EndGeneral {
           username = "John Doe",
           email = "john.doe@example.com",
           score = Ranks.SILVER.score + (Ranks.GOLD.score - Ranks.SILVER.score) / 2,
-          friends = listOf("friend_1", "friend_2", "friend_3"))
+          friends = listOf(mockedFriendsForMockedUser[0].uid, mockedFriendsForMockedUser[1].uid))
 
   // for the input text field in add friend testing
   private val dummyFriendId = "friendId123"
@@ -109,15 +104,6 @@ class End2EndGeneral {
 
     wheneverBlocking { userRepository.getFriendsByUid(mockedUser.uid) }
         .thenReturn(mockedFriendsForMockedUser)
-    /*userRepository.stub {
-      onBlocking { getFriendsByUid(mockedUser.uid) }.doReturn(mockedFriendsForMockedUser)
-    }*/
-    /*
-    runTest {
-      // mock the mockedUser's friends
-      whenever(userRepository.getFriendsByUid(mockedUser.uid))
-          .thenReturn(mockedFriendsForMockedUser)
-    }*/
 
     composeTestRule.setContent {
       StreetWorkApp(
@@ -158,13 +144,9 @@ class End2EndGeneral {
 
     composeTestRule.onNodeWithTag("profileUsername").assertTextEquals(mockedUser.username)
     composeTestRule.onNodeWithTag("profileScore").assertTextEquals("Score: ${mockedUser.score}")
-    // verifying the friends list
-    composeTestRule.waitUntil(timeoutMillis = 5000) {
-      composeTestRule.onAllNodesWithTag("friendItem").fetchSemanticsNodes().size ==
-          mockedUser.friends.size
-      //    composeTestRule.onAllNodesWithTag("friendItem").fetchSemanticsNodes().size ==
-      // mockedUser.friends.size
-    }
+
+    // verifying friends list
+    composeTestRule.onAllNodesWithTag("friendItem").assertCountEquals(mockedUser.friends.size)
     // go to add friend
     composeTestRule.onNodeWithTag("profileAddButton").performClick()
     composeTestRule.waitForIdle()
