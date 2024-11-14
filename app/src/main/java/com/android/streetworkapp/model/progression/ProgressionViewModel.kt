@@ -31,6 +31,11 @@ open class ProgressionViewModel(private val repository: ProgressionRepository) :
     return repository.getNewProgressionId()
   }
 
+  /**
+   * Fetches or creates, if it doesn't exist, the user's Progression
+   *
+   * @param uid: the user's uid
+   */
   fun getOrAddProgression(uid: String) {
     viewModelScope.launch { _currentProgression.value = repository.getOrAddProgression(uid) }
   }
