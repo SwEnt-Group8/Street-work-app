@@ -1,9 +1,11 @@
 package com.android.streetworkapp
 
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -17,11 +19,10 @@ import androidx.navigation.navigation
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
 import com.android.streetworkapp.model.event.EventViewModel
-import com.android.streetworkapp.model.park.Park
+import com.android.streetworkapp.model.park.NominatimParkNameRepository
 import com.android.streetworkapp.model.park.ParkRepositoryFirestore
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
-import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
 import com.android.streetworkapp.model.progression.ProgressionRepositoryFirestore
 import com.android.streetworkapp.model.progression.ProgressionViewModel
@@ -66,6 +67,7 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
 
   // repositories
   val overpassParkLocationRepo = OverpassParkLocationRepository(OkHttpClient())
+  val parkNameRepository = NominatimParkNameRepository(OkHttpClient())
   // viewmodels
   val parkLocationViewModel = ParkLocationViewModel(overpassParkLocationRepo)
 
@@ -76,7 +78,7 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
 
   // Instantiate park repository :
   val parkRepository = ParkRepositoryFirestore(firestoreDB)
-  val parkViewModel = ParkViewModel(parkRepository)
+  val parkViewModel = ParkViewModel(parkRepository, parkNameRepository)
 
   // Instantiate event repository :
   val eventRepository = EventRepositoryFirestore(firestoreDB)
@@ -96,6 +98,7 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
       progressionViewModel)
 }
 
+@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun StreetWorkApp(
     parkLocationViewModel: ParkLocationViewModel,
@@ -118,18 +121,6 @@ fun StreetWorkApp(
   screenParams = LIST_OF_SCREENS.find { currentScreenName.value == it.screenName }
 
   // Park with no events
-  val testPark =
-      Park(
-          pid = "123",
-          name = "Sample Park",
-          location = ParkLocation(0.0, 0.0, "321"),
-          imageReference = "parks/sample.png",
-          rating = 4.0f,
-          nbrRating = 2,
-          capacity = 10,
-          occupancy = 5,
-          events = emptyList())
-
   val sampleEvent =
       Event(
           eid = "event123",
@@ -145,6 +136,7 @@ fun StreetWorkApp(
           owner = "ownerUserId",
           listParticipants = listOf("user1", "user2", "user3"),
           parkId = "park567")
+
   Scaffold(
       containerColor = ColorPalette.PRINCIPLE_BACKGROUND_COLOR,
       topBar = {
@@ -197,25 +189,19 @@ fun StreetWorkApp(
                 composable(Screen.MAP) {
                   MapScreen(
                       parkLocationViewModel,
+                      parkViewModel,
                       navigationActions,
                       mapCallbackOnMapLoaded,
                       innerPadding)
                 }
                 composable(Screen.PARK_OVERVIEW) {
-                  ParkOverviewScreen(testPark, innerPadding, navigationActions, eventViewModel)
+                  ParkOverviewScreen(parkViewModel, innerPadding, navigationActions, eventViewModel)
                 }
                 composable(Screen.ADD_EVENT) {
                   AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
                 }
                 composable(Screen.EVENT_OVERVIEW) {
-                  EventOverviewScreen(
-                      navigationActions,
-                      sampleEvent,
-                      testPark,
-                      innerPadding) // TODO: change to current park and current selected Event
-                  // Note: navigationActions is not used here atm but it will be useful to link
-                  // event to parks (ex: user clicks on event notif in social and wants to see the
-                  // park overview from here)
+                  EventOverviewScreen(eventViewModel, parkViewModel, innerPadding)
                 }
               }
 

@@ -16,9 +16,12 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.printToLog
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.streetworkapp.StreetWorkApp
-import com.android.streetworkapp.model.event.EventRepositoryFirestore
+import com.android.streetworkapp.model.event.Event
+import com.android.streetworkapp.model.event.EventList
+import com.android.streetworkapp.model.event.EventRepository
 import com.android.streetworkapp.model.event.EventViewModel
-import com.android.streetworkapp.model.park.ParkRepositoryFirestore
+import com.android.streetworkapp.model.park.Park
+import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocation
@@ -26,7 +29,9 @@ import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
 import com.android.streetworkapp.model.progression.ProgressionRepositoryFirestore
 import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.user.UserRepositoryFirestore
+import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
+import com.google.firebase.Timestamp
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Assert
@@ -34,6 +39,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.mock
 
 // this is very wrong but something in the ADD_EVENT screen makes the test stall and I really can't
 // be bothered to debug it. (We only skip one screen out of all the others so it shouldn't matter
@@ -45,6 +51,13 @@ class BottomNavigationTest {
 
   private lateinit var parkLocationRepository: OverpassParkLocationRepository
   private lateinit var parkLocationViewModel: ParkLocationViewModel
+
+  private lateinit var parkRepository: ParkRepository
+  private lateinit var parkViewModel: ParkViewModel
+  private lateinit var eventRepository: EventRepository
+  private lateinit var eventViewModel: EventViewModel
+  private lateinit var userRepository: UserRepository
+  private lateinit var userViewModel: UserViewModel
 
   @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
   @Composable
@@ -69,6 +82,13 @@ class BottomNavigationTest {
 
   @Before
   fun setUp() {
+    parkRepository = mock(ParkRepository::class.java)
+    parkViewModel = ParkViewModel(parkRepository)
+    eventRepository = mock(EventRepository::class.java)
+    eventViewModel = EventViewModel(eventRepository)
+    userRepository = mock(UserRepository::class.java)
+    userViewModel = UserViewModel(userRepository)
+
     val mockParkList =
         listOf(
             ParkLocation(lat = 46.518659400000004, lon = 6.566561505148001, id = "1"),
@@ -135,9 +155,45 @@ class BottomNavigationTest {
   @Test
   fun bottomBarDisplaysCorrectlyOnScreens() {
 
+    val eventList =
+        EventList(
+            events =
+                listOf(
+                    Event(
+                        "1",
+                        "Group workout",
+                        "A fun group workout session to train new skills! \r\n\r\n" +
+                            "Come and join the fun of training with other motivated street workers while progressing on your figures\r\n" +
+                            "We accept all levels: newcomers welcome\r\n\r\n" +
+                            "see https/street-work-app/thissitedoesnotexist for more details",
+                        5,
+                        10,
+                        Timestamp.now(),
+                        "Malick")))
+
+    val event = eventList.events.first()
+    // fullevent = event.copy(participants = 10, maxParticipants = 10)
+
+    // Park with events
+    val park =
+        Park(
+            pid = "123",
+            name = "Sample Park",
+            location = ParkLocation(0.0, 0.0, "321"),
+            imageReference = "parks/sample.png",
+            rating = 4.0f,
+            nbrRating = 2,
+            capacity = 10,
+            occupancy = 5,
+            events = emptyList())
+
     val currentScreenParam =
         mutableStateOf(
             LIST_OF_SCREENS.first()) // can't call setContent twice per test so we use this instead
+
+    parkViewModel.setCurrentPark(park)
+    eventViewModel.setCurrentEvent(event)
+
     composeTestRule.setContent {
       StreetWorkApp(
           parkLocationViewModel,
