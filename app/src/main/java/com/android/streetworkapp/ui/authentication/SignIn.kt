@@ -25,11 +25,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
+import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserViewModel
-import com.android.streetworkapp.model.user.createNewUserFromFirebaseUser
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.utils.GoogleAuthService
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -91,4 +92,20 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
           GoogleAuthButton(authService, context, launcher)
         }
   }
+}
+
+/**
+ * Creates a new [User] object from the provided [FirebaseUser].
+ *
+ * @param firebaseUser The FirebaseUser object to create the User object from.
+ * @return The User object created from the FirebaseUser.
+ */
+fun createNewUserFromFirebaseUser(firebaseUser: FirebaseUser): User {
+  require(firebaseUser.uid.isNotEmpty()) { "UID must not be empty" }
+  return User(
+      uid = firebaseUser.uid,
+      username = firebaseUser.displayName ?: "",
+      email = firebaseUser.email ?: "",
+      score = 0,
+      friends = emptyList())
 }
