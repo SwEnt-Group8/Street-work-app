@@ -1,5 +1,6 @@
 package com.android.streetworkapp.end2end
 
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -154,9 +155,7 @@ class End2EndGeneral {
     composeTestRule.onNodeWithTag("profileUsername").assertTextEquals(mockedUser.username)
     composeTestRule.onNodeWithTag("profileScore").assertTextEquals("Score: ${mockedUser.score}")
     // verifying the friends list
-    val friendItems = composeTestRule.onAllNodesWithTag("friendItem")
-    assert(friendItems.fetchSemanticsNodes().size == mockedUser.friends.size)
-
+    composeTestRule.onAllNodesWithTag("friendItem").assertCountEquals(mockedUser.friends.size)
     // go to add friend
     composeTestRule.onNodeWithTag("profileAddButton").performClick()
     composeTestRule.waitForIdle()
