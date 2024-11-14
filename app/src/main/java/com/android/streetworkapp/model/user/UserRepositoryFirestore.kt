@@ -131,6 +131,30 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
   }
 
   /**
+   * Retrieves a user from Firestore based on the provided UID. If the user doesn't exist, adds the
+   * user in Firestore.
+   *
+   * @param uid The unique ID of the user to retrieve or add.
+   * @param user The User object to add if the user doesn't exist.
+   */
+  override suspend fun getOrAddUserByUid(uid: String, user: User): User? {
+    require(uid.isNotEmpty()) { UID_EMPTY }
+    require(user.uid.isNotEmpty()) { "User UID must not be empty" }
+    return try {
+      val document = db.collection("users").document(uid).get().await()
+      if (!document.exists()) {
+        addUser(user)
+        user
+      } else {
+        documentToUser(document)
+      }
+    } catch (e: Exception) {
+      Log.e("FirestoreError", "Error getting or creating user by UID: ${e.message}")
+      null
+    }
+  }
+
+  /**
    * Updates the user's score in Firestore.
    *
    * @param uid The unique ID of the user whose score is being updated.

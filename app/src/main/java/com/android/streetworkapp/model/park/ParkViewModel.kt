@@ -1,22 +1,31 @@
 package com.android.streetworkapp.model.park
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.streetworkapp.model.parklocation.ParkLocation
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
 
-open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
+open class ParkViewModel(
+    private val repository: ParkRepository,
+    private val nameRepository: ParkNameRepository = NominatimParkNameRepository(OkHttpClient())
+) : ViewModel() {
 
-  // LiveData of the current park
-  private val _currentPark = MutableLiveData<Park?>()
-  val currentPark: LiveData<Park?>
+  // StateFlow of the current park
+  private val _currentPark = MutableStateFlow<Park?>(null)
+  val currentPark: StateFlow<Park?>
     get() = _currentPark
 
-  private val _park = MutableLiveData<Park?>()
-  val park: LiveData<Park?>
+  private val _park = MutableStateFlow<Park?>(null)
+  val park: StateFlow<Park?>
     get() = _park
+
+  private val _parkLocation = MutableStateFlow<ParkLocation>(ParkLocation())
+  val parkLocation: StateFlow<ParkLocation>
+    get() = _parkLocation
 
   /**
    * Set the current park.
@@ -35,7 +44,7 @@ open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
   fun loadCurrentPark(pid: String) {
     viewModelScope.launch {
       val fetchedPark = repository.getParkByPid(pid)
-      _currentPark.setValue(fetchedPark)
+      _currentPark.value = fetchedPark
     }
   }
 
@@ -57,7 +66,7 @@ open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
   fun getParkByPid(pid: String) {
     viewModelScope.launch {
       val fetchedPark = repository.getParkByPid(pid)
-      _park.setValue(fetchedPark)
+      _park.value = fetchedPark
     }
   }
 
@@ -70,7 +79,7 @@ open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
   fun getParkByLocationId(locationId: String) {
     viewModelScope.launch {
       val fetchedPark = repository.getParkByLocationId(locationId)
-      _park.setValue(fetchedPark)
+      _park.value = fetchedPark
     }
   }
 
@@ -102,6 +111,30 @@ open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
   fun updateName(pid: String, name: String) =
       viewModelScope.launch { repository.updateName(pid, name) }
 
+  /** Update the name of the current park using the nominatim API. */
+  fun updateCurrentParkNameNominatim() =
+      viewModelScope.launch {
+
+        // Only true when we have never updated the park name with nominatim to reduce calls to the
+        // API
+        if (_currentPark.value?.name?.contains("Default Park") == true) {
+          nameRepository.convertLocationIdToParkName(
+              _parkLocation.value.id,
+              { name -> _currentPark.value?.let { repository.updateName(it.pid, name) } },
+              { Log.e("Error", "The update of the park name has failed.") })
+        }
+      }
+
+  /**
+   * Set the new parkLocation
+   *
+   * @param parkLocation: a ParkLocation object
+   */
+  fun setParkLocation(parkLocation: ParkLocation?) {
+    require(parkLocation != null) { "ParkLocation can not be null" }
+    _parkLocation.value = parkLocation
+  }
+
   /**
    * Update the image reference of a park.
    *
@@ -110,15 +143,6 @@ open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
    */
   fun updateImageReference(pid: String, imageReference: String) =
       viewModelScope.launch { repository.updateImageReference(pid, imageReference) }
-
-  /**
-   * Add a rating to a park.
-   *
-   * @param pid The park ID.
-   * @param rating The rating to add.
-   */
-  fun addRating(pid: String, rating: Int) =
-      viewModelScope.launch { repository.addRating(pid, rating) }
 
   /**
    * Delete a rating from a park.
@@ -169,6 +193,20 @@ open class ParkViewModel(private val repository: ParkRepository) : ViewModel() {
    */
   fun deleteEventFromPark(pid: String, eid: String) =
       viewModelScope.launch { repository.deleteEventFromPark(pid, eid) }
+
+  /**
+   * Add a rating to a park, ensuring that the user has not already rated it.
+   *
+   * @param pid The park ID.
+   * @param uid The user ID of the person rating.
+   * @param rating The rating to add.
+   */
+  fun addRating(pid: String, uid: String, rating: Float) =
+      viewModelScope.launch {
+        repository.addRating(pid, uid, rating)
+        val updatedPark = repository.getParkByPid(pid)
+        _currentPark.value = updatedPark
+      }
 
   /**
    * Delete a park by its ID.

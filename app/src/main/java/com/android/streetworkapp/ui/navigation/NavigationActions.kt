@@ -6,11 +6,13 @@ import androidx.compose.material.icons.outlined.Place
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
+import com.android.sample.R
 
 object Route {
   const val AUTH = "Auth"
   const val MAP = "Map"
   const val PROFILE = "Profile"
+  const val PROGRESSION = "Progression"
   const val UNK = "TBD" // TODO: not yet defined
 }
 
@@ -22,6 +24,7 @@ object Screen {
   const val PARK_OVERVIEW = "Park Overview Screen"
   const val ADD_EVENT = "Add Event Screen"
   const val EVENT_OVERVIEW = "Event Overview Screen"
+  const val PROGRESSION = "Progression Screen"
   const val UNK = "TBD Screen" // TODO: not yet defined
 }
 
@@ -71,7 +74,7 @@ data class ScreenParams(
             BottomNavigationMenuType.DEFAULT,
             isTopBarVisible = true,
             TopAppBarManager(
-                "<Park Name>",
+                "Park Overview",
                 hasNavigationIcon = true,
                 navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
     val ADD_EVENT =
@@ -91,9 +94,16 @@ data class ScreenParams(
             BottomNavigationMenuType.EVENT_OVERVIEW,
             isTopBarVisible = true,
             TopAppBarManager(
-                "<Event Name>",
+                "Event Overview",
                 hasNavigationIcon = true,
                 navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
+    val PROGRESSION =
+        ScreenParams(
+            Screen.PROGRESSION,
+            isBottomBarVisible = true,
+            BottomNavigationMenuType.DEFAULT,
+            isTopBarVisible = true,
+            TopAppBarManager("My Progress", hasNavigationIcon = false))
   }
 }
 
@@ -105,26 +115,44 @@ val LIST_OF_SCREENS =
         ScreenParams.ADD_FRIEND,
         ScreenParams.PARK_OVERVIEW,
         ScreenParams.ADD_EVENT,
-        ScreenParams.EVENT_OVERVIEW)
+        ScreenParams.EVENT_OVERVIEW,
+        ScreenParams.PROGRESSION)
 
 /**
  * Represents a top-level destination in the app's navigation.
  *
  * @property route The route associated with this destination.
  * @property icon The icon to display for this destination.
- * @property textId an identifier for this destination.
+ * @property textId an identifier for the destination.
  */
-data class TopLevelDestination(val route: String, val icon: ImageVector, val textId: String)
+data class TopLevelDestination(
+    val route: String,
+    val icon: ImageVector?,
+    val imagePainter: Int?,
+    val textId: String
+)
 
 // all data classes here are reachable through user actions (i.e not auth)
 object TopLevelDestinations {
-  val MAP = TopLevelDestination(route = Route.MAP, icon = Icons.Outlined.Place, textId = "Map")
+  val MAP =
+      TopLevelDestination(
+          route = Route.MAP, icon = Icons.Outlined.Place, imagePainter = null, textId = "Map")
   val PROFILE =
       TopLevelDestination(
-          route = Route.PROFILE, icon = Icons.Outlined.AccountCircle, textId = "Profile")
+          route = Route.PROFILE,
+          icon = Icons.Outlined.AccountCircle,
+          imagePainter = null,
+          textId = "Profile")
+  val PROGRESSION =
+      TopLevelDestination(
+          route = Route.PROGRESSION,
+          icon = null,
+          imagePainter = R.drawable.trophy_24px,
+          textId = "Progression")
 }
 
-val LIST_TOP_LEVEL_DESTINATION = listOf(TopLevelDestinations.MAP, TopLevelDestinations.PROFILE)
+val LIST_TOP_LEVEL_DESTINATION =
+    listOf(TopLevelDestinations.PROGRESSION, TopLevelDestinations.MAP, TopLevelDestinations.PROFILE)
 
 open class NavigationActions(
     private val navController: NavHostController,

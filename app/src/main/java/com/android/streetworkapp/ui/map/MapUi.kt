@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.android.streetworkapp.model.park.ParkViewModel
 import androidx.core.content.ContextCompat
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
@@ -40,6 +41,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 @Composable
 fun MapScreen(
     parkLocationViewModel: ParkLocationViewModel,
+    parkViewModel: ParkViewModel,
     navigationActions: NavigationActions,
     callbackOnMapLoaded: () -> Unit = {},
     innerPaddingValues: PaddingValues = PaddingValues(0.dp)
@@ -94,7 +96,8 @@ fun MapScreen(
                 contentDescription = "Marker",
                 state = MarkerState(position = LatLng(park.lat, park.lon)),
                 onClick = {
-                  // TODO: selectPark
+                  parkViewModel.getOrCreateParkByLocation(park)
+                  parkViewModel.setParkLocation(park)
                   navigationActions.navigateTo(Screen.PARK_OVERVIEW)
                   true
                 })

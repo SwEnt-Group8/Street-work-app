@@ -226,29 +226,6 @@ class ParkRepositoryFirestoreTest {
       }
 
   @Test
-  fun addRatingWithValidPidAndRatingAddsRatingSuccessfully() = runTest {
-    val pid = "123"
-    val rating = 4
-    val currentRating = 3.0
-    val currentNbrRating = 2
-
-    `when`(db.collection("parks")).thenReturn(collection)
-    `when`(collection.document(pid)).thenReturn(documentRef)
-    `when`(documentRef.get()).thenReturn(Tasks.forResult(document))
-    `when`(document.getDouble("rating")).thenReturn(currentRating)
-    `when`(document.getLong("nbrRating")).thenReturn(currentNbrRating.toLong())
-
-    val newNbrRating = currentNbrRating + 1
-    val newRating = ((currentRating * currentNbrRating) + rating) / newNbrRating
-
-    `when`(documentRef.update(mapOf("rating" to newRating, "nbrRating" to newNbrRating)))
-        .thenReturn(Tasks.forResult(null))
-
-    parkRepository.addRating(pid, rating)
-    verify(documentRef).update(mapOf("rating" to newRating, "nbrRating" to newNbrRating))
-  }
-
-  @Test
   fun deleteRatingWithValidPidAndRatingDeletesRatingSuccessfully() = runTest {
     val pid = "123"
     val rating = 4
@@ -422,13 +399,6 @@ class ParkRepositoryFirestoreTest {
   }
 
   @Test
-  fun addRatingWithInvalidRatingThrowsIllegalArgumentException() = runTest {
-    assertThrows(IllegalArgumentException::class.java) {
-      runBlocking { parkRepository.addRating("123", 6) }
-    }
-  }
-
-  @Test
   fun updateCapacityWithInvalidCapacityThrowsIllegalArgumentException() = runTest {
     assertThrows(IllegalArgumentException::class.java) {
       runBlocking { parkRepository.updateCapacity("123", 0) }
@@ -474,5 +444,86 @@ class ParkRepositoryFirestoreTest {
     assertEquals(10, park?.capacity)
     assertEquals(5, park?.occupancy)
     assertEquals(listOf("event1", "event2"), park?.events)
+  }
+
+  @Test
+  fun addRatingWithNewUserUpdatesRatingSuccessfully() = runTest {
+    // Arrange
+    val pid = "123"
+    val uid = "user_001"
+    val newRating = 4.0f
+    val initialRating = 3.0f
+    val initialNbrRating = 2
+    val initialVotersUIDs = listOf("user_002")
+
+    // Set up initial Park data as a DocumentSnapshot mock
+    whenever(document.exists()).thenReturn(true)
+    whenever(document.toObject(Park::class.java))
+        .thenReturn(
+            Park(
+                pid = pid,
+                name = "Sample Park",
+                location = ParkLocation(0.0, 0.0, "321"),
+                imageReference = "parks/sample.png",
+                rating = initialRating,
+                nbrRating = initialNbrRating,
+                capacity = 10,
+                occupancy = 5,
+                events = listOf("event1", "event2"),
+                votersUIDs = initialVotersUIDs))
+
+    // Mock Firestore interactions
+    whenever(db.collection("parks")).thenReturn(collection)
+    whenever(collection.document(pid)).thenReturn(documentRef)
+    whenever(documentRef.get()).thenReturn(Tasks.forResult(document))
+
+    // Calculate the expected updated values
+    val updatedNbrRating = initialNbrRating + 1
+    val updatedRating = (newRating + initialRating * initialNbrRating) / updatedNbrRating
+    val updatedVotersUIDs = initialVotersUIDs + uid
+
+    // Act
+    parkRepository.addRating(pid, uid, newRating)
+
+    // Verify that the Firestore update was called with the correct values
+    verify(documentRef)
+        .set(
+            Park(
+                pid = pid,
+                name = "Sample Park",
+                location = ParkLocation(0.0, 0.0, "321"),
+                imageReference = "parks/sample.png",
+                rating = updatedRating,
+                nbrRating = updatedNbrRating,
+                capacity = 10,
+                occupancy = 5,
+                events = listOf("event1", "event2"),
+                votersUIDs = updatedVotersUIDs))
+  }
+
+  @Test
+  fun deleteRatingWithCurrentNbrRatingOfOneResetsRatingToZero() = runTest {
+    // Arrange
+    val pid = "123"
+    val rating = 4
+    val currentRating = 4.0
+    val currentNbrRating = 1
+
+    // Mock Firestore interactions
+    `when`(db.collection("parks")).thenReturn(collection)
+    `when`(collection.document(pid)).thenReturn(documentRef)
+    `when`(documentRef.get()).thenReturn(Tasks.forResult(document))
+    `when`(document.getDouble("rating")).thenReturn(currentRating)
+    `when`(document.getLong("nbrRating")).thenReturn(currentNbrRating.toLong())
+
+    // Expected values after removing the rating
+    val newNbrRating = 0
+    val newRating = 0.0
+
+    // Act
+    parkRepository.deleteRating(pid, rating)
+
+    // Assert
+    verify(documentRef).update(mapOf("rating" to newRating, "nbrRating" to newNbrRating))
   }
 }

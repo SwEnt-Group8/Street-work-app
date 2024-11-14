@@ -12,10 +12,10 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
 
   companion object {
     private const val COLLECTION_PATH = "parks"
+    private const val INVALID_RATING_MESSAGE = "Rating must be between 1 and 5."
+    private const val PID_EMPTY = "Park ID cannot be empty."
+    private const val LID_EMPTY = "Location ID cannot be empty."
   }
-
-  val PID_EMPTY = "Park ID cannot be empty."
-  val LID_EMPTY = "Location ID cannot be empty."
 
   /**
    * Get a new park ID.
@@ -108,11 +108,11 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
    * @param pid The park ID.
    * @param name The new name.
    */
-  override suspend fun updateName(pid: String, name: String) {
+  override fun updateName(pid: String, name: String) {
     require(pid.isNotEmpty()) { PID_EMPTY }
     require(name.isNotEmpty()) { "Name cannot be empty." }
     try {
-      db.collection(COLLECTION_PATH).document(pid).update("name", name).await()
+      db.collection(COLLECTION_PATH).document(pid).update("name", name)
     } catch (e: Exception) {
       Log.e("FirestoreError", "Error updating park name: ${e.message}")
     }
@@ -135,32 +135,6 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
   }
 
   /**
-   * Add a rating to a park.
-   *
-   * @param pid The park ID.
-   * @param rating The rating to add from 1 to 5.
-   */
-  override suspend fun addRating(pid: String, rating: Int) {
-    require(pid.isNotEmpty()) { PID_EMPTY }
-    require(rating in 1..5) { "Rating must be between 1 and 5." }
-    try {
-      val document = db.collection(COLLECTION_PATH).document(pid).get().await()
-      val currentRating = document.getDouble("rating") ?: 0.0
-      val currentNbrRating = document.getLong("nbrRating")?.toInt() ?: 0
-
-      val newNbrRating = currentNbrRating + 1
-      val newRating = ((currentRating * currentNbrRating) + rating) / newNbrRating
-
-      db.collection(COLLECTION_PATH)
-          .document(pid)
-          .update(mapOf("rating" to newRating, "nbrRating" to newNbrRating))
-          .await()
-    } catch (e: Exception) {
-      Log.e("FirestoreError", "Error adding rating to park: ${e.message}")
-    }
-  }
-
-  /**
    * Delete a rating from a park.
    *
    * @param pid The park ID.
@@ -168,7 +142,7 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
    */
   override suspend fun deleteRating(pid: String, rating: Int) {
     require(pid.isNotEmpty()) { PID_EMPTY }
-    require(rating in 1..5) { "Rating must be between 1 and 5." }
+    require(rating in 1..5) { INVALID_RATING_MESSAGE }
     try {
       val document = db.collection(COLLECTION_PATH).document(pid).get().await()
       val currentRating = document.getDouble("rating") ?: 0.0
@@ -295,6 +269,47 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
   }
 
   /**
+   * Add a rating to a park if the user has not already rated it.
+   *
+   * @param pid The park ID.
+   * @param uid The user ID of the person rating.
+   * @param rating The rating to add from 1 to 5.
+   */
+  override suspend fun addRating(pid: String, uid: String, rating: Float) {
+    require(pid.isNotEmpty()) { PID_EMPTY }
+    require(rating in 1.0f..5.0f) { INVALID_RATING_MESSAGE }
+
+    try {
+      val parkRef = db.collection(COLLECTION_PATH).document(pid)
+      val document = parkRef.get().await()
+
+      // Convert the document snapshot to a Park object
+      val park = document.toObject(Park::class.java)
+
+      if (park != null) {
+        // Check if the user has already rated
+        if (uid !in park.votersUIDs) {
+          // Calculate the new average rating and update the rating count
+          val updatedNbrRating = park.nbrRating + 1
+          val updatedRating = (rating + park.nbrRating * park.rating) / updatedNbrRating
+
+          // Update the park object with the new values
+          park.rating = updatedRating
+          park.nbrRating = updatedNbrRating
+          park.votersUIDs += uid
+
+          // Save the updated park object back to Firestore
+          parkRef.set(park).await()
+        }
+      } else {
+        Log.e("FirestoreError", "Park not found with ID: $pid")
+      }
+    } catch (e: Exception) {
+      Log.e("FirestoreError", "Error adding rating to park: ${e.message}")
+    }
+  }
+
+  /**
    * Convert a Firestore document to a park object.
    *
    * @param document The Firestore document.
@@ -319,7 +334,25 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
             emptyList<String>()
           }
 
-      Park(pid, name, location, imageReference, rating, nbrRating, capacity, occupancy, events)
+      val votersUIDs =
+          try {
+            (document["votersUIDs"] as? List<*>)?.filterIsInstance<String>() ?: emptyList()
+          } catch (e: Exception) {
+            Log.e("FirestoreError", "Error retrieving votersUIDs list", e)
+            emptyList<String>()
+          }
+
+      Park(
+          pid,
+          name,
+          location,
+          imageReference,
+          rating,
+          nbrRating,
+          capacity,
+          occupancy,
+          events,
+          votersUIDs)
     } catch (e: Exception) {
       Log.e("FirestoreError", "Error converting document to park: ${e.message}")
       null

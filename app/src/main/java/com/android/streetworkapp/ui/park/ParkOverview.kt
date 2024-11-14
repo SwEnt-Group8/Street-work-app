@@ -2,9 +2,9 @@ package com.android.streetworkapp.ui.park
 
 // Portions of this code were generated with the help of GitHub Copilot.
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,16 +19,20 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -40,47 +44,60 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.compose.rememberNavController
 import com.android.sample.R
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventOverviewUiState
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.Park
+import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
+import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.utils.toFormattedString
 
 /**
  * Display the overview of a park, including park details and a list of events.
  *
- * @param park The park data to display.
+ * @param parkViewModel The view model for the park.
+ * @param innerPadding The padding to apply to the screen.
+ * @param navigationActions The navigation actions to navigate to other screens.
+ * @param eventViewModel The view model for the events.
  */
 @Composable
 fun ParkOverviewScreen(
-    park: Park,
+    parkViewModel: ParkViewModel,
     innerPadding: PaddingValues = PaddingValues(0.dp),
     navigationActions: NavigationActions = NavigationActions(rememberNavController()),
     eventViewModel: EventViewModel
 ) {
+  val currentPark = parkViewModel.currentPark.collectAsState()
+
+  parkViewModel.park.collectAsState().value?.pid?.let { parkViewModel.loadCurrentPark(it) }
+
+  currentPark.value?.let { eventViewModel.getEvents(it) }
+
+  parkViewModel.updateCurrentParkNameNominatim()
+
+  val showRatingDialog = remember { mutableStateOf(false) }
+
   Box(modifier = Modifier.padding(innerPadding).fillMaxSize().testTag("parkOverviewScreen")) {
     Column {
-      ImageTitle(image = null, title = park.name) // TODO: Fetch image from Firestore storage
-      ParkDetails(park = park)
-      EventItemList(eventViewModel) // TODO: Fetch events from Firestore
-    }
-    FloatingActionButton(
-        onClick = {
-          navigationActions.navigateTo(Screen.ADD_EVENT)
-
-          Log.d("ParkOverviewScreen", "Create event button clicked") // TODO: Handle button click
-        },
-        modifier =
-            Modifier.align(Alignment.BottomCenter)
-                .padding(40.dp)
-                .size(width = 150.dp, height = 40.dp)
-                .testTag("createEventButton"),
-    ) {
-      Text("Create an event")
+      ImageTitle(image = null, title = currentPark.value?.name ?: "loading...")
+      // TODO: Fetch image from Firestore storage
+      Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        ParkDetails(park = currentPark.value, showRatingDialog)
+        Button(
+            onClick = { navigationActions.navigateTo(Screen.ADD_EVENT) },
+            modifier = Modifier.size(width = 150.dp, height = 40.dp).testTag("createEventButton"),
+            colors = ColorPalette.BUTTON_COLOR) {
+              Text("Create an event")
+            }
+      }
+      RatingDialog(showRatingDialog)
+      HorizontalDivider(modifier = Modifier.fillMaxWidth())
+      EventItemList(eventViewModel, navigationActions)
     }
   }
 }
@@ -125,15 +142,20 @@ fun ImageTitle(image: Painter?, title: String) {
  * @param park The park data to display.
  */
 @Composable
-fun ParkDetails(park: Park) {
-  Column(modifier = Modifier.testTag("parkDetails")) {
+fun ParkDetails(park: Park?, showRatingDialog: MutableState<Boolean>) {
+  Column(modifier = Modifier.testTag("parkDetails").padding(bottom = 16.dp, end = 48.dp)) {
     Text(
-        text = "Details",
+        text = "Park rating",
         fontSize = 24.sp,
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(start = 16.dp, top = 6.dp, bottom = 2.dp))
-    RatingComponent(rating = park.rating.toInt(), park.nbrRating) // Round the rating
-    OccupancyBar(occupancy = (park.occupancy.toFloat() / park.capacity.toFloat()))
+
+    Row {
+      park?.rating?.let { RatingComponent(rating = it.toInt(), park.nbrRating) } // Round the rating
+
+      // TODO: Check if the user has already rated the park and hide the button if true
+      RatingButton(showRatingDialog)
+    }
   }
 }
 
@@ -153,7 +175,7 @@ fun RatingComponent(rating: Int, nbrReview: Int) {
           Icon(
               imageVector = Icons.Default.Star,
               contentDescription = "Star",
-              tint = if (i <= rating) Color(0xFF6650a4) else Color.Gray,
+              tint = if (i <= rating) ColorPalette.INTERACTION_COLOR_DARK else Color.Gray,
               modifier = Modifier.size(24.dp))
         }
         Text(
@@ -165,35 +187,107 @@ fun RatingComponent(rating: Int, nbrReview: Int) {
 }
 
 /**
- * Display a progress bar showing the park's occupancy.
+ * Display the button to rate the park. Should not be displayed if the user has already rated the
+ * park.
  *
- * @param occupancy The park's occupancy percentage from 0 to 1.
+ * @param showRatingDialog The state to show the rating dialog.
  */
 @Composable
-fun OccupancyBar(occupancy: Float) {
-  require(occupancy in 0f..1f) { "Occupancy must be between 0 and 1" }
-  Row(
-      modifier = Modifier.padding(start = 16.dp, end = 16.dp).testTag("occupancyBar"),
-      verticalAlignment = Alignment.CenterVertically) {
-        LinearProgressIndicator(
-            progress = { occupancy },
-            modifier = Modifier.weight(1f),
+fun RatingButton(showRatingDialog: MutableState<Boolean>) {
+  IconButton(
+      onClick = { showRatingDialog.value = true },
+      modifier = Modifier.size(24.dp).padding(start = 8.dp).testTag("ratingButton")) {
+        Icon(
+            painter = painterResource(id = R.drawable.add_plus_square), // Use an icon resource
+            contentDescription = "Rate",
+            modifier = Modifier.size(24.dp))
+      }
+}
+
+/**
+ * Display a dialog to rate the park. Ues the starRating variable to store the "live" rating value.
+ * Used to submit the rating to the MVVM.
+ *
+ * @param showDialog The state to show the dialog.
+ */
+@Composable
+fun RatingDialog(showDialog: MutableState<Boolean>) {
+  // Star rating is 1-5 stars
+  val starRating = remember { mutableIntStateOf(3) }
+
+  if (showDialog.value) {
+    AlertDialog(
+        modifier = Modifier.testTag("ratingDialog"),
+        onDismissRequest = { showDialog.value = false },
+        confirmButton = {
+          TextButton(
+              onClick = {
+                // TODO Handle confirmation action with park MVVM
+                showDialog.value = false
+              },
+              modifier = Modifier.testTag("submitRatingButton")) {
+                Text("Submit rating", color = ColorPalette.SECONDARY_TEXT_COLOR)
+              }
+        },
+        dismissButton = {
+          TextButton(
+              onClick = { showDialog.value = false },
+              modifier = Modifier.testTag("cancelRatingButton")) {
+                Text("Cancel", color = Color.Red)
+              }
+        },
+        title = {
+          Text(
+              "Rate this park",
+              color = ColorPalette.PRIMARY_TEXT_COLOR,
+              modifier = Modifier.testTag("RatingTitle"))
+        },
+        text = {
+          // Main content of the dialog :
+          InteractiveRatingComponent(starRating)
+        },
+        properties =
+            DialogProperties(
+                dismissOnClickOutside = true) // Makes dialog dismissible by clicking outside
         )
-        Text(
-            text = "${(occupancy * 100).toInt()}% Occupancy",
-            modifier = Modifier.padding(start = 8.dp).testTag("occupancyText"),
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Light)
+  }
+}
+
+/**
+ * Display an interactive star rating component.
+ *
+ * @param rating The rating value which will be modified by the user.
+ */
+@Composable
+fun InteractiveRatingComponent(rating: MutableState<Int>) {
+  require(rating.value in 1..5) { "Rating must be between 1 and 5" }
+  Row(
+      modifier = Modifier.fillMaxWidth().testTag("ratingComponent"),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.Center) {
+        for (i in 1..5) {
+          IconButton(
+              onClick = { rating.value = i },
+              modifier = Modifier.size(45.dp).testTag("starButton_${i}")) {
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = "Star",
+                    tint =
+                        if (i <= rating.value) ColorPalette.INTERACTION_COLOR_DARK else Color.Gray,
+                    modifier = Modifier.size(45.dp).testTag("starIcon_${i}"))
+              }
+        }
       }
 }
 
 /**
  * Display a list of events or a message if no there is no events.
  *
- * @param eventList The list of events to display.
+ * @param eventViewModel The event MVVM.
+ * @param navigationActions The navigation actions to navigate to other screens.
  */
 @Composable
-fun EventItemList(eventViewModel: EventViewModel) {
+fun EventItemList(eventViewModel: EventViewModel, navigationActions: NavigationActions) {
   val uiState = eventViewModel.uiState.collectAsState().value
 
   Column(modifier = Modifier.testTag("eventItemList")) {
@@ -205,7 +299,9 @@ fun EventItemList(eventViewModel: EventViewModel) {
 
     when (uiState) {
       is EventOverviewUiState.NotEmpty -> {
-        LazyColumn { items(uiState.eventList) { event -> EventItem(event = event) } }
+        LazyColumn {
+          items(uiState.eventList) { event -> EventItem(event, eventViewModel, navigationActions) }
+        }
       }
       is EventOverviewUiState.Empty -> {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -227,7 +323,7 @@ fun EventItemList(eventViewModel: EventViewModel) {
  * @param event The event data to display.
  */
 @Composable
-fun EventItem(event: Event) {
+fun EventItem(event: Event, eventViewModel: EventViewModel, navigationActions: NavigationActions) {
   ListItem(
       modifier = Modifier.padding(0.dp).testTag("eventItem"),
       headlineContent = { Text(text = event.title) },
@@ -252,10 +348,11 @@ fun EventItem(event: Event) {
       trailingContent = {
         Button(
             onClick = {
-              Log.d("EventItem", "About event button clicked") // TODO: Handle button click
+              eventViewModel.setCurrentEvent(event)
+              navigationActions.navigateTo(Screen.EVENT_OVERVIEW)
             },
             modifier = Modifier.size(width = 80.dp, height = 48.dp).testTag("eventButton"),
-            colors = ButtonDefaults.buttonColors(),
+            colors = ColorPalette.BUTTON_COLOR,
             contentPadding = PaddingValues(0.dp)) {
               Text("About", modifier = Modifier.testTag("eventButtonText"))
             }
