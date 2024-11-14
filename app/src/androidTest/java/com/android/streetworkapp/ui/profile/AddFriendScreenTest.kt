@@ -16,6 +16,7 @@ import com.android.streetworkapp.ui.navigation.Screen
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -45,7 +46,6 @@ class AddFriendScreenTest : TestCase() {
   @Before
   fun setUp() {
     // Mock the the navigation and User viewmodel
-    navigationActions = mock(NavigationActions::class.java)
     userRepository = mock(UserRepository::class.java)
     userViewModel = UserViewModel(userRepository)
 
@@ -54,8 +54,7 @@ class AddFriendScreenTest : TestCase() {
     context = mock(Context::class.java)
 
     // Mock the current route to be the add profile screen
-    `when`(navigationActions.currentRoute()).thenReturn(Screen.ADD_FRIEND)
-    composeTestRule.setContent { AddFriendScreen(navigationActions, userViewModel) }
+    composeTestRule.setContent { AddFriendScreen(userViewModel) }
   }
 
   @OptIn(ExperimentalCoroutinesApi::class)
@@ -69,25 +68,34 @@ class AddFriendScreenTest : TestCase() {
   fun hasRequiredComponents() {
     composeTestRule.waitForIdle() // Wait for rendering
 
+    composeTestRule.waitForIdle()
+
     composeTestRule.onNodeWithTag("addFriendScreen").assertExists()
     composeTestRule.onNodeWithTag("AddFriendColumn").assertExists()
     composeTestRule.onNodeWithTag("BluetoothButton").assertExists()
-    composeTestRule.onNodeWithTag("inputID").assertExists()
-    composeTestRule.onNodeWithTag("RequestButton").assertExists()
+    composeTestRule.onNodeWithTag("InstructionsContainer").assertExists()
+    composeTestRule.onNodeWithTag("InstructionsTitle").assertExists()
+    composeTestRule.onNodeWithTag("InstructionsBox").assertExists()
+    composeTestRule.onNodeWithTag("PhoneIcon").assertExists()
+    composeTestRule.onNodeWithTag("InstructionsText").assertExists()
+    composeTestRule.onNodeWithTag("BluetoothIcon").assertExists()
 
     composeTestRule.onNodeWithTag("addFriendScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("AddFriendColumn").assertIsDisplayed()
     composeTestRule.onNodeWithTag("BluetoothButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("inputID").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("RequestButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("InstructionsContainer").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("InstructionsTitle").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("InstructionsBox").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("PhoneIcon").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("InstructionsText").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("BluetoothIcon").assertIsDisplayed()
   }
 
   @Test
   fun textCorrectlyDisplayed() {
     composeTestRule.waitForIdle() // Wait for rendering
 
-    composeTestRule.onNodeWithTag("BluetoothButton").assertTextEquals("Broadcast UID")
-    composeTestRule.onNodeWithTag("RequestButton").assertTextEquals("Send request")
+    composeTestRule.onNodeWithTag("BluetoothButton").assertTextEquals("Send request")
   }
 
   @Test
@@ -95,35 +103,5 @@ class AddFriendScreenTest : TestCase() {
     composeTestRule.waitForIdle() // Wait for rendering
 
     composeTestRule.onNodeWithTag("BluetoothButton").assertHasClickAction()
-    composeTestRule.onNodeWithTag("RequestButton").assertHasClickAction()
-  }
-
-  // added runBlocking to test suspend function
-  // runBlocking allows you to execute and wait for coroutines to finish
-  @Test
-  fun requestButtonClick_withEmptyId() = runTest {
-    composeTestRule.waitForIdle() // Wait for rendering
-
-    // simulate clicking the RequestButton with empty ID
-    composeTestRule.onNodeWithTag("RequestButton").performClick()
-
-    // verify that addFriend is never called
-    verify(userRepository, never()).addFriend(anyString(), anyString())
-  }
-
-  @Test
-  fun testButtonClick_withValidId() = runTest {
-    // create fake user id
-    val uid = ""
-    val fake = "validID"
-    // Simulate entering a valid ID inside text field
-    composeTestRule.onNodeWithTag("inputID").performTextInput(fake)
-
-    // Simulate clicking the RequestButton
-    composeTestRule.onNodeWithTag("RequestButton").performClick()
-
-    testDispatcher.scheduler.advanceUntilIdle()
-    // Verify that addFriend has the correct parameters
-    verify(userRepository).addFriend(uid, fake)
   }
 }

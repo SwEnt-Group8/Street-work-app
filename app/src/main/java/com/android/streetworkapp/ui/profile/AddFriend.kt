@@ -40,7 +40,6 @@ import com.android.streetworkapp.device.bluetooth.BluetoothClient
 import com.android.streetworkapp.device.bluetooth.BluetoothConstants
 import com.android.streetworkapp.device.bluetooth.BluetoothServer
 import com.android.streetworkapp.model.user.UserViewModel
-import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_DARK
 import com.android.streetworkapp.ui.theme.ColorPalette.PRIMARY_TEXT_COLOR
 import com.android.streetworkapp.ui.theme.ColorPalette.PRINCIPLE_BACKGROUND_COLOR
@@ -49,7 +48,6 @@ import com.android.streetworkapp.ui.theme.LightGray
 
 @Composable
 fun AddFriendScreen(
-    navigationActions: NavigationActions,
     userViewModel: UserViewModel,
     innerPaddingValues: PaddingValues = PaddingValues(0.dp)
 ) {
@@ -105,14 +103,17 @@ fun AddFriendScreen(
                 .testTag("AddFriendColumn"),
         horizontalAlignment = Alignment.CenterHorizontally) {
           Column(
-              modifier =
-                  Modifier.align(Alignment.Start).padding(horizontal = 16.dp, vertical = 8.dp)) {
+              modifier = Modifier
+                  .align(Alignment.Start)
+                  .padding(horizontal = 16.dp, vertical = 8.dp)
+                  .testTag("InstructionsContainer")) {
                 // Title
                 Text(
                     text = "Instructions",
-                    modifier =
-                        Modifier.align(Alignment.Start)
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                    modifier = Modifier
+                            .align(Alignment.Start)
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .testTag("InstructionsTitle"),
                     style =
                         TextStyle(
                             fontSize = 18.sp,
@@ -131,8 +132,8 @@ fun AddFriendScreen(
                       .background(
                           PRINCIPLE_BACKGROUND_COLOR,
                           shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
-                      .padding(start = 12.dp, top = 12.dp, end = 12.dp, bottom = 12.dp)
-                      .testTag("instructionsContainer")) {
+                      .padding(12.dp)
+                      .testTag("InstructionsBox")) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                   Image(
                       painter = painterResource(id = R.drawable.phone),
@@ -141,7 +142,7 @@ fun AddFriendScreen(
                           Modifier.size(32.dp)
                               .background(LightGray, shape = CircleShape)
                               .padding(6.dp)
-                              .testTag("phoneIcon"))
+                              .testTag("PhoneIcon"))
                   Text(
                       text =
                           "Bring your phones together while activating bluetooth to add a friend",
@@ -151,13 +152,13 @@ fun AddFriendScreen(
                               lineHeight = 16.sp,
                               fontWeight = FontWeight(500),
                               color = PRIMARY_TEXT_COLOR),
-                      modifier = Modifier.padding(start = 8.dp))
+                      modifier = Modifier.padding(start = 8.dp).testTag("InstructionsText"))
                 }
               }
           Image(
               painter = painterResource(id = R.drawable.bluetooth),
               contentDescription = "Bluetooth Icon",
-              modifier = Modifier.size(150.dp).testTag("bluetoothIcon").padding(vertical = 16.dp))
+              modifier = Modifier.size(150.dp).testTag("BluetoothIcon").padding(vertical = 16.dp))
 
           BluetoothButton(bluetoothServer, uid)
         }
