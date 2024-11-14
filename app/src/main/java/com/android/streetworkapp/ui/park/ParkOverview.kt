@@ -73,6 +73,7 @@ import com.android.streetworkapp.utils.toFormattedString
  * @param innerPadding The padding to apply to the screen.
  * @param navigationActions The navigation actions to navigate to other screens.
  * @param eventViewModel The view model for the events.
+ * @param userViewModel The view model for the user.
  */
 @Composable
 fun ParkOverviewScreen(
@@ -156,6 +157,8 @@ fun ImageTitle(image: Painter?, title: String) {
  * Display the details of a park, including the park's rating and occupancy.
  *
  * @param park The park data to display.
+ * @param showRatingDialog The state to show the rating dialog.
+ * @param user The user who is viewing the park.
  */
 @Composable
 fun ParkDetails(park: Park, showRatingDialog: MutableState<Boolean>, user: User?) {
@@ -223,9 +226,12 @@ fun RatingButton(showRatingDialog: MutableState<Boolean>) {
 
 /**
  * Display a dialog to rate the park. Ues the starRating variable to store the "live" rating value.
- * Used to submit the rating to the MVVM.
+ * Used to submit the rating to the park MVVM.
  *
  * @param showDialog The state to show the dialog.
+ * @param park The park to rate.
+ * @param user The user who is rating the park.
+ * @param parkViewModel The park view model.
  */
 @Composable
 fun RatingDialog(
@@ -304,6 +310,7 @@ fun handleRating(
     Toast.makeText(context, "Invalid rating value, could not rate park", Toast.LENGTH_SHORT).show()
   } else {
     Log.d("ParkOverview", "handleRating: Adding rating to park")
+    Toast.makeText(context, "Rating submitted", Toast.LENGTH_SHORT).show()
     parkViewModel.addRating(park.pid, user.uid, starRating.toFloat())
   }
 }
