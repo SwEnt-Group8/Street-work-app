@@ -23,6 +23,9 @@ class ProgressionRepositoryFirestore(private val db: FirebaseFirestore) : Progre
    *
    * @param uid: The uid (User Id)
    */
+
+  // Note: for reviewers, the viewmodel implementation that was done wasn't compatible with our
+  // userviewmodel, this is a quick fix I made, will need to rework the whole viewmodel in later pr
   override suspend fun getOrAddProgression(uid: String): Progression {
     require(uid.isNotEmpty()) { "Empty UID" }
     return try {
