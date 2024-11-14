@@ -51,8 +51,3 @@ enum class MedalsAchievement(val achievement: Achievement) {
   PLATINUM(Achievement(R.drawable.place_holder, "Platinum medal", emptyList(), "Last medal"))
 }
 
-enum class SCORE_INCREASE(val scoreAdded: Int) {
-  CREATE_EVENT(10),
-  JOIN_EVENT(5),
-  ADD_FRIEND(10)
-}
