@@ -352,7 +352,7 @@ fun EventItem(event: Event, eventViewModel: EventViewModel, navigationActions: N
               navigationActions.navigateTo(Screen.EVENT_OVERVIEW)
             },
             modifier =
-                Modifier.size(width = 80.dp, height = 48.dp).testTag("eventButton ${event.title}"),
+                Modifier.size(width = 80.dp, height = 48.dp).testTag("eventButton"),
             colors = ColorPalette.BUTTON_COLOR,
             contentPadding = PaddingValues(0.dp)) {
               Text("About", modifier = Modifier.testTag("eventButtonText"))
