@@ -6,6 +6,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
@@ -45,7 +46,7 @@ class AddFriendScreenTest : TestCase() {
     context = mock(Context::class.java)
 
     // Mock the current route to be the add profile screen
-    composeTestRule.setContent { AddFriendScreen(userViewModel) }
+
   }
 
   @OptIn(ExperimentalCoroutinesApi::class)
@@ -57,6 +58,7 @@ class AddFriendScreenTest : TestCase() {
 
   @Test
   fun hasRequiredComponents() {
+    composeTestRule.setContent { AddFriendScreen(userViewModel) }
     composeTestRule.waitForIdle() // Wait for rendering
 
     composeTestRule.waitForIdle()
@@ -84,6 +86,7 @@ class AddFriendScreenTest : TestCase() {
 
   @Test
   fun textCorrectlyDisplayed() {
+    composeTestRule.setContent { AddFriendScreen(userViewModel) }
     composeTestRule.waitForIdle() // Wait for rendering
 
     composeTestRule.onNodeWithTag("BluetoothButton").assertTextEquals("Send request")
@@ -91,8 +94,41 @@ class AddFriendScreenTest : TestCase() {
 
   @Test
   fun buttonWork() {
+    composeTestRule.setContent { AddFriendScreen(userViewModel) }
     composeTestRule.waitForIdle() // Wait for rendering
 
     composeTestRule.onNodeWithTag("BluetoothButton").assertHasClickAction()
+  }
+
+  @Test
+  fun friendRequestDialogAcceptButtonWorks() {
+    val username = "testUser"
+    var acceptClicked = false
+
+    // Set the content to show the FriendRequestDialog
+    composeTestRule.setContent {
+      FriendRequestDialog(
+          username = username, onAccept = { acceptClicked = true }, onRefuse = { /* no action */})
+    }
+
+    // Click the "Accept" button and verify the action
+    composeTestRule.onNodeWithTag("acceptButton").performClick()
+    assert(acceptClicked) { "Accept button was not clicked" }
+  }
+
+  @Test
+  fun friendRequestDialogRefuseButtonWorks() {
+    val username = "testUser"
+    var refuseClicked = false
+
+    // Set the content to show the FriendRequestDialog
+    composeTestRule.setContent {
+      FriendRequestDialog(
+          username = username, onAccept = { /* no action */}, onRefuse = { refuseClicked = true })
+    }
+
+    // Click the "Refuse" button and verify the action
+    composeTestRule.onNodeWithTag("refuseButton").performClick()
+    assert(refuseClicked) { "Refuse button was not clicked" }
   }
 }

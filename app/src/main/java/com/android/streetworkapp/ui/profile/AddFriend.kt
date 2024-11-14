@@ -176,7 +176,7 @@ fun FriendRequestDialog(username: String, onAccept: () -> Unit, onRefuse: () -> 
               Text("Friend request from $username", color = PRIMARY_TEXT_COLOR)
             }
       },
-      text = { Text("Do you want to add $username as a friend ?", color = SECONDARY_TEXT_COLOR) },
+      text = { Text("Do you want to add $username as a friend?", color = SECONDARY_TEXT_COLOR) },
       confirmButton = {
         Button(
             onClick = onAccept,
@@ -193,5 +193,6 @@ fun FriendRequestDialog(username: String, onAccept: () -> Unit, onRefuse: () -> 
               Text("Refuse", color = PRIMARY_TEXT_COLOR)
             }
       },
-      containerColor = PRINCIPLE_BACKGROUND_COLOR)
+      containerColor = PRINCIPLE_BACKGROUND_COLOR,
+      modifier = Modifier.testTag("FriendRequestDialog"))
 }
