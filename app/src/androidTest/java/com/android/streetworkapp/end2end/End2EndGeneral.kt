@@ -1,6 +1,5 @@
 package com.android.streetworkapp.end2end
 
-import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -34,10 +33,9 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
-import org.mockito.kotlin.stub
 import org.mockito.kotlin.verifyBlocking
+import org.mockito.kotlin.wheneverBlocking
 
 class End2EndGeneral {
   @Mock private lateinit var userRepository: UserRepository
@@ -109,9 +107,11 @@ class End2EndGeneral {
         .`when`(progressionRepository)
         .getProgression(eq(mockedUser.uid), any<(Progression) -> Unit>(), any())
 
-    userRepository.stub {
+    wheneverBlocking { userRepository.getFriendsByUid(mockedUser.uid) }
+        .thenReturn(mockedFriendsForMockedUser)
+    /*userRepository.stub {
       onBlocking { getFriendsByUid(mockedUser.uid) }.doReturn(mockedFriendsForMockedUser)
-    }
+    }*/
     /*
     runTest {
       // mock the mockedUser's friends
@@ -159,7 +159,12 @@ class End2EndGeneral {
     composeTestRule.onNodeWithTag("profileUsername").assertTextEquals(mockedUser.username)
     composeTestRule.onNodeWithTag("profileScore").assertTextEquals("Score: ${mockedUser.score}")
     // verifying the friends list
-    composeTestRule.onAllNodesWithTag("friendItem").assertCountEquals(mockedUser.friends.size)
+    composeTestRule.waitUntil(timeoutMillis = 5000) {
+      composeTestRule.onAllNodesWithTag("friendItem").fetchSemanticsNodes().size ==
+          mockedUser.friends.size
+      //    composeTestRule.onAllNodesWithTag("friendItem").fetchSemanticsNodes().size ==
+      // mockedUser.friends.size
+    }
     // go to add friend
     composeTestRule.onNodeWithTag("profileAddButton").performClick()
     composeTestRule.waitForIdle()
