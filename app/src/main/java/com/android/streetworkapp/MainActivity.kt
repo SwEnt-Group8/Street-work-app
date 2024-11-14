@@ -17,6 +17,7 @@ import androidx.navigation.navigation
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
 import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.park.NominatimParkNameRepository
 import com.android.streetworkapp.model.park.ParkRepositoryFirestore
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
@@ -62,6 +63,7 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
 
   // repositories
   val overpassParkLocationRepo = OverpassParkLocationRepository(OkHttpClient())
+  val parkNameRepository = NominatimParkNameRepository(OkHttpClient())
   // viewmodels
   val parkLocationViewModel = ParkLocationViewModel(overpassParkLocationRepo)
 
@@ -72,7 +74,7 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
 
   // Instantiate park repository :
   val parkRepository = ParkRepositoryFirestore(firestoreDB)
-  val parkViewModel = ParkViewModel(parkRepository)
+  val parkViewModel = ParkViewModel(parkRepository, parkNameRepository)
 
   // Instantiate event repository :
   val eventRepository = EventRepositoryFirestore(firestoreDB)
