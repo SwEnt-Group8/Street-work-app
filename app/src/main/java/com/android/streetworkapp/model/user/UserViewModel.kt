@@ -1,6 +1,5 @@
 package com.android.streetworkapp.model.user
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -74,10 +73,8 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @return The User object if found, or null if the user doesn't exist or an error occurs.
    */
   fun getUserByUid(uid: String) {
-    Log.d("DEBUGSWENT", "Getting user by uid: $uid")
     viewModelScope.launch {
       val user = repository.getUserByUid(uid)
-      Log.d("DEBUGSWENT", "Fetched user: $user")
       if (user != null) {
         _user.value = user
       }
@@ -117,10 +114,8 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @return A list of User objects representing the user's friends.
    */
   fun getFriendsByUid(uid: String) {
-    Log.d("DEBUGSWENT", "Getting friends by uid: $uid")
     viewModelScope.launch {
       val fetchedFriends = repository.getFriendsByUid(uid)
-      Log.d("DEBUGSWENT", "Fetched friends: $fetchedFriends")
       if (fetchedFriends != null) {
         _friends.value = fetchedFriends
       }
