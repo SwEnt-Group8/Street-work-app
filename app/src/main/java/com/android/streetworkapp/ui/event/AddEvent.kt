@@ -69,7 +69,6 @@ import java.util.concurrent.TimeUnit
  *
  * @param navigationActions used to navigate in the app
  */
-@SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEventScreen(
@@ -98,7 +97,7 @@ fun AddEventScreen(
     event.owner = owner
   }
 
-  val parkId = parkViewModel.currentPark.value?.pid
+  val parkId = parkViewModel.currentPark.collectAsState().value?.pid
   if (!parkId.isNullOrEmpty()) {
     event.parkId = parkId
   }
