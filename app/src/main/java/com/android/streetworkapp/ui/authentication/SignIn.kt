@@ -25,13 +25,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
-import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.model.user.createNewUserFromFirebaseUser
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.utils.GoogleAuthService
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -92,59 +90,5 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
 
           GoogleAuthButton(authService, context, launcher)
         }
-  }
-}
-
-/**
- * Checks if the user is already in the database, and if not, adds them.
- *
- * @param user The user to check and add.
- * @param userViewModel The [UserViewModel] to use for database operations.
- */
-fun checkAndAddUser(user: FirebaseUser?, userViewModel: UserViewModel) {
-  Log.d("SignInScreen", "Entered checkAndAddUser")
-  if (user == null) return
-  // Observe _user for the result of fetchUserByUid
-
-  // userViewModel.user.observeForever(observer)
-  userViewModel.getUserByUid(user.uid)
-  userViewModel.getFriendsByUid(user.uid)
-  userViewModel.setCurrentUser(
-      User(
-          uid = user.uid,
-          username = user.displayName ?: "Unknown",
-          email = user.email ?: "No Email",
-          score = 0,
-          friends = emptyList()))
-}
-
-/**
- * Observes the user data and adds the user if they don't exist.
- *
- * @param user The user to observe and add.
- * @param userViewModel The [UserViewModel] to use for database operations.
- */
-fun observeAndSetCurrentUser(user: FirebaseUser?, userViewModel: UserViewModel) {
-  val currentUser = userViewModel.user.value
-  user?.let { firebaseUser ->
-    if (currentUser == null) {
-      // If no existing data, set loggedInUser with default values and add the user
-      Log.d(
-          "SignInScreen",
-          "[observeAndSet] User ${user.displayName} doesn't exist, adding user to database")
-      val newUser =
-          User(
-              uid = firebaseUser.uid,
-              username = firebaseUser.displayName ?: "Unknown",
-              email = firebaseUser.email ?: "No Email",
-              score = 0,
-              friends = emptyList())
-      userViewModel.addUser(newUser)
-      userViewModel.setCurrentUser(newUser)
-    } else {
-      // Set loggedInUser with existing data
-      userViewModel.setCurrentUser(currentUser)
-      userViewModel.getFriendsByUid(currentUser.uid)
-    }
   }
 }
