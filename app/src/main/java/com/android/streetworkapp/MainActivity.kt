@@ -199,20 +199,10 @@ fun StreetWorkApp(
                 }
                 // screen for adding friend
                 composable(Screen.ADD_FRIEND) {
-                  AddFriendScreen(navigationActions, userViewModel, innerPadding)
+                  AddFriendScreen(userViewModel, innerPadding)
                 }
               }
             }
         navigationActions.apply(navTestInvokation)
       }
-}
-
-@Composable
-fun Streetworkapp(testing: Boolean) {
-  Log.d("Empty composable", "This should be completed")
-  if (testing) {
-    Log.d("Empty composable", "Context is null")
-  } else {
-    Log.d("Empty composable", "Context is not null")
-  }
 }
