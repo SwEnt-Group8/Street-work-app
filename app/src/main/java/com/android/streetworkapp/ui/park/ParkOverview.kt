@@ -236,9 +236,9 @@ fun RatingButton(showRatingDialog: MutableState<Boolean>) {
 @Composable
 fun RatingDialog(
     showDialog: MutableState<Boolean>,
-    park: Park?,
-    user: User?,
-    parkViewModel: ParkViewModel
+    park: Park? = null,
+    user: User? = null,
+    parkViewModel: ParkViewModel? = null
 ) {
   // Star rating is 1-5 stars
   val starRating = remember { mutableIntStateOf(3) }
@@ -298,7 +298,7 @@ fun handleRating(
     park: Park?,
     user: User?,
     starRating: Int,
-    parkViewModel: ParkViewModel
+    parkViewModel: ParkViewModel?
 ) {
   Log.d("ParkOverview", "handleRating: {park=$park ; user=$user ; rating=$starRating")
 
@@ -308,6 +308,8 @@ fun handleRating(
     Toast.makeText(context, "Park not found, could not rate park", Toast.LENGTH_SHORT).show()
   } else if (starRating < 1 || starRating > 5) {
     Toast.makeText(context, "Invalid rating value, could not rate park", Toast.LENGTH_SHORT).show()
+  } else if (parkViewModel == null) {
+      Toast.makeText(context, "Error with view model, could not rate park", Toast.LENGTH_SHORT).show()
   } else {
     Log.d("ParkOverview", "handleRating: Adding rating to park")
     Toast.makeText(context, "Rating submitted", Toast.LENGTH_SHORT).show()
