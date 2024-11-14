@@ -24,7 +24,7 @@ fun BluetoothButton(
         bluetoothController.startGattServer(uid) // Start GATT server to send UID
         Toast.makeText(context, "Broadcasting UID via BLE GATT server", Toast.LENGTH_SHORT).show()
       },
-      modifier = Modifier.size(220.dp, 50.dp).testTag("BluetoothButton")) {
+      modifier = Modifier.size(220.dp, 40.dp).testTag("BluetoothButton")) {
         Text(text = "Broadcast UID", fontSize = 17.sp)
       }
 }
