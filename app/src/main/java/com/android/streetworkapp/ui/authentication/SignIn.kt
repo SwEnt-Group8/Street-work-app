@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserViewModel
+import com.android.streetworkapp.model.user.createNewUserFromFirebaseUser
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.utils.GoogleAuthService
@@ -51,8 +52,10 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
       authService.rememberFirebaseAuthLauncher(
           onAuthComplete = { result ->
             firebaseUser = result.user
-            checkAndAddUser(firebaseUser, userViewModel)
-            firebaseUser?.let { firebaseUser -> userViewModel.getUserByUid(firebaseUser.uid) }
+            firebaseUser?.let { firebaseUser ->
+              userViewModel.getOrAddUserByUid(
+                  firebaseUser.uid, createNewUserFromFirebaseUser(firebaseUser))
+            }
           },
           onAuthError = {
             firebaseUser = null
