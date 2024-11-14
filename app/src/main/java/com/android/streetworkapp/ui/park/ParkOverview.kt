@@ -300,24 +300,30 @@ fun handleRating(
 ) {
   Log.d("ParkOverview", "handleRating: {park=$park ; user=$user ; rating=$starRating")
 
-  if (user == null) {
-    if (context != null)
-        Toast.makeText(context, "User not found, could not rate park", Toast.LENGTH_SHORT).show()
-  } else if (park == null) {
-    if (context != null)
-        Toast.makeText(context, "Park not found, could not rate park", Toast.LENGTH_SHORT).show()
-  } else if (starRating < 1 || starRating > 5) {
-    if (context != null)
-        Toast.makeText(context, "Invalid rating value, could not rate park", Toast.LENGTH_SHORT)
-            .show()
-  } else if (parkViewModel == null) {
-    if (context != null)
-        Toast.makeText(context, "Error with view model, could not rate park", Toast.LENGTH_SHORT)
-            .show()
-  } else {
-    Log.d("ParkOverview", "handleRating: Adding rating to park")
-    if (context != null) Toast.makeText(context, "Rating submitted", Toast.LENGTH_SHORT).show()
-    parkViewModel.addRating(park.pid, user.uid, starRating.toFloat())
+  when {
+    user == null -> {
+      if (context != null)
+          Toast.makeText(context, "User not found, could not rate park", Toast.LENGTH_SHORT).show()
+    }
+    park == null -> {
+      if (context != null)
+          Toast.makeText(context, "Park not found, could not rate park", Toast.LENGTH_SHORT).show()
+    }
+    starRating < 1 || starRating > 5 -> {
+      if (context != null)
+          Toast.makeText(context, "Invalid rating value, could not rate park", Toast.LENGTH_SHORT)
+              .show()
+    }
+    parkViewModel == null -> {
+      if (context != null)
+          Toast.makeText(context, "Error with view model, could not rate park", Toast.LENGTH_SHORT)
+              .show()
+    }
+    else -> {
+      Log.d("ParkOverview", "handleRating: Adding rating to park")
+      if (context != null) Toast.makeText(context, "Rating submitted", Toast.LENGTH_SHORT).show()
+      parkViewModel.addRating(park.pid, user.uid, starRating.toFloat())
+    }
   }
 }
 

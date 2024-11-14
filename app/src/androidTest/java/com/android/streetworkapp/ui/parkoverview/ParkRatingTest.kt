@@ -27,10 +27,12 @@ class ParkRatingTest {
   @get:Rule val composeTestRule = createComposeRule()
 
   private lateinit var showRatingDialog: MutableState<Boolean>
+  private lateinit var emptyPark: Park
 
   @Before
   fun setUp() {
     showRatingDialog = mutableStateOf(false)
+    emptyPark = Park("", "", ParkLocation(0.0, 0.0, ""), "", 1f, 1, 10, 0, emptyList(), emptyList())
   }
 
   @Test
@@ -124,10 +126,6 @@ class ParkRatingTest {
 
   @Test
   fun isRatingButtonCorrectlyDisplayedWhenNoRating() {
-    // default park constructor
-    val emptyPark =
-        Park("", "", ParkLocation(0.0, 0.0, ""), "", 1f, 1, 10, 0, emptyList(), emptyList())
-
     val user = User("uid", "username", "email", 0, emptyList())
 
     composeTestRule.setContent { ParkDetails(emptyPark, showRatingDialog, user) }
@@ -139,10 +137,6 @@ class ParkRatingTest {
   @Test
   fun isRatingButtonCorrectlyDisplayedWhenRating() {
     val user = User("uid", "username", "email", 0, emptyList())
-
-    // default park constructor
-    val emptyPark =
-        Park("", "", ParkLocation(0.0, 0.0, ""), "", 1f, 1, 10, 0, emptyList(), emptyList())
 
     // Set the user as having rated the emptyPark.
     emptyPark.votersUIDs = listOf(user.uid)
@@ -160,10 +154,6 @@ class ParkRatingTest {
   @Test
   fun isRatingButtonCorrectlyDisplayedWhenNoUser() {
     val user: User? = null
-
-    // default park constructor
-    val emptyPark =
-        Park("", "", ParkLocation(0.0, 0.0, ""), "", 1f, 1, 10, 0, emptyList(), emptyList())
 
     composeTestRule.setContent { ParkDetails(emptyPark, showRatingDialog, user) }
 
