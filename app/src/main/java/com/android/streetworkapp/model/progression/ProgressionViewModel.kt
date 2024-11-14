@@ -56,6 +56,7 @@ open class ProgressionViewModel(private val repository: ProgressionRepository) :
 
   /**
    * Check the score of the user. With enough points, the user wins medals.
+   * This function should be called EACH TIME points are added
    *
    * @param score: The current score of the user
    */

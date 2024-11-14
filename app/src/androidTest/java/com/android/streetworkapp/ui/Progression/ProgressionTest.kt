@@ -114,7 +114,7 @@ class ProgressionTest {
     composeTestRule.onNodeWithTag("emptyAchievementsText").assertIsNotDisplayed()
 
     mockedProgression.achievements.forEachIndexed { index, achievementName
-      -> // only one achievement for now, but since we'll scale things later I make the test easily
+      -> // only one type of achievement for now, but since we'll scale things later I make the test easily
          // scalable
       val achievement = enumValueOf<MedalsAchievement>(achievementName).achievement
       val achievementItem = composeTestRule.onNodeWithTag("achievementItem${index}")

@@ -56,3 +56,4 @@ enum class SCORE_INCREASE(val scoreAdded: Int) {
   JOIN_EVENT(5),
   ADD_FRIEND(10)
 }
+ 
