@@ -98,7 +98,7 @@ class End2EndGeneral {
 
   /** Tests everything included up to M2 except for everything that involves parks */
   @Test
-  fun e2eNavigationAndDisplaysCorrectDetailsExceptForParks() = runTest {
+  fun e2eNavigationAndDisplaysCorrectDetailsExceptForParks() {
 
     // mock the mockedUser's progression
     doAnswer { invocation ->
@@ -108,8 +108,11 @@ class End2EndGeneral {
         .`when`(progressionRepository)
         .getProgression(eq(mockedUser.uid), any<(Progression) -> Unit>(), any())
 
-    // mock the mockedUser's friends
-    whenever(userRepository.getFriendsByUid(mockedUser.uid)).thenReturn(mockedFriendsForMockedUser)
+    runTest {
+      // mock the mockedUser's friends
+      whenever(userRepository.getFriendsByUid(mockedUser.uid))
+          .thenReturn(mockedFriendsForMockedUser)
+    }
 
     composeTestRule.setContent {
       StreetWorkApp(
@@ -163,10 +166,13 @@ class End2EndGeneral {
     composeTestRule.onNodeWithTag("inputID").performTextInput(dummyFriendId)
     composeTestRule.onNodeWithTag("RequestButton").performClick()
 
-    verify(userRepository)
-        .addFriend(
-            mockedUser.uid,
-            dummyFriendId) // the behavior of adding friends will very likely change in the future,
-    // thus the test doesn't go into more depth
+    runTest {
+      verify(userRepository)
+          .addFriend(
+              mockedUser.uid,
+              dummyFriendId) // the behavior of adding friends will very likely change in the
+                             // future,
+      // thus the test doesn't go into more depth
+    }
   }
 }
