@@ -7,37 +7,23 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import com.android.streetworkapp.StreetWorkApp
-import com.android.streetworkapp.model.event.Event
-import com.android.streetworkapp.model.event.EventList
 import com.android.streetworkapp.model.event.EventRepository
 import com.android.streetworkapp.model.event.EventViewModel
-import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.park.ParkViewModel
-import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
-import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.model.parklocation.ParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
 import com.android.streetworkapp.model.progression.ProgressionRepository
-import com.android.streetworkapp.model.progression.ProgressionRepositoryFirestore
 import com.android.streetworkapp.model.progression.ProgressionViewModel
-import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
-import com.google.firebase.Timestamp
-import io.mockk.every
-import io.mockk.impl.annotations.InjectMockKs
-import io.mockk.impl.annotations.MockK
-import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockk
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.RETURNS_DEFAULTS
 import org.mockito.Mockito.mock
 
 class TopAppBarTest {
-
 
   @get:Rule val composeTestRule = createComposeRule()
 

@@ -133,7 +133,7 @@ fun ProgressScreen(
                   value = "<tbi>",
                   testTagPrefix =
                       "metricCardParksVisited") // TODO: to be implemented when Park visited metric
-                                                // will be done
+              // will be done
               MetricCard(
                   label = "Friends added",
                   value = "${currentUser?.friends?.size}",

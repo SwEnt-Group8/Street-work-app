@@ -16,30 +16,17 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.printToLog
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.streetworkapp.StreetWorkApp
-import com.android.streetworkapp.model.event.Event
-import com.android.streetworkapp.model.event.EventList
 import com.android.streetworkapp.model.event.EventRepository
-import com.android.streetworkapp.model.event.EventRepositoryFirestore
 import com.android.streetworkapp.model.event.EventViewModel
-import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkRepository
-import com.android.streetworkapp.model.park.ParkRepositoryFirestore
 import com.android.streetworkapp.model.park.ParkViewModel
-import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
-import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.model.parklocation.ParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
 import com.android.streetworkapp.model.progression.ProgressionRepository
-import com.android.streetworkapp.model.progression.ProgressionRepositoryFirestore
 import com.android.streetworkapp.model.progression.ProgressionViewModel
-import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
-import com.google.firebase.Timestamp
-import io.mockk.every
-import io.mockk.mockk
 import org.junit.Assert
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -115,19 +102,19 @@ class BottomNavigationTest {
 
   @Test
   fun bottomBarDisplaysCorrectlyOnScreens() {
-      val currentScreenParam =
-          mutableStateOf(
-              LIST_OF_SCREENS.first()) // can't call setContent twice per test so we use this instead
-      composeTestRule.setContent {
-          StreetWorkApp(
-              ParkLocationViewModel(mock(ParkLocationRepository::class.java, RETURNS_DEFAULTS)),
-              { navigateTo(currentScreenParam.value.screenName) },
-              {},
-              UserViewModel(mock(UserRepository::class.java, RETURNS_DEFAULTS)),
-              ParkViewModel(mock(ParkRepository::class.java, RETURNS_DEFAULTS)),
-              EventViewModel(mock(EventRepository::class.java, RETURNS_DEFAULTS)),
-              ProgressionViewModel(mock(ProgressionRepository::class.java, RETURNS_DEFAULTS)))
-      }
+    val currentScreenParam =
+        mutableStateOf(
+            LIST_OF_SCREENS.first()) // can't call setContent twice per test so we use this instead
+    composeTestRule.setContent {
+      StreetWorkApp(
+          ParkLocationViewModel(mock(ParkLocationRepository::class.java, RETURNS_DEFAULTS)),
+          { navigateTo(currentScreenParam.value.screenName) },
+          {},
+          UserViewModel(mock(UserRepository::class.java, RETURNS_DEFAULTS)),
+          ParkViewModel(mock(ParkRepository::class.java, RETURNS_DEFAULTS)),
+          EventViewModel(mock(EventRepository::class.java, RETURNS_DEFAULTS)),
+          ProgressionViewModel(mock(ProgressionRepository::class.java, RETURNS_DEFAULTS)))
+    }
 
     val bottomNavTypeToTest =
         BottomNavigationMenuType.entries.filter { it != BottomNavigationMenuType.NONE }
