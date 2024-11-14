@@ -24,7 +24,6 @@ import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.Route
-import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -35,9 +34,10 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.stub
+import org.mockito.kotlin.verifyBlocking
 
 class End2EndGeneral {
   @Mock private lateinit var userRepository: UserRepository
@@ -109,11 +109,15 @@ class End2EndGeneral {
         .`when`(progressionRepository)
         .getProgression(eq(mockedUser.uid), any<(Progression) -> Unit>(), any())
 
+    userRepository.stub {
+      onBlocking { getFriendsByUid(mockedUser.uid) }.doReturn(mockedFriendsForMockedUser)
+    }
+    /*
     runTest {
       // mock the mockedUser's friends
       whenever(userRepository.getFriendsByUid(mockedUser.uid))
           .thenReturn(mockedFriendsForMockedUser)
-    }
+    }*/
 
     composeTestRule.setContent {
       StreetWorkApp(
@@ -165,13 +169,10 @@ class End2EndGeneral {
     composeTestRule.onNodeWithTag("inputID").performTextInput(dummyFriendId)
     composeTestRule.onNodeWithTag("RequestButton").performClick()
 
-    runTest {
-      verify(userRepository)
-          .addFriend(
-              mockedUser.uid,
-              dummyFriendId) // the behavior of adding friends will very likely change in the
-      // future,
-      // thus the test doesn't go into more depth
-    }
+    verifyBlocking(userRepository) {
+      addFriend(mockedUser.uid, dummyFriendId)
+    } // the behavior of adding friends will very likely change in the
+    // future,
+    // thus the test doesn't go into more depth
   }
 }
