@@ -40,7 +40,7 @@ class ProgressionRepositoryFirestore(private val db: FirebaseFirestore) : Progre
         documentToProgression(document.documents[0])
       }
     } catch (e: Exception) {
-      Log.e("FirestoreError", "Error getting or creating user by UID: ${e.message}")
+      Log.e("FirestoreError", "Error getting or creating Progression from user uid: ${e.message}")
       Progression("", "", 0, 0, 0, emptyList())
     }
   }
