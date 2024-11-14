@@ -94,17 +94,6 @@ class End2EndGeneral {
   fun setUp() {
     MockitoAnnotations.openMocks(this)
     userViewModel.setCurrentUser(mockedUser)
-
-    composeTestRule.setContent {
-      StreetWorkApp(
-          ParkLocationViewModel(mock(ParkLocationRepository::class.java)),
-          { navigateTo(Route.MAP) },
-          {},
-          userViewModel,
-          ParkViewModel(mock(ParkRepository::class.java)),
-          EventViewModel(mock(EventRepository::class.java)),
-          progressionViewModel)
-    }
   }
 
   /** Tests everything included up to M2 except for everything that involves parks */
@@ -121,6 +110,17 @@ class End2EndGeneral {
 
     // mock the mockedUser's friends
     whenever(userRepository.getFriendsByUid(mockedUser.uid)).thenReturn(mockedFriendsForMockedUser)
+
+    composeTestRule.setContent {
+      StreetWorkApp(
+          ParkLocationViewModel(mock(ParkLocationRepository::class.java)),
+          { navigateTo(Route.MAP) },
+          {},
+          userViewModel,
+          ParkViewModel(mock(ParkRepository::class.java)),
+          EventViewModel(mock(EventRepository::class.java)),
+          progressionViewModel)
+    }
 
     composeTestRule.waitForIdle()
     // already on map here
