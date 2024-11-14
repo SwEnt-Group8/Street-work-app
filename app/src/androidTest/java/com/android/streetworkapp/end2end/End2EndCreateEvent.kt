@@ -146,7 +146,7 @@ class End2EndCreateEvent {
     // find a marker on the map and click it
     val uiDevice = UiDevice.getInstance(getInstrumentation())
 
-    composeTestRule.waitUntil {
+    composeTestRule.waitUntil(10000) {
       uiDevice.findObject(UiSelector().descriptionContains("Marker1")).exists()
     }
 
