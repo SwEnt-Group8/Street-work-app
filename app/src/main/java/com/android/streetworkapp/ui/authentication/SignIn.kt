@@ -38,6 +38,8 @@ import com.google.firebase.ktx.Firebase
 @Composable
 fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewModel) {
 
+  val user by userViewModel.user.collectAsState()
+
   // This part of the code handles google sign-in :
   var firebaseUser by remember { mutableStateOf(Firebase.auth.currentUser) }
 
@@ -62,8 +64,6 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
             Log.d("SignInScreen", "Sign-in failed : $it")
             Toast.makeText(context, "Login failed! : $it", Toast.LENGTH_LONG).show()
           })
-
-  val user by userViewModel.user.collectAsState()
 
   // Wait for the user to be fetched from database before setting it
   // as the current user and navigating to the map screen
