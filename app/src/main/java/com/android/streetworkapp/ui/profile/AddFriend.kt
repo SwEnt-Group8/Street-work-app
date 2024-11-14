@@ -1,21 +1,22 @@
 package com.android.streetworkapp.ui.profile
 
-import android.os.Build
 import android.util.Log
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -27,25 +28,31 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.sample.R
 import com.android.streetworkapp.device.bluetooth.BluetoothClient
 import com.android.streetworkapp.device.bluetooth.BluetoothConstants
 import com.android.streetworkapp.device.bluetooth.BluetoothServer
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_DARK
+import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_LIGHT
+import com.android.streetworkapp.ui.theme.ColorPalette.PRIMARY_TEXT_COLOR
+import com.android.streetworkapp.ui.theme.ColorPalette.PRINCIPLE_BACKGROUND_COLOR
+import com.android.streetworkapp.ui.theme.ColorPalette.SECONDARY_TEXT_COLOR
+import com.android.streetworkapp.ui.theme.LightGray
 
-@RequiresApi(Build.VERSION_CODES.S)
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddFriendScreen(
     navigationActions: NavigationActions,
-    userViewModel: UserViewModel = viewModel(factory = UserViewModel.Factory),
+    userViewModel: UserViewModel,
     innerPaddingValues: PaddingValues = PaddingValues(0.dp)
 ) {
   // variable for outlined text
@@ -58,6 +65,9 @@ fun AddFriendScreen(
   // Instantiate BluetoothClient
   val bluetoothClient = remember { BluetoothClient(context) }
   val bluetoothServer = remember { BluetoothServer(context) }
+
+  var showRequestDialog by remember { mutableStateOf(false) }
+  var receivedUid by remember { mutableStateOf("") }
 
   // Start scanning for GATT servers on screen load
   LaunchedEffect(Unit) {
@@ -78,43 +88,116 @@ fun AddFriendScreen(
     }
   }
 
+  if (showRequestDialog) {
+    FriendRequestDialog(
+        username = receivedUid,
+        onAccept = {
+          userViewModel.addFriend(uid, receivedUid)
+          Toast.makeText(context, "Friend added.", Toast.LENGTH_SHORT).show()
+          showRequestDialog = false
+        },
+        onRefuse = { showRequestDialog = false })
+  }
+
   Box(modifier = Modifier.testTag("addFriendScreen")) {
     Column(
         modifier = Modifier.fillMaxSize().padding(innerPaddingValues).testTag("AddFriendColumn"),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterVertically)) {
+        horizontalAlignment = Alignment.CenterHorizontally) {
+          Column(
+              modifier =
+                  Modifier.align(Alignment.Start).padding(horizontal = 16.dp, vertical = 4.dp)) {
+                // Title
+                Text(
+                    text = "Instructions",
+                    modifier =
+                        Modifier.align(Alignment.Start)
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                    style =
+                        TextStyle(
+                            fontSize = 18.sp,
+                            lineHeight = 24.sp,
+                            fontWeight = FontWeight(500),
+                            color = PRIMARY_TEXT_COLOR))
+              }
+          Box(
+              modifier =
+                  Modifier.padding(horizontal = 8.dp)
+                      .border(
+                          width = 1.dp,
+                          color = Color.Gray,
+                          shape = androidx.compose.foundation.shape.RoundedCornerShape(6.dp))
+                      .width(336.dp)
+                      .background(
+                          PRINCIPLE_BACKGROUND_COLOR,
+                          shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
+                      .padding(start = 12.dp, top = 12.dp, end = 12.dp, bottom = 12.dp)
+                      .testTag("instructionsContainer")) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                  Image(
+                      painter = painterResource(id = R.drawable.phone),
+                      contentDescription = "Phone Icon",
+                      modifier =
+                          Modifier.size(32.dp)
+                              .background(LightGray, shape = CircleShape)
+                              .padding(6.dp)
+                              .testTag("phoneIcon"))
+                  Text(
+                      text =
+                          "Bring your phones together while activating bluetooth to add a friend",
+                      style =
+                          TextStyle(
+                              fontSize = 14.sp,
+                              lineHeight = 16.sp,
+                              fontWeight = FontWeight(500),
+                              color = PRIMARY_TEXT_COLOR),
+                      modifier = Modifier.padding(start = 8.dp))
+                }
+              }
           Image(
-              painter = painterResource(id = R.drawable.place_holder),
-              contentDescription = "profile picture",
-              modifier = Modifier.size(200.dp))
+              painter = painterResource(id = R.drawable.bluetooth),
+              contentDescription = "Bluetooth Icon",
+              modifier = Modifier.size(150.dp).testTag("bluetoothIcon"))
 
           BluetoothButton(bluetoothServer, uid)
-
-          // write friend ID
-          OutlinedTextField(
-              value = id,
-              onValueChange = { id = it },
-              label = { Text("Friend ID") },
-              placeholder = { Text("Add a friend with id") },
-              modifier =
-                  Modifier.width(300.dp) // make the text field smaller
-                      .testTag("inputID"))
-
-          // Put the id inside the friend list of USER
-          Button(
-              onClick = {
-                if (id.isEmpty()) {
-                  // If id is null or empty, show a toast message to the user
-                  Toast.makeText(context, "ID cannot be empty.", Toast.LENGTH_SHORT).show()
-                } else {
-                  // add the friend to the user firendlist
-                  userViewModel.addFriend(uid, id)
-                  Toast.makeText(context, "Friend request sent.", Toast.LENGTH_SHORT).show()
-                }
-              },
-              modifier = Modifier.size(220.dp, 50.dp).testTag("RequestButton")) {
-                Text(text = "Send request", fontSize = 17.sp)
-              }
         }
   }
+}
+
+@Composable
+fun FriendRequestDialog(username: String, onAccept: () -> Unit, onRefuse: () -> Unit) {
+  androidx.compose.material3.AlertDialog(
+      onDismissRequest = { onRefuse() },
+      title = {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.testTag("dialogTitle")) {
+              Image(
+                  painter = painterResource(id = R.drawable.phone),
+                  contentDescription = "Phone Icon",
+                  modifier =
+                      Modifier.size(24.dp)
+                          .padding(end = 8.dp)
+                          .background(INTERACTION_COLOR_LIGHT, shape = CircleShape)
+                          .testTag("phoneIcon"))
+              Text("Friend request from $username", color = PRIMARY_TEXT_COLOR)
+            }
+      },
+      text = { Text("Do you want to add $username?", color = SECONDARY_TEXT_COLOR) },
+      confirmButton = {
+        Button(
+            onClick = onAccept,
+            colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
+            modifier = Modifier.testTag("acceptButton")) {
+              Text("Accept", color = PRIMARY_TEXT_COLOR)
+            }
+      },
+      dismissButton = {
+        Button(
+            onClick = onRefuse,
+            colors = ButtonDefaults.buttonColors(containerColor = SECONDARY_TEXT_COLOR),
+            modifier = Modifier.testTag("refuseButton")) {
+              Text("Refuse", color = PRIMARY_TEXT_COLOR)
+            }
+      },
+      containerColor = PRINCIPLE_BACKGROUND_COLOR)
 }
