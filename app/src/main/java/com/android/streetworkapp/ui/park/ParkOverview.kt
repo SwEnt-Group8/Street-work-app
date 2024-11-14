@@ -2,6 +2,9 @@ package com.android.streetworkapp.ui.park
 
 // Portions of this code were generated with the help of GitHub Copilot.
 
+import android.content.Context
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -42,6 +45,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -55,6 +59,8 @@ import com.android.streetworkapp.model.event.EventOverviewUiState
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkViewModel
+import com.android.streetworkapp.model.user.User
+import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.theme.ColorPalette
@@ -73,13 +79,19 @@ fun ParkOverviewScreen(
     parkViewModel: ParkViewModel,
     innerPadding: PaddingValues = PaddingValues(0.dp),
     navigationActions: NavigationActions = NavigationActions(rememberNavController()),
-    eventViewModel: EventViewModel
+    eventViewModel: EventViewModel,
+    userViewModel: UserViewModel
 ) {
-  val currentPark = parkViewModel.currentPark.collectAsState()
 
+  // MVVM calls for park state :
+  val currentPark = parkViewModel.currentPark.collectAsState()
   parkViewModel.park.collectAsState().value?.pid?.let { parkViewModel.loadCurrentPark(it) }
 
+  // MVVM calls for event state of the park :
   currentPark.value?.let { eventViewModel.getEvents(it) }
+
+  // MVVM calls for user state :
+  val currentUser = userViewModel.currentUser.collectAsState().value
 
   val showRatingDialog = remember { mutableStateOf(false) }
 
@@ -87,8 +99,8 @@ fun ParkOverviewScreen(
     Column {
       ImageTitle(image = null, title = currentPark.value?.name ?: "loading...")
       // TODO: Fetch image from Firestore storage
-      currentPark.value?.let { ParkDetails(park = it, showRatingDialog) }
-      RatingDialog(showRatingDialog)
+      currentPark.value?.let { ParkDetails(park = it, showRatingDialog, currentUser) }
+      RatingDialog(showRatingDialog, currentPark.value, currentUser, parkViewModel)
       EventItemList(eventViewModel, navigationActions)
     }
     FloatingActionButton(
@@ -144,7 +156,7 @@ fun ImageTitle(image: Painter?, title: String) {
  * @param park The park data to display.
  */
 @Composable
-fun ParkDetails(park: Park, showRatingDialog: MutableState<Boolean>) {
+fun ParkDetails(park: Park, showRatingDialog: MutableState<Boolean>, user: User?) {
   Column(modifier = Modifier.testTag("parkDetails")) {
     Text(
         text = "Details",
@@ -155,8 +167,7 @@ fun ParkDetails(park: Park, showRatingDialog: MutableState<Boolean>) {
     Row(modifier = Modifier.fillMaxWidth()) {
       RatingComponent(rating = park.rating.toInt(), park.nbrRating) // Round the rating
 
-      // TODO: Check if the user has already rated the park and hide the button if true
-      RatingButton(showRatingDialog)
+      if (shouldRatingButtonBeVisible(park, user)) RatingButton(showRatingDialog)
     }
 
     OccupancyBar(occupancy = (park.occupancy.toFloat() / park.capacity.toFloat()))
@@ -215,9 +226,15 @@ fun RatingButton(showRatingDialog: MutableState<Boolean>) {
  * @param showDialog The state to show the dialog.
  */
 @Composable
-fun RatingDialog(showDialog: MutableState<Boolean>) {
+fun RatingDialog(
+    showDialog: MutableState<Boolean>,
+    park: Park?,
+    user: User?,
+    parkViewModel: ParkViewModel
+) {
   // Star rating is 1-5 stars
   val starRating = remember { mutableIntStateOf(3) }
+  val context = LocalContext.current
 
   if (showDialog.value) {
     AlertDialog(
@@ -226,7 +243,9 @@ fun RatingDialog(showDialog: MutableState<Boolean>) {
         confirmButton = {
           TextButton(
               onClick = {
-                // TODO Handle confirmation action with park MVVM
+                // Handle confirmation action with park MVVM
+                Log.d("ParkOverview", "RatingDialog: Submitting rating")
+                handleRating(context, park, user, starRating.intValue, parkViewModel)
                 showDialog.value = false
               },
               modifier = Modifier.testTag("submitRatingButton")) {
@@ -255,6 +274,50 @@ fun RatingDialog(showDialog: MutableState<Boolean>) {
                 dismissOnClickOutside = true) // Makes dialog dismissible by clicking outside
         )
   }
+}
+
+/**
+ * Verifies that the current state is correct and then rates the park.
+ *
+ * @param context The context of the application.
+ * @param park The park to rate.
+ * @param user The user who is rating the park.
+ * @param starRating The rating value.
+ * @param parkViewModel The park view model.
+ */
+fun handleRating(
+    context: Context,
+    park: Park?,
+    user: User?,
+    starRating: Int,
+    parkViewModel: ParkViewModel
+) {
+  Log.d("ParkOverview", "handleRating: {park=$park ; user=$user ; rating=$starRating")
+
+  if (user == null) {
+    Toast.makeText(context, "User not found, could not rate park", Toast.LENGTH_SHORT).show()
+  } else if (park == null) {
+    Toast.makeText(context, "Park not found, could not rate park", Toast.LENGTH_SHORT).show()
+  } else if (starRating < 1 || starRating > 5) {
+    Toast.makeText(context, "Invalid rating value, could not rate park", Toast.LENGTH_SHORT).show()
+  } else {
+    Log.d("ParkOverview", "handleRating: Adding rating to park")
+    parkViewModel.addRating(park.pid, user.uid, starRating.toFloat())
+  }
+}
+
+/**
+ * Defines whether a user can see the rating button depending on whether he already has rated a
+ * park.
+ *
+ * @param park The park to check.
+ * @param user The user to check.
+ * @return True if the user has rated the park, false otherwise.
+ */
+fun shouldRatingButtonBeVisible(park: Park, user: User?): Boolean {
+  val res = user != null && !park.votersUIDs.contains(user.uid)
+  Log.d("ParkOverview", "shouldRatingButtonBeVisible: for $user at $park => $res")
+  return res
 }
 
 /**
