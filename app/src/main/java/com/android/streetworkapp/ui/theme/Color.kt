@@ -1,5 +1,7 @@
 package com.android.streetworkapp.ui.theme
 
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.ui.graphics.Color
 
 val Purple80 = Color(0xFFD0BCFF)
@@ -35,4 +37,19 @@ object ColorPalette {
   val INTERACTION_COLOR_DARK = Color(0xFF007BFF) // Blue
   val INTERACTION_COLOR_LIGHT = Color(0xFFBADBFF) // Light Blue
   val BORDER_COLOR = Color(0xFFDDDDDD)
+  val BUTTON_COLOR =
+      ButtonColors(
+          containerColor = INTERACTION_COLOR_DARK,
+          contentColor = PRIMARY_TEXT_COLOR,
+          disabledContentColor = SECONDARY_TEXT_COLOR,
+          disabledContainerColor = INTERACTION_COLOR_LIGHT)
+  val NAVIGATION_BAR_ITEM_COLORS =
+      NavigationBarItemColors(
+          selectedIconColor = PRIMARY_TEXT_COLOR,
+          selectedTextColor = PRIMARY_TEXT_COLOR,
+          selectedIndicatorColor = INTERACTION_COLOR_DARK,
+          disabledIconColor = Color.Transparent,
+          disabledTextColor = PRIMARY_TEXT_COLOR,
+          unselectedIconColor = PRIMARY_TEXT_COLOR,
+          unselectedTextColor = PRIMARY_TEXT_COLOR)
 }

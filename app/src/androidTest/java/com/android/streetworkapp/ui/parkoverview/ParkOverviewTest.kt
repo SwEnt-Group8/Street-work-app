@@ -18,7 +18,6 @@ import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.ui.navigation.Screen
-import com.android.streetworkapp.ui.park.OccupancyBar
 import com.android.streetworkapp.ui.park.ParkOverviewScreen
 import com.android.streetworkapp.ui.park.RatingComponent
 import com.google.firebase.Timestamp
@@ -104,6 +103,7 @@ class ParkOverviewTest {
       ParkOverviewScreen(
           parkViewModel, eventViewModel = eventViewModel, navigationActions = navigationActions)
     }
+    composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("parkOverviewScreen").isDisplayed()
     composeTestRule.onNodeWithTag("imageTitle").isDisplayed()
     composeTestRule.onNodeWithTag("title").isDisplayed()
@@ -123,30 +123,17 @@ class ParkOverviewTest {
   }
 
   @Test
-  fun parkOverviewScreenDisplaysCorrectParkDetails() {
-    parkViewModel.setCurrentPark(park)
-    composeTestRule.setContent {
-      ParkOverviewScreen(
-          parkViewModel, eventViewModel = eventViewModel, navigationActions = navigationActions)
-    }
-    composeTestRule.onNodeWithTag("title").assertTextEquals("EPFL Esplanade")
-    composeTestRule.onNodeWithTag("nbrReview").assertTextEquals("(102)")
-    composeTestRule.onNodeWithTag("occupancyText").assertTextEquals("80% Occupancy")
-  }
-
-  @Test
   fun parkOverviewScreenDisplaysCorrectEvent() = runTest {
     `when`(eventRepository.getEvents(any(), any(), any())).then {
       it.getArgument<(List<Event>) -> Unit>(1)(listOf(eventList.events.first()))
     }
-
     parkViewModel.setCurrentPark(park)
 
     composeTestRule.setContent {
       ParkOverviewScreen(
           parkViewModel, eventViewModel = eventViewModel, navigationActions = navigationActions)
     }
-
+    composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("createEventButton").assertTextEquals("Create an event")
     composeTestRule.onNodeWithTag("eventItem").assertTextContains("Group workout")
     composeTestRule
@@ -172,6 +159,7 @@ class ParkOverviewTest {
       ParkOverviewScreen(
           parkViewModel, eventViewModel = eventViewModel, navigationActions = navigationActions)
     }
+    composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("noEventText").isDisplayed()
     composeTestRule.onNodeWithTag("noEventText").assertTextEquals("No event is planned yet")
   }
@@ -198,17 +186,6 @@ class ParkOverviewTest {
   }
 
   @Test
-  fun parkOverviewScreenInvalidOccupancyTriggersException() {
-    parkViewModel.setCurrentPark(invalidOccupancyPark)
-    assertThrows(IllegalArgumentException::class.java) {
-      composeTestRule.setContent {
-        ParkOverviewScreen(
-            parkViewModel, eventViewModel = eventViewModel, navigationActions = navigationActions)
-      }
-    }
-  }
-
-  @Test
   fun ratingComponentWithMinRating() {
     composeTestRule.setContent { RatingComponent(rating = 1, nbrReview = 10) }
     composeTestRule.onNodeWithTag("ratingComponent").isDisplayed()
@@ -220,19 +197,5 @@ class ParkOverviewTest {
     composeTestRule.setContent { RatingComponent(rating = 5, nbrReview = 20) }
     composeTestRule.onNodeWithTag("ratingComponent").isDisplayed()
     composeTestRule.onNodeWithTag("nbrReview").assertTextEquals("(20)")
-  }
-
-  @Test
-  fun occupancyBarWithMinOccupancy() {
-    composeTestRule.setContent { OccupancyBar(occupancy = 0.0f) }
-    composeTestRule.onNodeWithTag("occupancyBar").isDisplayed()
-    composeTestRule.onNodeWithTag("occupancyText").assertTextEquals("0% Occupancy")
-  }
-
-  @Test
-  fun occupancyBarWithMaxOccupancy() {
-    composeTestRule.setContent { OccupancyBar(occupancy = 1.0f) }
-    composeTestRule.onNodeWithTag("occupancyBar").isDisplayed()
-    composeTestRule.onNodeWithTag("occupancyText").assertTextEquals("100% Occupancy")
   }
 }

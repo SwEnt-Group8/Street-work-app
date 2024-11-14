@@ -46,6 +46,7 @@ import com.android.streetworkapp.ui.theme.ColorPalette.PRINCIPLE_BACKGROUND_COLO
 import com.android.streetworkapp.ui.theme.ColorPalette.SECONDARY_TEXT_COLOR
 import com.android.streetworkapp.ui.theme.LightGray
 
+
 @Composable
 fun AddFriendScreen(
     userViewModel: UserViewModel,
