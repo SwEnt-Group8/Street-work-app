@@ -102,7 +102,8 @@ fun StreetWorkApp(
     userViewModel: UserViewModel,
     parkViewModel: ParkViewModel,
     eventViewModel: EventViewModel,
-    progressionViewModel: ProgressionViewModel
+    progressionViewModel: ProgressionViewModel,
+    navTestInvokationOnEachRecompose: Boolean = false
 ) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
@@ -115,7 +116,7 @@ fun StreetWorkApp(
   var firstTimeLoaded by remember { mutableStateOf<Boolean>(true) }
 
 
-    navigationActions.registerStringListenerOnDestinationChange(currentScreenName)
+  navigationActions.registerStringListenerOnDestinationChange(currentScreenName)
   screenParams = LIST_OF_SCREENS.find { currentScreenName.value == it.screenName }
 
   // Park with no events
@@ -217,7 +218,8 @@ fun StreetWorkApp(
                 }
               }
             }
-      if (firstTimeLoaded) {
+
+      if (firstTimeLoaded ||navTestInvokationOnEachRecompose) {
           firstTimeLoaded = false
           navigationActions.apply(navTestInvokation)
       }

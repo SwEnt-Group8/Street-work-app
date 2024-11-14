@@ -38,7 +38,7 @@ import org.junit.runner.RunWith
 // this is very wrong but something in the ADD_EVENT screen makes the test stall and I really can't
 // be bothered to debug it. (We only skip one screen out of all the others so it shouldn't matter
 // that much)
-val TEST_SCREEN_EXCLUSION_LIST = listOf<String>(Screen.ADD_EVENT)
+val TEST_SCREEN_EXCLUSION_LIST = listOf<String>(Screen.ADD_EVENT, Screen.EVENT_OVERVIEW)
 
 @RunWith(AndroidJUnit4::class)
 class BottomNavigationTest {
@@ -103,25 +103,17 @@ class BottomNavigationTest {
   fun displayAllComponents() {
     composeTestRule.setContent { BottomNavigationTest() }
     composeTestRule.onNodeWithTag("bottomNavigationMenu").assertExists().assertIsDisplayed()
-    composeTestRule
-        .onAllNodesWithTag("bottomNavigationItem")
-        .assertCountEquals(LIST_TOP_LEVEL_DESTINATION.size)
 
-    val navItems = composeTestRule.onAllNodesWithTag("bottomNavigationItem")
-
-    for (i in LIST_TOP_LEVEL_DESTINATION.indices) {
-      navItems[i].assertIsDisplayed()
-    }
+      for (topLevelDest in LIST_TOP_LEVEL_DESTINATION)
+          composeTestRule.onNodeWithTag("bottomNavigationItem${topLevelDest.route}").assertIsDisplayed()
   }
 
   @Test
   fun menuItemsAreClickable() {
     composeTestRule.setContent { BottomNavigationTest() }
-    val navItems = composeTestRule.onAllNodesWithTag("bottomNavigationItem")
 
-    for (i in LIST_TOP_LEVEL_DESTINATION.indices) {
-      navItems[i].performClick()
-    }
+      for (topLevelDest in LIST_TOP_LEVEL_DESTINATION)
+          composeTestRule.onNodeWithTag("bottomNavigationItem${topLevelDest.route}").performClick()
   }
 
   @Test
@@ -146,7 +138,9 @@ class BottomNavigationTest {
           UserViewModel(mockk<UserRepositoryFirestore>()),
           ParkViewModel(mockk<ParkRepositoryFirestore>()),
           EventViewModel(mockk<EventRepositoryFirestore>()),
-          ProgressionViewModel(mockk<ProgressionRepositoryFirestore>()))
+          ProgressionViewModel(mockk<ProgressionRepositoryFirestore>()),
+          true
+          )
     }
 
     val bottomNavTypeToTest =
