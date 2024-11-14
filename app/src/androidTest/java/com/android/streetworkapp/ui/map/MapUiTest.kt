@@ -32,7 +32,7 @@ class MapUiTest {
 
   @get:Rule val composeTestRule = createComposeRule()
 
-  //grant the permission to access location (remove the window for permission)
+  // grant the permission to access location (remove the window for permission)
   @get:Rule
   val permissionRule: GrantPermissionRule =
       GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
