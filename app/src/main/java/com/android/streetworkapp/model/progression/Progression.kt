@@ -50,4 +50,3 @@ enum class MedalsAchievement(val achievement: Achievement) {
   GOLD(Achievement(R.drawable.place_holder, "Gold medal", emptyList(), "Third medal")),
   PLATINUM(Achievement(R.drawable.place_holder, "Platinum medal", emptyList(), "Last medal"))
 }
-
