@@ -16,7 +16,9 @@ import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocation
+import com.android.streetworkapp.model.parklocation.ParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
+import com.android.streetworkapp.model.progression.ProgressionRepository
 import com.android.streetworkapp.model.progression.ProgressionRepositoryFirestore
 import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.user.UserRepositoryFirestore
@@ -24,58 +26,20 @@ import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
 import com.google.firebase.Timestamp
 import io.mockk.every
+import io.mockk.impl.annotations.InjectMockKs
+import io.mockk.impl.annotations.MockK
+import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockk
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mockito.RETURNS_DEFAULTS
 import org.mockito.Mockito.mock
 
 class TopAppBarTest {
 
-  private lateinit var parkLocationRepository: OverpassParkLocationRepository
-  private lateinit var parkLocationViewModel: ParkLocationViewModel
-
-  private lateinit var parkRepository: ParkRepository
-  private lateinit var parkViewModel: ParkViewModel
-  private lateinit var eventRepository: EventRepository
-  private lateinit var eventViewModel: EventViewModel
-  private lateinit var userRepository: UserRepository
-  private lateinit var userViewModel: UserViewModel
 
   @get:Rule val composeTestRule = createComposeRule()
-
-  @Before
-  fun setUp() {
-    parkRepository = mock(ParkRepository::class.java)
-    parkViewModel = ParkViewModel(parkRepository)
-    eventRepository = mock(EventRepository::class.java)
-    eventViewModel = EventViewModel(eventRepository)
-    userRepository = mock(UserRepository::class.java)
-    userViewModel = UserViewModel(userRepository)
-
-    val mockParkList =
-        listOf(
-            ParkLocation(lat = 46.518659400000004, lon = 6.566561505148001, id = "1"),
-            ParkLocation(lat = 34.052235, lon = -118.243683, id = "2"),
-            ParkLocation(lat = 51.507351, lon = -0.127758, id = "3"),
-            ParkLocation(lat = 35.676192, lon = 139.650311, id = "4"),
-            ParkLocation(lat = -33.868820, lon = 151.209290, id = "5"))
-
-    parkLocationRepository = mockk<OverpassParkLocationRepository>()
-    every {
-      parkLocationRepository.search(
-          any<Double>(),
-          any<Double>(),
-          any<(List<ParkLocation>) -> Unit>(),
-          any<(Exception) -> Unit>())
-    } answers
-        {
-          val onSuccess = this.args[2] as (List<ParkLocation>) -> Unit
-          onSuccess(mockParkList) // Invoke onSuccess with the custom list
-        }
-
-    parkLocationViewModel = ParkLocationViewModel(parkLocationRepository)
-  }
 
   @Test
   fun changingTitleInManagerMakesItChangeOnScreen() {
@@ -91,57 +55,18 @@ class TopAppBarTest {
 
   @Test
   fun isDisplayedCorrectlyOnScreens() {
-
-    val eventList =
-        EventList(
-            events =
-                listOf(
-                    Event(
-                        "1",
-                        "Group workout",
-                        "A fun group workout session to train new skills! \r\n\r\n" +
-                            "Come and join the fun of training with other motivated street workers while progressing on your figures\r\n" +
-                            "We accept all levels: newcomers welcome\r\n\r\n" +
-                            "see https/street-work-app/thissitedoesnotexist for more details",
-                        5,
-                        10,
-                        Timestamp.now(),
-                        "Malick")))
-
-    val event = eventList.events.first()
-    // fullevent = event.copy(participants = 10, maxParticipants = 10)
-
-    // Park with events
-    val park =
-        Park(
-            pid = "123",
-            name = "Sample Park",
-            location = ParkLocation(0.0, 0.0, "321"),
-            imageReference = "parks/sample.png",
-            rating = 4.0f,
-            nbrRating = 2,
-            capacity = 10,
-            occupancy = 5,
-            events = emptyList())
-
-    parkViewModel.setCurrentPark(park)
-    eventViewModel.setCurrentEvent(event)
-
     val currentScreenParam =
         mutableStateOf(
             LIST_OF_SCREENS.first()) // can't call setContent twice per test so we use this instead
     composeTestRule.setContent {
       StreetWorkApp(
-          parkLocationViewModel,
+          ParkLocationViewModel(mock(ParkLocationRepository::class.java, RETURNS_DEFAULTS)),
           { navigateTo(currentScreenParam.value.screenName) },
           {},
-          UserViewModel(mockk<UserRepositoryFirestore>()),
-          ParkViewModel(mockk<ParkRepositoryFirestore>()),
-          EventViewModel(mockk<EventRepositoryFirestore>()),
-          ProgressionViewModel(mockk<ProgressionRepositoryFirestore>()))
-          userViewModel,
-          parkViewModel,
-          eventViewModel)
+          UserViewModel(mock(UserRepository::class.java, RETURNS_DEFAULTS)),
+          ParkViewModel(mock(ParkRepository::class.java, RETURNS_DEFAULTS)),
+          EventViewModel(mock(EventRepository::class.java, RETURNS_DEFAULTS)),
+          ProgressionViewModel(mock(ProgressionRepository::class.java, RETURNS_DEFAULTS)))
     }
 
     for (screenParam in LIST_OF_SCREENS) {
