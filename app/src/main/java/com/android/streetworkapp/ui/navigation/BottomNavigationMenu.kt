@@ -4,7 +4,6 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -71,9 +70,8 @@ fun BottomNavigationMenu(
                       topLevelDestination.icon,
                       contentDescription = topLevelDestination.textId,
                       tint =
-                          Color
-                              .Black) // same here as in the trophy xml, will need to modify this
-                                      // once we setup light/dark mode
+                          Color.Black) // same here as in the trophy xml, will need to modify this
+                  // once we setup light/dark mode
                 }
               },
               selected = false,

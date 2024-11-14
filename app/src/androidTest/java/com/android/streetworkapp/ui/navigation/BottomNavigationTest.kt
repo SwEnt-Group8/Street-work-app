@@ -104,16 +104,18 @@ class BottomNavigationTest {
     composeTestRule.setContent { BottomNavigationTest() }
     composeTestRule.onNodeWithTag("bottomNavigationMenu").assertExists().assertIsDisplayed()
 
-      for (topLevelDest in LIST_TOP_LEVEL_DESTINATION)
-          composeTestRule.onNodeWithTag("bottomNavigationItem${topLevelDest.route}").assertIsDisplayed()
+    for (topLevelDest in LIST_TOP_LEVEL_DESTINATION) composeTestRule
+        .onNodeWithTag("bottomNavigationItem${topLevelDest.route}")
+        .assertIsDisplayed()
   }
 
   @Test
   fun menuItemsAreClickable() {
     composeTestRule.setContent { BottomNavigationTest() }
 
-      for (topLevelDest in LIST_TOP_LEVEL_DESTINATION)
-          composeTestRule.onNodeWithTag("bottomNavigationItem${topLevelDest.route}").performClick()
+    for (topLevelDest in LIST_TOP_LEVEL_DESTINATION) composeTestRule
+        .onNodeWithTag("bottomNavigationItem${topLevelDest.route}")
+        .performClick()
   }
 
   @Test
@@ -139,8 +141,7 @@ class BottomNavigationTest {
           ParkViewModel(mockk<ParkRepositoryFirestore>()),
           EventViewModel(mockk<EventRepositoryFirestore>()),
           ProgressionViewModel(mockk<ProgressionRepositoryFirestore>()),
-          true
-          )
+          true)
     }
 
     val bottomNavTypeToTest =

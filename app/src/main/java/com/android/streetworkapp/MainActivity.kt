@@ -115,7 +115,6 @@ fun StreetWorkApp(
 
   var firstTimeLoaded by remember { mutableStateOf<Boolean>(true) }
 
-
   navigationActions.registerStringListenerOnDestinationChange(currentScreenName)
   screenParams = LIST_OF_SCREENS.find { currentScreenName.value == it.screenName }
 
@@ -219,10 +218,10 @@ fun StreetWorkApp(
               }
             }
 
-      if (firstTimeLoaded ||navTestInvokationOnEachRecompose) {
+        if (firstTimeLoaded || navTestInvokationOnEachRecompose) {
           firstTimeLoaded = false
           navigationActions.apply(navTestInvokation)
-      }
+        }
       }
 }
 
