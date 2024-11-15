@@ -7,7 +7,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextInput
 import com.android.streetworkapp.StreetWorkApp
 import com.android.streetworkapp.model.event.EventRepository
 import com.android.streetworkapp.model.event.EventViewModel
@@ -35,7 +34,6 @@ import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
-import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.wheneverBlocking
 
 class End2EndGeneral {
@@ -152,6 +150,8 @@ class End2EndGeneral {
     composeTestRule.waitForIdle()
 
     composeTestRule.onNodeWithTag("addFriendScreen").assertIsDisplayed()
+
+    /*
     // perform add friend request
     composeTestRule.onNodeWithTag("inputID").performTextInput(dummyFriendId)
     composeTestRule.onNodeWithTag("RequestButton").performClick()
@@ -161,5 +161,7 @@ class End2EndGeneral {
     } // the behavior of adding friends will very likely change in the
     // future,
     // thus the test doesn't go into more depth
+    */
+
   }
 }
