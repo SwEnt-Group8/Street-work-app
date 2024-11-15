@@ -1,6 +1,5 @@
 package com.android.streetworkapp.model.user
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -74,10 +73,8 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @return The User object if found, or null if the user doesn't exist or an error occurs.
    */
   fun getUserByUid(uid: String) {
-    Log.d("DEBUGSWENT", "Getting user by uid: $uid")
     viewModelScope.launch {
       val user = repository.getUserByUid(uid)
-      Log.d("DEBUGSWENT", "Fetched user: $user")
       if (user != null) {
         _user.value = user
       }
@@ -117,10 +114,8 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @return A list of User objects representing the user's friends.
    */
   fun getFriendsByUid(uid: String) {
-    Log.d("DEBUGSWENT", "Getting friends by uid: $uid")
     viewModelScope.launch {
       val fetchedFriends = repository.getFriendsByUid(uid)
-      Log.d("DEBUGSWENT", "Fetched friends: $fetchedFriends")
       if (fetchedFriends != null) {
         _friends.value = fetchedFriends
       }
@@ -133,6 +128,19 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @param user The User object to add to Firestore.
    */
   fun addUser(user: User) = viewModelScope.launch { repository.addUser(user) }
+
+  /**
+   * Retrieves a user from Firestore based on the provided ID, or adds it if they don't exist.
+   *
+   * @param uid The unique ID of the user to retrieve or add.
+   * @param user The User object to add if the user doesn't exist.
+   */
+  fun getOrAddUserByUid(uid: String, user: User) {
+    viewModelScope.launch {
+      val fetchedUser = repository.getOrAddUserByUid(uid, user)
+      _user.value = fetchedUser
+    }
+  }
 
   /**
    * Updates the user's score in Firestore.
