@@ -67,3 +67,9 @@ enum class MedalsAchievement(val achievement: Achievement) {
           listOf("Platinum"),
           "Last medal"))
 }
+
+enum class SCORE_INCREASE(val scoreAdded: Int) {
+  CREATE_EVENT(10),
+  JOIN_EVENT(5),
+  ADD_FRIEND(10)
+}

@@ -107,7 +107,8 @@ fun StreetWorkApp(
     userViewModel: UserViewModel,
     parkViewModel: ParkViewModel,
     eventViewModel: EventViewModel,
-    progressionViewModel: ProgressionViewModel
+    progressionViewModel: ProgressionViewModel,
+    navTestInvokationOnEachRecompose: Boolean = false
 ) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
@@ -116,6 +117,8 @@ fun StreetWorkApp(
     mutableStateOf<String?>(null)
   } // not using by here since I want to pass the mutableState to a fn
   var screenParams by remember { mutableStateOf<ScreenParams?>(null) }
+
+  var firstTimeLoaded by remember { mutableStateOf<Boolean>(true) }
 
   navigationActions.registerStringListenerOnDestinationChange(currentScreenName)
   screenParams = LIST_OF_SCREENS.find { currentScreenName.value == it.screenName }
@@ -218,6 +221,10 @@ fun StreetWorkApp(
                 composable(Screen.ADD_FRIEND) { AddFriendScreen(userViewModel, innerPadding) }
               }
             }
-        navigationActions.apply(navTestInvokation)
+
+        if (firstTimeLoaded || navTestInvokationOnEachRecompose) {
+          firstTimeLoaded = false
+          navigationActions.apply(navTestInvokation)
+        }
       }
 }

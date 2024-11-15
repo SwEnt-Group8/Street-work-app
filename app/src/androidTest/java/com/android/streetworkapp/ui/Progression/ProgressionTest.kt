@@ -18,6 +18,9 @@ import com.android.streetworkapp.ui.progress.ProgressScreen
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
+import io.mockk.every
+import io.mockk.impl.annotations.MockK
+import io.mockk.slot
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -59,7 +62,6 @@ class ProgressionTest {
         {
           Progression()
         }
-
     composeTestRule.setContent {
       ProgressScreen(navigationActions, userViewModel, progressionViewModel)
     }
@@ -103,6 +105,7 @@ class ProgressionTest {
           mockedProgression
         }
 
+
     composeTestRule.setContent {
       ProgressScreen(navigationActions, userViewModel, progressionViewModel)
     }
@@ -143,7 +146,7 @@ class ProgressionTest {
             eventsCreated = 0,
             eventsJoined = 0,
             achievements = emptyList())
-
+        
     coEvery { progressionRepository.getOrAddProgression(eq(mockedUser.uid)) } answers
         {
           mockedProgression
