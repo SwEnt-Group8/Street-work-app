@@ -1,3 +1,4 @@
+import android.net.Uri
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepository
@@ -41,6 +42,7 @@ class SignInTest {
     // Create a spy on UserViewModel and set the MutableStateFlow directly
     userViewModel = spy(UserViewModel(repository))
     `when`(userViewModel.user).thenReturn(fakeUserStateFlow)
+    `when`(firebaseUser.photoUrl).thenReturn(Uri.parse(""))
   }
 
   @After
@@ -55,7 +57,8 @@ class SignInTest {
     `when`(firebaseUser.displayName).thenReturn("John Doe")
     `when`(firebaseUser.email).thenReturn("john@example.com")
 
-    val existingUser = User("user123", "John Doe", "john@example.com", 100, emptyList())
+    val existingUser =
+        User("user123", "John Doe", "john@example.com", 100, emptyList(), picture = "")
     fakeUserStateFlow.value = existingUser
 
     // Call the function
@@ -84,6 +87,7 @@ class SignInTest {
     `when`(firebaseUser.uid).thenReturn("newUser123")
     `when`(firebaseUser.displayName).thenReturn("New User")
     `when`(firebaseUser.email).thenReturn("newuser@example.com")
+    `when`(firebaseUser.photoUrl.toString()).thenReturn("")
     fakeUserStateFlow.value = null // Simulate no user initially
 
     // Call the observeAndSetCurrentUser function
@@ -95,7 +99,8 @@ class SignInTest {
             username = "New User",
             email = "newuser@example.com",
             score = 0,
-            friends = emptyList())
+            friends = emptyList(),
+            picture = "")
 
     // Verify that addUser and setCurrentUser were called with the expected user
     verify(userViewModel).addUser(expectedUser)
@@ -105,7 +110,8 @@ class SignInTest {
   @Test
   fun `observeAndSetCurrentUser sets existing user if user already exists`() = runTest {
     // Given a FirebaseUser and an existing user in the LiveData
-    val existingUser = User("user123", "Existing User", "existing@example.com", 100, emptyList())
+    val existingUser =
+        User("user123", "Existing User", "existing@example.com", 100, emptyList(), picture = "")
     fakeUserStateFlow.value = existingUser
     `when`(firebaseUser.uid).thenReturn("user123")
 
