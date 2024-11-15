@@ -221,7 +221,7 @@ fun StreetWorkApp(
               }
             }
 
-        if (!e2eEventTesting) {
+        if (e2eEventTesting) {
           LaunchedEffect(navTestInvokation) { navigationActions.apply(navTestInvokation) }
         } else if (firstTimeLoaded || navTestInvokationOnEachRecompose) {
           firstTimeLoaded = false
