@@ -6,7 +6,6 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.printToLog
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.rule.GrantPermissionRule
 import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
@@ -32,11 +31,6 @@ class MapUiTest {
 
   @get:Rule val composeTestRule = createComposeRule()
 
-  // grant the permission to access location (remove the window for permission)
-  @get:Rule
-  val permissionRule: GrantPermissionRule =
-      GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
-
   @Before
   fun setUp() {
     parkLocationRepository = OverpassParkLocationRepository(OkHttpClient())
@@ -51,9 +45,6 @@ class MapUiTest {
     composeTestRule.setContent {
       MapScreen(parkLocationViewModel, parkViewModel, navigationActions)
     }
-
-    composeTestRule.waitForIdle()
-
     composeTestRule.onRoot().printToLog("MapScreen")
   }
 
@@ -64,8 +55,6 @@ class MapUiTest {
     composeTestRule.setContent {
       MapScreen(parkLocationViewModel, parkViewModel, navigationActions)
     }
-
-    composeTestRule.waitForIdle()
 
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("googleMap").assertIsDisplayed()

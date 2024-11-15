@@ -1,77 +1,55 @@
 package com.android.streetworkapp.ui.map
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.util.Log
-import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.ActivityResultLauncher
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import com.android.streetworkapp.utils.LocationService
-import com.android.streetworkapp.utils.PermissionManager
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.maps.model.LatLng
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import com.android.streetworkapp.ui.theme.WoodCharcoal
 
 @Composable
-fun MapManager(
-    userLocation: MutableState<LatLng>,
-    onUserLocationChange: (MutableState<LatLng>) -> Unit,
-    permissionManager: PermissionManager,
-    locationService: LocationService
-) {
+fun MapManager(requestPermissionLauncher: ActivityResultLauncher<String>) {
   val context = LocalContext.current
-
   val hasLocationPermission by remember {
-    mutableStateOf(permissionManager.hasLocationPermission())
+    mutableStateOf(
+        ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
+            PackageManager.PERMISSION_GRANTED)
   }
-
-  // Request permission launcher
-  val requestPermissionLauncher =
-      rememberLauncherForActivityResult(
-          contract = ActivityResultContracts.RequestPermission(),
-          onResult = { isGranted ->
-            if (isGranted) {
-              // Permission granted, fetch user location
-              Log.d("Map", "Location permission granted")
-              Toast.makeText(context, "Permission granted.", Toast.LENGTH_SHORT).show()
-            } else {
-              // Permission denied
-              Log.d("Map", "Location permission denied")
-              Toast.makeText(context, "Location permission denied.", Toast.LENGTH_SHORT).show()
-            }
-          })
 
   // Request location permission if not granted
   LaunchedEffect(hasLocationPermission) {
     if (!hasLocationPermission) {
-      permissionManager.requestLocationPermission(requestPermissionLauncher)
+      Log.d("Map", "requestPermissionLauncher.launch")
+      requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
     }
   }
-
-  // update userLocation each update
-  val locationCallback = remember {
-    object : LocationCallback() {
-      override fun onLocationResult(locationResult: LocationResult) {
-        locationResult.lastLocation?.let { location ->
-          userLocation.value = LatLng(location.latitude, location.longitude)
-          onUserLocationChange(userLocation)
-        }
+  // Could be remove depends on the map implementation
+  Box(
+      modifier = Modifier.fillMaxSize().padding(16.dp).testTag("BoxMap"),
+      contentAlignment = Alignment.Center) {
+        Button(
+            onClick = {
+              requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            },
+            modifier = Modifier.testTag("requestPermissionButton"),
+            colors = ButtonDefaults.buttonColors(WoodCharcoal)) {
+              Text(text = "Test Permission")
+            }
       }
-    }
-  }
-
-  // Start location updates when it have permission
-  LaunchedEffect(hasLocationPermission) {
-    if (hasLocationPermission) {
-      locationService.startLocationUpdates(locationCallback)
-    }
-  }
-  // Stop location updates
-  DisposableEffect(Unit) { onDispose { locationService.stopLocationUpdates(locationCallback) } }
 }
