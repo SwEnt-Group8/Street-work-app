@@ -5,5 +5,6 @@ data class User(
     val username: String,
     val email: String,
     val score: Int,
-    val friends: List<String>
+    val friends: List<String>,
+    val picture: String
 )

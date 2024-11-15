@@ -270,6 +270,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
       val username = document.getString("username") ?: return null
       val email = document.getString("email") ?: return null
       val score = document.getLong("score")?.toInt() ?: 0
+      val picture = document.getString("picture") ?: return null
       // Safely handle the 'friends' field
       val friends =
           try {
@@ -280,7 +281,13 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
           }
 
       val validFriends = friends.filterIsInstance<String>()
-      User(uid = uid, username = username, email = email, score = score, friends = validFriends)
+      User(
+          uid = uid,
+          username = username,
+          email = email,
+          score = score,
+          friends = validFriends,
+          picture = picture)
     } catch (e: Exception) {
       Log.e("FirestoreError", "Error converting document to User", e)
       null
