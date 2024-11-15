@@ -7,6 +7,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.test.rule.GrantPermissionRule
 import com.android.streetworkapp.StreetWorkApp
 import com.android.streetworkapp.model.event.EventRepository
 import com.android.streetworkapp.model.event.EventViewModel
@@ -40,6 +41,11 @@ class End2EndGeneral {
   @InjectMocks private lateinit var progressionViewModel: ProgressionViewModel
 
   @get:Rule val composeTestRule = createComposeRule()
+
+  // grant the permission to access location (remove the window for permission)
+  @get:Rule
+  val permissionRule: GrantPermissionRule =
+      GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
   private val mockedUserUid = "123456"
 
