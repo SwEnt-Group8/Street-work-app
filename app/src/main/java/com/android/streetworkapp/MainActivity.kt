@@ -23,6 +23,8 @@ import com.android.streetworkapp.model.park.ParkRepositoryFirestore
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
+import com.android.streetworkapp.model.progression.ProgressionRepositoryFirestore
+import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.authentication.SignInScreen
@@ -81,8 +83,18 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
   val eventRepository = EventRepositoryFirestore(firestoreDB)
   val eventViewModel = EventViewModel(eventRepository)
 
+  // Instantiate progression repository
+  val progressionRepository = ProgressionRepositoryFirestore(firestoreDB)
+  val progressionViewModel = ProgressionViewModel(progressionRepository)
+
   StreetWorkApp(
-      parkLocationViewModel, testInvokation, {}, userViewModel, parkViewModel, eventViewModel)
+      parkLocationViewModel,
+      testInvokation,
+      {},
+      userViewModel,
+      parkViewModel,
+      eventViewModel,
+      progressionViewModel)
 }
 
 @Composable
@@ -93,7 +105,9 @@ fun StreetWorkApp(
     userViewModel: UserViewModel,
     parkViewModel: ParkViewModel,
     eventViewModel: EventViewModel,
-    e2eTesting: Boolean = false
+    progressionViewModel: ProgressionViewModel,
+    navTestInvokationOnEachRecompose: Boolean = false,
+    e2eEventTesting: Boolean = false
 ) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
@@ -102,6 +116,8 @@ fun StreetWorkApp(
     mutableStateOf<String?>(null)
   } // not using by here since I want to pass the mutableState to a fn
   var screenParams by remember { mutableStateOf<ScreenParams?>(null) }
+
+  var firstTimeLoaded by remember { mutableStateOf<Boolean>(true) }
 
   navigationActions.registerStringListenerOnDestinationChange(currentScreenName)
   screenParams = LIST_OF_SCREENS.find { currentScreenName.value == it.screenName }
@@ -163,7 +179,10 @@ fun StreetWorkApp(
                 composable(Screen.AUTH) { SignInScreen(navigationActions, userViewModel) }
               }
               navigation(startDestination = Screen.PROGRESSION, route = Route.PROGRESSION) {
-                composable(Screen.PROGRESSION) { ProgressScreen(navigationActions, innerPadding) }
+                composable(Screen.PROGRESSION) {
+                  ProgressScreen(
+                      navigationActions, userViewModel, progressionViewModel, innerPadding)
+                }
               }
               navigation(
                   startDestination = Screen.MAP,
@@ -178,7 +197,8 @@ fun StreetWorkApp(
                       innerPadding)
                 }
                 composable(Screen.PARK_OVERVIEW) {
-                  ParkOverviewScreen(parkViewModel, innerPadding, navigationActions, eventViewModel)
+                  ParkOverviewScreen(
+                      parkViewModel, innerPadding, navigationActions, eventViewModel, userViewModel)
                 }
                 composable(Screen.ADD_EVENT) {
                   AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
@@ -197,25 +217,15 @@ fun StreetWorkApp(
                   ProfileScreen(navigationActions, userViewModel, innerPadding)
                 }
                 // screen for adding friend
-                composable(Screen.ADD_FRIEND) {
-                  AddFriendScreen(navigationActions, userViewModel, innerPadding)
-                }
+                composable(Screen.ADD_FRIEND) { AddFriendScreen(userViewModel, innerPadding) }
               }
             }
-        if (e2eTesting) {
+
+        if (!e2eEventTesting) {
           LaunchedEffect(navTestInvokation) { navigationActions.apply(navTestInvokation) }
-        } else {
+        } else if (firstTimeLoaded || navTestInvokationOnEachRecompose) {
+          firstTimeLoaded = false
           navigationActions.apply(navTestInvokation)
         }
       }
-}
-
-@Composable
-fun Streetworkapp(testing: Boolean) {
-  Log.d("Empty composable", "This should be completed")
-  if (testing) {
-    Log.d("Empty composable", "Context is null")
-  } else {
-    Log.d("Empty composable", "Context is not null")
-  }
 }

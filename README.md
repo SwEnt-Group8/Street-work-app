@@ -26,14 +26,15 @@
 The Street Work'App is designed to connect street workout enthusiasts by recommending parks for workouts and facilitating real-life social interactions. Street workout is a growing physical activity that combines calisthenics and gymnastics, performed in outdoor spaces like parks. This app helps users find like-minded individuals to practice with and promotes the development of a local street workout community.
 
 ## Project architecture
-<img width="787" alt="diagrammeM1" src="https://github.com/user-attachments/assets/375f3b13-f150-4b0b-9bae-b1cfb46c37a3">
+<img width="872" alt="image" src="https://github.com/user-attachments/assets/55dcd946-d8ae-48da-a5df-3b9154bca342">
+
 
 ## Core Features
 1. **Park Discovery via Location:**
     - Users can discover nearby parks for street workouts based on their current location.
 
 2. **Friendship Through In-Person Connections:**
-    - Friends can only be added by meeting at the same park and scanning a QR code, encouraging real-world connections.
+    - Friends can only be added by meeting at the same park with bluetooth, encouraging real-world connections.
 
 3. **Park Events:**
     - Users can create and join events at parks to meet others and explore new workout locations.

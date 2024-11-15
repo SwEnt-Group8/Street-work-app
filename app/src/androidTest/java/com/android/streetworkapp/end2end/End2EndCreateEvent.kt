@@ -29,6 +29,8 @@ import com.android.streetworkapp.model.park.ParkRepositoryFirestore
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
+import com.android.streetworkapp.model.progression.ProgressionRepository
+import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.Screen
@@ -57,12 +59,14 @@ class End2EndCreateEvent {
   private lateinit var userViewModel: UserViewModel
   private lateinit var parkViewModel: ParkViewModel
   private lateinit var eventViewModel: EventViewModel
+  private lateinit var progressionViewModel: ProgressionViewModel
 
   // mock event
   private lateinit var testEvent: Event
 
   // mocked repository not used in this test
   private lateinit var userRepository: UserRepository
+  private lateinit var progressionRepository: ProgressionRepository
 
   // Boolean to check if the map is loaded
   private var mapISLoaded = false
@@ -99,12 +103,14 @@ class End2EndCreateEvent {
     eventRepository = EventRepositoryFirestore(firestoreDB)
     userRepository = mock(UserRepository::class.java)
     parkRepository = ParkRepositoryFirestore(firestoreDB, testing = true)
+    progressionRepository = mock(ProgressionRepository::class.java)
 
     // viewmodels
     parkLocationViewModel = ParkLocationViewModel(parkLocationRepository)
     userViewModel = UserViewModel(userRepository)
     parkViewModel = ParkViewModel(parkRepository, parkNameRepository)
     eventViewModel = EventViewModel(eventRepository)
+    progressionViewModel = ProgressionViewModel(progressionRepository)
 
     testEvent =
         Event(
@@ -124,6 +130,7 @@ class End2EndCreateEvent {
           userViewModel,
           parkViewModel,
           eventViewModel,
+          progressionViewModel,
           true)
     }
   }
