@@ -7,7 +7,6 @@ plugins {
     alias(libs.plugins.ktfmt)
     alias(libs.plugins.sonar)
     id("jacoco")
-
     alias(libs.plugins.gms) // Google services (auth)
 }
 
@@ -186,6 +185,9 @@ dependencies {
     androidTestImplementation(libs.mockk)
     androidTestImplementation(libs.mockk.android)
     androidTestImplementation(libs.mockk.agent)
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.4.0") {
+        exclude(module = "protobuf-lite")
+    }
 
 
     // ------------- Jetpack Compose ------------------
@@ -223,6 +225,8 @@ dependencies {
     implementation(libs.maps.compose)
     implementation(libs.maps.compose.utils)
     implementation(libs.play.services.auth)
+    implementation( libs.play.services.location)
+    implementation(libs.places)
 
     // ----------       Firebase     ------------
     implementation(libs.firebase.database.ktx)
@@ -239,6 +243,10 @@ dependencies {
     androidTestImplementation(libs.mockito.kotlin)
     androidTestImplementation (libs.mockito.android)
 
+}
+
+configurations.configureEach {
+    exclude(group = "com.google.protobuf", module = "protobuf-lite")
 }
 
 tasks.withType<Test> {

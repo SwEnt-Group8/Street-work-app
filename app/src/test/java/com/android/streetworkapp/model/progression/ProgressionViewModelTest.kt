@@ -41,6 +41,13 @@ class ProgressionViewModelTest {
   }
 
   @Test
+  fun getOrAddProgressionCallsRepository() = runTest {
+    progressionViewModel.getOrAddProgression("test")
+    testDispatcher.scheduler.advanceUntilIdle()
+    verify(repository).getOrAddProgression("test")
+  }
+
+  @Test
   fun getProgressionIdCallsRepository() = runTest {
     progressionViewModel.getNewProgressionId()
     testDispatcher.scheduler.advanceUntilIdle()

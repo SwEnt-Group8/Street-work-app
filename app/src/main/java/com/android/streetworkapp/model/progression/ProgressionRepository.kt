@@ -7,6 +7,8 @@ interface ProgressionRepository {
 
   fun getProgression(uid: String, onSuccess: (Progression) -> Unit, onFailure: (Exception) -> Unit)
 
+  suspend fun getOrAddProgression(uid: String): Progression
+
   suspend fun updateProgressionWithAchievementAndGoal(
       progressionId: String,
       achievements: List<String>,

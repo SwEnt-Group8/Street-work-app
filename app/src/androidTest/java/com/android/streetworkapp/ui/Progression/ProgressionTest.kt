@@ -16,9 +16,8 @@ import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.progress.ProgressScreen
 import io.mockk.MockKAnnotations
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
-import io.mockk.slot
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -56,6 +55,11 @@ class ProgressionTest {
 
   @Test
   fun isScreenDisplayed() {
+
+    coEvery { progressionRepository.getOrAddProgression(eq(mockedUser.uid)) } answers
+        {
+          Progression()
+        }
     composeTestRule.setContent {
       ProgressScreen(navigationActions, userViewModel, progressionViewModel)
     }
@@ -64,6 +68,12 @@ class ProgressionTest {
 
   @Test
   fun areAllComponentsDisplayed() {
+
+    coEvery { progressionRepository.getOrAddProgression(eq(mockedUser.uid)) } answers
+        {
+          Progression()
+        }
+
     composeTestRule.setContent {
       ProgressScreen(navigationActions, userViewModel, progressionViewModel)
     }
@@ -88,10 +98,10 @@ class ProgressionTest {
             eventsJoined = 14,
             achievements = listOf(MedalsAchievement.BRONZE.toString()))
 
-    val getProgressionOnSuccessSlot = slot<(Progression) -> Unit>()
-    every {
-      progressionRepository.getProgression(any(), capture(getProgressionOnSuccessSlot), any())
-    } answers { getProgressionOnSuccessSlot.captured(mockedProgression) }
+    coEvery { progressionRepository.getOrAddProgression(eq(mockedUser.uid)) } answers
+        {
+          mockedProgression
+        }
 
     composeTestRule.setContent {
       ProgressScreen(navigationActions, userViewModel, progressionViewModel)
@@ -134,10 +144,10 @@ class ProgressionTest {
             eventsJoined = 0,
             achievements = emptyList())
 
-    val getProgressionOnSuccessSlot = slot<(Progression) -> Unit>()
-    every {
-      progressionRepository.getProgression(any(), capture(getProgressionOnSuccessSlot), any())
-    } answers { getProgressionOnSuccessSlot.captured(mockedProgression) }
+    coEvery { progressionRepository.getOrAddProgression(eq(mockedUser.uid)) } answers
+        {
+          mockedProgression
+        }
 
     composeTestRule.setContent {
       ProgressScreen(navigationActions, userViewModel, progressionViewModel)

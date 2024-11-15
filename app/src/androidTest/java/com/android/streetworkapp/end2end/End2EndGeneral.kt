@@ -28,12 +28,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.Mockito.doAnswer
 import org.mockito.Mockito.mock
-import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.any
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.wheneverBlocking
 
 class End2EndGeneral {
@@ -96,13 +92,10 @@ class End2EndGeneral {
   fun e2eNavigationAndDisplaysCorrectDetailsExceptForParks() {
 
     // mock the mockedUser's progression
-    doAnswer { invocation ->
-          val onSuccessCallback = invocation.getArgument<(Progression) -> Unit>(1)
-          onSuccessCallback.invoke(mockedUserProgression)
-        }
-        .`when`(progressionRepository)
-        .getProgression(eq(mockedUser.uid), any<(Progression) -> Unit>(), any())
+    wheneverBlocking { progressionRepository.getOrAddProgression(mockedUser.uid) }
+        .thenReturn(mockedUserProgression)
 
+    // mock the mockedUser's friends
     wheneverBlocking { userRepository.getFriendsByUid(mockedUser.uid) }
         .thenReturn(mockedFriendsForMockedUser)
 
