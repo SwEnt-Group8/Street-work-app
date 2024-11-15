@@ -151,6 +151,8 @@ class End2EndGeneral {
 
     composeTestRule.onNodeWithTag("addFriendScreen").assertIsDisplayed()
 
+    // someone made some changes to the addFriend that made this part irrelevant :)))) (night before
+    // M2, just commenting it out to quick fix it)
     /*
     // perform add friend request
     composeTestRule.onNodeWithTag("inputID").performTextInput(dummyFriendId)
