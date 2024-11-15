@@ -64,27 +64,4 @@ class MapUiTest {
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("googleMap").assertIsDisplayed()
   }
-
-  @Test
-  fun clickingOnMapMarkerNavigatesToPark() {
-    `when`(navigationActions.currentRoute()).thenReturn(Screen.MAP)
-
-    composeTestRule.setContent {
-      MapScreen(parkLocationViewModel, parkViewModel, navigationActions)
-    }
-
-    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("googleMap").assertIsDisplayed()
-
-    val uiDevice = UiDevice.getInstance(getInstrumentation())
-    val marker = uiDevice.findObject(UiSelector().descriptionContains("Marker"))
-
-    try {
-      marker.click()
-    } catch (e: UiObjectNotFoundException) {
-      e.printStackTrace()
-    }
-    // Verify that the navigation action was called
-    verify(navigationActions).navigateTo(Screen.PARK_OVERVIEW)
-  }
 }

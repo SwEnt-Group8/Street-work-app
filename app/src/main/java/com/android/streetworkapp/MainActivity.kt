@@ -52,7 +52,6 @@ import java.util.Date
 import okhttp3.OkHttpClient
 
 class MainActivity : ComponentActivity() {
-  @RequiresApi(Build.VERSION_CODES.S)
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     Log.d("MainActivity", "Setup content")
@@ -62,7 +61,6 @@ class MainActivity : ComponentActivity() {
 
 // the testInvokation is super ugly but I have NOT found any other way to test the navigation from a
 // ui perspective since we don't use fragments
-@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
 
