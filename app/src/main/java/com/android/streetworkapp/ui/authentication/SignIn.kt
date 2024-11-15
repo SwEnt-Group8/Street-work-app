@@ -91,6 +91,7 @@ fun checkAndAddUser(user: FirebaseUser?, userViewModel: UserViewModel) {
   Log.d("SignInScreen", "Entered checkAndAddUser")
   if (user == null) return
   // Observe _user for the result of fetchUserByUid
+  observeAndSetCurrentUser(user, userViewModel)
 
   // userViewModel.user.observeForever(observer)
   userViewModel.getUserByUid(user.uid)
@@ -101,7 +102,8 @@ fun checkAndAddUser(user: FirebaseUser?, userViewModel: UserViewModel) {
           username = user.displayName ?: "Unknown",
           email = user.email ?: "No Email",
           score = 0,
-          friends = emptyList()))
+          friends = emptyList(),
+          picture = user.photoUrl.toString()))
 }
 
 /**
@@ -124,7 +126,8 @@ fun observeAndSetCurrentUser(user: FirebaseUser?, userViewModel: UserViewModel) 
               username = firebaseUser.displayName ?: "Unknown",
               email = firebaseUser.email ?: "No Email",
               score = 0,
-              friends = emptyList())
+              friends = emptyList(),
+              picture = firebaseUser.photoUrl.toString())
       userViewModel.addUser(newUser)
       userViewModel.setCurrentUser(newUser)
     } else {
