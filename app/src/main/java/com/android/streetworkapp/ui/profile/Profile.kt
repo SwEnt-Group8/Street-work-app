@@ -2,7 +2,6 @@ package com.android.streetworkapp.ui.profile
 
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -190,15 +189,7 @@ fun DisplayFriendItem(friend: User) {
       modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("friendItem"),
       verticalAlignment = Alignment.CenterVertically) {
         // Friend's avatar
-        Image(
-            painter = painterResource(id = R.drawable.profile),
-            contentDescription = "${friend.username}'s avatar",
-            modifier =
-                Modifier.size(80.dp)
-                    .clip(CircleShape)
-                    .padding(end = 16.dp)
-                    .testTag("friendProfilePicture"),
-            contentScale = ContentScale.Fit)
+        DisplayFriendPicture(friend)
 
         // Friend's info (name, score, status)
         Column(modifier = Modifier.weight(1f)) {
@@ -230,4 +221,46 @@ fun DisplayFriendItem(friend: User) {
                   contentDescription = "More options")
             }
       }
+}
+
+/**
+ * This function displays the friend profile picture.
+ *
+ * @param friend - The friend to display.
+ */
+@Composable
+fun DisplayFriendPicture(friend: User?) {
+  val DEFAULT_PROFILE_PICTURE = R.drawable.profile
+  if (friend != null) {
+    val photo = friend.picture
+
+    AsyncImage(
+        model =
+            ImageRequest.Builder(LocalContext.current)
+                .data(photo)
+                .placeholder(DEFAULT_PROFILE_PICTURE)
+                .build(),
+        contentDescription = "${friend.username}'s avatar",
+        modifier =
+            Modifier.size(80.dp)
+                .clip(CircleShape)
+                .border(2.dp, Color.LightGray, CircleShape)
+                .testTag("friendProfilePicture"),
+        contentScale = ContentScale.Crop)
+  } else {
+    // display the profile picture
+    AsyncImage(
+        model =
+            ImageRequest.Builder(LocalContext.current)
+                .data(DEFAULT_PROFILE_PICTURE)
+                .placeholder(DEFAULT_PROFILE_PICTURE)
+                .build(),
+        contentDescription = "fake avatar",
+        modifier =
+            Modifier.size(80.dp)
+                .clip(CircleShape)
+                .border(2.dp, Color.LightGray, CircleShape)
+                .testTag("friendProfilePicture"),
+        contentScale = ContentScale.Crop)
+  }
 }
