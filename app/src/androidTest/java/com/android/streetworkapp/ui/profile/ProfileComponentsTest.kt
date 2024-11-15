@@ -51,6 +51,13 @@ class ProfileComponentsTest {
   }
 
   @Test
+  fun isNullUserPictureCorrectlyDisplayed() {
+    val user = null
+    composeTestRule.setContent { DisplayFriendPicture(user) }
+    composeTestRule.onNodeWithTag("friendProfilePicture").assertExists().assertIsDisplayed()
+  }
+
+  @Test
   fun isFriendElementCorrectlyDisplayed() {
     val friend = User("uid-alice", "Alice", "alice@gmail.com", 42, emptyList(), "")
     val DEFAULT_USER_STATUS = "Definitely not a bot"
