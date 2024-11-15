@@ -120,7 +120,8 @@ class End2EndCreateEvent {
           { mapISLoaded = true },
           userViewModel,
           parkViewModel,
-          eventViewModel)
+          eventViewModel,
+          true)
     }
   }
 

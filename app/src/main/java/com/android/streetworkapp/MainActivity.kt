@@ -92,7 +92,8 @@ fun StreetWorkApp(
     mapCallbackOnMapLoaded: () -> Unit = {},
     userViewModel: UserViewModel,
     parkViewModel: ParkViewModel,
-    eventViewModel: EventViewModel
+    eventViewModel: EventViewModel,
+    e2eTesting: Boolean = false
 ) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
@@ -201,7 +202,11 @@ fun StreetWorkApp(
                 }
               }
             }
-        LaunchedEffect(navTestInvokation) { navigationActions.apply(navTestInvokation) }
+        if (e2eTesting) {
+          LaunchedEffect(navTestInvokation) { navigationActions.apply(navTestInvokation) }
+        } else {
+          navigationActions.apply(navTestInvokation)
+        }
       }
 }
 
