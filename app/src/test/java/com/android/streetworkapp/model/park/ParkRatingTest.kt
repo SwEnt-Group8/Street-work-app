@@ -34,7 +34,7 @@ class ParkRatingTest {
   @Test
   fun handlerCorrectlyCallingAddRatingForStarRatingValues() = runTest {
     // Instantiate basic (but correct) user :
-    val user = User("uid", "username", "email", 0, emptyList())
+    val user = User("uid", "username", "email", 0, emptyList(), picture = "")
 
     val starRatingValues = listOf(1, 2, 3, 4, 5, 0, -1, 100)
 
@@ -56,9 +56,9 @@ class ParkRatingTest {
   @Test
   fun handlerCorrectlyCallingAddRatingForUserValues() = runTest {
     // Instantiate basic (but correct) park :
-    val user1 = User("uid1", "username1", "email1", 0, emptyList())
-    val user2 = User("uid2", "username2", "email2", 0, emptyList())
-    val user3 = User("uid3", "username3", "email3", 0, emptyList())
+    val user1 = User("uid1", "username1", "email1", 0, emptyList(), picture = "")
+    val user2 = User("uid2", "username2", "email2", 0, emptyList(), picture = "")
+    val user3 = User("uid3", "username3", "email3", 0, emptyList(), picture = "")
 
     val userValues = listOf(null, user1, user2, null, user3)
     val starRating = 4
@@ -82,7 +82,7 @@ class ParkRatingTest {
   @Test
   fun handlerCorrectlyCallingAddRatingForParkValues() = runTest {
     val starRating = 1
-    val user = User("uid", "username", "email", 0, emptyList())
+    val user = User("uid", "username", "email", 0, emptyList(), picture = "")
 
     // Testing for park with no rating and park with rating :
     val ratedPark =

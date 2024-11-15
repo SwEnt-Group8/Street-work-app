@@ -39,6 +39,7 @@ class UserRepositoryFirestoreTest {
     batch = mock()
 
     whenever(db.collection("users")).thenReturn(collection)
+    whenever(document.getString("picture")).thenReturn("")
   }
 
   @Test
@@ -122,6 +123,7 @@ class UserRepositoryFirestoreTest {
     whenever(friendDocument1.getString("email")).thenReturn("friend1@example.com")
     whenever(friendDocument1.getLong("score")).thenReturn(50L)
     whenever(friendDocument1.get("friends")).thenReturn(emptyList<String>())
+    whenever(friendDocument1.getString("picture")).thenReturn("")
 
     val friendDocument2 = mock<DocumentSnapshot>()
     whenever(friendDocument2.exists()).thenReturn(true)
@@ -130,6 +132,7 @@ class UserRepositoryFirestoreTest {
     whenever(friendDocument2.getString("email")).thenReturn("friend2@example.com")
     whenever(friendDocument2.getLong("score")).thenReturn(60L)
     whenever(friendDocument2.get("friends")).thenReturn(emptyList<String>())
+    whenever(friendDocument2.getString("picture")).thenReturn("")
 
     // Mock QuerySnapshot for friends
     val friendsQuerySnapshot = mock<QuerySnapshot>()
@@ -161,12 +164,14 @@ class UserRepositoryFirestoreTest {
     assertEquals("friend1@example.com", friend1?.email)
     assertEquals(50, friend1?.score)
     assertTrue(friend1?.friends?.isEmpty() == true)
+    assertEquals("", friend1?.picture)
 
     assertNotNull(friend2)
     assertEquals("Friend Two", friend2?.username)
     assertEquals("friend2@example.com", friend2?.email)
     assertEquals(60, friend2?.score)
     assertTrue(friend2?.friends?.isEmpty() == true)
+    assertEquals("", friend1?.picture)
   }
 
   @Test
@@ -261,7 +266,8 @@ class UserRepositoryFirestoreTest {
             username = "John Doe",
             email = "john.doe@example.com",
             score = 100,
-            friends = listOf("friend1", "friend2"))
+            friends = listOf("friend1", "friend2"),
+            picture = "")
 
     `when`(db.collection("users")).thenReturn(collection)
     `when`(collection.document(user.uid)).thenReturn(documentRef)
@@ -452,7 +458,8 @@ class UserRepositoryFirestoreTest {
             username = "Test User",
             email = "test@example.com",
             score = 0,
-            friends = emptyList())
+            friends = emptyList(),
+            picture = "")
 
     // Mock Firestore interactions to throw an exception
     whenever(db.collection("users")).thenReturn(collection)
@@ -696,7 +703,13 @@ class UserRepositoryFirestoreTest {
     val user =
         userRepository.getOrAddUserByUid(
             "123",
-            User("123", "John Doe", "john.doe@example.com", 100, listOf("friend1", "friend2")))
+            User(
+                "123",
+                "John Doe",
+                "john.doe@example.com",
+                100,
+                listOf("friend1", "friend2"),
+                picture = ""))
 
     // Assert the result is not null and contains expected values
     assertNotNull(user)
@@ -726,7 +739,7 @@ class UserRepositoryFirestoreTest {
     `when`(documentRef.set(any(User::class.java))).thenReturn(Tasks.forResult(null))
 
     // Call the repository method
-    val newUser = User("invalid", "New User", "new.user@example.com", 0, emptyList())
+    val newUser = User("invalid", "New User", "new.user@example.com", 0, emptyList(), picture = "")
     val user = userRepository.getOrAddUserByUid("invalid", newUser)
 
     // Assert the result is not null and contains expected values
@@ -756,7 +769,13 @@ class UserRepositoryFirestoreTest {
     val user =
         userRepository.getOrAddUserByUid(
             "123",
-            User("123", "John Doe", "john.doe@example.com", 100, listOf("friend1", "friend2")))
+            User(
+                "123",
+                "John Doe",
+                "john.doe@example.com",
+                100,
+                listOf("friend1", "friend2"),
+                picture = ""))
 
     // Assert that the method returns null
     assertNull(user)

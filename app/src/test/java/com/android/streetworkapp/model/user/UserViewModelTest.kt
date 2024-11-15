@@ -47,7 +47,7 @@ class UserViewModelTest {
   @Test
   fun getUserByIdCallsRepositoryWithCorrectUid() = runTest {
     val uid = "user123"
-    val user = User(uid, "John Doe", "john@example.com", 100, emptyList())
+    val user = User(uid, "John Doe", "john@example.com", 100, emptyList(), picture = "")
     whenever(repository.getUserByUid(uid)).thenReturn(user)
     userViewModel.getUserByUid(uid)
     testDispatcher.scheduler.advanceUntilIdle()
@@ -57,7 +57,7 @@ class UserViewModelTest {
   @Test
   fun getUserByEmailCallsRepositoryWithCorrectEmail() = runTest {
     val email = "john@example.com"
-    val user = User("user123", "John Doe", email, 100, emptyList())
+    val user = User("user123", "John Doe", email, 100, emptyList(), picture = "")
     whenever(repository.getUserByEmail(email)).thenReturn(user)
     userViewModel.getUserByEmail(email)
     testDispatcher.scheduler.advanceUntilIdle()
@@ -67,7 +67,7 @@ class UserViewModelTest {
   @Test
   fun getUserByUserNameCallsRepositoryWithCorrectUsername() = runTest {
     val userName = "John Doe"
-    val user = User("user123", userName, "john@example.com", 0, emptyList())
+    val user = User("user123", userName, "john@example.com", 0, emptyList(), picture = "")
     whenever(repository.getUserByUserName(userName)).thenReturn(user)
     userViewModel.getUserByUserName(userName)
     testDispatcher.scheduler.advanceUntilIdle()
@@ -79,8 +79,8 @@ class UserViewModelTest {
     val uid = "user123"
     val friends =
         listOf(
-            User("friend1", "Friend One", "friend1@example.com", 50, emptyList()),
-            User("friend2", "Friend Two", "friend2@example.com", 60, emptyList()))
+            User("friend1", "Friend One", "friend1@example.com", 50, emptyList(), picture = ""),
+            User("friend2", "Friend Two", "friend2@example.com", 60, emptyList(), picture = ""))
     whenever(repository.getFriendsByUid(uid)).thenReturn(friends)
     userViewModel.getFriendsByUid(uid)
     testDispatcher.scheduler.advanceUntilIdle()
@@ -89,7 +89,7 @@ class UserViewModelTest {
 
   @Test
   fun addUserCallsRepositoryWithCorrectUser() = runTest {
-    val user = User("user123", "John Doe", "john@example.com", 100, emptyList())
+    val user = User("user123", "John Doe", "john@example.com", 100, emptyList(), picture = "")
     userViewModel.addUser(user)
     testDispatcher.scheduler.advanceUntilIdle()
     verify(repository).addUser(user)
@@ -136,7 +136,7 @@ class UserViewModelTest {
 
   @Test
   fun loadCurrentUserCallsRepositoryWithCorrectUidAndUpdatesCurrentUser() = runTest {
-    val user = User("user123", "John Doe", "john@example.com", 100, emptyList())
+    val user = User("user123", "John Doe", "john@example.com", 100, emptyList(), picture = "")
     userViewModel.loadCurrentUser(user)
     testDispatcher.scheduler.advanceUntilIdle()
     val observedUser = userViewModel.currentUser.first()
@@ -145,7 +145,7 @@ class UserViewModelTest {
 
   @Test
   fun setCurrentUserUpdatesCurrentUser() = runTest {
-    val user = User("user123", "John Doe", "john@example.com", 100, emptyList())
+    val user = User("user123", "John Doe", "john@example.com", 100, emptyList(), picture = "")
     userViewModel.setCurrentUser(user)
     val observedUser = userViewModel.currentUser.first()
     assertEquals(user, observedUser)
@@ -153,7 +153,7 @@ class UserViewModelTest {
 
   @Test
   fun getUserUpdatesUser() = runTest {
-    val user = User("user123", "Jane Doe", "jane@example.com", 50, emptyList())
+    val user = User("user123", "Jane Doe", "jane@example.com", 50, emptyList(), picture = "")
     whenever(repository.getUserByEmail("jane@example.com")).thenReturn(user)
     userViewModel.getUserByEmail("jane@example.com")
     testDispatcher.scheduler.advanceUntilIdle()
@@ -167,8 +167,8 @@ class UserViewModelTest {
     val uid = "user123"
     val friends =
         listOf(
-            User("friend1", "Friend One", "friend1@example.com", 50, emptyList()),
-            User("friend2", "Friend Two", "friend2@example.com", 60, emptyList()))
+            User("friend1", "Friend One", "friend1@example.com", 50, emptyList(), picture = ""),
+            User("friend2", "Friend Two", "friend2@example.com", 60, emptyList(), picture = ""))
     whenever(repository.getFriendsByUid(uid)).thenReturn(friends)
     userViewModel.getFriendsByUid(uid)
     testDispatcher.scheduler.advanceUntilIdle()
@@ -180,7 +180,7 @@ class UserViewModelTest {
   @Test
   fun getOrAddUserByUidCallsRepositoryWithCorrectUidAndUser() = runTest {
     val uid = "user123"
-    val user = User(uid, "John Doe", "john@example.com", 100, emptyList())
+    val user = User(uid, "John Doe", "john@example.com", 100, emptyList(), picture = "")
     whenever(repository.getOrAddUserByUid(uid, user)).thenReturn(user)
     userViewModel.getOrAddUserByUid(uid, user)
     testDispatcher.scheduler.advanceUntilIdle()
@@ -190,7 +190,7 @@ class UserViewModelTest {
   @Test
   fun getOrAddUserByUidUpdateUser() = runTest {
     val uid = "user123"
-    val user = User(uid, "John Doe", "john@example.com", 100, emptyList())
+    val user = User(uid, "John Doe", "john@example.com", 100, emptyList(), picture = "")
     whenever(repository.getOrAddUserByUid(uid, user)).thenReturn(user)
     userViewModel.getOrAddUserByUid(uid, user)
     testDispatcher.scheduler.advanceUntilIdle()

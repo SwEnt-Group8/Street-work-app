@@ -107,5 +107,6 @@ fun createNewUserFromFirebaseUser(firebaseUser: FirebaseUser): User {
       username = firebaseUser.displayName ?: "",
       email = firebaseUser.email ?: "",
       score = 0,
-      friends = emptyList())
+      friends = emptyList(),
+      picture = "")
 }

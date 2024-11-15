@@ -1,5 +1,6 @@
 package com.android.streetworkapp.ui.authentication
 
+import android.net.Uri
 import com.google.firebase.auth.FirebaseUser
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
@@ -14,6 +15,7 @@ class SignInTest {
   @Before
   fun setUp() {
     firebaseUser = Mockito.mock(FirebaseUser::class.java)
+    Mockito.`when`(firebaseUser.photoUrl).thenReturn(Uri.EMPTY)
   }
 
   @Test
@@ -32,6 +34,7 @@ class SignInTest {
     assertEquals("testuser@example.com", user.email)
     assertEquals(0, user.score)
     assertEquals(emptyList<String>(), user.friends)
+    assertEquals("", user.picture)
   }
 
   @Test
