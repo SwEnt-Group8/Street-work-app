@@ -26,13 +26,13 @@ data class Progression(
  *
  * @param icon The icon.
  * @param title The title of this progression.
- * @param tag The tags linked to this achievement.
+ * @param tags The tags linked to this achievement.
  * @param description A description of the achievement.
  */
 data class Achievement(
     val icon: Int,
     val title: String,
-    val tag: List<String>,
+    val tags: List<String>,
     val description: String
 )
 
@@ -49,4 +49,10 @@ enum class MedalsAchievement(val achievement: Achievement) {
   SILVER(Achievement(R.drawable.place_holder, "Silver medal", emptyList(), "Second medal")),
   GOLD(Achievement(R.drawable.place_holder, "Gold medal", emptyList(), "Third medal")),
   PLATINUM(Achievement(R.drawable.place_holder, "Platinum medal", emptyList(), "Last medal"))
+}
+
+enum class SCORE_INCREASE(val scoreAdded: Int) {
+  CREATE_EVENT(10),
+  JOIN_EVENT(5),
+  ADD_FRIEND(10)
 }
