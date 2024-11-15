@@ -37,7 +37,6 @@ class ProgressionRepositoryFirestore(private val db: FirebaseFirestore) : Progre
           .get()
           .addOnSuccessListener { documents ->
             val progression = documentToProgression(documents.documents[0])
-
             onSuccess(progression)
           }
           .addOnFailureListener(onFailure)

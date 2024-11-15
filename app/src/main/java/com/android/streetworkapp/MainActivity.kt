@@ -24,6 +24,8 @@ import com.android.streetworkapp.model.park.ParkRepositoryFirestore
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
+import com.android.streetworkapp.model.progression.ProgressionRepositoryFirestore
+import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.authentication.SignInScreen
@@ -82,8 +84,18 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
   val eventRepository = EventRepositoryFirestore(firestoreDB)
   val eventViewModel = EventViewModel(eventRepository)
 
+  // Instantiate progression repository
+  val progressionRepository = ProgressionRepositoryFirestore(firestoreDB)
+  val progressionViewModel = ProgressionViewModel(progressionRepository)
+
   StreetWorkApp(
-      parkLocationViewModel, testInvokation, {}, userViewModel, parkViewModel, eventViewModel)
+      parkLocationViewModel,
+      testInvokation,
+      {},
+      userViewModel,
+      parkViewModel,
+      eventViewModel,
+      progressionViewModel)
 }
 
 @RequiresApi(Build.VERSION_CODES.S)
@@ -94,7 +106,9 @@ fun StreetWorkApp(
     mapCallbackOnMapLoaded: () -> Unit = {},
     userViewModel: UserViewModel,
     parkViewModel: ParkViewModel,
-    eventViewModel: EventViewModel
+    eventViewModel: EventViewModel,
+    progressionViewModel: ProgressionViewModel,
+    navTestInvokationOnEachRecompose: Boolean = false
 ) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
@@ -103,6 +117,8 @@ fun StreetWorkApp(
     mutableStateOf<String?>(null)
   } // not using by here since I want to pass the mutableState to a fn
   var screenParams by remember { mutableStateOf<ScreenParams?>(null) }
+
+  var firstTimeLoaded by remember { mutableStateOf<Boolean>(true) }
 
   navigationActions.registerStringListenerOnDestinationChange(currentScreenName)
   screenParams = LIST_OF_SCREENS.find { currentScreenName.value == it.screenName }
@@ -164,7 +180,10 @@ fun StreetWorkApp(
                 composable(Screen.AUTH) { SignInScreen(navigationActions, userViewModel) }
               }
               navigation(startDestination = Screen.PROGRESSION, route = Route.PROGRESSION) {
-                composable(Screen.PROGRESSION) { ProgressScreen(navigationActions, innerPadding) }
+                composable(Screen.PROGRESSION) {
+                  ProgressScreen(
+                      navigationActions, userViewModel, progressionViewModel, innerPadding)
+                }
               }
               navigation(
                   startDestination = Screen.MAP,
@@ -202,6 +221,10 @@ fun StreetWorkApp(
                 composable(Screen.ADD_FRIEND) { AddFriendScreen(userViewModel, innerPadding) }
               }
             }
-        navigationActions.apply(navTestInvokation)
+
+        if (firstTimeLoaded || navTestInvokationOnEachRecompose) {
+          firstTimeLoaded = false
+          navigationActions.apply(navTestInvokation)
+        }
       }
 }
