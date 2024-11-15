@@ -19,6 +19,33 @@ class ProgressionRepositoryFirestore(private val db: FirebaseFirestore) : Progre
   }
 
   /**
+   * Returns the existing progression linked to the uid, or creates a new one if none is found
+   *
+   * @param uid: The uid (User Id)
+   */
+
+  // Note: for reviewers, the viewmodel implementation that was done wasn't compatible with our
+  // userviewmodel, this is a quick fix I made, will need to rework the whole viewmodel in later pr
+  override suspend fun getOrAddProgression(uid: String): Progression {
+    require(uid.isNotEmpty()) { "Empty UID" }
+    return try {
+      val document = db.collection(COLLECTION_PATH).whereEqualTo("uid", uid).get().await()
+      if (document.isEmpty) {
+        val progressionId = this.getNewProgressionId()
+        val progression = Progression(progressionId, uid, Ranks.BRONZE.score)
+        db.collection(COLLECTION_PATH).document().set(progression).await()
+
+        progression
+      } else {
+        documentToProgression(document.documents[0])
+      }
+    } catch (e: Exception) {
+      Log.e("FirestoreError", "Error getting or creating Progression from user uid: ${e.message}")
+      Progression("", "", 0, 0, 0, emptyList())
+    }
+  }
+
+  /**
    * Fetch the progression linked to the given uid
    *
    * @param uid: The uid (User Id)
@@ -28,7 +55,7 @@ class ProgressionRepositoryFirestore(private val db: FirebaseFirestore) : Progre
   override fun getProgression(
       uid: String,
       onSuccess: (Progression) -> Unit,
-      onFailure: (Exception) -> Unit
+      onFailure: (Exception) -> Unit,
   ) {
     require(uid.isNotEmpty()) { ERROR_UID_EMPTY }
     try {

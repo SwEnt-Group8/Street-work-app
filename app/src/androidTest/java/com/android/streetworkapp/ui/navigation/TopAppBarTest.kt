@@ -7,55 +7,25 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import com.android.streetworkapp.StreetWorkApp
-import com.android.streetworkapp.model.event.EventRepositoryFirestore
+import com.android.streetworkapp.model.event.EventRepository
 import com.android.streetworkapp.model.event.EventViewModel
-import com.android.streetworkapp.model.park.ParkRepositoryFirestore
+import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.park.ParkViewModel
-import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
-import com.android.streetworkapp.model.parklocation.ParkLocation
+import com.android.streetworkapp.model.parklocation.ParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
-import com.android.streetworkapp.model.progression.ProgressionRepositoryFirestore
+import com.android.streetworkapp.model.progression.ProgressionRepository
 import com.android.streetworkapp.model.progression.ProgressionViewModel
-import com.android.streetworkapp.model.user.UserRepositoryFirestore
+import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
-import io.mockk.every
 import io.mockk.mockk
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mockito.RETURNS_DEFAULTS
+import org.mockito.Mockito.mock
 
 class TopAppBarTest {
 
-  private lateinit var parkLocationRepository: OverpassParkLocationRepository
-  private lateinit var parkLocationViewModel: ParkLocationViewModel
-
   @get:Rule val composeTestRule = createComposeRule()
-
-  @Before
-  fun setUp() {
-    val mockParkList =
-        listOf(
-            ParkLocation(lat = 46.518659400000004, lon = 6.566561505148001, id = "1"),
-            ParkLocation(lat = 34.052235, lon = -118.243683, id = "2"),
-            ParkLocation(lat = 51.507351, lon = -0.127758, id = "3"),
-            ParkLocation(lat = 35.676192, lon = 139.650311, id = "4"),
-            ParkLocation(lat = -33.868820, lon = 151.209290, id = "5"))
-
-    parkLocationRepository = mockk<OverpassParkLocationRepository>()
-    every {
-      parkLocationRepository.search(
-          any<Double>(),
-          any<Double>(),
-          any<(List<ParkLocation>) -> Unit>(),
-          any<(Exception) -> Unit>())
-    } answers
-        {
-          val onSuccess = this.args[2] as (List<ParkLocation>) -> Unit
-          onSuccess(mockParkList) // Invoke onSuccess with the custom list
-        }
-
-    parkLocationViewModel = ParkLocationViewModel(parkLocationRepository)
-  }
 
   @Test
   fun changingTitleInManagerMakesItChangeOnScreen() {
@@ -76,13 +46,13 @@ class TopAppBarTest {
             LIST_OF_SCREENS.first()) // can't call setContent twice per test so we use this instead
     composeTestRule.setContent {
       StreetWorkApp(
-          parkLocationViewModel,
+          ParkLocationViewModel(mock(ParkLocationRepository::class.java, RETURNS_DEFAULTS)),
           { navigateTo(currentScreenParam.value.screenName) },
           {},
-          UserViewModel(mockk<UserRepositoryFirestore>()),
-          ParkViewModel(mockk<ParkRepositoryFirestore>()),
-          EventViewModel(mockk<EventRepositoryFirestore>()),
-          ProgressionViewModel(mockk<ProgressionRepositoryFirestore>()),
+          UserViewModel(mock(UserRepository::class.java, RETURNS_DEFAULTS)),
+          ParkViewModel(mock(ParkRepository::class.java, RETURNS_DEFAULTS)),
+          EventViewModel(mock(EventRepository::class.java, RETURNS_DEFAULTS)),
+          ProgressionViewModel(mock(ProgressionRepository::class.java, RETURNS_DEFAULTS)),
           true)
     }
 
