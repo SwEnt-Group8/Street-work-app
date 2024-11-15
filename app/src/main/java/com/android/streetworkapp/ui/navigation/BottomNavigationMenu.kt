@@ -98,7 +98,8 @@ fun EventBottomBar(participants: Int, maxParticipants: Int) {
                 Toast.makeText(context, "not yet implemented", Toast.LENGTH_LONG).show()
               },
               modifier = Modifier.testTag("joinEventButton"),
-              enabled = participants < maxParticipants) {
+              enabled = participants < maxParticipants,
+              colors = ColorPalette.BUTTON_COLOR) {
                 Text("Join this event", modifier = Modifier.testTag("joinEventButtonText"))
               }
         }

@@ -93,6 +93,7 @@ class EventOverviewTest {
 
     composeTestRule.onNodeWithTag("eventOverviewScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("eventContent").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("eventTitle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("ownerIcon").assertIsDisplayed()
     composeTestRule.onNodeWithTag("eventOwner").assertIsDisplayed()
     composeTestRule.onNodeWithTag("dateIcon").assertIsDisplayed()
@@ -102,7 +103,6 @@ class EventOverviewTest {
     composeTestRule.onNodeWithTag("locationIcon").assertIsDisplayed()
     composeTestRule.onNodeWithTag("location").assertIsDisplayed()
     composeTestRule.onNodeWithTag("googleMap").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("eventImage").assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("eventOwner").assertTextEquals("Organized by: ${event.owner}")
     composeTestRule.onNodeWithTag("date").assertTextEquals(event.date.toFormattedString())

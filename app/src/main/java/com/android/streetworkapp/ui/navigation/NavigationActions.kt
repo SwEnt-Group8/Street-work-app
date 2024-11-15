@@ -74,7 +74,7 @@ data class ScreenParams(
             BottomNavigationMenuType.DEFAULT,
             isTopBarVisible = true,
             TopAppBarManager(
-                "<Park Name>",
+                "Park Overview",
                 hasNavigationIcon = true,
                 navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
     val ADD_EVENT =
@@ -94,7 +94,7 @@ data class ScreenParams(
             BottomNavigationMenuType.EVENT_OVERVIEW,
             isTopBarVisible = true,
             TopAppBarManager(
-                "<Event Name>",
+                "Event Overview",
                 hasNavigationIcon = true,
                 navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
     val PROGRESSION =

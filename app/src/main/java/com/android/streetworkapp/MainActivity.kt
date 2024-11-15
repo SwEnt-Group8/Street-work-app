@@ -1,9 +1,11 @@
 package com.android.streetworkapp
 
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -17,6 +19,7 @@ import androidx.navigation.navigation
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
 import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.park.NominatimParkNameRepository
 import com.android.streetworkapp.model.park.ParkRepositoryFirestore
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
@@ -64,6 +67,7 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
 
   // repositories
   val overpassParkLocationRepo = OverpassParkLocationRepository(OkHttpClient())
+  val parkNameRepository = NominatimParkNameRepository(OkHttpClient())
   // viewmodels
   val parkLocationViewModel = ParkLocationViewModel(overpassParkLocationRepo)
 
@@ -74,7 +78,7 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
 
   // Instantiate park repository :
   val parkRepository = ParkRepositoryFirestore(firestoreDB)
-  val parkViewModel = ParkViewModel(parkRepository)
+  val parkViewModel = ParkViewModel(parkRepository, parkNameRepository)
 
   // Instantiate event repository :
   val eventRepository = EventRepositoryFirestore(firestoreDB)
@@ -94,6 +98,7 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
       progressionViewModel)
 }
 
+@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun StreetWorkApp(
     parkLocationViewModel: ParkLocationViewModel,
@@ -193,7 +198,8 @@ fun StreetWorkApp(
                       innerPadding)
                 }
                 composable(Screen.PARK_OVERVIEW) {
-                  ParkOverviewScreen(parkViewModel, innerPadding, navigationActions, eventViewModel)
+                  ParkOverviewScreen(
+                      parkViewModel, innerPadding, navigationActions, eventViewModel, userViewModel)
                 }
                 composable(Screen.ADD_EVENT) {
                   AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
@@ -212,9 +218,7 @@ fun StreetWorkApp(
                   ProfileScreen(navigationActions, userViewModel, innerPadding)
                 }
                 // screen for adding friend
-                composable(Screen.ADD_FRIEND) {
-                  AddFriendScreen(navigationActions, userViewModel, innerPadding)
-                }
+                composable(Screen.ADD_FRIEND) { AddFriendScreen(userViewModel, innerPadding) }
               }
             }
 
@@ -223,14 +227,4 @@ fun StreetWorkApp(
           navigationActions.apply(navTestInvokation)
         }
       }
-}
-
-@Composable
-fun Streetworkapp(testing: Boolean) {
-  Log.d("Empty composable", "This should be completed")
-  if (testing) {
-    Log.d("Empty composable", "Context is null")
-  } else {
-    Log.d("Empty composable", "Context is not null")
-  }
 }

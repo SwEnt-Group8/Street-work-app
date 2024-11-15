@@ -55,6 +55,7 @@ import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.theme.ColorPalette
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -140,8 +141,8 @@ fun AddEventScreen(
                   .padding(40.dp)
                   .size(width = 150.dp, height = 40.dp)
                   .testTag("addEventButton"),
-          containerColor = Color.Blue,
-          contentColor = Color.White) {
+          containerColor = ColorPalette.INTERACTION_COLOR_DARK,
+          contentColor = ColorPalette.PRIMARY_TEXT_COLOR) {
             Text("Add new event")
           }
     }

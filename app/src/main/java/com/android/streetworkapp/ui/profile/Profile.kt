@@ -42,6 +42,7 @@ import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
+import com.android.streetworkapp.ui.theme.ColorPalette
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -94,7 +95,8 @@ fun ProfileScreen(
             // Add Friend Button
             Button(
                 onClick = { navigationActions.navigateTo(Screen.ADD_FRIEND) },
-                modifier = Modifier.padding(horizontal = 4.dp).testTag("profileAddButton")) {
+                modifier = Modifier.padding(horizontal = 4.dp).testTag("profileAddButton"),
+                colors = ColorPalette.BUTTON_COLOR) {
                   Text(text = "Add friend")
                 }
           }
