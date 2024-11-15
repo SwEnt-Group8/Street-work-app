@@ -8,10 +8,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
 /** A repository interface using Firestore for park data. */
-class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepository {
+class ParkRepositoryFirestore(private val db: FirebaseFirestore, testing: Boolean = false) :
+    ParkRepository {
+
+  private val COLLECTION_PATH: String = if (testing) "testParks" else "parks"
 
   companion object {
-    private const val COLLECTION_PATH = "parks"
     private const val INVALID_RATING_MESSAGE = "Rating must be between 1 and 5."
     private const val PID_EMPTY = "Park ID cannot be empty."
     private const val LID_EMPTY = "Location ID cannot be empty."
