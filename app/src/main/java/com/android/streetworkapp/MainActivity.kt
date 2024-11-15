@@ -6,7 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -221,9 +220,9 @@ fun StreetWorkApp(
               }
             }
 
-        if (e2eEventTesting) {
+        /* if (e2eEventTesting) {
           LaunchedEffect(navTestInvokation) { navigationActions.apply(navTestInvokation) }
-        } else if (firstTimeLoaded || navTestInvokationOnEachRecompose) {
+        } else */ if (firstTimeLoaded || navTestInvokationOnEachRecompose) {
           firstTimeLoaded = false
           navigationActions.apply(navTestInvokation)
         }
