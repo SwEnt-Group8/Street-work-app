@@ -1,13 +1,12 @@
 package com.android.streetworkapp
 
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.annotation.RequiresApi
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -98,7 +97,6 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
       progressionViewModel)
 }
 
-@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun StreetWorkApp(
     parkLocationViewModel: ParkLocationViewModel,
@@ -108,7 +106,8 @@ fun StreetWorkApp(
     parkViewModel: ParkViewModel,
     eventViewModel: EventViewModel,
     progressionViewModel: ProgressionViewModel,
-    navTestInvokationOnEachRecompose: Boolean = false
+    navTestInvokationOnEachRecompose: Boolean = false,
+    e2eEventTesting: Boolean = false
 ) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
@@ -222,7 +221,9 @@ fun StreetWorkApp(
               }
             }
 
-        if (firstTimeLoaded || navTestInvokationOnEachRecompose) {
+        if (e2eEventTesting) {
+          LaunchedEffect(navTestInvokation) { navigationActions.apply(navTestInvokation) }
+        } else if (firstTimeLoaded || navTestInvokationOnEachRecompose) {
           firstTimeLoaded = false
           navigationActions.apply(navTestInvokation)
         }

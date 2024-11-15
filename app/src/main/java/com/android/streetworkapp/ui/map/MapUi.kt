@@ -74,7 +74,7 @@ fun MapScreen(
     val cameraPositionState = rememberCameraPositionState {
       position = CameraPosition.Builder().target(initialLatLng.value).zoom(12f).build()
     }
-
+    var markerIndex = 0
     // Display the Google Map
     GoogleMap(
         onMapLoaded = callbackOnMapLoaded,
@@ -92,8 +92,9 @@ fun MapScreen(
 
           // marker for parks
           parks.forEach { park ->
+            ++markerIndex
             Marker(
-                contentDescription = "Marker",
+                contentDescription = "Marker$markerIndex",
                 state = MarkerState(position = LatLng(park.lat, park.lon)),
                 onClick = {
                   parkViewModel.getOrCreateParkByLocation(park)
