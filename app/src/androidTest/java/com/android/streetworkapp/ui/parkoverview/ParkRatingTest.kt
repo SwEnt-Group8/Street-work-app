@@ -126,7 +126,7 @@ class ParkRatingTest {
 
   @Test
   fun isRatingButtonCorrectlyDisplayedWhenNoRating() {
-    val user = User("uid", "username", "email", 0, emptyList())
+    val user = User("uid", "username", "email", 0, emptyList(), picture = "")
 
     composeTestRule.setContent { ParkDetails(emptyPark, showRatingDialog, user) }
 
@@ -136,7 +136,7 @@ class ParkRatingTest {
 
   @Test
   fun isRatingButtonCorrectlyDisplayedWhenRating() {
-    val user = User("uid", "username", "email", 0, emptyList())
+    val user = User("uid", "username", "email", 0, emptyList(), picture = "")
 
     // Set the user as having rated the emptyPark.
     emptyPark.votersUIDs = listOf(user.uid)
