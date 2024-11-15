@@ -10,9 +10,6 @@ import com.android.streetworkapp.StreetWorkApp
 import com.android.streetworkapp.model.event.EventRepository
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.ParkRepository
-import com.android.streetworkapp.model.event.EventRepositoryFirestore
-import com.android.streetworkapp.model.event.EventViewModel
-import com.android.streetworkapp.model.park.ParkRepositoryFirestore
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.ParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
@@ -20,11 +17,6 @@ import com.android.streetworkapp.model.progression.ProgressionRepository
 import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
-import com.android.streetworkapp.model.progression.ProgressionRepositoryFirestore
-import com.android.streetworkapp.model.progression.ProgressionViewModel
-import com.android.streetworkapp.model.user.UserRepositoryFirestore
-import com.android.streetworkapp.model.user.UserViewModel
-import io.mockk.every
 import io.mockk.mockk
 import org.junit.Rule
 import org.junit.Test
@@ -60,7 +52,8 @@ class TopAppBarTest {
           UserViewModel(mock(UserRepository::class.java, RETURNS_DEFAULTS)),
           ParkViewModel(mock(ParkRepository::class.java, RETURNS_DEFAULTS)),
           EventViewModel(mock(EventRepository::class.java, RETURNS_DEFAULTS)),
-          ProgressionViewModel(mock(ProgressionRepository::class.java, RETURNS_DEFAULTS)))
+          ProgressionViewModel(mock(ProgressionRepository::class.java, RETURNS_DEFAULTS)),
+          true)
     }
 
     for (screenParam in LIST_OF_SCREENS) {
