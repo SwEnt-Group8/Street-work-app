@@ -1,6 +1,5 @@
 package com.android.streetworkapp.model.progression
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.streetworkapp.model.progression.MedalsAchievement.BRONZE
@@ -17,10 +16,6 @@ open class ProgressionViewModel(private val repository: ProgressionRepository) :
 
   private val _currentProgression = MutableStateFlow<Progression>(Progression())
   val currentProgression: StateFlow<Progression> = _currentProgression.asStateFlow()
-
-  companion object {
-    private const val ERROR_UID_EMPTY = "The uid must not be empty."
-  }
 
   /**
    * Used to have a unique progressionId in the database.
@@ -39,29 +34,6 @@ open class ProgressionViewModel(private val repository: ProgressionRepository) :
   fun getOrAddProgression(uid: String) {
     viewModelScope.launch { _currentProgression.value = repository.getOrAddProgression(uid) }
   }
-
-  /**
-   * Fetch the progression linked to the given uid
-   *
-   * @param uid: The uid (User Id)
-   */
-  fun getCurrentProgression(uid: String) {
-    require(uid.isNotEmpty()) { ERROR_UID_EMPTY }
-
-    repository.getProgression(
-        uid = uid,
-        onSuccess = { progression -> _currentProgression.value = progression },
-        onFailure = { Log.e("FirestoreError", "Error getting events: ${it.message}") })
-  }
-
-  /**
-   * Create the progression linked to the given uid
-   *
-   * @param uid: The uid (User Id)
-   * @param progressionId: The id of the "progression" object
-   */
-  fun createProgression(uid: String, progressionId: String) =
-      viewModelScope.launch { repository.createProgression(uid, progressionId) }
 
   /**
    * Check the score of the user. With enough points, the user wins medals. This function should be

@@ -9,7 +9,6 @@ class ProgressionRepositoryFirestore(private val db: FirebaseFirestore) : Progre
 
   companion object {
     private const val COLLECTION_PATH = "progressions"
-    private const val ERROR_UID_EMPTY = "The uid must not be empty."
     private const val ERROR_PID_EMPTY = "The progression id must not be empty."
   }
 
@@ -23,9 +22,6 @@ class ProgressionRepositoryFirestore(private val db: FirebaseFirestore) : Progre
    *
    * @param uid: The uid (User Id)
    */
-
-  // Note: for reviewers, the viewmodel implementation that was done wasn't compatible with our
-  // userviewmodel, this is a quick fix I made, will need to rework the whole viewmodel in later pr
   override suspend fun getOrAddProgression(uid: String): Progression {
     require(uid.isNotEmpty()) { "Empty UID" }
     return try {
@@ -46,33 +42,6 @@ class ProgressionRepositoryFirestore(private val db: FirebaseFirestore) : Progre
   }
 
   /**
-   * Fetch the progression linked to the given uid
-   *
-   * @param uid: The uid (User Id)
-   * @param onSuccess The callback to execute on success.
-   * @param onFailure The callback to execute on failure.
-   */
-  override fun getProgression(
-      uid: String,
-      onSuccess: (Progression) -> Unit,
-      onFailure: (Exception) -> Unit,
-  ) {
-    require(uid.isNotEmpty()) { ERROR_UID_EMPTY }
-    try {
-      db.collection(COLLECTION_PATH)
-          .whereEqualTo("uid", uid)
-          .get()
-          .addOnSuccessListener { documents ->
-            val progression = documentToProgression(documents.documents[0])
-            onSuccess(progression)
-          }
-          .addOnFailureListener(onFailure)
-    } catch (e: Exception) {
-      Log.e("FirestoreError", "Error getting progression. Reason: ${e.message}")
-    }
-  }
-
-  /**
    * Used to change the next goal and to add new achievements.
    *
    * @param progressionId: the id of a progression object
@@ -89,24 +58,6 @@ class ProgressionRepositoryFirestore(private val db: FirebaseFirestore) : Progre
       db.collection(COLLECTION_PATH)
           .document(progressionId)
           .update("currentGoal", goal, "achievements", achievements)
-          .await()
-    } catch (e: Exception) {
-      Log.e("FirestoreError", "Error: ${e.message}")
-    }
-  }
-
-  /**
-   * Used to create a new progression object in the database
-   *
-   * @param progressionId: the id of a progression object
-   * @param uid: The new list of achievements
-   */
-  override suspend fun createProgression(uid: String, progressionId: String) {
-    require(uid.isNotEmpty()) { ERROR_UID_EMPTY }
-    try {
-      db.collection(COLLECTION_PATH)
-          .document(progressionId)
-          .set(Progression(progressionId, uid, Ranks.BRONZE.score))
           .await()
     } catch (e: Exception) {
       Log.e("FirestoreError", "Error: ${e.message}")
