@@ -29,6 +29,14 @@ data class Comment(
 
 //Responses data classes
 @Serializable
+data class SuccessResponse(
+    val attributeScores: Map<String, AttributeScore>,
+    val languages: List<String>,
+    val detectedLanguages: List<String>
+)
+
+
+@Serializable
 data class AttributeScore(
     val spanScores: List<SpanScore>,
     val summaryScore: Score
@@ -116,5 +124,13 @@ enum class PerspectiveApiErrors(val errorMessage: String) {
      */
     JSON_DESERIALIZATION_ERROR("Failed to deserialize input from Perspective API response"),
 
-    UNSUPPORTED_HTTP_CODE("Received an unsupported HTTP code")
+    /**
+     * Received a HTTP code not included in {200, 400}
+     */
+    UNSUPPORTED_HTTP_CODE("Received an unsupported HTTP code"),
+
+    /**
+     * Received an empty body as API response
+     */
+    EMPTY_BODY_RESPONSE("Received an empty body in Perspective API response")
 }
