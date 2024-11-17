@@ -2,5 +2,6 @@ package com.android.streetworkapp.model.moderation
 
 interface TextModerationRepository {
     suspend fun evaluateText(content: String): List<TagAnnotation>?
-    fun formatPostRequestBody(content: String) : String
+    fun formatPostRequestBody(content: String): String
+    fun extractTagAndProbabilitiesFromResponseBody(responseBody: String): List<TagAnnotation>?
 }
