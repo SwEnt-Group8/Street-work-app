@@ -27,20 +27,6 @@ class ProgressionViewModelTest {
   }
 
   @Test
-  fun createProgressionCallsRepository() = runTest {
-    progressionViewModel.createProgression("test", "test")
-    testDispatcher.scheduler.advanceUntilIdle()
-    verify(repository).createProgression("test", "test")
-  }
-
-  @Test
-  fun getProgressionCallsRepository() = runTest {
-    progressionViewModel.getCurrentProgression("test")
-    testDispatcher.scheduler.advanceUntilIdle()
-    verify(repository).getProgression(any(), any(), any())
-  }
-
-  @Test
   fun getOrAddProgressionCallsRepository() = runTest {
     progressionViewModel.getOrAddProgression("test")
     testDispatcher.scheduler.advanceUntilIdle()

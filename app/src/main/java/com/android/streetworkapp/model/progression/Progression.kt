@@ -40,7 +40,8 @@ enum class Ranks(val score: Int) {
   BRONZE(100),
   SILVER(1000),
   GOLD(10000),
-  PLATINUM(100000)
+  PLATINUM(100000),
+  CEILING(100000)
 }
 
 enum class MedalsAchievement(val achievement: Achievement) {
@@ -68,7 +69,7 @@ enum class MedalsAchievement(val achievement: Achievement) {
           "Last medal"))
 }
 
-enum class SCORE_INCREASE(val scoreAdded: Int) {
+enum class ScoreIncrease(val scoreAdded: Int) {
   CREATE_EVENT(10),
   JOIN_EVENT(5),
   ADD_FRIEND(10)
