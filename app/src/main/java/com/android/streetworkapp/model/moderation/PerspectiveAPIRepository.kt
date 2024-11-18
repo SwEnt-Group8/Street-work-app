@@ -20,14 +20,44 @@ import java.net.HttpURLConnection.HTTP_OK
 class PerspectiveAPIRepository(private val client: OkHttpClient): TextModerationRepository {
     private val DEBUG_PREFIX = "PerspectiveAPIRepository:"
 
-    override fun evaluateText(content: String): TextEvaluationResult {
+
+    override fun evaluateText(
+        content: String,
+        thresholds: Map<TextModerationTags, Double>
+    ): Boolean {
+        if (content.isEmpty())
+            return false
+
+        when (val result = this.getTextAnnotations(content)) {
+            is TextEvaluationResult.Error -> {
+                Log.d(DEBUG_PREFIX, result.errorType.errorMessage)
+                return false
+            }
+            is TextEvaluationResult.Success -> {
+                for (resultAnnotation in result.annotations) {
+                    thresholds[resultAnnotation.tag]?.let { thresholdTagProbability ->
+                        if (resultAnnotation.probability > thresholdTagProbability)
+                            return false //Text over one of the thresholds
+
+                    } ?: run {
+                        return false //invalid tag
+                    }
+                }
+
+                return true //all the tags under the thresholds :)
+            }
+        }
+
+    }
+
+    //TODO: comment what this code does in the interface
+    override fun getTextAnnotations(content: String): TextEvaluationResult {
         //I don't perform any checks on the content, I'll let the api handle the error checking
 
         val requestMediaType = "application/json; charset=utf-8".toMediaType()
         val requestBody = this.formatPostRequestBody(content).toRequestBody(requestMediaType)
 
-        //TODO: parse api key
-        //note: I'm pretty sure someone could get the key by sniffing the packets, but since we can't have a backend here we are :)
+        //note: someone could get the key by sniffing the packets, but since we can't have a backend here we are :)
         val request = Request.Builder().url("https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key=${BuildConfig.PERSPECTIVE_API_KEY}").post(requestBody).build()
 
         val response = client.newCall(request).execute()
@@ -55,7 +85,7 @@ class PerspectiveAPIRepository(private val client: OkHttpClient): TextModeration
     private fun formatPostRequestBody(content: String): String {
         val request = Request(
             comment = Comment(content),
-            requestedAttributes = TEXT_MODERATION_TAGS.entries.associate { it.name to Unit },
+            requestedAttributes = TextModerationTags.entries.associate { it.name to Unit },
             languages = emptyList(), //we don't know the input language, we'll let the api decide
             doNotStore = true //we don't want the api to store our inputs
             )
@@ -68,7 +98,7 @@ class PerspectiveAPIRepository(private val client: OkHttpClient): TextModeration
             val attributeScoresMap = Json.decodeFromString<SuccessResponse>(responseBody).attributeScores
             val tagsAnnotations = attributeScoresMap.map { (tag, attributeScore) ->
                 TagAnnotation(
-                    enumValueOf<TEXT_MODERATION_TAGS>(tag),
+                    enumValueOf<TextModerationTags>(tag),
                     attributeScore.summaryScore.value
                 )
             }
