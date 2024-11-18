@@ -41,7 +41,7 @@ enum class Ranks(val score: Int) {
   SILVER(1000),
   GOLD(10000),
   PLATINUM(100000),
-  CEILING(1000000)
+  CEILING(100000)
 }
 
 enum class MedalsAchievement(val achievement: Achievement) {
