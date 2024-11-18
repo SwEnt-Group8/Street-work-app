@@ -29,8 +29,7 @@ class ProgressionRepositoryFirestore(private val db: FirebaseFirestore) : Progre
       if (document.isEmpty) {
         val progressionId = this.getNewProgressionId()
         val progression = Progression(progressionId, uid, Ranks.BRONZE.score)
-        db.collection(COLLECTION_PATH).document().set(progression).await()
-
+        db.collection(COLLECTION_PATH).document(progressionId).set(progression).await()
         progression
       } else {
         documentToProgression(document.documents[0])
