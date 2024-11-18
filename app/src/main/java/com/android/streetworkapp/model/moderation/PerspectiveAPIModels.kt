@@ -6,14 +6,15 @@ import kotlinx.serialization.Serializable
 
 /** Default values we can use as thresholds for our TextModerationTags */
 object PerspectiveAPIThresholds {
-  val DEFAULT_THRESHOLD_VALUES = TextModerationTags.entries.associateWith { 0.5 }
+  val DEFAULT_THRESHOLD_VALUES = TextModerationTags.entries.associateWith { 0.2 }
 }
 
 /** All the tags we want to fetch from the API */
 enum class TextModerationTags {
   TOXICITY,
   INSULT,
-  THREAT
+  THREAT,
+  PROFANITY
 }
 
 /** Used to store the results from the API */
