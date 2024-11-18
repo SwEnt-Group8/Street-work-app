@@ -66,6 +66,26 @@ open class EventViewModel(private val repository: EventRepository) : ViewModel()
    * @param event The event to add.
    */
   fun addEvent(event: Event) = viewModelScope.launch { repository.addEvent(event) }
+
+  /**
+   * Add a participant to an event.
+   *
+   * @param eid The event ID.
+   * @param uid The user ID.
+   */
+  fun addParticipantToEvent(eid: String, uid: String) {
+    viewModelScope.launch { repository.addParticipantToEvent(eid, uid) }
+  }
+
+  /**
+   * Remove a participant from an event.
+   *
+   * @param eid The event ID.
+   * @param uid The user ID.
+   */
+  fun removeParticipantFromEvent(eid: String, uid: String) {
+    viewModelScope.launch { repository.removeParticipantFromEvent(eid, uid) }
+  }
 }
 
 sealed class EventOverviewUiState {

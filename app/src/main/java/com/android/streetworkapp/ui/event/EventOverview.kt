@@ -1,5 +1,6 @@
 package com.android.streetworkapp.ui.event
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +19,7 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.twotone.Face
+import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -27,6 +29,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
@@ -36,6 +40,8 @@ import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkViewModel
+import com.android.streetworkapp.model.user.User
+import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.utils.toFormattedString
 import com.google.android.gms.maps.model.CameraPosition
@@ -62,21 +68,33 @@ private val uiState: MutableStateFlow<DashboardState> = MutableStateFlow(Dashboa
 fun EventOverviewScreen(
     eventViewModel: EventViewModel,
     parkViewModel: ParkViewModel,
+    userViewModel: UserViewModel,
     paddingValues: PaddingValues = PaddingValues(0.dp)
 ) {
 
-  val event = eventViewModel.currentEvent.collectAsState().value!!
+  val event = eventViewModel.currentEvent.collectAsState()
   val park = parkViewModel.currentPark.collectAsState()
+  val user = userViewModel.currentUser.collectAsState()
 
   Box(modifier = Modifier.fillMaxSize().padding(paddingValues).testTag("eventOverviewScreen")) {
     Column(modifier = Modifier.fillMaxHeight().testTag("eventContent")) {
-      EventDetails(event)
+      event.value?.let { EventDetails(it) }
 
-      HorizontalDivider(modifier = Modifier.fillMaxWidth().padding(8.dp))
+      HorizontalDivider(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp))
 
-      EventDashboard(event)
+      event.value?.let { EventDashboard(it) }
 
       park.value?.let { EventMap(it) }
+
+      event.value?.let {
+        user.value?.let { user ->
+          if (it.listParticipants.contains(user.uid)) {
+            LeaveEventButton(it, eventViewModel, user)
+          } else {
+            JoinEventButton(it, eventViewModel, user)
+          }
+        }
+      }
     }
   }
 }
@@ -228,6 +246,41 @@ fun DashBoardBar() {
             onClick = { uiState.value = DashboardState.Participants },
             colors = ColorPalette.NAVIGATION_BAR_ITEM_COLORS)
       }
+}
+
+@Composable
+fun JoinEventButton(event: Event, eventViewModel: EventViewModel, user: User) {
+  val context = LocalContext.current
+
+  Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
+    Button(
+        onClick = {
+          Toast.makeText(context, "You have joined this event", Toast.LENGTH_LONG).show()
+          eventViewModel.addParticipantToEvent(event.eid, user.uid)
+        },
+        modifier = Modifier.testTag("joinEventButton"),
+        enabled = event.participants < event.maxParticipants,
+        colors = ColorPalette.BUTTON_COLOR) {
+          Text("Join this event", modifier = Modifier.testTag("joinEventButtonText"))
+        }
+  }
+}
+
+@Composable
+fun LeaveEventButton(event: Event, eventViewModel: EventViewModel, user: User) {
+  val context = LocalContext.current
+
+  Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
+    Button(
+        onClick = {
+          Toast.makeText(context, "You have left this event", Toast.LENGTH_LONG).show()
+          eventViewModel.removeParticipantFromEvent(event.eid, user.uid)
+        },
+        modifier = Modifier.testTag("leaveEventButton"),
+        colors = ColorPalette.BUTTON_COLOR.copy(containerColor = Color.Red)) {
+          Text("Leave this event", modifier = Modifier.testTag("leaveEventButtonText"))
+        }
+  }
 }
 
 /** Represents the different states of the event dashboard */

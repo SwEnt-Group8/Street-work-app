@@ -68,6 +68,62 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
     }
   }
 
+  /**
+   * Add a participant to an event.
+   *
+   * @param eid The event ID.
+   * @param uid The user ID.
+   */
+  override suspend fun addParticipantToEvent(eid: String, uid: String) {
+    require(eid.isNotEmpty())
+    require(uid.isNotEmpty())
+    try {
+      val event = getEventByEid(eid)
+      if (event != null) {
+        val updatedParticipants = event.participants + 1
+        val updatedListParticipants = event.listParticipants.toMutableList()
+        updatedListParticipants.add(uid)
+        db.collection(COLLECTION_PATH)
+            .document(eid)
+            .update(
+                "participants", updatedParticipants, "listParticipants", updatedListParticipants)
+            .await()
+      } else {
+        Log.e("FirestoreError", "Error adding participant to event: Event does not exist.")
+      }
+    } catch (e: Exception) {
+      Log.e("FirestoreError", "Error adding participant to event: ${e.message}")
+    }
+  }
+
+  /**
+   * Remove a participant from an event.
+   *
+   * @param eid The event ID.
+   * @param uid The user ID.
+   */
+  override suspend fun removeParticipantFromEvent(eid: String, uid: String) {
+    require(eid.isNotEmpty())
+    require(uid.isNotEmpty())
+    try {
+      val event = getEventByEid(eid)
+      if (event != null) {
+        val updatedParticipants = event.participants - 1
+        val updatedListParticipants = event.listParticipants.toMutableList()
+        updatedListParticipants.remove(uid)
+        db.collection(COLLECTION_PATH)
+            .document(eid)
+            .update(
+                "participants", updatedParticipants, "listParticipants", updatedListParticipants)
+            .await()
+      } else {
+        Log.e("FirestoreError", "Error removing participant from event: Event does not exist.")
+      }
+    } catch (e: Exception) {
+      Log.e("FirestoreError", "Error removing participant from event: ${e.message}")
+    }
+  }
+
   fun documentToEvent(document: DocumentSnapshot): Event? {
     return if (document.exists()) {
       Event(
