@@ -6,6 +6,7 @@ import java.net.HttpURLConnection.HTTP_BAD_REQUEST
 import java.net.HttpURLConnection.HTTP_OK
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
+import okhttp3.HttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -53,12 +54,16 @@ class PerspectiveAPIRepository(private val client: OkHttpClient) : TextModeratio
 
     // note: someone could get the key by sniffing the packets, but since we can't have a backend
     // here we are :)
-    val request =
-        Request.Builder()
-            .url(
-                "https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key=${BuildConfig.PERSPECTIVE_API_KEY}")
-            .post(requestBody)
+    val url =
+        HttpUrl.Builder()
+            .scheme("https")
+            .host("commentanalyzer.googleapis.com")
+            .addPathSegment("v1alpha1")
+            .addPathSegment("comments:analyze")
+            .addQueryParameter("key", BuildConfig.PERSPECTIVE_API_KEY)
             .build()
+
+    val request = Request.Builder().url(url).post(requestBody).build()
 
     val response = client.newCall(request).execute()
     when (response.code) {
