@@ -135,7 +135,7 @@ fun AddEventScreen(
               userViewModel.increaseUserScore(event.owner, SCORE_INCREASE.CREATE_EVENT.scoreAdded)
               // Note: temporary value to use the progression screen. Should be update once
               // the gamification is completed
-              Toast.makeText(context, "+510 Points", Toast.LENGTH_SHORT).show()
+              Toast.makeText(context, "+"+SCORE_INCREASE.CREATE_EVENT.scoreAdded+" Points", Toast.LENGTH_SHORT).show()
 
               navigationActions.goBack()
             }
