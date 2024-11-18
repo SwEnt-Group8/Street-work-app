@@ -6,6 +6,26 @@ import kotlinx.serialization.Serializable
 //All the definitions below are used to interact with Perspective API
 
 /**
+ * Default values we can use as thresholds for our TextModerationTags
+ */
+object PerspectiveAPIThresholds{
+    val DEFAULT_THRESHOLD_VALUES = TextModerationTags.entries.associateWith { 0.5 }
+}
+
+/**
+ * All the tags we want to fetch from the API
+ */
+enum class TextModerationTags {
+    TOXICITY, INSULT, THREAT
+}
+
+/**
+ * Used to store the results from the API
+ */
+data class TagAnnotation(val tag: TextModerationTags, val probability: Double)
+
+
+/**
  * Used to return the result of a query to PerspectiveAPI
  */
 sealed class TextEvaluationResult {
