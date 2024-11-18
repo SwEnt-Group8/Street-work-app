@@ -43,7 +43,7 @@ open class ProgressionViewModel(private val repository: ProgressionRepository) :
    */
   fun checkScore(score: Int) =
       viewModelScope.launch {
-        while (_currentProgression.value.currentGoal < score && score <= Ranks.PLATINUM.score) {
+        while (_currentProgression.value.currentGoal < score && score <= Ranks.CEILING.score) {
           val unlockedAchievement = getMedalByScore(_currentProgression.value.currentGoal)
           val nextMedalName =
               enumValues<MedalsAchievement>().getOrNull(unlockedAchievement.ordinal + 1)?.name
