@@ -1,25 +1,19 @@
 package com.android.streetworkapp.model.moderation
 
 import android.util.Log
-import androidx.compose.material3.Text
 import com.android.sample.BuildConfig
-import com.squareup.okhttp.RequestBody
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import okhttp3.OkHttpClient
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.encodeToJsonElement
-import kotlinx.serialization.json.jsonObject
 import okhttp3.Request
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
 import java.net.HttpURLConnection.HTTP_BAD_REQUEST
 import java.net.HttpURLConnection.HTTP_OK
 
 class PerspectiveAPIRepository(private val client: OkHttpClient): TextModerationRepository {
     private val DEBUG_PREFIX = "PerspectiveAPIRepository:"
-
 
     override fun evaluateText(
         content: String,
@@ -76,8 +70,9 @@ class PerspectiveAPIRepository(private val client: OkHttpClient): TextModeration
                 }
             }
             HTTP_BAD_REQUEST -> {
-                val error = Json.decodeFromString<ErrorResponse>(response.body.toString())
-                return TextEvaluationResult.Error(enumValues<PerspectiveApiErrors>().find { it.name == error.status  } ?: PerspectiveApiErrors.UNKNOWN_ERROR)
+                val responseBody = response.body?.string() ?: run { return TextEvaluationResult.Error(PerspectiveApiErrors.EMPTY_BODY_RESPONSE) }
+                val error = extractErrorFromResponseBody(responseBody)
+                return TextEvaluationResult.Error(error)
             }
             else -> {
                 Log.d(this.DEBUG_PREFIX, "Received unsupported http code (${response.code}) from api")
@@ -111,6 +106,16 @@ class PerspectiveAPIRepository(private val client: OkHttpClient): TextModeration
         } catch (e : Exception) {
             Log.d(this.DEBUG_PREFIX, "Failed to map response body into valid List<TagAnnotation>")
             return null
+        }
+    }
+
+    private fun extractErrorFromResponseBody(responseBody: String): PerspectiveApiErrors {
+        try {
+            val error = Json.decodeFromString<ErrorResponse>(responseBody)
+            return enumValues<PerspectiveApiErrors>().find { it.name == error.status }
+                ?: PerspectiveApiErrors.UNKNOWN_ERROR
+        } catch (e: Exception) {
+            return PerspectiveApiErrors.JSON_DESERIALIZATION_ERROR
         }
     }
 }
