@@ -52,6 +52,7 @@ import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventConstants
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.ParkViewModel
+import com.android.streetworkapp.model.progression.SCORE_INCREASE
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.theme.ColorPalette
@@ -131,7 +132,7 @@ fun AddEventScreen(
               parkViewModel.addEventToPark(event.parkId, event.eid)
 
               // Used for the gamification feature
-              userViewModel.increaseUserScore(event.owner, 510)
+              userViewModel.increaseUserScore(event.owner, SCORE_INCREASE.CREATE_EVENT.scoreAdded)
               // Note: temporary value to use the progression screen. Should be update once
               // the gamification is completed
               Toast.makeText(context, "+510 Points", Toast.LENGTH_SHORT).show()
