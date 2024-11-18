@@ -8,11 +8,4 @@ interface TextModerationRepository {
      * @return True if the text is under the thresholds for all tags, false otherwise
      */
     fun evaluateText(content: String, thresholds: Map<TextModerationTags, Double>): Boolean
-
-    /**
-     * Gets the tags and their probabilities for param content
-     * @param content Text to be analyzed
-     * @return TextEvaluationResult.Success if the API could process the content, TextEvaluationResult.Error if an error was encountered
-     */
-    fun getTextAnnotations(content: String): TextEvaluationResult
 }

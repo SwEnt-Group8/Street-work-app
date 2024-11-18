@@ -30,7 +30,7 @@ class PerspectiveAPIRepository(private val client: OkHttpClient): TextModeration
 
         when (val result = this.getTextAnnotations(content)) {
             is TextEvaluationResult.Error -> {
-                Log.d(DEBUG_PREFIX, result.errorType.errorMessage)
+                Log.d(this.DEBUG_PREFIX, result.errorType.errorMessage)
                 return false
             }
             is TextEvaluationResult.Success -> {
@@ -50,8 +50,12 @@ class PerspectiveAPIRepository(private val client: OkHttpClient): TextModeration
 
     }
 
-    //TODO: comment what this code does in the interface
-    override fun getTextAnnotations(content: String): TextEvaluationResult {
+    /**
+     * Gets the tags and their probabilities for param content
+     * @param content Text to be analyzed
+     * @return TextEvaluationResult.Success if the API could process the content, TextEvaluationResult.Error if an error was encountered
+     */
+    private fun getTextAnnotations(content: String): TextEvaluationResult {
         //I don't perform any checks on the content, I'll let the api handle the error checking
 
         val requestMediaType = "application/json; charset=utf-8".toMediaType()
