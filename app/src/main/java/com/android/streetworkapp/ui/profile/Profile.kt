@@ -57,7 +57,7 @@ fun ProfileScreen(
     navigationActions: NavigationActions,
     userViewModel: UserViewModel = viewModel(factory = UserViewModel.Factory),
     innerPaddingValues: PaddingValues = PaddingValues(0.dp),
-    topAppBarManager: TopAppBarManager?
+    topAppBarManager: TopAppBarManager? = null
 ) {
   // Setting the current TopAppBar actions :
   val showSettingDialog = remember { mutableStateOf(false) }
