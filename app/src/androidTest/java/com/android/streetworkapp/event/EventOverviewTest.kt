@@ -3,6 +3,7 @@ package com.android.streetworkapp.event
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -158,6 +159,7 @@ class EventOverviewTest {
     }
 
     composeTestRule.waitForIdle()
+    composeTestRule.waitUntil { composeTestRule.onNodeWithTag("joinEventButton").isDisplayed() }
     composeTestRule.onNodeWithTag("joinEventButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("leaveEventButton").assertIsNotDisplayed()
   }
@@ -172,6 +174,9 @@ class EventOverviewTest {
     }
 
     composeTestRule.waitForIdle()
+    composeTestRule.waitUntil(10000) {
+      composeTestRule.onNodeWithTag("leaveEventButton").isDisplayed()
+    }
     composeTestRule.onNodeWithTag("joinEventButton").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("leaveEventButton").assertIsDisplayed()
   }
