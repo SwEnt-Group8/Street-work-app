@@ -17,13 +17,9 @@ class TopAppBarManager(
     val DEFAULT_TOP_APP_BAR_NAVIGATION_ICON = Icons.AutoMirrored.Filled.ArrowBack
   }
 
-  enum class TopAppBarAction(
-      val icon: Int,
-      val contentDescription: String,
-      val testTag: String,
-  ) {
+  enum class TopAppBarAction(val icon: Int, val contentDescription: String, val testTag: String) {
     SETTINGS(
-        icon = R.drawable.setting, contentDescription = "Settings", testTag = "settings_button");
+        icon = R.drawable.settings, contentDescription = "Settings", testTag = "settings_button");
 
     // Now `onClick` is a parameter for `TopAppBarAction`
     fun onClick(callback: () -> Unit) {
