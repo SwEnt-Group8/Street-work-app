@@ -38,8 +38,9 @@ android {
     }
 
 
+    //fetching keys
     val mapsApiKey: String = localProperties.getProperty("MAPS_API_KEY") ?: ""
-    val perspectiveAPIKey = localProperties.getProperty("PERSPECTIVE_API_KEY")
+    val perspectiveApiKey: String = System.getenv("PERSPECTIVE_API_KEY") ?: localProperties.getProperty("PERSPECTIVE_API_KEY", "")
 
     defaultConfig {
         applicationId = "com.android.streetworkapp"
@@ -52,8 +53,9 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
-        buildConfigField("String", "PERSPECTIVE_API_KEY", "\"${localProperties.getProperty("PERSPECTIVE_API_KEY")}\"")
+        buildConfigField("String", "PERSPECTIVE_API_KEY", "\"${perspectiveApiKey}\"")
     }
 
     buildTypes {
