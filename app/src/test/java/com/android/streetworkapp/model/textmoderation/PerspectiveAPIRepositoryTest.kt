@@ -2,6 +2,8 @@ package com.android.streetworkapp.model.textmoderation
 
 import com.android.streetworkapp.model.moderation.PerspectiveAPIRepository
 import com.android.streetworkapp.model.moderation.PerspectiveAPIThresholds
+import com.android.streetworkapp.model.moderation.PerspectiveApiErrors
+import com.android.streetworkapp.model.moderation.TextEvaluation
 import com.android.streetworkapp.model.moderation.TextModerationTags
 import java.net.HttpURLConnection.HTTP_BAD_REQUEST
 import java.net.HttpURLConnection.HTTP_OK
@@ -32,7 +34,7 @@ class PerspectiveAPIRepositoryTest {
   @InjectMocks private lateinit var perspectiveAPIRepository: PerspectiveAPIRepository
 
   // API responses
-  private val PERSPECTIVE_API_INVALID_REQUEST_RESPONSE =
+  private val PERSPECTIVE_API_INVALID_ARGUMENT_RESPONSE =
       """{
         "error": {
         "code": 400,
@@ -107,7 +109,7 @@ class PerspectiveAPIRepositoryTest {
     ]
 }"""
 
-  private val PERSPECTIVE_API_VALID_VALID_RESPONSE_OVER_THRESHOLDS =
+  private val PERSPECTIVE_API_VALID_RESPONSE_OVER_THRESHOLDS =
       """{
     "attributeScores": {
         "TOXICITY": {
@@ -181,78 +183,102 @@ class PerspectiveAPIRepositoryTest {
   }
 
   @Test
-  fun evaluateTextReturnsFalseOnUnhandledHTPPResponseCode() {
+  fun evaluateTextReturnsErrorAndCorrectErrorMessageOnUnhandledHTPPResponseCode() {
     whenever(okHttpClient.newCall(any())).thenReturn(call)
     whenever(call.execute()).thenReturn(response)
     whenever(response.code).thenReturn(-1)
 
-    assert(
-        !perspectiveAPIRepository.evaluateText(
-            "content", PerspectiveAPIThresholds.DEFAULT_THRESHOLD_VALUES))
+    when (val result =
+        perspectiveAPIRepository.evaluateText(
+            "content", PerspectiveAPIThresholds.DEFAULT_THRESHOLD_VALUES)) {
+      is TextEvaluation.Error ->
+          assert(result.errorMessage == PerspectiveApiErrors.UNSUPPORTED_HTTP_CODE.errorMessage)
+      is TextEvaluation.Result -> assert(false)
+    }
   }
 
   @Test
-  fun evaluateTextReturnsFalseOnAPIResponseError() {
+  fun evaluateTextReturnsErrorOnInvalidParameterRequestAndCorrectErrorMessage() {
     whenever(okHttpClient.newCall(any())).thenReturn(call)
     whenever(call.execute()).thenReturn(response)
     whenever(response.code).thenReturn(HTTP_BAD_REQUEST)
     whenever(response.body).thenReturn(responseBody)
-    whenever(responseBody.string()).thenReturn(PERSPECTIVE_API_INVALID_REQUEST_RESPONSE)
+    whenever(responseBody.string()).thenReturn(PERSPECTIVE_API_INVALID_ARGUMENT_RESPONSE)
 
-    assert(
-        !perspectiveAPIRepository.evaluateText(
-            "content", PerspectiveAPIThresholds.DEFAULT_THRESHOLD_VALUES))
+    when (val result =
+        perspectiveAPIRepository.evaluateText(
+            "content", PerspectiveAPIThresholds.DEFAULT_THRESHOLD_VALUES)) {
+      is TextEvaluation.Error ->
+          assert(result.errorMessage == PerspectiveApiErrors.INVALID_ARGUMENT.errorMessage)
+      is TextEvaluation.Result -> assert(false)
+    }
   }
 
   @Test
-  fun evaluateTextReturnsFalseOnAPIResponseErrorAndDeserializationError() {
+  fun evaluateTextReturnsErrorAndCorrectErrorMessageOnDeserializationError() {
     whenever(okHttpClient.newCall(any())).thenReturn(call)
     whenever(call.execute()).thenReturn(response)
     whenever(response.code).thenReturn(HTTP_BAD_REQUEST)
     whenever(response.body).thenReturn(responseBody)
     whenever(responseBody.string()).thenReturn("###@@@#§") // making the deserialization fail
 
-    assert(
-        !perspectiveAPIRepository.evaluateText(
-            "content", PerspectiveAPIThresholds.DEFAULT_THRESHOLD_VALUES))
+    when (val result =
+        perspectiveAPIRepository.evaluateText(
+            "content", PerspectiveAPIThresholds.DEFAULT_THRESHOLD_VALUES)) {
+      is TextEvaluation.Error ->
+          assert(
+              result.errorMessage == PerspectiveApiErrors.JSON_DESERIALIZATION_ERROR.errorMessage)
+      is TextEvaluation.Result -> assert(false)
+    }
   }
 
   @Test
-  fun evaluateTextReturnsFalseOnAPIResponseSuccessAndDeserializationError() {
+  fun evaluateTextReturnsErrorAndCorrectErrorMessageOnAPIResponseSuccessAndDeserializationError() {
     whenever(okHttpClient.newCall(any())).thenReturn(call)
     whenever(call.execute()).thenReturn(response)
     whenever(response.code).thenReturn(HTTP_OK)
     whenever(response.body).thenReturn(responseBody)
     whenever(responseBody.string()).thenReturn("###@@@#§") // making the deserialization fail
 
-    assert(
-        !perspectiveAPIRepository.evaluateText(
-            "content", PerspectiveAPIThresholds.DEFAULT_THRESHOLD_VALUES))
+    when (val result =
+        perspectiveAPIRepository.evaluateText(
+            "content", PerspectiveAPIThresholds.DEFAULT_THRESHOLD_VALUES)) {
+      is TextEvaluation.Error ->
+          assert(
+              result.errorMessage == PerspectiveApiErrors.JSON_DESERIALIZATION_ERROR.errorMessage)
+      is TextEvaluation.Result -> assert(false)
+    }
   }
 
   @Test
-  fun evaluateTextReturnsTrueOnAPIResponseSuccessAndUnderThresholdValues() {
+  fun evaluateTextReturnsResultAndTrueOnAPIResponseSuccessAndUnderThresholdValues() {
     whenever(okHttpClient.newCall(any())).thenReturn(call)
     whenever(call.execute()).thenReturn(response)
     whenever(response.code).thenReturn(HTTP_OK)
     whenever(response.body).thenReturn(responseBody)
     whenever(responseBody.string()).thenReturn(PERSPECTIVE_API_VALID_RESPONSE_UNDER_THRESHOLDS)
 
-    assert(
+    when (val result =
         perspectiveAPIRepository.evaluateText(
-            "content", PerspectiveAPIThresholds.DEFAULT_THRESHOLD_VALUES))
+            "content", PerspectiveAPIThresholds.DEFAULT_THRESHOLD_VALUES)) {
+      is TextEvaluation.Error -> assert(false)
+      is TextEvaluation.Result -> assert(result.isTextUnderThresholds)
+    }
   }
 
   @Test
-  fun evaluateTextReturnsFalseOnAPIResponseSuccessAndOverThresholdValues() {
+  fun evaluateTextReturnsResultAndFalseOnAPIResponseSuccessAndOverThresholdValues() {
     whenever(okHttpClient.newCall(any())).thenReturn(call)
     whenever(call.execute()).thenReturn(response)
     whenever(response.code).thenReturn(HTTP_OK)
     whenever(response.body).thenReturn(responseBody)
-    whenever(responseBody.string()).thenReturn(PERSPECTIVE_API_VALID_VALID_RESPONSE_OVER_THRESHOLDS)
+    whenever(responseBody.string()).thenReturn(PERSPECTIVE_API_VALID_RESPONSE_OVER_THRESHOLDS)
 
-    assert(
-        !perspectiveAPIRepository.evaluateText(
-            "content", PerspectiveAPIThresholds.DEFAULT_THRESHOLD_VALUES))
+    when (val result =
+        perspectiveAPIRepository.evaluateText(
+            "content", PerspectiveAPIThresholds.DEFAULT_THRESHOLD_VALUES)) {
+      is TextEvaluation.Error -> assert(false)
+      is TextEvaluation.Result -> assert(!result.isTextUnderThresholds)
+    }
   }
 }

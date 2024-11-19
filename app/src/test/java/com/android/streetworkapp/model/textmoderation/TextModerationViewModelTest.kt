@@ -1,5 +1,6 @@
 package com.android.streetworkapp.model.textmoderation
 
+import com.android.streetworkapp.model.moderation.TextEvaluation
 import com.android.streetworkapp.model.moderation.TextModerationRepository
 import com.android.streetworkapp.model.moderation.TextModerationViewModel
 import kotlinx.coroutines.Dispatchers
@@ -37,19 +38,21 @@ class TextModerationViewModelTest {
 
   @Test
   fun underThresholdsIsCalledIfTextIsUnderThresholds() {
-    whenever(textModerationRepository.evaluateText(any(), any())).thenReturn(true)
+    whenever(textModerationRepository.evaluateText(any(), any()))
+        .thenReturn(TextEvaluation.Result(true))
 
-    val underThresholdsCallback = mock<() -> Unit>()
-    textModerationViewModel.analyzeText("content", { underThresholdsCallback.invoke() }, {})
-    verify(underThresholdsCallback).invoke()
+    val onEvaluationResultCallback = mock<(Boolean) -> Unit>()
+    textModerationViewModel.analyzeText("content", { onEvaluationResultCallback(it) }, {})
+    verify(onEvaluationResultCallback).invoke(true)
   }
 
   @Test
   fun overThresholdsIsCalledIfTextIsOverThresholds() {
-    whenever(textModerationRepository.evaluateText(any(), any())).thenReturn(false)
+    whenever(textModerationRepository.evaluateText(any(), any()))
+        .thenReturn(TextEvaluation.Result(false))
 
-    val overThresholdsCallback = mock<() -> Unit>()
-    textModerationViewModel.analyzeText("content", {}, { overThresholdsCallback() })
-    verify(overThresholdsCallback).invoke()
+    val onEvaluationResultCallback = mock<(Boolean) -> Unit>()
+    textModerationViewModel.analyzeText("content", { onEvaluationResultCallback(it) }, {})
+    verify(onEvaluationResultCallback).invoke(false)
   }
 }
