@@ -22,6 +22,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,6 +43,7 @@ import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
+import com.android.streetworkapp.ui.navigation.TopAppBarManager
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -49,8 +52,30 @@ import com.google.firebase.ktx.Firebase
 fun ProfileScreen(
     navigationActions: NavigationActions,
     userViewModel: UserViewModel = viewModel(factory = UserViewModel.Factory),
-    innerPaddingValues: PaddingValues = PaddingValues(0.dp)
+    innerPaddingValues: PaddingValues = PaddingValues(0.dp),
+    topAppBarManager: TopAppBarManager?
 ) {
+  // Setting the current TopAppBar actions :
+  val showSettingDialog = remember { mutableStateOf(false) }
+
+  topAppBarManager!!.setActionCallback(TopAppBarManager.TopAppBarAction.SETTINGS) {
+    showSettingDialog.value = true
+  }
+
+  if (showSettingDialog.value) {
+    Toast.makeText(LocalContext.current, "Not implemented yet", Toast.LENGTH_SHORT).show()
+  }
+
+  /*
+  Maybe another way to invoke, equal to me (proposed by copilot):
+
+  navigationActions.setTopAppBarActions(
+      mapOf(
+          TopAppBarManager.TopAppBarAction.SETTINGS to {
+              navigationActions.navigateTo(Screen.SETTINGS)
+          }))
+
+   */
 
   // Handling the MVVM calls for user :
   val currentUser = userViewModel.currentUser.collectAsState().value

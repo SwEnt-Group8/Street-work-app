@@ -1,6 +1,5 @@
 package com.android.streetworkapp.ui.navigation
 
-import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -10,7 +9,8 @@ class TopAppBarManager(
     private var title: String = "",
     private var hasNavigationIcon: Boolean = false,
     private var navigationIcon: ImageVector? = null,
-    private var actions: List<TopAppBarAction> = emptyList()
+    private var actions: List<TopAppBarAction> = emptyList(),
+    private var actionCallbacks: MutableMap<TopAppBarAction, () -> Unit> = mutableMapOf()
 ) {
 
   companion object {
@@ -21,14 +21,31 @@ class TopAppBarManager(
       val icon: Int,
       val contentDescription: String,
       val testTag: String,
-      val onClick: () -> Unit
   ) {
     SETTINGS(
-        icon = R.drawable.setting,
-        contentDescription = "Settings",
-        testTag = "settings_button",
-        onClick = { Log.d("TopAppBar", "clicked on settings actions - not yet implemented") }),
-    // Add more actions as needed
+        icon = R.drawable.setting, contentDescription = "Settings", testTag = "settings_button");
+
+    // Now `onClick` is a parameter for `TopAppBarAction`
+    fun onClick(callback: () -> Unit) {
+      callback()
+    }
+  }
+
+  // Set the callbacks for each action
+  fun setAllActionCallbacks(
+      actionCallbacks: Map<TopAppBarAction, () -> Unit> = actions.associateWith { {} }
+  ) {
+    this.actionCallbacks = actionCallbacks as MutableMap<TopAppBarAction, () -> Unit>
+  }
+
+  // Set the callback for a specific action
+  fun setActionCallback(action: TopAppBarAction, callback: () -> Unit) {
+    this.actionCallbacks[action] = callback
+  }
+
+  // Trigger onClick for an action (called from the composable)
+  fun onActionClick(action: TopAppBarAction) {
+    actionCallbacks[action]?.invoke()
   }
 
   /** Changes the TopAppBar title */

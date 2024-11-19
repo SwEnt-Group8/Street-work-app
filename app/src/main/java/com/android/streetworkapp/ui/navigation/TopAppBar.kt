@@ -23,9 +23,12 @@ fun TopAppBarWrapper(navigationActions: NavigationActions, topAppBarManager: Top
         },
         actions = {
           topAppBarManager.getTopAppBarActions().forEach { action ->
-            IconButton(onClick = action.onClick, modifier = Modifier.testTag(action.testTag)) {
-              Icon(painterResource(action.icon), contentDescription = action.contentDescription)
-            }
+              IconButton(
+                  onClick = { topAppBarManager.onActionClick(action) },
+                  modifier = Modifier.testTag(action.testTag)
+              ) {
+                  Icon(painterResource(action.icon), contentDescription = action.contentDescription)
+              }
           }
         },
         colors =

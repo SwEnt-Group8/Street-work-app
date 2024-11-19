@@ -214,7 +214,7 @@ fun StreetWorkApp(
               ) {
                 // profile screen + list of friend
                 composable(Screen.PROFILE) {
-                  ProfileScreen(navigationActions, userViewModel, innerPadding)
+                  ProfileScreen(navigationActions, userViewModel, innerPadding, screenParams?.topAppBarManager)
                 }
                 // screen for adding friend
                 composable(Screen.ADD_FRIEND) { AddFriendScreen(userViewModel, innerPadding) }
