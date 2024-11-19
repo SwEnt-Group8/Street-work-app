@@ -255,12 +255,4 @@ class PerspectiveAPIRepositoryTest {
         !perspectiveAPIRepository.evaluateText(
             "content", PerspectiveAPIThresholds.DEFAULT_THRESHOLD_VALUES))
   }
-
-  // TODO: remove
-  @Test
-  fun temp() {
-    val repo = PerspectiveAPIRepository(OkHttpClient())
-    val temp = repo.evaluateText("content", PerspectiveAPIThresholds.DEFAULT_THRESHOLD_VALUES)
-    assert(temp)
-  }
 }

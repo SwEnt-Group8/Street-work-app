@@ -132,8 +132,6 @@ jobs:
 
       # Run Unit tests
       - name: Run Unit tests
-        env:
-          PERSPECTIVE_API_KEY: ${{ secrets.PERSPECTIVE_API_KEY }}
         run: |
           # To run the CI with debug information, add --info
           ./gradlew check --parallel --build-cache
