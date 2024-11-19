@@ -83,7 +83,7 @@ fun EventOverviewScreen(
     Column(modifier = Modifier.fillMaxHeight().testTag("eventContent")) {
       event.value?.let { EventDetails(it) }
 
-      HorizontalDivider(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp))
+      HorizontalDivider(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp))
 
       event.value?.let { EventDashboard(it) }
 
@@ -290,7 +290,7 @@ fun JoinEventButton(
       modifier = Modifier.testTag("joinEventButton"),
       enabled = event.participants < event.maxParticipants,
       colors = ColorPalette.BUTTON_COLOR) {
-        Text("Join this event", modifier = Modifier.testTag("joinEventButtonText"))
+        Text("Join this event")
       }
 }
 
@@ -309,9 +309,10 @@ fun LeaveEventButton(
         eventViewModel.removeParticipantFromEvent(event.eid, user.uid)
         navigationActions.goBack()
       },
+      enabled = event.owner != user.uid,
       modifier = Modifier.testTag("leaveEventButton"),
       colors = ColorPalette.BUTTON_COLOR.copy(containerColor = Color.Red)) {
-        Text("Leave this event", modifier = Modifier.testTag("leaveEventButtonText"))
+        Text("Leave this event")
       }
 }
 

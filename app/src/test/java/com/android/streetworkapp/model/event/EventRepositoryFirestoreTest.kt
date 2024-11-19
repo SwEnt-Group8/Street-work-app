@@ -21,6 +21,7 @@ import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.timeout
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
@@ -61,11 +62,24 @@ class EventRepositoryFirestoreTest {
     whenever(db.collection("events")).thenReturn(collection)
     `when`(db.collection(any())).thenReturn(collection)
     `when`(collection.document(any())).thenReturn(documentRef)
-    `when`(collection.document()).thenReturn(documentRef)
+    `when`(documentRef.get()).thenReturn(Tasks.forResult(document))
+
+    `when`(document.exists()).thenReturn(true)
+    `when`(document.id).thenReturn(event.eid)
+    `when`(document.get("date")).thenReturn(event.date)
+    `when`(document.get("title")).thenReturn(event.title)
+    `when`(document.get("owner")).thenReturn(event.owner)
+    `when`(document.get("participants")).thenReturn(event.participants.toLong())
+    `when`(document.get("description")).thenReturn(event.description)
+    `when`(document.get("capacity")).thenReturn(event.listParticipants)
+    `when`(document.get("maxParticipants")).thenReturn(event.maxParticipants.toLong())
+    `when`(document.get("parkId")).thenReturn(event.parkId)
+    `when`(document.get("listParticipants")).thenReturn(event.listParticipants)
   }
 
   @Test
   fun getNewEidReturnsUniqueId() {
+
     `when`(collection.document()).thenReturn(documentRef)
     `when`(documentRef.id).thenReturn("uniqueEventId")
 
@@ -75,7 +89,6 @@ class EventRepositoryFirestoreTest {
 
   @Test
   fun addEventAddsEventSuccessfully() = runTest {
-    `when`(collection.document(event.eid)).thenReturn(documentRef)
     `when`(documentRef.set(event.eid)).thenReturn(Tasks.forResult(null))
 
     eventRepository.addEvent(event)
@@ -84,9 +97,6 @@ class EventRepositoryFirestoreTest {
 
   @Test
   fun getEventByEid_calls_getdocument() = runTest {
-    `when`(collection.document(event.eid)).thenReturn(documentRef)
-    `when`(documentRef.get()).thenReturn(Tasks.forResult(document))
-
     eventRepository.getEventByEid(event.eid)
 
     verify(documentRef, timeout(1000)).get()
@@ -106,8 +116,6 @@ class EventRepositoryFirestoreTest {
             occupancy = 8,
             events = listOf(event.eid))
     whenever(db.collection("parks")).thenReturn(collection)
-    `when`(collection.document(event.eid)).thenReturn(documentRef)
-    `when`(documentRef.get()).thenReturn(Tasks.forResult(document))
 
     eventRepository.getEvents(park, {}, { throw it })
 
@@ -115,18 +123,29 @@ class EventRepositoryFirestoreTest {
   }
 
   @Test
+  fun addParticipantToEvent_calls_update() = runTest {
+    `when`(documentRef.update(eq("participants"), any(), eq("listParticipants"), any()))
+        .thenReturn(Tasks.forResult(null))
+
+    eventRepository.addParticipantToEvent(event.eid, "123")
+
+    verify(documentRef, timeout(1000))
+        .update(eq("participants"), any(), eq("listParticipants"), any())
+  }
+
+  @Test
+  fun removeParticipantFromEvent_calls_update() = runTest {
+    `when`(documentRef.update(eq("participants"), any(), eq("listParticipants"), any()))
+        .thenReturn(Tasks.forResult(null))
+
+    eventRepository.removeParticipantFromEvent(event.eid, "123")
+
+    verify(documentRef, timeout(1000))
+        .update(eq("participants"), any(), eq("listParticipants"), any())
+  }
+
+  @Test
   fun documentToEvent_works() {
-    `when`(document.exists()).thenReturn(true)
-    `when`(document.id).thenReturn(event.eid)
-    `when`(document.get("date")).thenReturn(event.date)
-    `when`(document.get("title")).thenReturn(event.title)
-    `when`(document.get("owner")).thenReturn(event.owner)
-    `when`(document.get("participants")).thenReturn(event.participants.toLong())
-    `when`(document.get("description")).thenReturn(event.description)
-    `when`(document.get("capacity")).thenReturn(event.listParticipants)
-    `when`(document.get("maxParticipants")).thenReturn(event.maxParticipants.toLong())
-    `when`(document.get("parkId")).thenReturn(event.parkId)
-    `when`(document.get("listParticipants")).thenReturn(event.listParticipants)
     val fetchedEvent = eventRepository.documentToEvent(document)
     assertEquals(event, fetchedEvent)
   }

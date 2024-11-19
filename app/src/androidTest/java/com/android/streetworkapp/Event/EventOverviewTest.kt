@@ -1,4 +1,4 @@
-package com.android.streetworkapp.ui.parkoverview
+package com.android.streetworkapp.Event
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
@@ -15,6 +15,9 @@ import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.ParkLocation
+import com.android.streetworkapp.model.user.User
+import com.android.streetworkapp.model.user.UserRepository
+import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.event.EventOverviewScreen
 import com.android.streetworkapp.ui.navigation.LIST_OF_SCREENS
 import com.android.streetworkapp.ui.navigation.NavigationActions
@@ -29,12 +32,16 @@ import org.mockito.Mockito.mock
 
 class EventOverviewTest {
   private lateinit var park: Park
+  private lateinit var owner: User
+  private lateinit var joiner: User
   private lateinit var navigationActions: NavigationActions
   private lateinit var event: Event
   private lateinit var eventRepository: EventRepository
   private lateinit var eventViewModel: EventViewModel
   private lateinit var parkRepository: ParkRepository
   private lateinit var parkViewModel: ParkViewModel
+  private lateinit var userRepository: UserRepository
+  private lateinit var userViewModel: UserViewModel
   private lateinit var screenParams: ScreenParams
 
   // cannot be tested right now
@@ -48,7 +55,8 @@ class EventOverviewTest {
     eventViewModel = EventViewModel(eventRepository)
     parkRepository = mock(ParkRepository::class.java)
     parkViewModel = ParkViewModel(parkRepository)
-
+    userRepository = mock(UserRepository::class.java)
+    userViewModel = UserViewModel(userRepository)
     screenParams = LIST_OF_SCREENS.last()
 
     navigationActions = mock(NavigationActions::class.java)
@@ -66,7 +74,9 @@ class EventOverviewTest {
                         5,
                         10,
                         Timestamp.now(),
-                        "Malick")))
+                        "123",
+                        listOf("123")
+                    )))
 
     event = eventList.events.first()
     // fullevent = event.copy(participants = 10, maxParticipants = 10)
@@ -83,13 +93,17 @@ class EventOverviewTest {
             capacity = 10,
             occupancy = 5,
             events = emptyList())
+      owner = User(event.owner, "test", "test", 0, listOf(), "test")
+      joiner = owner.copy(uid = "joiner")
   }
 
   @Test
   fun everyImmutableComposableAreDisplayed() = runTest {
     eventViewModel.setCurrentEvent(event)
     parkViewModel.setCurrentPark(park)
-    composeTestRule.setContent { EventOverviewScreen(eventViewModel, parkViewModel) }
+    composeTestRule.setContent {
+      EventOverviewScreen(eventViewModel, parkViewModel, userViewModel, navigationActions)
+    }
 
     composeTestRule.onNodeWithTag("eventOverviewScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("eventContent").assertIsDisplayed()
@@ -116,7 +130,9 @@ class EventOverviewTest {
   fun everythingIsDisplayedInDashBoard() = runTest {
     eventViewModel.setCurrentEvent(event)
     parkViewModel.setCurrentPark(park)
-    composeTestRule.setContent { EventOverviewScreen(eventViewModel, parkViewModel) }
+    composeTestRule.setContent {
+      EventOverviewScreen(eventViewModel, parkViewModel, userViewModel, navigationActions)
+    }
 
     composeTestRule.onNodeWithTag("eventDashboard").assertIsDisplayed()
     composeTestRule.onNodeWithTag("dashboard").assertIsDisplayed()
@@ -132,4 +148,30 @@ class EventOverviewTest {
     composeTestRule.onNodeWithTag("participantsList").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("eventDescription").assertIsDisplayed()
   }
+
+    @Test
+    fun joinEventButtonIsDisplayed() = runTest {
+        eventViewModel.setCurrentEvent(event)
+        parkViewModel.setCurrentPark(park)
+        userViewModel.setCurrentUser(joiner)
+        composeTestRule.setContent {
+            EventOverviewScreen(eventViewModel, parkViewModel, userViewModel, navigationActions)
+        }
+
+        composeTestRule.onNodeWithTag("joinEventButton").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("leaveEventButton").assertIsNotDisplayed()
+    }
+
+    @Test
+    fun leaveEventButtonIsNotDisplayed() = runTest {
+        eventViewModel.setCurrentEvent(event)
+        parkViewModel.setCurrentPark(park)
+        userViewModel.setCurrentUser(owner)
+        composeTestRule.setContent {
+            EventOverviewScreen(eventViewModel, parkViewModel, userViewModel, navigationActions)
+        }
+
+        composeTestRule.onNodeWithTag("joinEventButton").assertIsNotDisplayed()
+        composeTestRule.onNodeWithTag("leaveEventButton").assertIsDisplayed()
+    }
 }
