@@ -19,10 +19,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -39,7 +40,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -50,6 +50,7 @@ import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.theme.ColorPalette
+import kotlinx.coroutines.flow.MutableStateFlow
 
 object ProgressionScreenSettings {
   val PROGRESSION_COLOR_BLUE = Color(0xFF007BFF)
@@ -58,9 +59,9 @@ object ProgressionScreenSettings {
   val columnPadding = PaddingValues(0.dp, progressBarSize * 0.15f, 0.dp, 0.dp)
 }
 
-// note: I haven' tested big values in the metrics tabs, the assumption was that those shouldn't
-// overflow the boxes either way (unless we put some stupid score system)
-// I did test for the rest thought
+// Mutable dashboard state
+private val uiState: MutableStateFlow<DashboardStateProgression> =
+    MutableStateFlow(DashboardStateProgression.Training)
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -145,31 +146,41 @@ fun ProgressScreen(
             Spacer(modifier = Modifier.height(15.dp))
           }
 
-          item {
-            Text(
-                text = "Achievements",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black,
-                textAlign = TextAlign.Start,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp).fillMaxWidth())
-          }
+          item { DashBoardBarProgression() }
 
-          if (currentProgression.achievements.isEmpty()) {
-            item {
-              Text(
-                  text = "You don't have any achievements yet!",
-                  fontSize = 15.sp,
-                  fontWeight = FontWeight.Normal,
-                  color = ColorPalette.SECONDARY_TEXT_COLOR,
-                  modifier = Modifier.padding(top = 10.dp).testTag("emptyAchievementsText"))
-            }
-          } else {
-            itemsIndexed(currentProgression.achievements) { index, achievementName ->
-              val achievementEnum = enumValueOf<MedalsAchievement>(achievementName)
-              Box(modifier = Modifier.testTag("achievementItem${index}")) {
-                AchievementItem(achievementEnum.achievement)
-                HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
+          item {
+            when (uiState.collectAsState().value) {
+              DashboardStateProgression.Achievement -> {
+
+                if (currentProgression.achievements.isEmpty()) {
+
+                  Text(
+                      text = "You don't have any achievements yet!",
+                      fontSize = 15.sp,
+                      fontWeight = FontWeight.Normal,
+                      color = ColorPalette.SECONDARY_TEXT_COLOR,
+                      modifier = Modifier.padding(top = 10.dp).testTag("emptyAchievementsText"))
+                } else {
+
+                  Column {
+                    currentProgression.achievements.forEach { achievementName ->
+                      val achievementEnum = enumValueOf<MedalsAchievement>(achievementName)
+                      Box(modifier = Modifier.testTag("achievementItem")) {
+                        AchievementItem(achievementEnum.achievement)
+                        HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
+                      }
+                    }
+                  }
+                }
+              }
+              DashboardStateProgression.Training -> {
+
+                Text(
+                    text = "Training screen",
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = ColorPalette.SECONDARY_TEXT_COLOR,
+                    modifier = Modifier.padding(top = 10.dp).testTag("emptyAchievementsText"))
               }
             }
           }
@@ -290,4 +301,34 @@ fun AchievementItem(achievement: Achievement) {
               color = ColorPalette.SECONDARY_TEXT_COLOR)
         }
       }
+}
+
+@Composable
+fun DashBoardBarProgression() {
+  NavigationBar(
+      modifier = Modifier.testTag("dashboard").fillMaxWidth().height(56.dp),
+      containerColor = ColorPalette.PRINCIPLE_BACKGROUND_COLOR) {
+        val state = uiState.collectAsState().value
+
+        NavigationBarItem(
+            modifier = Modifier.testTag("detailsTab"),
+            icon = { Text("Training") },
+            selected = state == DashboardStateProgression.Training,
+            onClick = { uiState.value = DashboardStateProgression.Training },
+            colors = ColorPalette.NAVIGATION_BAR_ITEM_COLORS)
+
+        NavigationBarItem(
+            modifier = Modifier.testTag("participantsTab"),
+            icon = { Text("Achievement") },
+            selected = state == DashboardStateProgression.Achievement,
+            onClick = { uiState.value = DashboardStateProgression.Achievement },
+            colors = ColorPalette.NAVIGATION_BAR_ITEM_COLORS)
+      }
+}
+
+/** Represents the different states of the progression dashboard */
+sealed class DashboardStateProgression {
+  data object Training : DashboardStateProgression()
+
+  data object Achievement : DashboardStateProgression()
 }
