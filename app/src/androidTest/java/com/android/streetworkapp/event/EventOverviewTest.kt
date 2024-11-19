@@ -1,4 +1,4 @@
-package com.android.streetworkapp.Event
+package com.android.streetworkapp.event
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
@@ -157,6 +157,7 @@ class EventOverviewTest {
       EventOverviewScreen(eventViewModel, parkViewModel, userViewModel, navigationActions)
     }
 
+    composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("joinEventButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("leaveEventButton").assertIsNotDisplayed()
   }
@@ -170,6 +171,7 @@ class EventOverviewTest {
       EventOverviewScreen(eventViewModel, parkViewModel, userViewModel, navigationActions)
     }
 
+    composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("joinEventButton").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("leaveEventButton").assertIsDisplayed()
   }
