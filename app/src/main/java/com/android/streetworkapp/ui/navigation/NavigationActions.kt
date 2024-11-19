@@ -90,8 +90,8 @@ data class ScreenParams(
     val EVENT_OVERVIEW =
         ScreenParams(
             Screen.EVENT_OVERVIEW,
-            isBottomBarVisible = false,
-            BottomNavigationMenuType.NONE,
+            isBottomBarVisible = true,
+            BottomNavigationMenuType.EVENT_OVERVIEW,
             isTopBarVisible = true,
             TopAppBarManager(
                 "Event Overview",

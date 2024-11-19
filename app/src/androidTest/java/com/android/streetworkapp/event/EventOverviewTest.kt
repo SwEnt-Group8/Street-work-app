@@ -20,6 +20,7 @@ import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.event.EventOverviewScreen
+import com.android.streetworkapp.ui.navigation.EventBottomBar
 import com.android.streetworkapp.ui.navigation.LIST_OF_SCREENS
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.ScreenParams
@@ -101,9 +102,7 @@ class EventOverviewTest {
   fun everyImmutableComposableAreDisplayed() = runTest {
     eventViewModel.setCurrentEvent(event)
     parkViewModel.setCurrentPark(park)
-    composeTestRule.setContent {
-      EventOverviewScreen(eventViewModel, parkViewModel, userViewModel, navigationActions)
-    }
+    composeTestRule.setContent { EventOverviewScreen(eventViewModel, parkViewModel) }
 
     composeTestRule.onNodeWithTag("eventOverviewScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("eventContent").assertIsDisplayed()
@@ -130,9 +129,7 @@ class EventOverviewTest {
   fun everythingIsDisplayedInDashBoard() = runTest {
     eventViewModel.setCurrentEvent(event)
     parkViewModel.setCurrentPark(park)
-    composeTestRule.setContent {
-      EventOverviewScreen(eventViewModel, parkViewModel, userViewModel, navigationActions)
-    }
+    composeTestRule.setContent { EventOverviewScreen(eventViewModel, parkViewModel) }
 
     composeTestRule.onNodeWithTag("eventDashboard").assertIsDisplayed()
     composeTestRule.onNodeWithTag("dashboard").assertIsDisplayed()
@@ -152,16 +149,10 @@ class EventOverviewTest {
   @Test
   fun joinEventButtonIsDisplayed() = runTest {
     eventViewModel.setCurrentEvent(event)
-    parkViewModel.setCurrentPark(park)
     userViewModel.setCurrentUser(joiner)
-    composeTestRule.setContent {
-      EventOverviewScreen(eventViewModel, parkViewModel, userViewModel, navigationActions)
-    }
+    composeTestRule.setContent { EventBottomBar(eventViewModel, userViewModel, navigationActions) }
 
     composeTestRule.waitForIdle()
-    composeTestRule.waitUntil(10000) {
-      composeTestRule.onNodeWithTag("joinEventButton").isDisplayed()
-    }
     composeTestRule.onNodeWithTag("joinEventButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("leaveEventButton").assertIsNotDisplayed()
   }
@@ -169,11 +160,9 @@ class EventOverviewTest {
   @Test
   fun leaveEventButtonIsNotDisplayed() = runTest {
     eventViewModel.setCurrentEvent(event)
-    parkViewModel.setCurrentPark(park)
     userViewModel.setCurrentUser(owner)
-    composeTestRule.setContent {
-      EventOverviewScreen(eventViewModel, parkViewModel, userViewModel, navigationActions)
-    }
+
+    composeTestRule.setContent { EventBottomBar(eventViewModel, userViewModel, navigationActions) }
 
     composeTestRule.waitForIdle()
     composeTestRule.waitUntil(10000) {

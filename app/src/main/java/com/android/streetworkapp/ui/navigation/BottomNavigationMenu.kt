@@ -1,25 +1,27 @@
 package com.android.streetworkapp.ui.navigation
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.user.UserViewModel
+import com.android.streetworkapp.ui.event.JoinEventButton
+import com.android.streetworkapp.ui.event.LeaveEventButton
 import com.android.streetworkapp.ui.theme.ColorPalette
 
 enum class BottomNavigationMenuType {
@@ -83,25 +85,34 @@ fun BottomNavigationMenu(
 /**
  * Bottom bar for the event screen, displaying a button to join the event.
  *
- * @param participants The number of participants that have joined the event.
- * @param maxParticipants The maximum number of participants allowed in the event.
+ * @param eventViewModel The event view model.
+ * @param userViewModel The user view model.
+ * @param navigationActions The navigation actions.
  */
 @Composable
-fun EventBottomBar(participants: Int, maxParticipants: Int) {
-  val context = LocalContext.current
+fun EventBottomBar(
+    eventViewModel: EventViewModel,
+    userViewModel: UserViewModel,
+    navigationActions: NavigationActions
+) {
+  val event = eventViewModel.currentEvent.collectAsState()
+  val user = userViewModel.currentUser.collectAsState()
+
   BottomAppBar(
       containerColor = Color.Transparent,
       modifier = Modifier.testTag(BottomNavigationMenuType.EVENT_OVERVIEW.getTopLevelTestTag())) {
-        Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
-          Button(
-              onClick = {
-                Toast.makeText(context, "not yet implemented", Toast.LENGTH_LONG).show()
-              },
-              modifier = Modifier.testTag("joinEventButton"),
-              enabled = participants < maxParticipants,
-              colors = ColorPalette.BUTTON_COLOR) {
-                Text("Join this event", modifier = Modifier.testTag("joinEventButtonText"))
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+              user.value?.let { user ->
+                event.value?.let { event ->
+                  if (event.listParticipants.contains(user.uid)) {
+                    LeaveEventButton(event, eventViewModel, user, navigationActions)
+                  } else {
+                    JoinEventButton(event, eventViewModel, user, navigationActions)
+                  }
+                }
               }
-        }
+            }
       }
 }

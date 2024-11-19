@@ -41,7 +41,6 @@ import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.user.User
-import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.utils.toFormattedString
@@ -69,14 +68,11 @@ private val uiState: MutableStateFlow<DashboardState> = MutableStateFlow(Dashboa
 fun EventOverviewScreen(
     eventViewModel: EventViewModel,
     parkViewModel: ParkViewModel,
-    userViewModel: UserViewModel,
-    navigationActions: NavigationActions,
     paddingValues: PaddingValues = PaddingValues(0.dp)
 ) {
 
   val event = eventViewModel.currentEvent.collectAsState()
   val park = parkViewModel.currentPark.collectAsState()
-  val user = userViewModel.currentUser.collectAsState()
 
   Box(modifier = Modifier.fillMaxSize().padding(paddingValues).testTag("eventOverviewScreen")) {
     Column(modifier = Modifier.fillMaxHeight().testTag("eventContent")) {
@@ -87,10 +83,6 @@ fun EventOverviewScreen(
       event.value?.let { EventDashboard(it) }
 
       park.value?.let { EventMap(it) }
-
-      user.value?.let { user ->
-        event.value?.let { event -> EventButton(event, eventViewModel, user, navigationActions) }
-      }
     }
   }
 }
@@ -167,7 +159,7 @@ fun EventMap(park: Park) {
       }
 
   GoogleMap(
-      modifier = Modifier.testTag("googleMap").fillMaxWidth().height(320.dp),
+      modifier = Modifier.testTag("googleMap").fillMaxSize(),
       cameraPositionState = cameraPositionState) {
         Marker(
             contentDescription = "Marker",
