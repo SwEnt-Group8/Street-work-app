@@ -75,8 +75,7 @@ class EventOverviewTest {
                         10,
                         Timestamp.now(),
                         "123",
-                        listOf("123")
-                    )))
+                        listOf("123"))))
 
     event = eventList.events.first()
     // fullevent = event.copy(participants = 10, maxParticipants = 10)
@@ -93,8 +92,8 @@ class EventOverviewTest {
             capacity = 10,
             occupancy = 5,
             events = emptyList())
-      owner = User(event.owner, "test", "test", 0, listOf(), "test")
-      joiner = owner.copy(uid = "joiner")
+    owner = User(event.owner, "test", "test", 0, listOf(), "test")
+    joiner = owner.copy(uid = "joiner")
   }
 
   @Test
@@ -149,29 +148,29 @@ class EventOverviewTest {
     composeTestRule.onNodeWithTag("eventDescription").assertIsDisplayed()
   }
 
-    @Test
-    fun joinEventButtonIsDisplayed() = runTest {
-        eventViewModel.setCurrentEvent(event)
-        parkViewModel.setCurrentPark(park)
-        userViewModel.setCurrentUser(joiner)
-        composeTestRule.setContent {
-            EventOverviewScreen(eventViewModel, parkViewModel, userViewModel, navigationActions)
-        }
-
-        composeTestRule.onNodeWithTag("joinEventButton").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("leaveEventButton").assertIsNotDisplayed()
+  @Test
+  fun joinEventButtonIsDisplayed() = runTest {
+    eventViewModel.setCurrentEvent(event)
+    parkViewModel.setCurrentPark(park)
+    userViewModel.setCurrentUser(joiner)
+    composeTestRule.setContent {
+      EventOverviewScreen(eventViewModel, parkViewModel, userViewModel, navigationActions)
     }
 
-    @Test
-    fun leaveEventButtonIsNotDisplayed() = runTest {
-        eventViewModel.setCurrentEvent(event)
-        parkViewModel.setCurrentPark(park)
-        userViewModel.setCurrentUser(owner)
-        composeTestRule.setContent {
-            EventOverviewScreen(eventViewModel, parkViewModel, userViewModel, navigationActions)
-        }
+    composeTestRule.onNodeWithTag("joinEventButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("leaveEventButton").assertIsNotDisplayed()
+  }
 
-        composeTestRule.onNodeWithTag("joinEventButton").assertIsNotDisplayed()
-        composeTestRule.onNodeWithTag("leaveEventButton").assertIsDisplayed()
+  @Test
+  fun leaveEventButtonIsNotDisplayed() = runTest {
+    eventViewModel.setCurrentEvent(event)
+    parkViewModel.setCurrentPark(park)
+    userViewModel.setCurrentUser(owner)
+    composeTestRule.setContent {
+      EventOverviewScreen(eventViewModel, parkViewModel, userViewModel, navigationActions)
     }
+
+    composeTestRule.onNodeWithTag("joinEventButton").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("leaveEventButton").assertIsDisplayed()
+  }
 }
