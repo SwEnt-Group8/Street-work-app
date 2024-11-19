@@ -70,8 +70,8 @@ data class ScreenParams(
     val PARK_OVERVIEW =
         ScreenParams(
             Screen.PARK_OVERVIEW,
-            isBottomBarVisible = false,
-            BottomNavigationMenuType.NONE,
+            isBottomBarVisible = true,
+            BottomNavigationMenuType.DEFAULT,
             isTopBarVisible = true,
             TopAppBarManager(
                 "Park Overview",
@@ -90,8 +90,8 @@ data class ScreenParams(
     val EVENT_OVERVIEW =
         ScreenParams(
             Screen.EVENT_OVERVIEW,
-            isBottomBarVisible = true,
-            BottomNavigationMenuType.EVENT_OVERVIEW,
+            isBottomBarVisible = false,
+            BottomNavigationMenuType.NONE,
             isTopBarVisible = true,
             TopAppBarManager(
                 "Event Overview",
