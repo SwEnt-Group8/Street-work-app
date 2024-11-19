@@ -26,7 +26,6 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -89,7 +88,9 @@ fun EventOverviewScreen(
 
       park.value?.let { EventMap(it) }
 
-      EventButton(event, eventViewModel, user, navigationActions)
+      user.value?.let { user ->
+        event.value?.let { event -> EventButton(event, eventViewModel, user, navigationActions) }
+      }
     }
   }
 }
@@ -252,22 +253,18 @@ fun DashBoardBar() {
  */
 @Composable
 fun EventButton(
-    event: State<Event?>,
+    event: Event,
     eventViewModel: EventViewModel,
-    user: State<User?>,
+    user: User,
     navigationActions: NavigationActions
 ) {
   Row(
       horizontalArrangement = Arrangement.Center,
       modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-        event.value?.let {
-          user.value?.let { user ->
-            if (it.listParticipants.contains(user.uid)) {
-              LeaveEventButton(it, eventViewModel, user, navigationActions)
-            } else {
-              JoinEventButton(it, eventViewModel, user, navigationActions)
-            }
-          }
+        if (event.listParticipants.contains(user.uid)) {
+          LeaveEventButton(event, eventViewModel, user, navigationActions)
+        } else {
+          JoinEventButton(event, eventViewModel, user, navigationActions)
         }
       }
 }
