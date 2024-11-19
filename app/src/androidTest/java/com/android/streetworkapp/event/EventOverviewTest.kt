@@ -3,7 +3,6 @@ package com.android.streetworkapp.event
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -31,10 +30,12 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.any
+import org.mockito.kotlin.verify
 
 class EventOverviewTest {
   private lateinit var park: Park
-  private lateinit var owner: User
+  private lateinit var participant: User
   private lateinit var joiner: User
   private lateinit var navigationActions: NavigationActions
   private lateinit var event: Event
@@ -76,7 +77,7 @@ class EventOverviewTest {
                         5,
                         10,
                         Timestamp.now(),
-                        "123",
+                        "124",
                         listOf("123"))))
 
     event = eventList.events.first()
@@ -94,8 +95,8 @@ class EventOverviewTest {
             capacity = 10,
             occupancy = 5,
             events = emptyList())
-    owner = User(event.owner, "test", "test", 0, listOf(), "test")
-    joiner = owner.copy(uid = "joiner")
+    participant = User("123", "test", "test", 0, listOf(), "test")
+    joiner = participant.copy(uid = "joiner")
   }
 
   @Test
@@ -153,22 +154,31 @@ class EventOverviewTest {
     composeTestRule.setContent { EventBottomBar(eventViewModel, userViewModel, navigationActions) }
 
     composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("joinEventButton").assertIsDisplayed()
+
     composeTestRule.onNodeWithTag("leaveEventButton").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("joinEventButton").assertIsDisplayed().performClick()
+
+    composeTestRule.waitForIdle()
+
+    verify(eventRepository).addParticipantToEvent(any(), any())
+    verify(navigationActions).goBack()
   }
 
   @Test
   fun leaveEventButtonIsNotDisplayed() = runTest {
     eventViewModel.setCurrentEvent(event)
-    userViewModel.setCurrentUser(owner)
+    userViewModel.setCurrentUser(participant)
 
     composeTestRule.setContent { EventBottomBar(eventViewModel, userViewModel, navigationActions) }
 
     composeTestRule.waitForIdle()
-    composeTestRule.waitUntil(10000) {
-      composeTestRule.onNodeWithTag("leaveEventButton").isDisplayed()
-    }
+
     composeTestRule.onNodeWithTag("joinEventButton").assertIsNotDisplayed()
-    composeTestRule.onNodeWithTag("leaveEventButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("leaveEventButton").assertIsDisplayed().performClick()
+
+    composeTestRule.waitForIdle()
+
+    verify(eventRepository).removeParticipantFromEvent(any(), any())
+    verify(navigationActions).goBack()
   }
 }

@@ -236,31 +236,6 @@ fun DashBoardBar() {
       }
 }
 
-/**
- * Button to join an event.
- *
- * @param event The event to join.
- * @param eventViewModel The event view model.
- * @param user The current user.
- */
-@Composable
-fun EventButton(
-    event: Event,
-    eventViewModel: EventViewModel,
-    user: User,
-    navigationActions: NavigationActions
-) {
-  Row(
-      horizontalArrangement = Arrangement.Center,
-      modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-        if (event.listParticipants.contains(user.uid)) {
-          LeaveEventButton(event, eventViewModel, user, navigationActions)
-        } else {
-          JoinEventButton(event, eventViewModel, user, navigationActions)
-        }
-      }
-}
-
 @Composable
 fun JoinEventButton(
     event: Event,
