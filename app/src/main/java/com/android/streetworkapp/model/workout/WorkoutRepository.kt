@@ -12,5 +12,12 @@ interface WorkoutRepository {
       endTime: Long?
   )
 
+  suspend fun updateExercise(
+      uid: String,
+      sessionId: String,
+      exerciseIndex: Int,
+      updatedExercise: Exercise
+  )
+
   suspend fun deleteWorkoutSession(uid: String, sessionId: String)
 }
