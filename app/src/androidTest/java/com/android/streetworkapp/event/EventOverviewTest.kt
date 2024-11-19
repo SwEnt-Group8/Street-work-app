@@ -159,7 +159,9 @@ class EventOverviewTest {
     }
 
     composeTestRule.waitForIdle()
-    composeTestRule.waitUntil(10000) { composeTestRule.onNodeWithTag("joinEventButton").isDisplayed() }
+    composeTestRule.waitUntil(10000) {
+      composeTestRule.onNodeWithTag("joinEventButton").isDisplayed()
+    }
     composeTestRule.onNodeWithTag("joinEventButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("leaveEventButton").assertIsNotDisplayed()
   }
