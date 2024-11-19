@@ -1,5 +1,6 @@
 package com.android.streetworkapp.model.moderation
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 // All the definitions below are used to interact with Perspective API
@@ -21,10 +22,10 @@ enum class TextModerationTags {
 data class TagAnnotation(val tag: TextModerationTags, val probability: Double)
 
 /** Used to return the result of a query to PerspectiveAPI */
-sealed class TextEvaluationResult {
-  data class Success(val annotations: List<TagAnnotation>) : TextEvaluationResult()
+sealed class PerspectiveAPIEvaluationResult {
+  data class Success(val annotations: List<TagAnnotation>) : PerspectiveAPIEvaluationResult()
 
-  data class Error(val errorType: PerspectiveApiErrors) : TextEvaluationResult()
+  data class Error(val errorType: PerspectiveApiErrors) : PerspectiveAPIEvaluationResult()
 }
 
 // Request data classes
@@ -53,15 +54,18 @@ data class SuccessResponse(
 @Serializable data class Score(val value: Double, val type: String)
 
 // errors def
+@Serializable data class ErrorResponse(val error: ErrorDetail)
 
 @Serializable
-data class ErrorResponse(
+data class ErrorDetail(
     val code: Int,
     val message: String,
     val status: String,
-    // Note: here we ignore the 'details' from the response as we don't need (thus it is not
-    // defined)
+    val details: List<ErrorExtraDetails>
 )
+
+@Serializable
+data class ErrorExtraDetails(@SerialName("@type") val type: String, val errorType: String)
 
 enum class PerspectiveApiErrors(val errorMessage: String) {
   // Official errors from the Perspective API's website

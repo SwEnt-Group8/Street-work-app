@@ -15,32 +15,36 @@ import okhttp3.RequestBody.Companion.toRequestBody
 class PerspectiveAPIRepository(private val client: OkHttpClient) : TextModerationRepository {
   private val DEBUG_PREFIX = "PerspectiveAPIRepository:"
 
-    /**
-     * Evaluates the text
-     *
-     * @param content Text to be analyzed
-     * @return True if the text is under all thresholds, false if the text is over at least one threshold
-     */
-  override fun evaluateText(content: String, thresholds: Map<TextModerationTags, Double>): Boolean {
-    if (content.isEmpty()) return false
+  /**
+   * Evaluates the text
+   *
+   * @param content Text to be analyzed
+   * @return True if the text is under all thresholds, false if the text is over at least one
+   *   threshold
+   */
+  override fun evaluateText(
+      content: String,
+      thresholds: Map<TextModerationTags, Double>
+  ): TextEvaluation {
+    if (content.isEmpty()) return TextEvaluation.Result(true)
 
     when (val result = this.getTextAnnotations(content)) {
-      is TextEvaluationResult.Error -> {
+      is PerspectiveAPIEvaluationResult.Error -> {
         Log.d(this.DEBUG_PREFIX, result.errorType.errorMessage)
-        return false
+        return TextEvaluation.Error(result.errorType.errorMessage)
       }
-      is TextEvaluationResult.Success -> {
+      is PerspectiveAPIEvaluationResult.Success -> {
         for (resultAnnotation in result.annotations) {
           thresholds[resultAnnotation.tag]?.let { thresholdTagProbability ->
             if (resultAnnotation.probability > thresholdTagProbability)
-                return false // Text over one of the thresholds
+                return TextEvaluation.Result(false) // Text over one of the thresholds
           }
               ?: run {
-                return false // invalid tag
+                return TextEvaluation.Result(false) // invalid tag
               }
         }
 
-        return true // all the tags under the thresholds :)
+        return TextEvaluation.Result(true) // all the tags under the thresholds :)
       }
     }
   }
@@ -52,7 +56,7 @@ class PerspectiveAPIRepository(private val client: OkHttpClient) : TextModeratio
    * @return TextEvaluationResult.Success if the API could process the content,
    *   TextEvaluationResult.Error if an error was encountered
    */
-  private fun getTextAnnotations(content: String): TextEvaluationResult {
+  private fun getTextAnnotations(content: String): PerspectiveAPIEvaluationResult {
     // I don't perform any checks on the content, I'll let the api handle the error checking
 
     val requestMediaType = "application/json; charset=utf-8".toMediaType()
@@ -77,28 +81,31 @@ class PerspectiveAPIRepository(private val client: OkHttpClient) : TextModeratio
         val responseBody =
             response.body?.string()
                 ?: run {
-                  return TextEvaluationResult.Error(PerspectiveApiErrors.EMPTY_BODY_RESPONSE)
+                  return PerspectiveAPIEvaluationResult.Error(
+                      PerspectiveApiErrors.EMPTY_BODY_RESPONSE)
                 }
         val annotations = this.extractTagsAndProbabilitiesFromResponseBody(responseBody)
         annotations?.let {
-          return TextEvaluationResult.Success(annotations)
+          return PerspectiveAPIEvaluationResult.Success(annotations)
         }
             ?: run {
-              return TextEvaluationResult.Error(PerspectiveApiErrors.JSON_DESERIALIZATION_ERROR)
+              return PerspectiveAPIEvaluationResult.Error(
+                  PerspectiveApiErrors.JSON_DESERIALIZATION_ERROR)
             }
       }
       HTTP_BAD_REQUEST -> {
         val responseBody =
             response.body?.string()
                 ?: run {
-                  return TextEvaluationResult.Error(PerspectiveApiErrors.EMPTY_BODY_RESPONSE)
+                  return PerspectiveAPIEvaluationResult.Error(
+                      PerspectiveApiErrors.EMPTY_BODY_RESPONSE)
                 }
         val error = extractErrorFromResponseBody(responseBody)
-        return TextEvaluationResult.Error(error)
+        return PerspectiveAPIEvaluationResult.Error(error)
       }
       else -> {
         Log.d(this.DEBUG_PREFIX, "Received unsupported http code (${response.code}) from api")
-        return TextEvaluationResult.Error(PerspectiveApiErrors.UNSUPPORTED_HTTP_CODE)
+        return PerspectiveAPIEvaluationResult.Error(PerspectiveApiErrors.UNSUPPORTED_HTTP_CODE)
       }
     }
   }
@@ -135,7 +142,7 @@ class PerspectiveAPIRepository(private val client: OkHttpClient) : TextModeratio
   private fun extractErrorFromResponseBody(responseBody: String): PerspectiveApiErrors {
     try {
       val error = Json.decodeFromString<ErrorResponse>(responseBody)
-      return enumValues<PerspectiveApiErrors>().find { it.name == error.status }
+      return enumValues<PerspectiveApiErrors>().find { it.name == error.error.status }
           ?: PerspectiveApiErrors.UNKNOWN_ERROR
     } catch (e: Exception) {
       return PerspectiveApiErrors.JSON_DESERIALIZATION_ERROR

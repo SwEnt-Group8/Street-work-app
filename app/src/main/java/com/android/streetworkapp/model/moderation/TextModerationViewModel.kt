@@ -10,23 +10,33 @@ open class TextModerationViewModel(val repository: TextModerationRepository) : V
    * moderation criteria.
    *
    * @param content The text to be analyzed.
-   * @param onTextUnderThresholds A callback function to be executed if the text is considered clean
-   *   (under the thresholds).
-   * @param onTextOverThresholds A callback function to be executed if the text exceeds the
-   *   thresholds.
+   * @param onTextEvaluationResult A callback function to be executed if the text has been
+   *   successfully evaluated. The value passed as parameter is true if the text is under all
+   *   thresholds, false otherwise
+   * @param onTextEvaluationError A callback function to be executed if an error occurs during the
+   *   request. The error message is passed as parameter
    * @param thresholds A map of threshold values for different text moderation tags. If not
    *   provided, default values are used.
    */
   fun analyzeText(
       content: String,
-      onTextUnderThresholds: () -> Unit,
-      onTextOverThresholds: () -> Unit,
+      onTextEvaluationResult: (Boolean) -> Unit,
+      onTextEvaluationError: (String) -> Unit,
       thresholds: Map<TextModerationTags, Double> =
           PerspectiveAPIThresholds.DEFAULT_THRESHOLD_VALUES
   ) {
     viewModelScope.launch {
-      if (repository.evaluateText(content, thresholds)) onTextUnderThresholds()
-      else onTextOverThresholds()
+      when (val result = repository.evaluateText(content, thresholds)) {
+        is TextEvaluation.Error -> onTextEvaluationError(result.errorMessage)
+        is TextEvaluation.Result -> onTextEvaluationResult(result.isTextUnderThresholds)
+      }
     }
   }
+}
+
+/** Used by the repositories to return the result to the viewmodel */
+sealed class TextEvaluation {
+  data class Result(val isTextUnderThresholds: Boolean) : TextEvaluation()
+
+  data class Error(val errorMessage: String) : TextEvaluation()
 }
