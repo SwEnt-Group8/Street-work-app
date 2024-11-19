@@ -15,6 +15,12 @@ import okhttp3.RequestBody.Companion.toRequestBody
 class PerspectiveAPIRepository(private val client: OkHttpClient) : TextModerationRepository {
   private val DEBUG_PREFIX = "PerspectiveAPIRepository:"
 
+    /**
+     * Evaluates the text
+     *
+     * @param content Text to be analyzed
+     * @return True if the text is under all thresholds, false if the text is over at least one threshold
+     */
   override fun evaluateText(content: String, thresholds: Map<TextModerationTags, Double>): Boolean {
     if (content.isEmpty()) return false
 
