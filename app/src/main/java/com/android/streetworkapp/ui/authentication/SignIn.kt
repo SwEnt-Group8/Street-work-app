@@ -2,6 +2,7 @@ package com.android.streetworkapp.ui.authentication
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -120,7 +122,15 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
 
           Spacer(modifier = Modifier.height(64.dp).testTag("loginScreenSpacer"))
 
-          GoogleAuthButton(authService, context, launcher)
+          Box(
+              modifier =
+                  Modifier.fillMaxWidth()
+                      .height(96.dp)
+                      .background(ColorPalette.INTERACTION_COLOR_DARK)
+                      .testTag("loginScreenGoogleAuthButtonContainer"),
+              contentAlignment = Alignment.Center) {
+                GoogleAuthButton(authService, context, launcher)
+              }
         }
   }
 }
