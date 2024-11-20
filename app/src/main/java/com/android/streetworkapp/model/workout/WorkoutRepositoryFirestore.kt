@@ -166,7 +166,7 @@ class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRep
     return WorkoutSession(
         sessionId = sessionMap["sessionId"] as? String ?: "",
         startTime = (sessionMap["startTime"] as? Long) ?: 0L,
-        endTime = sessionMap["endTime"] as? Long,
+        endTime = (sessionMap["endTime"] as? Long) ?: 0L,
         sessionType = SessionType.valueOf(sessionMap["sessionType"] as? String ?: "ALONE"),
         participants =
             (sessionMap["participants"] as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
