@@ -4,6 +4,7 @@ import android.util.Log
 import com.android.streetworkapp.model.park.Park
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
@@ -12,6 +13,8 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
 
   companion object {
     private const val COLLECTION_PATH = "events"
+    private const val FIELD_PARTICIPANTS = "participants"
+    private const val FIELD_LIST_PARTICIPANTS = "listParticipants"
   }
 
   /**
@@ -80,13 +83,13 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
     try {
       val event = getEventByEid(eid)
       if (event != null) {
-        val updatedParticipants = event.participants + 1
-        val updatedListParticipants = event.listParticipants.toMutableList()
-        updatedListParticipants.add(uid)
         db.collection(COLLECTION_PATH)
             .document(eid)
             .update(
-                "participants", updatedParticipants, "listParticipants", updatedListParticipants)
+                FIELD_PARTICIPANTS,
+                FieldValue.increment(1),
+                FIELD_LIST_PARTICIPANTS,
+                FieldValue.arrayUnion(uid))
             .await()
       } else {
         Log.e("FirestoreError", "Error adding participant to event: Event does not exist.")
@@ -108,13 +111,13 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
     try {
       val event = getEventByEid(eid)
       if (event != null) {
-        val updatedParticipants = event.participants - 1
-        val updatedListParticipants = event.listParticipants.toMutableList()
-        updatedListParticipants.remove(uid)
         db.collection(COLLECTION_PATH)
             .document(eid)
             .update(
-                "participants", updatedParticipants, "listParticipants", updatedListParticipants)
+                FIELD_PARTICIPANTS,
+                FieldValue.increment(-1),
+                FIELD_LIST_PARTICIPANTS,
+                FieldValue.arrayRemove(uid))
             .await()
       } else {
         Log.e("FirestoreError", "Error removing participant from event: Event does not exist.")
