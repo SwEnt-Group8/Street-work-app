@@ -7,6 +7,6 @@ package com.android.streetworkapp.model.workout
  * @param workoutSessions List of workout sessions
  */
 data class WorkoutData(
-    val userUid: String,
+    val userUid: String = "",
     val workoutSessions: List<WorkoutSession> = emptyList()
 )

@@ -14,7 +14,7 @@ package com.android.streetworkapp.model.workout
 data class WorkoutSession(
     val sessionId: String,
     val startTime: Long,
-    val endTime: Long?,
+    val endTime: Long,
     val sessionType: SessionType,
     val participants: List<String> = emptyList(),
     val exercises: List<Exercise> = emptyList(),
