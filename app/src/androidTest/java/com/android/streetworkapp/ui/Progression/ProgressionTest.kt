@@ -108,7 +108,7 @@ class ProgressionTest {
       ProgressScreen(navigationActions, userViewModel, progressionViewModel)
     }
 
-      composeTestRule.onNodeWithTag("AchievementTab").performClick()
+    composeTestRule.onNodeWithTag("AchievementTab").performClick()
 
     composeTestRule
         .onNodeWithTag("percentageInsideCircularProgressBar")
