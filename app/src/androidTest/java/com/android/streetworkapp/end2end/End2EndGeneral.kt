@@ -134,8 +134,8 @@ class End2EndGeneral {
         .assertTextEquals("${mockedUser.score}/${mockedUserProgression.currentGoal}")
 
     // checking that each achievements exists in the lazy column
-    mockedUserProgression.achievements.forEach { achievementName ->
-      composeTestRule.onNodeWithTag("achievementItem").assertExists()
+    mockedUserProgression.achievements.forEach { _ ->
+      composeTestRule.onNodeWithTag("achievementItem").assertIsDisplayed()
     }
 
     // navigate to Profile screen
