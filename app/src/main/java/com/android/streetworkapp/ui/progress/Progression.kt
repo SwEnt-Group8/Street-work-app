@@ -311,14 +311,14 @@ fun DashBoardBarProgression() {
         val state = uiState.collectAsState().value
 
         NavigationBarItem(
-            modifier = Modifier.testTag("detailsTab"),
+            modifier = Modifier.testTag("TrainingTab"),
             icon = { Text("Training") },
             selected = state == DashboardStateProgression.Training,
             onClick = { uiState.value = DashboardStateProgression.Training },
             colors = ColorPalette.NAVIGATION_BAR_ITEM_COLORS)
 
         NavigationBarItem(
-            modifier = Modifier.testTag("participantsTab"),
+            modifier = Modifier.testTag("AchievementTab"),
             icon = { Text("Achievement") },
             selected = state == DashboardStateProgression.Achievement,
             onClick = { uiState.value = DashboardStateProgression.Achievement },

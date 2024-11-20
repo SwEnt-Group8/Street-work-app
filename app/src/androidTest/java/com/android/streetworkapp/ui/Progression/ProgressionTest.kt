@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import com.android.streetworkapp.model.progression.MedalsAchievement
 import com.android.streetworkapp.model.progression.Progression
 import com.android.streetworkapp.model.progression.ProgressionRepositoryFirestore
@@ -106,6 +107,8 @@ class ProgressionTest {
     composeTestRule.setContent {
       ProgressScreen(navigationActions, userViewModel, progressionViewModel)
     }
+
+      composeTestRule.onNodeWithTag("AchievementTab").performClick()
 
     composeTestRule
         .onNodeWithTag("percentageInsideCircularProgressBar")
