@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -45,6 +46,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.streetworkapp.model.progression.Achievement
+import com.android.streetworkapp.model.progression.ExerciseAchievement
 import com.android.streetworkapp.model.progression.MedalsAchievement
 import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.user.UserViewModel
@@ -166,7 +168,7 @@ fun ProgressScreen(
                     currentProgression.achievements.forEach { achievementName ->
                       val achievementEnum = enumValueOf<MedalsAchievement>(achievementName)
                       Box(modifier = Modifier.testTag("achievementItem")) {
-                        AchievementItem(achievementEnum.achievement)
+                        AchievementItem(achievementEnum.achievement, false)
                         HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
                       }
                     }
@@ -175,12 +177,14 @@ fun ProgressScreen(
               }
               DashboardStateProgression.Training -> {
 
-                Text(
-                    text = "Training screen",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = ColorPalette.SECONDARY_TEXT_COLOR,
-                    modifier = Modifier.padding(top = 10.dp).testTag("emptyAchievementsText"))
+                enumValues<ExerciseAchievement>().forEach {
+                  it.achievement.description =
+                      "Record : 0.0 sec" // TODO: use the progression MVVM with current record
+
+                  AchievementItem(it.achievement, true)
+
+                  HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
+                }
               }
             }
           }
@@ -248,7 +252,7 @@ fun MetricCard(label: String, value: String, testTagPrefix: String) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun AchievementItem(achievement: Achievement) {
+fun AchievementItem(achievement: Achievement, navButton: Boolean) {
   Row(
       modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp, horizontal = 16.dp),
       verticalAlignment = Alignment.CenterVertically) {
@@ -299,6 +303,18 @@ fun AchievementItem(achievement: Achievement) {
               text = achievement.description,
               fontSize = 14.sp,
               color = ColorPalette.SECONDARY_TEXT_COLOR)
+        }
+
+        if (navButton) {
+          Button(
+              onClick = {
+                // TODO: navigate to detail progression screen (not yet implemented)
+              },
+              modifier = Modifier.padding(horizontal = 4.dp).testTag("detailButton"),
+              enabled = false, // Note: it is not enable until the corresponding screen is created
+              colors = ColorPalette.BUTTON_COLOR) {
+                Text(text = "Details")
+              }
         }
       }
 }

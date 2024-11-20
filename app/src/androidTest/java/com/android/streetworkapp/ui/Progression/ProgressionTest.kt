@@ -155,6 +155,7 @@ class ProgressionTest {
     composeTestRule.setContent {
       ProgressScreen(navigationActions, userViewModel, progressionViewModel)
     }
+    composeTestRule.onNodeWithTag("AchievementTab").performClick()
 
     composeTestRule.onNodeWithTag("emptyAchievementsText").assertIsDisplayed()
   }

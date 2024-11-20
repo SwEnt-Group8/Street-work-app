@@ -33,7 +33,7 @@ data class Achievement(
     val icon: Int,
     val title: String,
     val tags: List<String>,
-    val description: String
+    var description: String
 )
 
 enum class Ranks(val score: Int) {
@@ -67,6 +67,11 @@ enum class MedalsAchievement(val achievement: Achievement) {
           "Platinum medal",
           listOf("Platinum"),
           "Last medal"))
+}
+
+enum class ExerciseAchievement(val achievement: Achievement) {
+  HANDSTAND(Achievement(R.drawable.handstand, "Handstand", emptyList(), "")),
+  FRONT_LEVER(Achievement(R.drawable.front_lever, "Front Lever", emptyList(), ""))
 }
 
 enum class ScoreIncrease(val scoreAdded: Int) {
