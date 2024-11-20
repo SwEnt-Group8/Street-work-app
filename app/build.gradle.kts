@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.sonar)
     id("jacoco")
     alias(libs.plugins.gms) // Google services (auth)
+    kotlin("plugin.serialization") version "2.0.21"
 }
 
 android {
@@ -37,7 +38,9 @@ android {
     }
 
 
+    //fetching keys
     val mapsApiKey: String = localProperties.getProperty("MAPS_API_KEY") ?: ""
+    val perspectiveApiKey: String = System.getenv("PERSPECTIVE_API_KEY") ?: localProperties.getProperty("PERSPECTIVE_API_KEY", "")
 
     defaultConfig {
         applicationId = "com.android.streetworkapp"
@@ -50,7 +53,9 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+        buildConfigField("String", "PERSPECTIVE_API_KEY", "\"${perspectiveApiKey}\"")
     }
 
     buildTypes {
@@ -76,6 +81,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true //so that we can use BuildConfig.{field} in code
     }
 
     composeOptions {
@@ -155,6 +161,7 @@ fun DependencyHandlerScope.globalTestImplementation(dep: Any) {
 }
 
 dependencies {
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
     implementation (libs.androidx.material.icons.extended)
@@ -180,6 +187,7 @@ dependencies {
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.espresso.intents)
+
 
     // Testing Unit
     androidTestImplementation(libs.mockk)
