@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
@@ -96,11 +97,21 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
         modifier = Modifier.fillMaxSize().testTag("loginScreenColumnContainer"),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally) {
-          // Welcome text in the center
           Text(
-              text = "Welcome to the Street Work'App",
-              style = TextStyle(fontSize = 24.sp),
-              modifier = Modifier.testTag("loginTitle"))
+              text = "Welcome to Street WorkApp!",
+              style =
+                  TextStyle(
+                      fontSize = 26.sp,
+                      lineHeight = 26.sp,
+                      fontWeight = FontWeight(500),
+                      color = Color(0xFF000000),
+                      textAlign = TextAlign.Center,
+                  ),
+              modifier =
+                  Modifier.height(32.dp)
+                      .aspectRatio(308f / 24f)
+                      .fillMaxWidth()
+                      .testTag("loginTitle"))
 
           Spacer(modifier = Modifier.height(26.dp).testTag("loginScreenFirstSpacer"))
 
