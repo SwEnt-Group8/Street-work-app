@@ -133,6 +133,7 @@ class End2EndGeneral {
         .onNodeWithTag("scoreTextUnderCircularProgressBar")
         .assertTextEquals("${mockedUser.score}/${mockedUserProgression.currentGoal}")
 
+    // Note: left as comment, since it works locally but not on the CI
     // checking that each achievements exists in the lazy column
     // mockedUserProgression.achievements.forEach { _ ->
     //  composeTestRule.onNodeWithTag("achievementItem").assertIsDisplayed()
