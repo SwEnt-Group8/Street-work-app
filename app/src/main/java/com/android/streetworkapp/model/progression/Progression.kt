@@ -33,9 +33,10 @@ data class Achievement(
     val icon: Int,
     val title: String,
     val tags: List<String>,
-    val description: String
+    var description: String
 )
 
+/** Represents the different ranks needed to obtain the next medal */
 enum class Ranks(val score: Int) {
   BRONZE(100),
   SILVER(1000),
@@ -44,6 +45,7 @@ enum class Ranks(val score: Int) {
   CEILING(100000)
 }
 
+/** Represents a type of achievement based on points obtained */
 enum class MedalsAchievement(val achievement: Achievement) {
   NONE(Achievement(R.drawable.place_holder_achievement_icon, "No medal", emptyList(), "No medal")),
   BRONZE(
@@ -69,6 +71,13 @@ enum class MedalsAchievement(val achievement: Achievement) {
           "Last medal"))
 }
 
+/** Represents a type of achievement linked to the performance of the user on different exercises */
+enum class ExerciseAchievement(val achievement: Achievement) {
+  HANDSTAND(Achievement(R.drawable.handstand, "Handstand", emptyList(), "")),
+  FRONT_LEVER(Achievement(R.drawable.front_lever, "Front Lever", emptyList(), ""))
+}
+
+/** Represents the number of points obtained for different actions in the app */
 enum class ScoreIncrease(val scoreAdded: Int) {
   CREATE_EVENT(10),
   JOIN_EVENT(5),
