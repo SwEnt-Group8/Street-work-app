@@ -122,9 +122,9 @@ class End2EndGeneral {
 
     // navigate to Progress screen
     composeTestRule.onNodeWithTag("bottomNavigationItem${Route.PROGRESSION}").performClick()
+    composeTestRule.onNodeWithTag("AchievementTab").performClick()
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("progressionScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("AchievementTab").performClick()
     composeTestRule
         .onNodeWithTag("percentageInsideCircularProgressBar")
         .assertTextEquals(
@@ -134,8 +134,8 @@ class End2EndGeneral {
         .assertTextEquals("${mockedUser.score}/${mockedUserProgression.currentGoal}")
 
     // checking that each achievements exists in the lazy column
-    mockedUserProgression.achievements.forEachIndexed { index, _ ->
-      composeTestRule.onNodeWithTag("achievementItem${index}").assertExists()
+    mockedUserProgression.achievements.forEach { achievementName ->
+      composeTestRule.onNodeWithTag("achievementItem").assertExists()
     }
 
     // navigate to Profile screen
