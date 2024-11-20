@@ -162,7 +162,7 @@ class ProgressionTest {
   }
 
   @Test
-  fun screenDisplaysExercisesByDefault() {
+  fun screenDisplaysExercisesAfterClick() {
     val mockedProgression =
         Progression(
             progressionId = "prog123456",
@@ -180,6 +180,8 @@ class ProgressionTest {
     composeTestRule.setContent {
       ProgressScreen(navigationActions, userViewModel, progressionViewModel)
     }
+
+    composeTestRule.onNodeWithTag("TrainingTab").performClick()
 
     enumValues<ExerciseAchievement>().forEach { exercise ->
       composeTestRule.onNodeWithTag("exerciseItem" + exercise.name).assertExists()
