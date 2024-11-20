@@ -6,6 +6,7 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import com.android.streetworkapp.model.progression.ExerciseAchievement
 import com.android.streetworkapp.model.progression.MedalsAchievement
 import com.android.streetworkapp.model.progression.Progression
 import com.android.streetworkapp.model.progression.ProgressionRepositoryFirestore
@@ -158,5 +159,30 @@ class ProgressionTest {
     composeTestRule.onNodeWithTag("AchievementTab").performClick()
 
     composeTestRule.onNodeWithTag("emptyAchievementsText").assertIsDisplayed()
+  }
+
+  @Test
+  fun screenDisplaysExercisesByDefault() {
+    val mockedProgression =
+        Progression(
+            progressionId = "prog123456",
+            uid = mockedUser.uid,
+            currentGoal = Ranks.BRONZE.score,
+            eventsCreated = 0,
+            eventsJoined = 0,
+            achievements = emptyList())
+
+    coEvery { progressionRepository.getOrAddProgression(eq(mockedUser.uid)) } answers
+        {
+          mockedProgression
+        }
+
+    composeTestRule.setContent {
+      ProgressScreen(navigationActions, userViewModel, progressionViewModel)
+    }
+
+    enumValues<ExerciseAchievement>().forEach { exercise ->
+      composeTestRule.onNodeWithTag("exerciseItem" + exercise.name).assertExists()
+    }
   }
 }
