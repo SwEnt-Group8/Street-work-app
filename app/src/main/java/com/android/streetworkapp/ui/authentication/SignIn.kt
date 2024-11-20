@@ -120,7 +120,7 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
               text = "Make new friends, train together and share activities",
               testName = "loginScreenThirdRow")
 
-          Spacer(modifier = Modifier.height(64.dp).testTag("loginScreenSpacer"))
+          Spacer(modifier = Modifier.height(26.dp).testTag("loginScreenSpacer"))
 
           Box(
               modifier =
