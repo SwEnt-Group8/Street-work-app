@@ -171,7 +171,7 @@ fun IconAndTextRow(
         Icon(
             imageVector = imageVector,
             contentDescription = contentDescription,
-            modifier = Modifier.weight(0.8f).aspectRatio(26.4f / 33f).testTag("${testName}Icon"),
+            modifier = Modifier.weight(0.7f).aspectRatio(26.4f / 33f).testTag("${testName}Icon"),
             tint = ColorPalette.INTERACTION_COLOR_DARK)
         Spacer(modifier = Modifier.width(16.dp).testTag("${testName}Spacer"))
         Text(
