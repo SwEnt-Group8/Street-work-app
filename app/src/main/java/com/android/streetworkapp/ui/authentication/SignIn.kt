@@ -102,6 +102,8 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
               style = TextStyle(fontSize = 24.sp),
               modifier = Modifier.testTag("loginTitle"))
 
+          Spacer(modifier = Modifier.height(26.dp).testTag("loginScreenSpacer"))
+
           IconAndTextRow(
               imageVector = Icons.Filled.LocationOn,
               contentDescription = "Location marker icon",
