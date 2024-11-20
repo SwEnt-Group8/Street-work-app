@@ -124,6 +124,7 @@ class End2EndGeneral {
     composeTestRule.onNodeWithTag("bottomNavigationItem${Route.PROGRESSION}").performClick()
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("progressionScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("AchievementTab").performClick()
     composeTestRule
         .onNodeWithTag("percentageInsideCircularProgressBar")
         .assertTextEquals(
