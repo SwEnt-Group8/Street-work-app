@@ -142,7 +142,7 @@ fun IconAndTextRow(
     testName: String
 ) {
   Row(
-      modifier = Modifier.padding(20.dp).testTag(testName),
+      modifier = Modifier.padding(horizontal = 25.dp, vertical = 8.dp).testTag(testName),
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.Center) {
         Icon(
