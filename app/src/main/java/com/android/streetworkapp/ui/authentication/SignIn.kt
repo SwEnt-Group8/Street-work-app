@@ -12,6 +12,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.DirectionsRun
+import androidx.compose.material.icons.filled.ConnectWithoutContact
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -95,6 +99,24 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
               text = "Welcome to the Street Work'App",
               style = TextStyle(fontSize = 24.sp),
               modifier = Modifier.testTag("loginTitle"))
+
+          IconAndTextRow(
+              imageVector = Icons.Filled.LocationOn,
+              contentDescription = "Location marker icon",
+              text = "Find nearby parks and events to participate in or create",
+              testName = "loginScreenFirstRow")
+
+          IconAndTextRow(
+              imageVector = Icons.AutoMirrored.Filled.DirectionsRun,
+              contentDescription = "Running person icon",
+              text = "Track your activities and learn new skills",
+              testName = "loginScreenSecondRow")
+
+          IconAndTextRow(
+              imageVector = Icons.Filled.ConnectWithoutContact,
+              contentDescription = "People connecting icon",
+              text = "Make new friends, train together and share activities",
+              testName = "loginScreenThirdRow")
 
           Spacer(modifier = Modifier.height(64.dp).testTag("loginScreenSpacer"))
 
