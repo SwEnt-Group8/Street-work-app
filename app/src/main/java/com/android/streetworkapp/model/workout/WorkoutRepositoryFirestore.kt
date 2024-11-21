@@ -158,7 +158,7 @@ class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRep
   }
 
   /**
-   * Converts a Firestore document to a WorkoutSession object.
+   * Converts a session map to a WorkoutSession object.
    *
    * @param sessionMap The map representing the session.
    */
