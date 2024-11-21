@@ -115,4 +115,42 @@ class TopAppBarActionTest {
     composeTestRule.waitForIdle()
     assert(logicValue.value)
   }
+
+  @Test
+  fun areDefaultCallBackValueWorking() {
+    val actions = TopAppBarManager.TopAppBarAction.entries.toList()
+
+    val topAppBarManager = TopAppBarManager("any title", actions = actions)
+
+    val logicValue = mutableStateOf(false)
+    topAppBarManager.setAllActionCallbacks(actions.associateWith { { logicValue.value = true } })
+    topAppBarManager.setAllActionCallbacks() // This should reset everything to () -> {}
+
+    composeTestRule.setContent { TopAppBarWrapper(NavigationActions(mockk()), topAppBarManager) }
+
+    // Verify that the default value is working
+    // Warning : This test might break when new actions are added (resetting the value)
+    for (action in actions) {
+      composeTestRule.waitForIdle()
+      composeTestRule.onNodeWithTag(action.testTag).performClick()
+      composeTestRule.waitForIdle()
+      assert(!logicValue.value) // Value should not have changed
+      logicValue.value = false // Reset the value
+    }
+  }
+
+  @Test
+  fun isOnActionClickWorking(){
+    val settingsAction = TopAppBarManager.TopAppBarAction.SETTINGS
+
+    val topAppBarManager = TopAppBarManager("any title", actions = listOf(settingsAction))
+
+    val logicValue = mutableStateOf(false)
+
+    topAppBarManager.setActionCallback(settingsAction) { logicValue.value = true }
+
+    topAppBarManager.onActionClick(settingsAction)
+
+    assert(logicValue.value)
+  }
 }
