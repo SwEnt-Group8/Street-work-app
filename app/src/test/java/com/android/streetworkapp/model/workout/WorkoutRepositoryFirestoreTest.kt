@@ -155,4 +155,28 @@ class WorkoutRepositoryFirestoreTest {
                 "workoutSessions.$sessionId.exercises" to exercises,
                 "workoutSessions.$sessionId.endTime" to endTime))
   }
+
+  @Test
+  fun updateExerciseUpdatesCorrectFieldPath() = runTest {
+    val uid = "testUid"
+    val sessionId = "sessionId"
+    val exerciseIndex = 0
+    val updatedExercise = Exercise(name = "Pull-up", reps = 10, sets = 3)
+
+    // Mock Firestore interactions
+    `when`(db.collection(any())).thenReturn(collection)
+    `when`(collection.document(any())).thenReturn(documentRef)
+
+    // Call the function
+    repository.updateExercise(uid, sessionId, exerciseIndex, updatedExercise)
+
+    // Capture the update operation
+    val captor = argumentCaptor<Map<String, Any>>()
+    verify(documentRef).update(captor.capture())
+
+    // Verify the field path and value
+    val capturedUpdate = captor.firstValue
+    val expectedFieldPath = "workoutSessions.$sessionId.exercises.$exerciseIndex"
+    assertEquals(updatedExercise, capturedUpdate[expectedFieldPath])
+  }
 }
