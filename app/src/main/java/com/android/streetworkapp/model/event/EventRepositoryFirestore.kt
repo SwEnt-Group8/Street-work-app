@@ -4,6 +4,7 @@ import android.util.Log
 import com.android.streetworkapp.model.park.Park
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
@@ -12,6 +13,8 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
 
   companion object {
     private const val COLLECTION_PATH = "events"
+    private const val FIELD_PARTICIPANTS = "participants"
+    private const val FIELD_LIST_PARTICIPANTS = "listParticipants"
   }
 
   /**
@@ -65,6 +68,62 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
       db.collection(COLLECTION_PATH).document(event.eid).set(event).await()
     } catch (e: Exception) {
       Log.e("FirestoreError", "Error creating event: ${e.message}")
+    }
+  }
+
+  /**
+   * Add a participant to an event.
+   *
+   * @param eid The event ID.
+   * @param uid The user ID.
+   */
+  override suspend fun addParticipantToEvent(eid: String, uid: String) {
+    require(eid.isNotEmpty())
+    require(uid.isNotEmpty())
+    try {
+      val event = getEventByEid(eid)
+      if (event != null) {
+        db.collection(COLLECTION_PATH)
+            .document(eid)
+            .update(
+                FIELD_PARTICIPANTS,
+                FieldValue.increment(1),
+                FIELD_LIST_PARTICIPANTS,
+                FieldValue.arrayUnion(uid))
+            .await()
+      } else {
+        Log.e("FirestoreError", "Error adding participant to event: Event does not exist.")
+      }
+    } catch (e: Exception) {
+      Log.e("FirestoreError", "Error adding participant to event: ${e.message}")
+    }
+  }
+
+  /**
+   * Remove a participant from an event.
+   *
+   * @param eid The event ID.
+   * @param uid The user ID.
+   */
+  override suspend fun removeParticipantFromEvent(eid: String, uid: String) {
+    require(eid.isNotEmpty())
+    require(uid.isNotEmpty())
+    try {
+      val event = getEventByEid(eid)
+      if (event != null) {
+        db.collection(COLLECTION_PATH)
+            .document(eid)
+            .update(
+                FIELD_PARTICIPANTS,
+                FieldValue.increment(-1),
+                FIELD_LIST_PARTICIPANTS,
+                FieldValue.arrayRemove(uid))
+            .await()
+      } else {
+        Log.e("FirestoreError", "Error removing participant from event: Event does not exist.")
+      }
+    } catch (e: Exception) {
+      Log.e("FirestoreError", "Error removing participant from event: ${e.message}")
     }
   }
 
