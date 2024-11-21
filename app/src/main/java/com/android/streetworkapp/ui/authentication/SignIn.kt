@@ -102,7 +102,7 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
           Image(
               painter = painterResource(id = R.drawable.app_logo),
               contentDescription = "App Logo",
-              modifier = Modifier.height(225.dp).width(225.dp).testTag("appLogo"))
+              modifier = Modifier.height(225.dp).width(225.dp).testTag("loginScreenAppLogo"))
 
           Spacer(modifier = Modifier.height(26.dp).testTag("loginScreenFirstSpacer"))
 

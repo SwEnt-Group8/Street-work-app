@@ -33,7 +33,7 @@ class LoginTest : TestCase() {
 
     // For Box, Text, Image, Buttons, List : check if displayed :
     composeTestRule.onNodeWithTag("loginScreenBoxContainer").assertExists().assertIsDisplayed()
-    composeTestRule.onNodeWithTag("appLogo").assertExists().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("loginScreenAppLogo").assertExists().assertIsDisplayed()
     composeTestRule.onNodeWithTag("loginTitle").assertExists().assertIsDisplayed()
     composeTestRule.onNodeWithTag("loginScreenFirstRowIcon").assertExists().assertIsDisplayed()
     composeTestRule.onNodeWithTag("loginScreenSecondRowIcon").assertExists().assertIsDisplayed()
