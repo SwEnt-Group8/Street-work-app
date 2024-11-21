@@ -184,4 +184,12 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @param uid The unique ID of the user to delete.
    */
   fun deleteUserByUid(uid: String) = viewModelScope.launch { repository.deleteUserByUid(uid) }
+
+  /**
+   * Updates the user's profile picture in Firestore.
+   *
+   * @param uid The unique ID of the user whose picture is being updated.
+   */
+  fun updateUserPicture(uid: String, newPicture: String) =
+      viewModelScope.launch { repository.updateUserPicture(uid, newPicture) }
 }
