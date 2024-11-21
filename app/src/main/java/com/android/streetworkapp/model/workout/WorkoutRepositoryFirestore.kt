@@ -67,7 +67,6 @@ class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRep
    * @param exercises A list of exercises to add or update, if empty the exercises are not updated.
    * @param endTime The end time of the session, if null the end time is not updated.
    * @param winner The winner of the session, if null the winner is not updated.
-   *
    */
   override suspend fun updateWorkoutSessionDetails(
       uid: String,
