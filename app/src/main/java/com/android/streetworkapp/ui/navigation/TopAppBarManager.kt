@@ -19,7 +19,7 @@ class TopAppBarManager(
 
   enum class TopAppBarAction(val icon: Int, val contentDescription: String, val testTag: String) {
     SETTINGS(
-        icon = R.drawable.settings, contentDescription = "Settings", testTag = "settings_button");
+        icon = R.drawable.settings, contentDescription = "Settings", testTag = "settings_button")
 
     // Add more actions here
   }
