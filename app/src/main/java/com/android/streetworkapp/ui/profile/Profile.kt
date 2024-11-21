@@ -15,15 +15,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,7 +33,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -72,8 +68,6 @@ fun ProfileScreen(
     Column(
         modifier = Modifier.fillMaxWidth().padding(top = 50.dp).testTag("profileColumn"),
         horizontalAlignment = Alignment.CenterHorizontally) {
-          // Setting dialog
-          // SettingDialog(showSettingDialog, currentUser)
 
           // display the profile picture
           AsyncImage(
@@ -108,56 +102,6 @@ fun ProfileScreen(
           DisplayFriendList(friendList)
           Log.d("SignInScreen", "friendList : ${friendList}")
         }
-  }
-}
-
-/**
- * This function displays the setting dialog. Called in mainActivity with TopAppBar actions
- * callbacks
- *
- * @param showDialog - MutableState to show the dialog
- * @param user - The user whose settings are to be displayed.
- */
-@Composable
-fun SettingDialog(
-    showDialog: MutableState<Boolean>,
-    user: User? = null,
-) {
-  val context = LocalContext.current
-
-  if (showDialog.value) {
-    AlertDialog(
-        modifier = Modifier.testTag("settingDialog"),
-        onDismissRequest = { showDialog.value = false },
-        confirmButton = {
-          TextButton(
-              onClick = {
-                // Handle confirmation action
-                Toast.makeText(context, "Not implemented yet", Toast.LENGTH_SHORT).show()
-                showDialog.value = false
-              },
-              modifier = Modifier.testTag("submitSettingButton")) {
-                Text("Submit setting", color = ColorPalette.SECONDARY_TEXT_COLOR)
-              }
-        },
-        dismissButton = {
-          TextButton(
-              onClick = { showDialog.value = false },
-              modifier = Modifier.testTag("cancelRatingButton")) {
-                Text("Cancel", color = Color.Red)
-              }
-        },
-        title = {
-          Text(
-              "Your settings",
-              color = ColorPalette.PRIMARY_TEXT_COLOR,
-              modifier = Modifier.testTag("RatingTitle"))
-        },
-        text = { Text("Empty settings for now ...") },
-        properties =
-            DialogProperties(
-                dismissOnClickOutside = true) // Makes dialog dismissible by clicking outside
-        )
   }
 }
 

@@ -22,14 +22,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
@@ -48,7 +46,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.compose.rememberNavController
 import com.android.sample.R
 import com.android.streetworkapp.model.event.Event
@@ -62,6 +59,7 @@ import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.theme.ColorPalette
+import com.android.streetworkapp.ui.utils.CustomDialog
 import com.android.streetworkapp.utils.toFormattedString
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -98,6 +96,8 @@ fun ParkOverviewScreen(
 
   val showRatingDialog = remember { mutableStateOf(false) }
 
+  val context = LocalContext.current
+
   Box(modifier = Modifier.padding(innerPadding).fillMaxSize().testTag("parkOverviewScreen")) {
     Column {
       ImageTitle(image = null, title = currentPark.value?.name ?: "loading...")
@@ -111,7 +111,20 @@ fun ParkOverviewScreen(
               Text("Create an event")
             }
       }
-      RatingDialog(showRatingDialog, currentPark.value, currentUser, parkViewModel)
+
+      val starRating = remember { mutableIntStateOf(3) } // Stores the "live" rating value
+
+      CustomDialog(
+          showRatingDialog,
+          "Rating",
+          Content = { InteractiveRatingComponent(starRating) },
+          onSubmit = {
+            Log.d("ParkOverview", "RatingDialog: Submitting rating")
+            handleRating(
+                context, currentPark.value, currentUser, starRating.intValue, parkViewModel)
+          },
+          onDismiss = { starRating.intValue = 3 })
+
       HorizontalDivider(modifier = Modifier.fillMaxWidth())
       EventItemList(eventViewModel, navigationActions)
     }
@@ -220,66 +233,6 @@ fun RatingButton(showRatingDialog: MutableState<Boolean>) {
             contentDescription = "Rate",
             modifier = Modifier.size(24.dp))
       }
-}
-
-/**
- * Display a dialog to rate the park. Ues the starRating variable to store the "live" rating value.
- * Used to submit the rating to the park MVVM.
- *
- * @param showDialog The state to show the dialog.
- * @param park The park to rate.
- * @param user The user who is rating the park.
- * @param parkViewModel The park view model.
- */
-@Composable
-fun RatingDialog(
-    showDialog: MutableState<Boolean>,
-    park: Park? = null,
-    user: User? = null,
-    parkViewModel: ParkViewModel? = null
-) {
-  // Star rating is 1-5 stars
-  val starRating = remember { mutableIntStateOf(3) }
-  val context = LocalContext.current
-
-  if (showDialog.value) {
-    AlertDialog(
-        modifier = Modifier.testTag("ratingDialog"),
-        onDismissRequest = { showDialog.value = false },
-        confirmButton = {
-          TextButton(
-              onClick = {
-                // Handle confirmation action with park MVVM
-                Log.d("ParkOverview", "RatingDialog: Submitting rating")
-                handleRating(context, park, user, starRating.intValue, parkViewModel)
-                showDialog.value = false
-              },
-              modifier = Modifier.testTag("submitRatingButton")) {
-                Text("Submit rating", color = ColorPalette.SECONDARY_TEXT_COLOR)
-              }
-        },
-        dismissButton = {
-          TextButton(
-              onClick = { showDialog.value = false },
-              modifier = Modifier.testTag("cancelRatingButton")) {
-                Text("Cancel", color = Color.Red)
-              }
-        },
-        title = {
-          Text(
-              "Rate this park",
-              color = ColorPalette.PRIMARY_TEXT_COLOR,
-              modifier = Modifier.testTag("RatingTitle"))
-        },
-        text = {
-          // Main content of the dialog :
-          InteractiveRatingComponent(starRating)
-        },
-        properties =
-            DialogProperties(
-                dismissOnClickOutside = true) // Makes dialog dismissible by clicking outside
-        )
-  }
 }
 
 /**
