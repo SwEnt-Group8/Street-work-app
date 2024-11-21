@@ -113,7 +113,7 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
                       fontSize = 26.sp,
                       lineHeight = 26.sp,
                       fontWeight = FontWeight(500),
-                      color = Color(0xFF000000),
+                      color = Color.Black,
                       textAlign = TextAlign.Center,
                   ),
               modifier =
@@ -190,7 +190,7 @@ fun IconAndTextRow(
                     fontSize = 18.sp,
                     lineHeight = 24.sp,
                     fontWeight = FontWeight.W500,
-                    color = Color(0xFF000000)),
+                    color = Color.Black),
             modifier = Modifier.weight(5f).aspectRatio(269f / 44f).testTag("${testName}Text"))
       }
 }
