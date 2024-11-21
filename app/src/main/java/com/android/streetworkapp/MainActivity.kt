@@ -234,7 +234,6 @@ fun StreetWorkApp(
                       "Settings",
                       Content = { Text("Settings to be implemented") },
                   )
-
                 }
                 // screen for adding friend
                 composable(Screen.ADD_FRIEND) { AddFriendScreen(userViewModel, innerPadding) }

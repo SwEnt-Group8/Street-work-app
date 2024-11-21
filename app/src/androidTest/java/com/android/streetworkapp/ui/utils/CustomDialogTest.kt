@@ -27,9 +27,9 @@ class CustomDialogTest {
       CustomDialog(
           showDialog,
           dialogType,
-          Content = { /* No content needed */ },
-          onSubmit = { /* submit function not called */ },
-          onDismiss = { /* dismiss function not called */ })
+          Content = { /* No content needed */},
+          onSubmit = { /* submit function not called */},
+          onDismiss = { /* dismiss function not called */})
     }
 
     val dialog = composeTestRule.onNodeWithTag(dialogType + "Dialog")
@@ -71,8 +71,8 @@ class CustomDialogTest {
       CustomDialog(
           showDialog,
           dialogType,
-          Content = { /* No content needed */ },
-          onSubmit = { /* submit function not called */ },
+          Content = { /* No content needed */},
+          onSubmit = { /* submit function not called */},
           onDismiss = { onDismissCalled.value = true })
     }
 
@@ -93,9 +93,9 @@ class CustomDialogTest {
       CustomDialog(
           showDialog,
           dialogType,
-          Content = { /* No content needed */ },
+          Content = { /* No content needed */},
           onSubmit = { onSubmitCalled.value = true },
-          onDismiss = { /* dismiss function not called */ })
+          onDismiss = { /* dismiss function not called */})
     }
 
     composeTestRule.waitForIdle() // Wait for recomposition

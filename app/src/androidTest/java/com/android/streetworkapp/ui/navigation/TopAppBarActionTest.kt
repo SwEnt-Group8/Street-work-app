@@ -140,7 +140,7 @@ class TopAppBarActionTest {
   }
 
   @Test
-  fun isOnActionClickWorking(){
+  fun isOnActionClickWorking() {
     val settingsAction = TopAppBarManager.TopAppBarAction.SETTINGS
 
     val topAppBarManager = TopAppBarManager("any title", actions = listOf(settingsAction))

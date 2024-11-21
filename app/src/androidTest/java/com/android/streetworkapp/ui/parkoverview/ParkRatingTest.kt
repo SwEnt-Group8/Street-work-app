@@ -39,11 +39,11 @@ class ParkRatingTest {
       RatingButton(showRatingDialog)
 
       CustomDialog(
-        showRatingDialog,
-        "Rating",
-        Content = { /* No content needed */ },
-        onSubmit = { /* submit function not called */ },
-        onDismiss = { /* dismiss function not called */ })
+          showRatingDialog,
+          "Rating",
+          Content = { /* No content needed */},
+          onSubmit = { /* submit function not called */},
+          onDismiss = { /* dismiss function not called */})
     }
 
     val ratingButton = composeTestRule.onNodeWithTag("ratingButton")

@@ -14,8 +14,8 @@ import androidx.compose.ui.window.DialogProperties
 import com.android.streetworkapp.ui.theme.ColorPalette
 
 /**
- * This function displays the a customized dialog with callback functions.
- * Displayed depending on the showDialog value. Will hide itself once interacted with.
+ * This function displays the a customized dialog with callback functions. Displayed depending on
+ * the showDialog value. Will hide itself once interacted with.
  *
  * @param showDialog - MutableState to show the dialog
  * @param dialogType - Type of dialog to display ("Settings", "Rating", etc.)
