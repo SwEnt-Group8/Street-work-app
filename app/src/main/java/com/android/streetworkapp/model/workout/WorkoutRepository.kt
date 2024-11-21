@@ -8,8 +8,9 @@ interface WorkoutRepository {
   suspend fun updateWorkoutSessionDetails(
       uid: String,
       sessionId: String,
-      exercises: List<Exercise>,
-      endTime: Long?
+      exercises: List<Exercise> = emptyList(),
+      endTime: Long? = null,
+      winner: String? = null
   )
 
   suspend fun updateExercise(
