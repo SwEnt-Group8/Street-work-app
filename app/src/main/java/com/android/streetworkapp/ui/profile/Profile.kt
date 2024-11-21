@@ -49,9 +49,8 @@ import com.google.firebase.ktx.Firebase
 fun ProfileScreen(
     navigationActions: NavigationActions,
     userViewModel: UserViewModel = viewModel(factory = UserViewModel.Factory),
-    innerPaddingValues: PaddingValues = PaddingValues(0.dp)
+    innerPaddingValues: PaddingValues = PaddingValues(0.dp),
 ) {
-
   // Handling the MVVM calls for user :
   val currentUser = userViewModel.currentUser.collectAsState().value
 
@@ -69,6 +68,7 @@ fun ProfileScreen(
     Column(
         modifier = Modifier.fillMaxWidth().padding(top = 50.dp).testTag("profileColumn"),
         horizontalAlignment = Alignment.CenterHorizontally) {
+
           // display the profile picture
           AsyncImage(
               model =
