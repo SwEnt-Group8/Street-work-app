@@ -33,7 +33,11 @@ class LoginTest : TestCase() {
 
     // For Box, Text, Image, Buttons, List : check if displayed :
     composeTestRule.onNodeWithTag("loginScreenBoxContainer").assertExists().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("loginScreenAppLogo").assertExists().assertIsDisplayed()
     composeTestRule.onNodeWithTag("loginTitle").assertExists().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("loginScreenFirstRowIcon").assertExists().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("loginScreenSecondRowIcon").assertExists().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("loginScreenThirdRowIcon").assertExists().assertIsDisplayed()
     composeTestRule.onNodeWithTag("loginButton").assertExists().assertIsDisplayed()
     composeTestRule
         .onNodeWithTag("loginButtonIcon", useUnmergedTree = true)
@@ -44,14 +48,30 @@ class LoginTest : TestCase() {
 
     // For columns / rows / spacers : check if exist :
     composeTestRule.onNodeWithTag("loginScreenColumnContainer").assertExists()
-    composeTestRule.onNodeWithTag("loginScreenSpacer").assertExists()
-    composeTestRule.onNodeWithTag("loginScreenSpacer").assertExists()
+    composeTestRule.onNodeWithTag("loginScreenFirstSpacer").assertExists()
+    composeTestRule.onNodeWithTag("loginScreenSecondSpacer").assertExists()
+    composeTestRule.onNodeWithTag("loginScreenFirstRow").assertExists().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("loginScreenFirstRowSpacer").assertExists()
+    composeTestRule.onNodeWithTag("loginScreenSecondRow").assertExists().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("loginScreenSecondRowSpacer").assertExists()
+    composeTestRule.onNodeWithTag("loginScreenThirdRow").assertExists().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("loginScreenThirdRowSpacer").assertExists()
+    composeTestRule.onNodeWithTag("loginScreenThirdSpacer").assertExists()
     composeTestRule.onNodeWithTag("loginButtonRowContainer", useUnmergedTree = true).assertExists()
 
     // UX elements :
 
     // UX - Text values :
-    composeTestRule.onNodeWithTag("loginTitle").assertTextEquals("Welcome to the Street Work'App")
+    composeTestRule.onNodeWithTag("loginTitle").assertTextEquals("Welcome to Street WorkApp!")
+    composeTestRule
+        .onNodeWithTag("loginScreenFirstRowText")
+        .assertTextEquals("Find nearby parks and events to participate in or create")
+    composeTestRule
+        .onNodeWithTag("loginScreenSecondRowText")
+        .assertTextEquals("Track your activities and learn new skills")
+    composeTestRule
+        .onNodeWithTag("loginScreenThirdRowText")
+        .assertTextEquals("Make new friends, train together and share activities")
     composeTestRule.onNodeWithTag("loginButton").assertTextEquals("Sign in with Google")
     composeTestRule
         .onNodeWithTag("loginButtonText", useUnmergedTree = true)

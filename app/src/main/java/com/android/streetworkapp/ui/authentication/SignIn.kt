@@ -2,12 +2,24 @@ package com.android.streetworkapp.ui.authentication
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.DirectionsRun
+import androidx.compose.material.icons.filled.ConnectWithoutContact
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,10 +30,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
@@ -29,6 +46,7 @@ import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
+import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.utils.GoogleAuthService
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
@@ -81,17 +99,100 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
         modifier = Modifier.fillMaxSize().testTag("loginScreenColumnContainer"),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally) {
-          // Welcome text in the center
+          Image(
+              painter = painterResource(id = R.drawable.app_logo),
+              contentDescription = "App Logo",
+              modifier = Modifier.height(225.dp).width(225.dp).testTag("loginScreenAppLogo"))
+
+          Spacer(modifier = Modifier.height(26.dp).testTag("loginScreenFirstSpacer"))
+
           Text(
-              text = "Welcome to the Street Work'App",
-              style = TextStyle(fontSize = 24.sp),
-              modifier = Modifier.testTag("loginTitle"))
+              text = "Welcome to Street WorkApp!",
+              style =
+                  TextStyle(
+                      fontSize = 26.sp,
+                      lineHeight = 26.sp,
+                      fontWeight = FontWeight(500),
+                      color = Color.Black,
+                      textAlign = TextAlign.Center,
+                  ),
+              modifier =
+                  Modifier.height(32.dp)
+                      .aspectRatio(308f / 24f)
+                      .fillMaxWidth()
+                      .testTag("loginTitle"))
 
-          Spacer(modifier = Modifier.height(64.dp).testTag("loginScreenSpacer"))
+          Spacer(modifier = Modifier.height(26.dp).testTag("loginScreenSecondSpacer"))
 
-          GoogleAuthButton(authService, context, launcher)
+          IconAndTextRow(
+              imageVector = Icons.Filled.LocationOn,
+              contentDescription = "Location marker icon",
+              text = "Find nearby parks and events to participate in or create",
+              testName = "loginScreenFirstRow")
+
+          IconAndTextRow(
+              imageVector = Icons.AutoMirrored.Filled.DirectionsRun,
+              contentDescription = "Running person icon",
+              text = "Track your activities and learn new skills",
+              testName = "loginScreenSecondRow")
+
+          IconAndTextRow(
+              imageVector = Icons.Filled.ConnectWithoutContact,
+              contentDescription = "People connecting icon",
+              text = "Make new friends, train together and share activities",
+              testName = "loginScreenThirdRow")
+
+          Spacer(modifier = Modifier.height(26.dp).testTag("loginScreenThirdSpacer"))
+
+          Box(
+              modifier =
+                  Modifier.fillMaxWidth()
+                      .height(96.dp)
+                      .background(ColorPalette.INTERACTION_COLOR_DARK)
+                      .testTag("loginScreenGoogleAuthButtonContainer"),
+              contentAlignment = Alignment.Center) {
+                GoogleAuthButton(authService, context, launcher)
+              }
         }
   }
+}
+
+/**
+ * A composable function that displays an icon and a text in a row with specified padding and
+ * alignment.
+ *
+ * @param imageVector The vector image to be used as the icon.
+ * @param contentDescription The content description for the icon, used for accessibility.
+ * @param text The text to be displayed next to the icon.
+ * @param testName The test tag name to be used for testing purposes.
+ */
+@Composable
+fun IconAndTextRow(
+    imageVector: ImageVector,
+    contentDescription: String,
+    text: String,
+    testName: String
+) {
+  Row(
+      modifier = Modifier.padding(horizontal = 25.dp, vertical = 8.dp).testTag(testName),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.Center) {
+        Icon(
+            imageVector = imageVector,
+            contentDescription = contentDescription,
+            modifier = Modifier.weight(0.7f).aspectRatio(26.4f / 33f).testTag("${testName}Icon"),
+            tint = ColorPalette.INTERACTION_COLOR_DARK)
+        Spacer(modifier = Modifier.width(16.dp).testTag("${testName}Spacer"))
+        Text(
+            text = text,
+            style =
+                TextStyle(
+                    fontSize = 18.sp,
+                    lineHeight = 24.sp,
+                    fontWeight = FontWeight.W500,
+                    color = Color.Black),
+            modifier = Modifier.weight(5f).aspectRatio(269f / 44f).testTag("${testName}Text"))
+      }
 }
 
 /**
