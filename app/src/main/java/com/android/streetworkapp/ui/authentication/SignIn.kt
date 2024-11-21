@@ -2,6 +2,7 @@ package com.android.streetworkapp.ui.authentication
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -97,6 +99,11 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
         modifier = Modifier.fillMaxSize().testTag("loginScreenColumnContainer"),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally) {
+          Image(
+              painter = painterResource(id = R.drawable.app_logo),
+              contentDescription = "App Logo",
+              modifier = Modifier.height(200.dp).width(200.dp).testTag("appLogo"))
+
           Text(
               text = "Welcome to Street WorkApp!",
               style =
