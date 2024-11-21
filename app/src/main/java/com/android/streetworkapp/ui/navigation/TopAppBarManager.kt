@@ -21,25 +21,22 @@ class TopAppBarManager(
     SETTINGS(
         icon = R.drawable.settings, contentDescription = "Settings", testTag = "settings_button");
 
-    // Now `onClick` is a parameter for `TopAppBarAction`
-    fun onClick(callback: () -> Unit) {
-      callback()
-    }
+    // Add more actions here
   }
 
-  // Set the callbacks for each action
+  /** Set the callbacks for each action */
   fun setAllActionCallbacks(
       actionCallbacks: Map<TopAppBarAction, () -> Unit> = actions.associateWith { {} }
   ) {
     this.actionCallbacks = actionCallbacks as MutableMap<TopAppBarAction, () -> Unit>
   }
 
-  // Set the callback for a specific action
+  /** Set the callback for a specific action */
   fun setActionCallback(action: TopAppBarAction, callback: () -> Unit) {
     this.actionCallbacks[action] = callback
   }
 
-  // Trigger onClick for an action (called from the composable)
+  /** Trigger onClick for an action */
   fun onActionClick(action: TopAppBarAction) {
     actionCallbacks[action]?.invoke()
   }
@@ -64,12 +61,12 @@ class TopAppBarManager(
     return this.navigationIcon ?: TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON
   }
 
-  // Set the actions for the Top App Bar
+  /** Set the actions for the Top App Bar */
   fun setTopAppBarActions(actions: List<TopAppBarAction>) {
     this.actions = actions
   }
 
-  // Get the actions for the Top App Bar
+  /** Get the actions for the Top App Bar */
   fun getTopAppBarActions(): List<TopAppBarAction> {
     return this.actions
   }
