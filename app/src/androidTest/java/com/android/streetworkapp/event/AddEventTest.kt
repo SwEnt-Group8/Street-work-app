@@ -1,4 +1,4 @@
-package com.android.streetworkapp.ui.parkoverview
+package com.android.streetworkapp.event
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.ui.test.assertIsDisplayed

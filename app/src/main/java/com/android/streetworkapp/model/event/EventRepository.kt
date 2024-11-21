@@ -15,5 +15,9 @@ interface EventRepository {
       onFailure: (Exception) -> Unit
   )
 
+  suspend fun addParticipantToEvent(eid: String, uid: String)
+
+  suspend fun removeParticipantFromEvent(eid: String, uid: String)
+
   suspend fun addEvent(event: Event)
 }

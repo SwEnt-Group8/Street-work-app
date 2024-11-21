@@ -95,6 +95,7 @@ fun AddEventScreen(
   val owner = userViewModel.currentUser.collectAsState().value?.uid
   if (!owner.isNullOrEmpty()) {
     event.owner = owner
+    event.listParticipants = listOf(owner)
   }
 
   val parkId = parkViewModel.currentPark.collectAsState().value?.pid

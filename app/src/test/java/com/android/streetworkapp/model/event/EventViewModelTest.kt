@@ -71,4 +71,18 @@ class EventViewModelTest {
     testDispatcher.scheduler.advanceUntilIdle()
     verify(repository).getEventByEid(event.eid)
   }
+
+  @Test
+  fun addParticipantToEventCallsRepository() = runTest {
+    eventViewModel.addParticipantToEvent(event.eid, "123")
+    testDispatcher.scheduler.advanceUntilIdle()
+    verify(repository).addParticipantToEvent(any(), any())
+  }
+
+  @Test
+  fun removeParticipantFromEventCallsRepository() = runTest {
+    eventViewModel.removeParticipantFromEvent(event.eid, "123")
+    testDispatcher.scheduler.advanceUntilIdle()
+    verify(repository).removeParticipantFromEvent(any(), any())
+  }
 }
