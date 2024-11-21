@@ -1,7 +1,10 @@
 package com.android.streetworkapp.ui.utils
 
+import androidx.compose.material3.Text
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
@@ -27,7 +30,7 @@ class CustomDialogTest {
       CustomDialog(
           showDialog,
           dialogType,
-          Content = { /* No content needed */},
+          Content = { Text("Content", modifier = Modifier.testTag("content")) },
           onSubmit = { /* submit function not called */},
           onDismiss = { /* dismiss function not called */})
     }
@@ -52,12 +55,17 @@ class CustomDialogTest {
         .onNodeWithTag(dialogType + "DialogSubmitButton")
         .assertIsDisplayed()
         .assertHasClickAction()
+        .assertTextEquals("Submit")
 
     // Cancel Button is displayed
     composeTestRule
         .onNodeWithTag(dialogType + "DialogCancelButton")
         .assertIsDisplayed()
         .assertHasClickAction()
+        .assertTextEquals("Cancel")
+
+    // Content is displayed
+    composeTestRule.onNodeWithTag("content").assertIsDisplayed()
   }
 
   @Test

@@ -48,7 +48,7 @@ fun CustomDialog(
                 showDialog.value = false
               },
               modifier = Modifier.testTag(dialogType + "DialogSubmitButton")) {
-                Text("Submit $dialogType", color = ColorPalette.SECONDARY_TEXT_COLOR)
+                Text("Submit", color = ColorPalette.SECONDARY_TEXT_COLOR)
               }
         },
         dismissButton = {
