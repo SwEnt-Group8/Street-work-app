@@ -122,7 +122,7 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
                       .fillMaxWidth()
                       .testTag("loginTitle"))
 
-          Spacer(modifier = Modifier.height(26.dp).testTag("loginScreenFirstSpacer"))
+          Spacer(modifier = Modifier.height(26.dp).testTag("loginScreenSecondSpacer"))
 
           IconAndTextRow(
               imageVector = Icons.Filled.LocationOn,
@@ -142,7 +142,7 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
               text = "Make new friends, train together and share activities",
               testName = "loginScreenThirdRow")
 
-          Spacer(modifier = Modifier.height(26.dp).testTag("loginScreenSecondSpacer"))
+          Spacer(modifier = Modifier.height(26.dp).testTag("loginScreenThirdSpacer"))
 
           Box(
               modifier =
