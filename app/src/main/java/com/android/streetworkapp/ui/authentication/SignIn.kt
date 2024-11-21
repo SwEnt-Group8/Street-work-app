@@ -104,6 +104,8 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
               contentDescription = "App Logo",
               modifier = Modifier.height(200.dp).width(200.dp).testTag("appLogo"))
 
+          Spacer(modifier = Modifier.height(26.dp).testTag("loginScreenFirstSpacer"))
+
           Text(
               text = "Welcome to Street WorkApp!",
               style =
