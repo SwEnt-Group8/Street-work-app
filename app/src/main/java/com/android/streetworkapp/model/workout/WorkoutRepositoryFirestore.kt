@@ -64,28 +64,38 @@ class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRep
    *
    * @param uid The UID of the user (also the WorkoutData ID).
    * @param sessionId The ID of the session to update.
-   * @param exercises A list of exercises to add or update.
-   * @param endTime The end time of the session.
+   * @param exercises A list of exercises to add or update, if empty the exercises are not updated.
+   * @param endTime The end time of the session, if null the end time is not updated.
+   * @param winner The winner of the session, if null the winner is not updated.
+   *
    */
   override suspend fun updateWorkoutSessionDetails(
       uid: String,
       sessionId: String,
       exercises: List<Exercise>,
-      endTime: Long?
+      endTime: Long?,
+      winner: String?
   ) {
     require(uid.isNotEmpty()) { ERROR_UID_EMPTY }
     require(sessionId.isNotEmpty()) { ERROR_SESSION_ID_EMPTY }
 
     try {
-      // Construct the field path for the specific session's exercises and endTime
-      val sessionFieldPath = WORKOUT_SESSIONS
-      val updateMap =
-          mapOf(
-              "$sessionFieldPath.$sessionId.exercises" to exercises,
-              "$sessionFieldPath.$sessionId.endTime" to endTime)
+      // Construct the field path for the specific session details
+      val updateMap = mutableMapOf<String, Any?>()
 
+      if (exercises.isNotEmpty()) {
+        updateMap["$WORKOUT_SESSIONS.$sessionId.exercises"] = exercises
+      }
+      if (endTime != null) {
+        updateMap["$WORKOUT_SESSIONS.$sessionId.endTime"] = endTime
+      }
+      if (!winner.isNullOrEmpty()) {
+        updateMap["$WORKOUT_SESSIONS.$sessionId.winner"] = winner
+      }
       // Perform targeted update in Firestore
-      db.collection(COLLECTION_PATH).document(uid).update(updateMap).await()
+      if (updateMap.isNotEmpty()) {
+        db.collection(COLLECTION_PATH).document(uid).update(updateMap).await()
+      }
     } catch (e: Exception) {
       Log.e(
           ERROR_TAG, "Error updating WorkoutSession details for sessionId=$sessionId: ${e.message}")

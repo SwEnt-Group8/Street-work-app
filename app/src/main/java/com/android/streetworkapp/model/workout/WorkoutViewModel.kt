@@ -41,15 +41,17 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
    * @param sessionId The ID of the session to update.
    * @param exercises A list of exercises to add or update.
    * @param endTime The end time of the session.
+   * @param winner The winner of the session.
    */
   fun updateWorkoutSessionDetails(
       uid: String,
       sessionId: String,
-      exercises: List<Exercise>,
-      endTime: Long?
+      exercises: List<Exercise> = emptyList(),
+      endTime: Long? = null,
+      winner: String? = null
   ) {
     viewModelScope.launch {
-      repository.updateWorkoutSessionDetails(uid, sessionId, exercises, endTime)
+      repository.updateWorkoutSessionDetails(uid, sessionId, exercises, endTime, winner)
       refreshWorkoutData(uid)
     }
   }
