@@ -1,6 +1,7 @@
 package com.android.streetworkapp.ui.utils
 
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
@@ -22,18 +23,25 @@ class CustomDialogTest {
   private lateinit var showDialog: MutableState<Boolean>
   private var dialogType = "Type"
 
+  @Composable
+  private fun SetUpCustomDialog(
+      showDialog: MutableState<Boolean>,
+      onSubmit: () -> Unit = {},
+      onDismiss: () -> Unit = {}
+  ) {
+    CustomDialog(
+        showDialog,
+        dialogType,
+        Content = { Text("Content", modifier = Modifier.testTag("content")) },
+        onSubmit = onSubmit,
+        onDismiss = onDismiss)
+  }
+
   @Test
   fun isDialogCorrectlyDisplayed() {
     showDialog = mutableStateOf(false)
 
-    composeTestRule.setContent {
-      CustomDialog(
-          showDialog,
-          dialogType,
-          Content = { Text("Content", modifier = Modifier.testTag("content")) },
-          onSubmit = { /* submit function not called */},
-          onDismiss = { /* dismiss function not called */})
-    }
+    composeTestRule.setContent { SetUpCustomDialog(showDialog) }
 
     val dialog = composeTestRule.onNodeWithTag(dialogType + "Dialog")
 
@@ -76,12 +84,7 @@ class CustomDialogTest {
     val onDismissCalled = mutableStateOf(false)
 
     composeTestRule.setContent {
-      CustomDialog(
-          showDialog,
-          dialogType,
-          Content = { /* No content needed */},
-          onSubmit = { /* submit function not called */},
-          onDismiss = { onDismissCalled.value = true })
+      SetUpCustomDialog(showDialog, onDismiss = { onDismissCalled.value = true })
     }
 
     composeTestRule.waitForIdle() // Wait for recomposition
@@ -98,12 +101,7 @@ class CustomDialogTest {
     val onSubmitCalled = mutableStateOf(false)
 
     composeTestRule.setContent {
-      CustomDialog(
-          showDialog,
-          dialogType,
-          Content = { /* No content needed */},
-          onSubmit = { onSubmitCalled.value = true },
-          onDismiss = { /* dismiss function not called */})
+      SetUpCustomDialog(showDialog, onSubmit = { onSubmitCalled.value = true })
     }
 
     composeTestRule.waitForIdle() // Wait for recomposition
