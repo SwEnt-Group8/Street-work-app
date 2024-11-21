@@ -56,6 +56,7 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
             firebaseUser?.let { firebaseUser ->
               userViewModel.getOrAddUserByUid(
                   firebaseUser.uid, createNewUserFromFirebaseUser(firebaseUser))
+              userViewModel.updateUserPicture(firebaseUser.uid, firebaseUser.photoUrl.toString())
             }
           },
           onAuthError = {
