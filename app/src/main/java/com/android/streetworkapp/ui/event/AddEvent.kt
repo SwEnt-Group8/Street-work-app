@@ -1,5 +1,6 @@
 package com.android.streetworkapp.ui.event
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -33,6 +34,7 @@ import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -51,7 +53,9 @@ import androidx.compose.ui.window.Popup
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventConstants
 import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.moderation.TextModerationViewModel
 import com.android.streetworkapp.model.park.ParkViewModel
+import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
 import com.android.streetworkapp.model.progression.ScoreIncrease
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
@@ -76,6 +80,7 @@ fun AddEventScreen(
     parkViewModel: ParkViewModel,
     eventViewModel: EventViewModel,
     userViewModel: UserViewModel,
+    textModerationViewModel: TextModerationViewModel,
     paddingValues: PaddingValues = PaddingValues(0.dp)
 ) {
 
@@ -103,17 +108,25 @@ fun AddEventScreen(
     event.parkId = parkId
   }
 
+  //Will be triggered if text is over thresholds
+  var textModerationEvaluationIsOverThresholds = remember { mutableStateOf(false) } //we keep track of the mutable state since we need to reset it in the fields below (thus passing it as param)
+
   Box(
-      modifier = Modifier.padding(paddingValues).background(MaterialTheme.colorScheme.background),
+      modifier = Modifier
+          .padding(paddingValues)
+          .background(MaterialTheme.colorScheme.background),
   ) {
-    Box(modifier = Modifier.padding(top = 25.dp).fillMaxSize().testTag("addEventScreen")) {
+    Box(modifier = Modifier
+        .padding(top = 25.dp)
+        .fillMaxSize()
+        .testTag("addEventScreen")) {
       Column(
           modifier = Modifier.fillMaxWidth(),
           verticalArrangement = Arrangement.spacedBy(18.dp),
           horizontalAlignment = Alignment.CenterHorizontally) {
             Spacer(modifier = Modifier.size(24.dp))
-            EventTitleSelection(event)
-            EventDescriptionSelection(event)
+            EventTitleSelection(event, textModerationEvaluationIsOverThresholds)
+            EventDescriptionSelection(event, textModerationEvaluationIsOverThresholds)
             TimeSelection(event)
             Text(
                 text = "How many participants do you want?",
@@ -129,28 +142,26 @@ fun AddEventScreen(
               Toast.makeText(context, "Please fill the title of the event", Toast.LENGTH_SHORT)
                   .show()
             } else {
-              eventViewModel.addEvent(event)
-              parkViewModel.addEventToPark(event.parkId, event.eid)
-
-              // Used for the gamification feature
-              userViewModel.increaseUserScore(event.owner, ScoreIncrease.CREATE_EVENT.scoreAdded)
-              // Note: temporary value to use the progression screen. Should be update once
-              // the gamification is completed
-              Toast.makeText(
-                      context,
-                      "+" + ScoreIncrease.CREATE_EVENT.scoreAdded + " Points",
-                      Toast.LENGTH_SHORT)
-                  .show()
-
-              navigationActions.goBack()
+          //make sure the description & title are valid according to our evaluation thresholds
+              val formattedTextInput = "Title: ${event.title}. Description: ${event.description}" //we format it to do only one api call
+              textModerationViewModel.analyzeText(formattedTextInput,
+                  { isTextUnderThresholds ->
+                      if (isTextUnderThresholds) {
+                          createEvent(event, navigationActions, eventViewModel, userViewModel, parkViewModel, context)
+                      } else {
+                          //do some kind of UI work here
+                            textModerationEvaluationIsOverThresholds.value = true
+                      }
+                  }, { /*display the error message in someway*/ })
             }
           },
           modifier =
-              Modifier.align(Alignment.Center)
-                  .offset(0.dp, 100.dp)
-                  .padding(40.dp)
-                  .size(width = 150.dp, height = 40.dp)
-                  .testTag("addEventButton"),
+          Modifier
+              .align(Alignment.Center)
+              .offset(0.dp, 100.dp)
+              .padding(40.dp)
+              .size(width = 150.dp, height = 40.dp)
+              .testTag("addEventButton"),
           containerColor = ColorPalette.INTERACTION_COLOR_DARK,
           contentColor = ColorPalette.PRIMARY_TEXT_COLOR) {
             Text("Add new event")
@@ -165,7 +176,7 @@ fun AddEventScreen(
  * @param event the event that will be updated
  */
 @Composable
-fun EventTitleSelection(event: Event) {
+fun EventTitleSelection(event: Event, isError: MutableState<Boolean>) {
   var title by remember { mutableStateOf("") }
 
   OutlinedTextField(
@@ -173,9 +184,14 @@ fun EventTitleSelection(event: Event) {
       onValueChange = {
         title = it
         event.title = title
+        isError.value = false //reset the field
       },
       label = { Text("What kind of event do you want to create?") },
-      modifier = Modifier.testTag("titleTag").fillMaxWidth(0.9f).height(64.dp),
+      isError = isError.value,
+      modifier = Modifier
+          .testTag("titleTag")
+          .fillMaxWidth(0.9f)
+          .height(64.dp),
   )
 }
 
@@ -185,7 +201,7 @@ fun EventTitleSelection(event: Event) {
  * @param event the event that will be updated
  */
 @Composable
-fun EventDescriptionSelection(event: Event) {
+fun EventDescriptionSelection(event: Event, isError: MutableState<Boolean>) {
   var description by remember { mutableStateOf("") }
 
   OutlinedTextField(
@@ -193,9 +209,14 @@ fun EventDescriptionSelection(event: Event) {
       onValueChange = {
         description = it
         event.description = description
+        isError.value = false //reset the field
       },
       label = { Text("Describe your event:") },
-      modifier = Modifier.testTag("descriptionTag").fillMaxWidth(0.9f).height(128.dp))
+      isError = isError.value,
+      modifier = Modifier
+          .testTag("descriptionTag")
+          .fillMaxWidth(0.9f)
+          .height(128.dp))
 }
 
 /**
@@ -214,7 +235,9 @@ fun ParticipantNumberSelection(event: Event) {
       horizontalAlignment = Alignment.CenterHorizontally,
       modifier = Modifier.fillMaxWidth()) {
         Slider(
-            modifier = Modifier.fillMaxWidth(0.8f).testTag("sliderMaxParticipants"),
+            modifier = Modifier
+                .fillMaxWidth(0.8f)
+                .testTag("sliderMaxParticipants"),
             value = sliderPosition,
             onValueChange = {
               sliderPosition = it
@@ -283,21 +306,26 @@ fun TimeSelection(event: Event) {
                 }
           }
         },
-        modifier = Modifier.fillMaxWidth().height(64.dp))
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(64.dp))
 
     if (showDatePicker) {
       Popup(onDismissRequest = { showDatePicker = false }, alignment = Alignment.TopStart) {
         Box(
             modifier =
-                Modifier.fillMaxWidth()
-                    .shadow(elevation = 4.dp)
-                    .background(MaterialTheme.colorScheme.surface)
-                    .padding(16.dp)) {
+            Modifier
+                .fillMaxWidth()
+                .shadow(elevation = 4.dp)
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(16.dp)) {
               DatePicker(state = datePickerState, showModeToggle = false)
             }
 
         Button(
-            modifier = Modifier.offset(x = 280.dp, y = 140.dp).testTag("validateDate"),
+            modifier = Modifier
+                .offset(x = 280.dp, y = 140.dp)
+                .testTag("validateDate"),
             colors = ButtonColors(Color.Blue, Color.White, Color.Blue, Color.White),
             onClick = {
               showDatePicker = false
@@ -317,10 +345,11 @@ fun TimeSelection(event: Event) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier =
-                Modifier.fillMaxSize()
-                    .offset(y = 10.dp)
-                    .background(MaterialTheme.colorScheme.surface)
-                    .align(Alignment.Center)) {
+            Modifier
+                .fillMaxSize()
+                .offset(y = 10.dp)
+                .background(MaterialTheme.colorScheme.surface)
+                .align(Alignment.Center)) {
               TimePicker(state = timePickerState, modifier = Modifier.fillMaxWidth())
 
               Button(
@@ -347,3 +376,23 @@ private fun convertMillisToDate(millis: Long): String {
   formatter.timeZone = TimeZone.getTimeZone("UTC")
   return formatter.format(Date(millis))
 }
+
+
+
+private fun createEvent(event: Event, navigationActions: NavigationActions, eventViewModel: EventViewModel, userViewModel: UserViewModel, parkViewModel: ParkViewModel, context: Context) {
+    eventViewModel.addEvent(event)
+    parkViewModel.addEventToPark(event.parkId, event.eid)
+
+    // Used for the gamification feature
+    userViewModel.increaseUserScore(event.owner, ScoreIncrease.CREATE_EVENT.scoreAdded)
+    // Note: temporary value to use the progression screen. Should be update once
+    // the gamification is completed
+    Toast.makeText(
+        context,
+        "+" + ScoreIncrease.CREATE_EVENT.scoreAdded + " Points",
+        Toast.LENGTH_SHORT)
+        .show()
+
+    navigationActions.goBack()
+}
+
