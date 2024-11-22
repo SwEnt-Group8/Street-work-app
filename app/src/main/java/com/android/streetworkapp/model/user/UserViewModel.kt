@@ -23,6 +23,10 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
   val friends: StateFlow<List<User?>>
     get() = _friends
 
+  private val _parks = MutableStateFlow<List<String>>(emptyList())
+  val parks: StateFlow<List<String>>
+    get() = _parks
+
   /**
    * Sets the current user to the provided User object.
    *
@@ -123,6 +127,21 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
   }
 
   /**
+   * Retrieves the parks of a user from Firestore based on the provided user ID (uid).
+   *
+   * @param uid The unique ID of the user whose friends are being retrieved.
+   * @return A list of ID of park visited by the user, or null if an error occurs.
+   */
+  fun getParksByUid(uid: String) {
+    viewModelScope.launch {
+      val fetchedParks = repository.getParksByUid(uid)
+      if (fetchedParks != null) {
+        _parks.value = fetchedParks
+      }
+    }
+  }
+
+  /**
    * Adds a new user to Firestore.
    *
    * @param user The User object to add to Firestore.
@@ -177,6 +196,15 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    */
   fun removeFriend(uid: String, friendUid: String) =
       viewModelScope.launch { repository.removeFriend(uid, friendUid) }
+
+  /**
+   * Adds the newly discovered park in the parks lists in Firestore.
+   *
+   * @param uid The unique ID of the user.
+   * @param parkId The ID of the park to add to the user's parks list.
+   */
+  fun addNewPark(uid: String, parkId: String) =
+    viewModelScope.launch { repository.addNewPark(uid, parkId) }
 
   /**
    * Deletes a user from Firestore based on the provided ID.

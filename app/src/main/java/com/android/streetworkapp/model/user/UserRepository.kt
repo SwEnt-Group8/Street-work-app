@@ -12,6 +12,8 @@ interface UserRepository {
 
   suspend fun getFriendsByUid(uid: String): List<User>?
 
+  suspend fun getParksByUid(uid: String): List<String>?
+
   suspend fun addUser(user: User)
 
   suspend fun getOrAddUserByUid(uid: String, user: User): User?
@@ -23,6 +25,8 @@ interface UserRepository {
   suspend fun addFriend(uid: String, friendUid: String)
 
   suspend fun removeFriend(uid: String, friendUid: String)
+
+  suspend fun addNewPark(uid: String, parkId: String)
 
   suspend fun deleteUserByUid(uid: String)
 }
