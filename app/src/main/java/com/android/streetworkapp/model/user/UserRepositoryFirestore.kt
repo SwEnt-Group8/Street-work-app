@@ -259,20 +259,6 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
   }
 
   /**
-   * Updates the user's profile picture in Firestore.
-   *
-   * @param uid The unique ID of the user whose picture is being updated.
-   */
-  override suspend fun updateUserPicture(uid: String, newPicture: String) {
-    require(uid.isNotEmpty()) { UID_EMPTY }
-    try {
-      db.collection("users").document(uid).update("picture", newPicture).await()
-    } catch (e: Exception) {
-      Log.e("FirestoreError", "Error updating score of user with ID: $uid. Reason: ${e.message}")
-    }
-  }
-
-  /**
    * Converts a Firestore DocumentSnapshot into a User object.
    *
    * @param document The Firestore DocumentSnapshot containing user data.
