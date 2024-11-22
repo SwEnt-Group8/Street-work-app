@@ -25,7 +25,7 @@ class SignInTest {
     // Mock the FirebaseUser properties
     Mockito.`when`(firebaseUser.uid).thenReturn("testUid")
 
-    // Call the method to testb
+    // Call the method to test
     val user = createNewUserFromFirebaseUser(firebaseUser)
 
     // Verify the results
