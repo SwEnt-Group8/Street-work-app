@@ -170,7 +170,7 @@ fun DisplayFriendItem(friend: User) {
   val DEFAULT_USER_STATUS = "Definitely not a bot"
 
   Row(
-      modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("friendItem"),
+      modifier = Modifier.fillMaxWidth().padding(8.dp).testTag("friendItem"),
       verticalAlignment = Alignment.CenterVertically) {
         // Friend's avatar
         DisplayUserPicture(friend, 80.dp, "friendProfilePicture")
@@ -229,6 +229,7 @@ fun DisplayUserPicture(user: User?, size: Dp, testTag: String) {
         contentScale = ContentScale.Crop,
         modifier =
             Modifier.size(size)
+                .padding(8.dp)
                 .clip(CircleShape)
                 .border(2.dp, Color.LightGray, CircleShape)
                 .testTag(testTag))
