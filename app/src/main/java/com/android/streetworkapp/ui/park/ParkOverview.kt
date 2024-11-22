@@ -111,7 +111,7 @@ fun ParkOverviewScreen(
               Text("Create an event")
             }
       }
-      RatingDialog(showRatingDialog, currentPark.value, currentUser, parkViewModel)
+      RatingDialog(showRatingDialog, currentPark.value, currentUser, parkViewModel,userViewModel)
       HorizontalDivider(modifier = Modifier.fillMaxWidth())
       EventItemList(eventViewModel, navigationActions)
     }
@@ -236,7 +236,8 @@ fun RatingDialog(
     showDialog: MutableState<Boolean>,
     park: Park? = null,
     user: User? = null,
-    parkViewModel: ParkViewModel? = null
+    parkViewModel: ParkViewModel? = null,
+    userViewModel: UserViewModel
 ) {
   // Star rating is 1-5 stars
   val starRating = remember { mutableIntStateOf(3) }
@@ -251,7 +252,7 @@ fun RatingDialog(
               onClick = {
                 // Handle confirmation action with park MVVM
                 Log.d("ParkOverview", "RatingDialog: Submitting rating")
-                handleRating(context, park, user, starRating.intValue, parkViewModel)
+                handleRating(context, park, user, starRating.intValue, parkViewModel, userViewModel)
                 showDialog.value = false
               },
               modifier = Modifier.testTag("submitRatingButton")) {
@@ -283,20 +284,22 @@ fun RatingDialog(
 }
 
 /**
- * Verifies that the current state is correct and then rates the park.
+ * Verifies that the current state is correct and then rates the park and add 10p to user
  *
  * @param context The context of the application.
  * @param park The park to rate.
  * @param user The user who is rating the park.
  * @param starRating The rating value.
  * @param parkViewModel The park view model.
+ * @param userViewModel The user view model
  */
 fun handleRating(
     context: Context?,
     park: Park?,
     user: User?,
     starRating: Int,
-    parkViewModel: ParkViewModel?
+    parkViewModel: ParkViewModel?,
+    userViewModel: UserViewModel
 ) {
   Log.d("ParkOverview", "handleRating: {park=$park ; user=$user ; rating=$starRating")
 
@@ -323,6 +326,7 @@ fun handleRating(
       Log.d("ParkOverview", "handleRating: Adding rating to park")
       if (context != null) Toast.makeText(context, "Rating submitted", Toast.LENGTH_SHORT).show()
       parkViewModel.addRating(park.pid, user.uid, starRating.toFloat())
+        userViewModel.increaseUserScore(user.uid,10)
     }
   }
 }
