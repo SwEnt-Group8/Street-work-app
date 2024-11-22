@@ -1,10 +1,12 @@
 package com.android.streetworkapp
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -40,12 +42,14 @@ import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.navigation.ScreenParams
+import com.android.streetworkapp.ui.navigation.TopAppBarManager
 import com.android.streetworkapp.ui.navigation.TopAppBarWrapper
 import com.android.streetworkapp.ui.park.ParkOverviewScreen
 import com.android.streetworkapp.ui.profile.AddFriendScreen
 import com.android.streetworkapp.ui.profile.ProfileScreen
 import com.android.streetworkapp.ui.progress.ProgressScreen
 import com.android.streetworkapp.ui.theme.ColorPalette
+import com.android.streetworkapp.ui.utils.CustomDialog
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.Date
@@ -97,6 +101,7 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
       progressionViewModel)
 }
 
+@SuppressLint("UnrememberedMutableState")
 @Composable
 fun StreetWorkApp(
     parkLocationViewModel: ParkLocationViewModel,
@@ -213,6 +218,20 @@ fun StreetWorkApp(
                 // profile screen + list of friend
                 composable(Screen.PROFILE) {
                   ProfileScreen(navigationActions, userViewModel, innerPadding)
+                  val showSettingsDialog = remember { mutableStateOf(false) }
+
+                  screenParams?.topAppBarManager?.setActionCallback(
+                      TopAppBarManager.TopAppBarAction.SETTINGS) {
+                        showSettingsDialog.value = true
+                      }
+
+                  // The settings "in" the profile screen
+                  // TODO : Implement the dialog Content composable
+                  CustomDialog(
+                      showSettingsDialog,
+                      "Settings",
+                      Content = { Text("Settings to be implemented") },
+                  )
                 }
                 // screen for adding friend
                 composable(Screen.ADD_FRIEND) { AddFriendScreen(userViewModel, innerPadding) }

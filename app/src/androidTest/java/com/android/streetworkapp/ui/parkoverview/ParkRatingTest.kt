@@ -3,11 +3,9 @@ package com.android.streetworkapp.ui.parkoverview
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
-import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -17,7 +15,7 @@ import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.ui.park.InteractiveRatingComponent
 import com.android.streetworkapp.ui.park.ParkDetails
 import com.android.streetworkapp.ui.park.RatingButton
-import com.android.streetworkapp.ui.park.RatingDialog
+import com.android.streetworkapp.ui.utils.CustomDialog
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -39,7 +37,13 @@ class ParkRatingTest {
   fun isRatingButtonCorrect() {
     composeTestRule.setContent {
       RatingButton(showRatingDialog)
-      RatingDialog(showRatingDialog)
+
+      CustomDialog(
+          showRatingDialog,
+          "Rating",
+          Content = { /* No content needed */},
+          onSubmit = { /* submit function not called */},
+          onDismiss = { /* dismiss function not called */})
     }
 
     val ratingButton = composeTestRule.onNodeWithTag("ratingButton")
@@ -48,59 +52,7 @@ class ParkRatingTest {
 
     composeTestRule.waitForIdle() // Wait for recomposition
     assert(showRatingDialog.value)
-    composeTestRule.onNodeWithTag("ratingDialog").assertIsDisplayed()
-  }
-
-  @Test
-  fun isRatingDialogCorrectlyDisplayed() {
-    composeTestRule.setContent { RatingDialog(showRatingDialog) }
-
-    val dialog = composeTestRule.onNodeWithTag("ratingDialog")
-
-    dialog.assertIsNotDisplayed()
-
-    showRatingDialog.value = true
-    composeTestRule.waitForIdle() // Wait for recomposition
-
-    dialog.assertIsDisplayed()
-
-    // Title is displayed
-    composeTestRule
-        .onNodeWithTag("RatingTitle")
-        .assertIsDisplayed()
-        .assertTextEquals("Rate this park")
-
-    // Submit button is displayed
-    composeTestRule.onNodeWithTag("submitRatingButton").assertIsDisplayed().assertHasClickAction()
-
-    // Cancel Button is displayed
-    composeTestRule.onNodeWithTag("cancelRatingButton").assertIsDisplayed().assertHasClickAction()
-  }
-
-  @Test
-  fun isRatingDialogCorrectlyClosedByCancelling() {
-    // Cancelling a rating will close the dialog
-    composeTestRule.setContent {
-      val showRatingDialog = remember { mutableStateOf(true) }
-      RatingDialog(showRatingDialog)
-    }
-    composeTestRule.waitForIdle() // Wait for recomposition
-    composeTestRule.onNodeWithTag("cancelRatingButton").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("ratingDialog").assertIsNotDisplayed()
-  }
-
-  @Test
-  fun isRatingDialogCorrectlyClosedBySubmitting() {
-    // Submitting a rating will close the dialog
-    composeTestRule.setContent {
-      val showRatingDialog = remember { mutableStateOf(true) }
-      RatingDialog(showRatingDialog)
-    }
-    composeTestRule.waitForIdle() // Wait for recomposition
-    composeTestRule.onNodeWithTag("submitRatingButton").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("ratingDialog").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("RatingDialog").assertIsDisplayed()
   }
 
   @Test
@@ -121,7 +73,6 @@ class ParkRatingTest {
   }
 
   // New tests after MVVM link :
-
   // 1 - Is the button correctly hidden / shown depending on user and park state :
 
   @Test
