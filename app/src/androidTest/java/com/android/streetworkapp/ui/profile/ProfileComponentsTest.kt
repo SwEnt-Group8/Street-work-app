@@ -9,6 +9,7 @@ import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.streetworkapp.model.user.User
 import org.junit.Rule
@@ -53,8 +54,8 @@ class ProfileComponentsTest {
   @Test
   fun isNullUserPictureCorrectlyDisplayed() {
     val user = null
-    composeTestRule.setContent { DisplayFriendPicture(user) }
-    composeTestRule.onNodeWithTag("friendProfilePicture").assertExists().assertIsDisplayed()
+    composeTestRule.setContent { DisplayUserPicture(user, 80.dp, "test") }
+    composeTestRule.onNodeWithTag("test").assertExists().assertIsDisplayed()
   }
 
   @Test
