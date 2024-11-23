@@ -1,4 +1,4 @@
-package com.android.streetworkapp.event
+package com.android.streetworkapp.ui.event
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed

@@ -1,4 +1,4 @@
-package com.android.streetworkapp.event
+package com.android.streetworkapp.ui.event
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.ui.test.assertIsDisplayed
