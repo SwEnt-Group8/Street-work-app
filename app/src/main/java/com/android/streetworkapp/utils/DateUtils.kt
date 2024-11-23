@@ -29,3 +29,28 @@ fun String.toTimestamp(): Timestamp {
   val date = sdf.parse(this)
   return Timestamp(date!!)
 }
+
+/**
+ * Convert an epoch timestamp (Long) to a formatted string of format "dd/MM/yyyy HH:mm".
+ *
+ * @return The formatted string.
+ */
+fun Long.toFormattedString(): String {
+  val pattern = "dd/MM/yyyy HH:mm"
+  val sdf = SimpleDateFormat(pattern, Locale.getDefault())
+  sdf.timeZone = TimeZone.getTimeZone("UTC")
+  return sdf.format(this)
+}
+
+/**
+ * Convert a [String] of format "dd/MM/yyyy HH:mm" to a long.
+ *
+ * @param  The formatted date-time string.
+ * @return the.
+ */
+fun String.toEpochTimestamp(): Long {
+  val pattern = "dd/MM/yyyy HH:mm"
+  val sdf = SimpleDateFormat(pattern, Locale.getDefault())
+  sdf.timeZone = TimeZone.getTimeZone("UTC")
+  return sdf.parse(this)?.time ?: throw IllegalArgumentException("Invalid date format")
+}
