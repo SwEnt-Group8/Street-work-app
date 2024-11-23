@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.outlined.AccessTime
@@ -48,6 +50,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,7 +58,6 @@ import androidx.compose.ui.window.Popup
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventConstants
 import com.android.streetworkapp.model.event.EventViewModel
-import com.android.streetworkapp.model.moderation.PerspectiveApiErrors
 import com.android.streetworkapp.model.moderation.TextModerationViewModel
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.progression.ScoreIncrease
@@ -70,6 +72,10 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import java.util.concurrent.TimeUnit
+
+object AddEventParams {
+    const val TEXT_EVALUATION_DISPLAY_TIME = 7500L //ns
+}
 
 object AddEventFormErrorMessages {
     const val IS_TITLE_EMPTY_ERROR_MESSAGE = "Event title cannot be empty."
@@ -104,7 +110,7 @@ fun AddEventScreen(
           "",
           1, // set to one by default, because the owner is also a participant
           EventConstants.MIN_NUMBER_PARTICIPANTS,
-          Timestamp(0, 0),
+          Timestamp.now(), //note: the time in the time picker is not based on this, it's also the current time. If we were to modify one of them it would not match anymore. Something to keep in mid
           "unknown")
   ) }
 
@@ -137,15 +143,25 @@ fun AddEventScreen(
   ) {
     Box(modifier = Modifier
         .fillMaxSize()
-        .testTag("addEventScreen")) {
+        .testTag("addEventScreen")
+        .padding(vertical = 15.dp)
+    ) {
       Column(
-          modifier = Modifier.fillMaxWidth(),
+          modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
           verticalArrangement = Arrangement.spacedBy(18.dp),
           horizontalAlignment = Alignment.CenterHorizontally) {
-            Spacer(modifier = Modifier.size(24.dp))
             EventTitleSelection(event, isTitleEmptyError, isTextEvaluationOverThresholdsError)
             EventDescriptionSelection(event, isTextEvaluationOverThresholdsError)
             TimeSelection(event, isDateBackInTimeError)
+
+            Text(
+                text = "* Required fields",
+                color = ColorPalette.SECONDARY_TEXT_COLOR,
+                fontWeight = FontWeight.Normal,
+                fontSize = 12.sp,
+                textAlign = TextAlign.Left,
+                modifier = Modifier.fillMaxWidth(0.9f)
+            )
             Text(
                 text = "How many participants do you want?",
                 fontSize = 18.sp,
@@ -159,9 +175,9 @@ fun AddEventScreen(
                   color = MaterialTheme.colorScheme.error,
                   text = formErrorMessage)
           }
-
+          //for non users related errors, we only show the message for a brief amount of time
           LaunchedEffect(isTextEvaluationError) {
-              delay(7500)
+              delay(AddEventParams.TEXT_EVALUATION_DISPLAY_TIME)
               isTextEvaluationError = false
           }
 
@@ -221,12 +237,11 @@ fun EventTitleSelection(event: Event, isTitleEmptyError: MutableState<Boolean>, 
         isTitleEmptyError.value = false
         isTextEvaluationError.value = false
       },
-      label = { Text("What kind of event do you want to create?") },
+      label = { Text("What's your event's title? *") },
       isError =  isTitleEmptyError.value || isTextEvaluationError.value,
       modifier = Modifier
           .testTag("titleTag")
           .fillMaxWidth(0.9f)
-          .height(64.dp),
   )
 }
 
@@ -246,7 +261,7 @@ fun EventDescriptionSelection(event: Event, isTextEvaluationError: MutableState<
         event.description = description
         isTextEvaluationError.value = false //reset the field error
       },
-      label = { Text("Describe your event:") },
+      label = { Text("Describe your event") },
       isError = isTextEvaluationError.value,
       modifier = Modifier
           .testTag("descriptionTag")
@@ -305,7 +320,7 @@ fun TimeSelection(event: Event, isDateError: MutableState<Boolean>) {
   var showTimePicker by remember { mutableStateOf(false) }
 
   val currentTime = Calendar.getInstance()
-  val datePickerState = rememberDatePickerState(currentTime.timeInMillis)
+  val datePickerState = rememberDatePickerState(event.date.toDate().time)
   val timePickerState =
       rememberTimePickerState(
           initialHour = currentTime.get(Calendar.HOUR_OF_DAY),
@@ -321,13 +336,13 @@ fun TimeSelection(event: Event, isDateError: MutableState<Boolean>) {
   val selectedDate =
       datePickerState.selectedDateMillis?.let { convertMillisToDate(currentTimeSelection!!) } ?: ""
 
-  Box(modifier = Modifier.fillMaxWidth(0.9f)) {
+  Box(modifier = Modifier.fillMaxWidth(0.9f).padding(bottom = 0.dp)) {
     OutlinedTextField(
         value = selectedDate,
         onValueChange = {
         },
         isError = isDateError.value,
-        label = { Text("When do you want to train?") },
+        label = { Text("When do you want your event to be? *") },
         readOnly = true,
         trailingIcon = {
           Row {
@@ -345,7 +360,7 @@ fun TimeSelection(event: Event, isDateError: MutableState<Boolean>) {
         },
         modifier = Modifier
             .fillMaxWidth()
-            .height(64.dp))
+    )
 
     if (showDatePicker) {
       Popup(onDismissRequest = { showDatePicker = false }, alignment = Alignment.TopStart) {
