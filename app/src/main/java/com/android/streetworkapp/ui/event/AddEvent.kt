@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -47,6 +48,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
@@ -55,7 +57,6 @@ import com.android.streetworkapp.model.event.EventConstants
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.moderation.TextModerationViewModel
 import com.android.streetworkapp.model.park.ParkViewModel
-import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
 import com.android.streetworkapp.model.progression.ScoreIncrease
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
@@ -87,7 +88,7 @@ fun AddEventScreen(
   val context = LocalContext.current
 
   val eid = eventViewModel.getNewEid()
-  val event =
+  val event by remember { mutableStateOf<Event>(
       Event(
           eid,
           "",
@@ -96,6 +97,7 @@ fun AddEventScreen(
           EventConstants.MIN_NUMBER_PARTICIPANTS,
           Timestamp(0, 0),
           "unknown")
+  ) }
 
   val owner = userViewModel.currentUser.collectAsState().value?.uid
   if (!owner.isNullOrEmpty()) {
@@ -108,8 +110,14 @@ fun AddEventScreen(
     event.parkId = parkId
   }
 
-  //Will be triggered if text is over thresholds
-  var textModerationEvaluationIsOverThresholds = remember { mutableStateOf(false) } //we keep track of the mutable state since we need to reset it in the fields below (thus passing it as param)
+    //TODO: setup errors messages globally here
+  var isTitleEmptyError = remember { mutableStateOf(false) }//we keep track of the mutable state since we need to reset it in the fields below (thus passing it as param)
+  var isTextEvaluationError = remember { mutableStateOf(false) } //same here
+  var isDateError = remember { mutableStateOf(false) } //same here
+  var formErrorMessage by remember { mutableStateOf("") } //message to be displayed at bottom of form in case of form error
+
+  //If we add another error, just add it in the list for the text error to appear at bottom of form
+  val errorStates = listOf(isTitleEmptyError.value, isTextEvaluationError.value, isDateError.value)
 
   Box(
       modifier = Modifier
@@ -117,7 +125,6 @@ fun AddEventScreen(
           .background(MaterialTheme.colorScheme.background),
   ) {
     Box(modifier = Modifier
-        .padding(top = 25.dp)
         .fillMaxSize()
         .testTag("addEventScreen")) {
       Column(
@@ -125,46 +132,53 @@ fun AddEventScreen(
           verticalArrangement = Arrangement.spacedBy(18.dp),
           horizontalAlignment = Alignment.CenterHorizontally) {
             Spacer(modifier = Modifier.size(24.dp))
-            EventTitleSelection(event, textModerationEvaluationIsOverThresholds)
-            EventDescriptionSelection(event, textModerationEvaluationIsOverThresholds)
+            EventTitleSelection(event, isTitleEmptyError, isTextEvaluationError)
+            EventDescriptionSelection(event, isTextEvaluationError)
             TimeSelection(event)
             Text(
                 text = "How many participants do you want?",
                 fontSize = 18.sp,
             )
             ParticipantNumberSelection(event)
+
+          if (errorStates.any { it }) {
+              Text(
+                  modifier = Modifier.padding(vertical = 0.dp, horizontal = 25.dp),
+                  textAlign = TextAlign.Center,
+                  color = MaterialTheme.colorScheme.error,
+                  text = formErrorMessage)
           }
-      FloatingActionButton(
-          onClick = {
-            if (event.date.toDate() < Calendar.getInstance().time) {
-              Toast.makeText(context, "Date cannot be in the past", Toast.LENGTH_SHORT).show()
-            } else if (event.title.isEmpty()) {
-              Toast.makeText(context, "Please fill the title of the event", Toast.LENGTH_SHORT)
-                  .show()
-            } else {
-          //make sure the description & title are valid according to our evaluation thresholds
-              val formattedTextInput = "Title: ${event.title}. Description: ${event.description}" //we format it to do only one api call
-              textModerationViewModel.analyzeText(formattedTextInput,
-                  { isTextUnderThresholds ->
-                      if (isTextUnderThresholds) {
-                          createEvent(event, navigationActions, eventViewModel, userViewModel, parkViewModel, context)
-                      } else {
-                          //do some kind of UI work here
-                            textModerationEvaluationIsOverThresholds.value = true
-                      }
-                  }, { /*display the error message in someway*/ })
-            }
-          },
-          modifier =
-          Modifier
-              .align(Alignment.Center)
-              .offset(0.dp, 100.dp)
-              .padding(40.dp)
-              .size(width = 150.dp, height = 40.dp)
-              .testTag("addEventButton"),
-          containerColor = ColorPalette.INTERACTION_COLOR_DARK,
-          contentColor = ColorPalette.PRIMARY_TEXT_COLOR) {
-            Text("Add new event")
+
+          Button(
+              colors = ButtonDefaults.buttonColors(
+                  containerColor = ColorPalette.INTERACTION_COLOR_DARK,
+                  contentColor = ColorPalette.PRIMARY_TEXT_COLOR
+              ),
+              modifier = Modifier.testTag("addEventButton"),
+              onClick = {
+                  if (event.date.toDate() < Calendar.getInstance().time) {
+                      isDateError.value = true
+                      formErrorMessage = "Date cannot be in the past."
+                  } else if (event.title.isEmpty()) {
+                      isTitleEmptyError.value = true
+                      formErrorMessage = "Event title cannot be empty."
+                  } else {
+                      //making sure the description & title are valid according to our evaluation thresholds
+                      val formattedTextInput = "Title: ${event.title}. Description: ${event.description}" //we format it to do only one api call
+                      textModerationViewModel.analyzeText(formattedTextInput,
+                          { isTextUnderThresholds ->
+                              if (isTextUnderThresholds) {
+                                  createEvent(event, navigationActions, eventViewModel, userViewModel, parkViewModel, context)
+                              } else {
+                                  isTextEvaluationError.value = true
+                                  formErrorMessage = "Your event's title and/or description contains language that may not meet our guidelines. Please review and make sure it's respectful and appropriate before submitting again."
+                              }
+                          }, { /*display the error message in someway*/ })
+                  }
+              }
+          ) {
+              Text("Add new event")
+          }
           }
     }
   }
@@ -176,7 +190,7 @@ fun AddEventScreen(
  * @param event the event that will be updated
  */
 @Composable
-fun EventTitleSelection(event: Event, isError: MutableState<Boolean>) {
+fun EventTitleSelection(event: Event, isTitleEmptyError: MutableState<Boolean>, isTextEvaluationError: MutableState<Boolean>) {
   var title by remember { mutableStateOf("") }
 
   OutlinedTextField(
@@ -184,10 +198,12 @@ fun EventTitleSelection(event: Event, isError: MutableState<Boolean>) {
       onValueChange = {
         title = it
         event.title = title
-        isError.value = false //reset the field
+        //reset the field errors
+        isTitleEmptyError.value = false
+        isTextEvaluationError.value = false
       },
       label = { Text("What kind of event do you want to create?") },
-      isError = isError.value,
+      isError =  isTitleEmptyError.value || isTextEvaluationError.value,
       modifier = Modifier
           .testTag("titleTag")
           .fillMaxWidth(0.9f)
@@ -201,7 +217,7 @@ fun EventTitleSelection(event: Event, isError: MutableState<Boolean>) {
  * @param event the event that will be updated
  */
 @Composable
-fun EventDescriptionSelection(event: Event, isError: MutableState<Boolean>) {
+fun EventDescriptionSelection(event: Event, isTextEvaluationError: MutableState<Boolean>) {
   var description by remember { mutableStateOf("") }
 
   OutlinedTextField(
@@ -209,10 +225,10 @@ fun EventDescriptionSelection(event: Event, isError: MutableState<Boolean>) {
       onValueChange = {
         description = it
         event.description = description
-        isError.value = false //reset the field
+        isTextEvaluationError.value = false //reset the field error
       },
       label = { Text("Describe your event:") },
-      isError = isError.value,
+      isError = isTextEvaluationError.value,
       modifier = Modifier
           .testTag("descriptionTag")
           .fillMaxWidth(0.9f)
@@ -289,7 +305,9 @@ fun TimeSelection(event: Event) {
   Box(modifier = Modifier.fillMaxWidth(0.9f)) {
     OutlinedTextField(
         value = selectedDate,
-        onValueChange = {},
+        onValueChange = {
+
+        },
         label = { Text("When do you want to train?") },
         readOnly = true,
         trailingIcon = {
