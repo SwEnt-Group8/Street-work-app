@@ -1,5 +1,7 @@
 package com.android.streetworkapp.model.workout
 
+import com.android.streetworkapp.utils.toFormattedString
+
 /**
  * A data class representing a workout session.
  *
@@ -19,7 +21,11 @@ data class WorkoutSession(
     val participants: List<String> = emptyList(),
     val exercises: List<Exercise> = emptyList(),
     val winner: String? = null
-)
+) {
+  fun getFormattedStartTime(): String = startTime.toFormattedString()
+
+  fun getFormattedEndTime(): String = endTime.toFormattedString()
+}
 
 /** An enum class representing the type of workout session. */
 enum class SessionType {
