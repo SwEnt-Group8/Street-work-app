@@ -134,7 +134,7 @@ fun AddEventScreen(
             Spacer(modifier = Modifier.size(24.dp))
             EventTitleSelection(event, isTitleEmptyError, isTextEvaluationError)
             EventDescriptionSelection(event, isTextEvaluationError)
-            TimeSelection(event)
+            TimeSelection(event, isDateError)
             Text(
                 text = "How many participants do you want?",
                 fontSize = 18.sp,
@@ -281,7 +281,7 @@ fun ParticipantNumberSelection(event: Event) {
  */
 @ExperimentalMaterial3Api
 @Composable
-fun TimeSelection(event: Event) {
+fun TimeSelection(event: Event, isDateError: MutableState<Boolean>) {
   var showDatePicker by remember { mutableStateOf(false) }
   var showTimePicker by remember { mutableStateOf(false) }
 
@@ -306,8 +306,8 @@ fun TimeSelection(event: Event) {
     OutlinedTextField(
         value = selectedDate,
         onValueChange = {
-
         },
+        isError = isDateError.value,
         label = { Text("When do you want to train?") },
         readOnly = true,
         trailingIcon = {
@@ -352,6 +352,8 @@ fun TimeSelection(event: Event) {
                   datePickerState.selectedDateMillis
                       ?.let { TimeUnit.MILLISECONDS.toSeconds(currentTimeSelection!!) }
                       ?.let { Timestamp(it, 0) }!!
+
+
             }) {
               Text("Validate")
             }
@@ -375,8 +377,9 @@ fun TimeSelection(event: Event) {
                   colors = ButtonColors(Color.Blue, Color.White, Color.Blue, Color.White),
                   onClick = {
                     showTimePicker = false
+                    isDateError.value = false //reset the field error
 
-                    event.date =
+                      event.date =
                         datePickerState.selectedDateMillis
                             ?.let { TimeUnit.MILLISECONDS.toSeconds(currentTimeSelection!!) }
                             ?.let { Timestamp(it, 0) }!!
