@@ -14,11 +14,13 @@ import androidx.compose.ui.window.DialogProperties
 import com.android.streetworkapp.ui.theme.ColorPalette
 
 /**
- * This function displays the a customized dialog with callback functions. Displayed depending on
- * the showDialog value. Will hide itself once interacted with.
+ * This function displays the customized dialog with callback functions. Displayed depending on the
+ * showDialog value. Will hide itself once interacted with.
  *
  * @param showDialog - MutableState to show the dialog
- * @param dialogType - Type of dialog to display ("Settings", "Rating", etc.)
+ * @param dialogType - Type of dialog (QUERY, INFO)
+ * @param tag - Describe the instance ("Settings", "Rating", etc.)
+ * @param title - Title of the dialog
  * @param Content - Content of the dialog
  * @param onSubmit - Submission callback
  * @param onDismiss - Dismiss callback
@@ -26,7 +28,9 @@ import com.android.streetworkapp.ui.theme.ColorPalette
 @Composable
 fun CustomDialog(
     showDialog: MutableState<Boolean>,
-    dialogType: String = "",
+    dialogType: DialogType = DialogType.QUERY,
+    tag: String = "",
+    title: String = "Your $tag",
     Content: @Composable () -> Unit = {},
     onSubmit: () -> Unit = {},
     onDismiss: () -> Unit = {}
@@ -35,42 +39,59 @@ fun CustomDialog(
 
   if (showDialog.value) {
     AlertDialog(
-        modifier = Modifier.testTag(dialogType + "Dialog"),
+        modifier = Modifier.testTag(tag + "Dialog"),
         onDismissRequest = {
           onDismiss()
           showDialog.value = false
         },
         confirmButton = {
-          TextButton(
-              onClick = {
-                onSubmit()
-                Toast.makeText(context, "$dialogType Dialog submitted", Toast.LENGTH_SHORT).show()
-                showDialog.value = false
-              },
-              modifier = Modifier.testTag(dialogType + "DialogSubmitButton")) {
-                Text("Submit", color = ColorPalette.SECONDARY_TEXT_COLOR)
-              }
+          if (dialogType.shouldShowSubmitButton()) {
+            TextButton(
+                onClick = {
+                  onSubmit()
+                  Toast.makeText(context, "Submitted", Toast.LENGTH_SHORT).show()
+                  showDialog.value = false
+                },
+                modifier = Modifier.testTag(tag + "DialogSubmitButton")) {
+                  Text("Submit", color = ColorPalette.SECONDARY_TEXT_COLOR)
+                }
+          }
         },
         dismissButton = {
-          TextButton(
-              onClick = {
-                onDismiss()
-                showDialog.value = false
-              },
-              modifier = Modifier.testTag(dialogType + "DialogCancelButton")) {
-                Text("Cancel", color = Color.Red)
-              }
+          if (dialogType.shouldShowCancelButton()) {
+            TextButton(
+                onClick = {
+                  onDismiss()
+                  showDialog.value = false
+                },
+                modifier = Modifier.testTag(tag + "DialogCancelButton")) {
+                  Text("Cancel", color = Color.Red)
+                }
+          }
         },
         title = {
           Text(
-              "Your $dialogType",
+              title,
               color = ColorPalette.PRIMARY_TEXT_COLOR,
-              modifier = Modifier.testTag(dialogType + "DialogTitle"))
+              modifier = Modifier.testTag(tag + "DialogTitle"))
         },
         text = { Content() },
         properties =
             DialogProperties(
                 dismissOnClickOutside = true) // Makes dialog dismissible by clicking outside
         )
+  }
+}
+
+enum class DialogType {
+  QUERY, // Have submit / cancel buttons + use OnSubmit / onDismiss.
+  INFO; // Only display the content + use onDismiss.
+
+  fun shouldShowSubmitButton(): Boolean {
+    return this == QUERY
+  }
+
+  fun shouldShowCancelButton(): Boolean {
+    return this == QUERY
   }
 }

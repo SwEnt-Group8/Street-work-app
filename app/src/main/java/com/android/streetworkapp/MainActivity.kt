@@ -229,7 +229,7 @@ fun StreetWorkApp(
                   // TODO : Implement the dialog Content composable
                   CustomDialog(
                       showSettingsDialog,
-                      "Settings",
+                      tag = "Settings",
                       Content = { Text("Settings to be implemented") },
                   )
                 }
