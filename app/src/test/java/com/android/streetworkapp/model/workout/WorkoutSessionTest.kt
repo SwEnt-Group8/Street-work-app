@@ -21,14 +21,14 @@ class WorkoutSessionTest {
 
   @Test
   fun `test getFormattedStartTime returns correctly formatted start time`() {
-    val expectedFormat = "24-11-2024 06:40"
+    val expectedFormat = "24/11/2024 06:40"
     val actualFormat = workoutSession.getFormattedStartTime()
     assertEquals(expectedFormat, actualFormat)
   }
 
   @Test
   fun `test getFormattedEndTime returns correctly formatted end time`() {
-    val expectedFormat = "24-11-2024 07:40"
+    val expectedFormat = "24/11/2024 07:40"
     val actualFormat = workoutSession.getFormattedEndTime()
     assertEquals(expectedFormat, actualFormat)
   }
