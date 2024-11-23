@@ -166,4 +166,5 @@ class AddEventTest {
         .assertIsDisplayed() // we want that a click with changes in the time but no changes in the
     // default value of the title does not make the user leave the screen
   }
+
 }
