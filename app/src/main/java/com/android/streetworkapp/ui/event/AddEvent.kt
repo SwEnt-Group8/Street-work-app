@@ -23,7 +23,6 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -35,6 +34,7 @@ import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -55,6 +55,7 @@ import androidx.compose.ui.window.Popup
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventConstants
 import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.moderation.PerspectiveApiErrors
 import com.android.streetworkapp.model.moderation.TextModerationViewModel
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.progression.ScoreIncrease
@@ -62,12 +63,20 @@ import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.google.firebase.Timestamp
+import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import java.util.concurrent.TimeUnit
+
+object AddEventFormErrorMessages {
+    const val IS_TITLE_EMPTY_ERROR_MESSAGE = "Event title cannot be empty."
+    const val IS_DATE_BACK_IN_TIME_ERROR = "Date cannot be in the past."
+    const val IS_TEXT_EVALUATION_OVER_THRESHOLDS_ERROR = "Your event's title and/or description contains language that may not meet our guidelines. Please review and make sure it's respectful and appropriate before submitting again."
+    const val TEXT_EVALUATION_ERROR = "It looks like something went wrong on our end. This could be due to a network issue or an unexpected error. Please try again in a moment."
+}
 
 /**
  * Display a view that is used to add a new Event to a given park.
@@ -110,16 +119,18 @@ fun AddEventScreen(
     event.parkId = parkId
   }
 
-    //TODO: setup errors messages globally here
-  var isTitleEmptyError = remember { mutableStateOf(false) }//we keep track of the mutable state since we need to reset it in the fields below (thus passing it as param)
-  var isTextEvaluationError = remember { mutableStateOf(false) } //same here
-  var isDateError = remember { mutableStateOf(false) } //same here
+  val isTitleEmptyError = remember { mutableStateOf(false) }//we keep track of the mutable state since we need to reset it in the fields below (thus passing it as param)
+  val isTextEvaluationOverThresholdsError = remember { mutableStateOf(false) } //same here
+  val isDateBackInTimeError = remember { mutableStateOf(false) } //same here
+  var isTextEvaluationError by remember { mutableStateOf(false) } //for api error, deserialization error or network issues
   var formErrorMessage by remember { mutableStateOf("") } //message to be displayed at bottom of form in case of form error
 
-  //If we add another error, just add it in the list for the text error to appear at bottom of form
-  val errorStates = listOf(isTitleEmptyError.value, isTextEvaluationError.value, isDateError.value)
+  /*
+  If we add another error, just add it in the list for the text error to appear at bottom of form. The formErrorMessage is shown if any one of these is true
+   */
+  val errorStates = listOf(isTitleEmptyError.value, isTextEvaluationOverThresholdsError.value, isDateBackInTimeError.value, isTextEvaluationError)
 
-  Box(
+    Box(
       modifier = Modifier
           .padding(paddingValues)
           .background(MaterialTheme.colorScheme.background),
@@ -132,9 +143,9 @@ fun AddEventScreen(
           verticalArrangement = Arrangement.spacedBy(18.dp),
           horizontalAlignment = Alignment.CenterHorizontally) {
             Spacer(modifier = Modifier.size(24.dp))
-            EventTitleSelection(event, isTitleEmptyError, isTextEvaluationError)
-            EventDescriptionSelection(event, isTextEvaluationError)
-            TimeSelection(event, isDateError)
+            EventTitleSelection(event, isTitleEmptyError, isTextEvaluationOverThresholdsError)
+            EventDescriptionSelection(event, isTextEvaluationOverThresholdsError)
+            TimeSelection(event, isDateBackInTimeError)
             Text(
                 text = "How many participants do you want?",
                 fontSize = 18.sp,
@@ -149,6 +160,11 @@ fun AddEventScreen(
                   text = formErrorMessage)
           }
 
+          LaunchedEffect(isTextEvaluationError) {
+              delay(7500)
+              isTextEvaluationError = false
+          }
+
           Button(
               colors = ButtonDefaults.buttonColors(
                   containerColor = ColorPalette.INTERACTION_COLOR_DARK,
@@ -157,11 +173,11 @@ fun AddEventScreen(
               modifier = Modifier.testTag("addEventButton"),
               onClick = {
                   if (event.date.toDate() < Calendar.getInstance().time) {
-                      isDateError.value = true
-                      formErrorMessage = "Date cannot be in the past."
+                      isDateBackInTimeError.value = true
+                      formErrorMessage = AddEventFormErrorMessages.IS_DATE_BACK_IN_TIME_ERROR
                   } else if (event.title.isEmpty()) {
                       isTitleEmptyError.value = true
-                      formErrorMessage = "Event title cannot be empty."
+                      formErrorMessage = AddEventFormErrorMessages.IS_TITLE_EMPTY_ERROR_MESSAGE
                   } else {
                       //making sure the description & title are valid according to our evaluation thresholds
                       val formattedTextInput = "Title: ${event.title}. Description: ${event.description}" //we format it to do only one api call
@@ -170,10 +186,13 @@ fun AddEventScreen(
                               if (isTextUnderThresholds) {
                                   createEvent(event, navigationActions, eventViewModel, userViewModel, parkViewModel, context)
                               } else {
-                                  isTextEvaluationError.value = true
-                                  formErrorMessage = "Your event's title and/or description contains language that may not meet our guidelines. Please review and make sure it's respectful and appropriate before submitting again."
+                                  isTextEvaluationOverThresholdsError.value = true
+                                  formErrorMessage = AddEventFormErrorMessages.IS_TEXT_EVALUATION_OVER_THRESHOLDS_ERROR
                               }
-                          }, { /*display the error message in someway*/ })
+                          }, {
+                              isTextEvaluationError = true
+                              formErrorMessage = AddEventFormErrorMessages.TEXT_EVALUATION_ERROR
+                          })
                   }
               }
           ) {
