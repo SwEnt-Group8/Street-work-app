@@ -110,8 +110,7 @@ class End2EndParks {
           ParkViewModel(mockk()),
           EventViewModel(mockk()),
           ProgressionViewModel(mockk()),
-          TextModerationViewModel(mockk())
-          )
+          TextModerationViewModel(mockk()))
       // setup so as we're already on the MAP route
     }
 

@@ -2,10 +2,10 @@ package com.android.streetworkapp.model.moderation
 
 import android.util.Log
 import com.android.sample.BuildConfig
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.net.HttpURLConnection.HTTP_BAD_REQUEST
 import java.net.HttpURLConnection.HTTP_OK
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
 import okhttp3.HttpUrl
@@ -59,57 +59,56 @@ class PerspectiveAPIRepository(private val client: OkHttpClient) : TextModeratio
    *   TextEvaluationResult.Error if an error was encountered
    */
   private suspend fun getTextAnnotations(content: String): PerspectiveAPIEvaluationResult {
-      return withContext(Dispatchers.IO) {
-          try {
-              // Prepare the request
-              val requestMediaType = "application/json; charset=utf-8".toMediaType()
-              val requestBody = formatPostRequestBody(content).toRequestBody(requestMediaType)
+    return withContext(Dispatchers.IO) {
+      try {
+        // Prepare the request
+        val requestMediaType = "application/json; charset=utf-8".toMediaType()
+        val requestBody = formatPostRequestBody(content).toRequestBody(requestMediaType)
 
-              val url = HttpUrl.Builder()
-                  .scheme("https")
-                  .host("commentanalyzer.googleapis.com")
-                  .addPathSegment("v1alpha1")
-                  .addPathSegment("comments:analyze")
-                  .addQueryParameter("key", BuildConfig.PERSPECTIVE_API_KEY)
-                  .build()
+        val url =
+            HttpUrl.Builder()
+                .scheme("https")
+                .host("commentanalyzer.googleapis.com")
+                .addPathSegment("v1alpha1")
+                .addPathSegment("comments:analyze")
+                .addQueryParameter("key", BuildConfig.PERSPECTIVE_API_KEY)
+                .build()
 
-              val request = Request.Builder().url(url).post(requestBody).build()
+        val request = Request.Builder().url(url).post(requestBody).build()
 
-              // Execute the request
-              val response = client.newCall(request).execute()
+        // Execute the request
+        val response = client.newCall(request).execute()
 
-              // Handle response
-              when (response.code) {
-                  HTTP_OK -> {
-                      val responseBody = response.body?.string()
-                          ?: return@withContext PerspectiveAPIEvaluationResult.Error(
-                              PerspectiveApiErrors.EMPTY_BODY_RESPONSE
-                          )
-                      val annotations = extractTagsAndProbabilitiesFromResponseBody(responseBody)
-                      annotations?.let {
-                          PerspectiveAPIEvaluationResult.Success(annotations)
-                      } ?: PerspectiveAPIEvaluationResult.Error(
-                          PerspectiveApiErrors.JSON_DESERIALIZATION_ERROR
-                      )
-                  }
-                  HTTP_BAD_REQUEST -> {
-                      val responseBody = response.body?.string()
-                          ?: return@withContext PerspectiveAPIEvaluationResult.Error(
-                              PerspectiveApiErrors.EMPTY_BODY_RESPONSE
-                          )
-                      val error = extractErrorFromResponseBody(responseBody)
-                      PerspectiveAPIEvaluationResult.Error(error)
-                  }
-                  else -> {
-                      Log.d(DEBUG_PREFIX, "Received unsupported HTTP code (${response.code}) from API")
-                      PerspectiveAPIEvaluationResult.Error(PerspectiveApiErrors.UNSUPPORTED_HTTP_CODE)
-                  }
-              }
-          } catch (e: Exception) {
-              Log.e(DEBUG_PREFIX, "Network error: ${e.message}", e)
-              PerspectiveAPIEvaluationResult.Error(PerspectiveApiErrors.NETWORK_ERROR)
+        // Handle response
+        when (response.code) {
+          HTTP_OK -> {
+            val responseBody =
+                response.body?.string()
+                    ?: return@withContext PerspectiveAPIEvaluationResult.Error(
+                        PerspectiveApiErrors.EMPTY_BODY_RESPONSE)
+            val annotations = extractTagsAndProbabilitiesFromResponseBody(responseBody)
+            annotations?.let { PerspectiveAPIEvaluationResult.Success(annotations) }
+                ?: PerspectiveAPIEvaluationResult.Error(
+                    PerspectiveApiErrors.JSON_DESERIALIZATION_ERROR)
           }
+          HTTP_BAD_REQUEST -> {
+            val responseBody =
+                response.body?.string()
+                    ?: return@withContext PerspectiveAPIEvaluationResult.Error(
+                        PerspectiveApiErrors.EMPTY_BODY_RESPONSE)
+            val error = extractErrorFromResponseBody(responseBody)
+            PerspectiveAPIEvaluationResult.Error(error)
+          }
+          else -> {
+            Log.d(DEBUG_PREFIX, "Received unsupported HTTP code (${response.code}) from API")
+            PerspectiveAPIEvaluationResult.Error(PerspectiveApiErrors.UNSUPPORTED_HTTP_CODE)
+          }
+        }
+      } catch (e: Exception) {
+        Log.e(DEBUG_PREFIX, "Network error: ${e.message}", e)
+        PerspectiveAPIEvaluationResult.Error(PerspectiveApiErrors.NETWORK_ERROR)
       }
+    }
   }
 
   private fun formatPostRequestBody(content: String): String {

@@ -115,8 +115,7 @@ class End2EndGeneral {
           ParkViewModel(mock(ParkRepository::class.java)),
           EventViewModel(mock(EventRepository::class.java)),
           progressionViewModel,
-          mock(TextModerationViewModel::class.java)
-          )
+          mock(TextModerationViewModel::class.java))
     }
 
     composeTestRule.waitForIdle()

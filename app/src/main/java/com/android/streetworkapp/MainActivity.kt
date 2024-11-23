@@ -5,23 +5,14 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -30,8 +21,6 @@ import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.moderation.PerspectiveAPIRepository
-import com.android.streetworkapp.model.moderation.TextModerationRepository
-import com.android.streetworkapp.model.moderation.TextModerationTags
 import com.android.streetworkapp.model.moderation.TextModerationViewModel
 import com.android.streetworkapp.model.park.NominatimParkNameRepository
 import com.android.streetworkapp.model.park.ParkRepositoryFirestore
@@ -104,7 +93,6 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
   val progressionRepository = ProgressionRepositoryFirestore(firestoreDB)
   val progressionViewModel = ProgressionViewModel(progressionRepository)
 
-
   // Instantiate Text Moderation
   val textModerationRepository = PerspectiveAPIRepository(OkHttpClient())
   val textModerationViewModel = TextModerationViewModel(textModerationRepository)
@@ -117,8 +105,7 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
       parkViewModel,
       eventViewModel,
       progressionViewModel,
-      textModerationViewModel
-      )
+      textModerationViewModel)
 }
 
 @SuppressLint("UnrememberedMutableState")
@@ -138,7 +125,7 @@ fun StreetWorkApp(
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
 
-    val currentScreenName = remember {
+  val currentScreenName = remember {
     mutableStateOf<String?>(null)
   } // not using by here since I want to pass the mutableState to a fn
   var screenParams by remember { mutableStateOf<ScreenParams?>(null) }
@@ -225,7 +212,13 @@ fun StreetWorkApp(
                       parkViewModel, innerPadding, navigationActions, eventViewModel, userViewModel)
                 }
                 composable(Screen.ADD_EVENT) {
-                  AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel, innerPadding)
+                  AddEventScreen(
+                      navigationActions,
+                      parkViewModel,
+                      eventViewModel,
+                      userViewModel,
+                      textModerationViewModel,
+                      innerPadding)
                 }
                 composable(Screen.EVENT_OVERVIEW) {
                   EventOverviewScreen(eventViewModel, parkViewModel, innerPadding)

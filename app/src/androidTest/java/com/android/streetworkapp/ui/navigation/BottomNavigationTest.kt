@@ -111,8 +111,7 @@ class BottomNavigationTest {
           ParkViewModel(mock(ParkRepository::class.java, RETURNS_DEFAULTS)),
           EventViewModel(mock(EventRepository::class.java, RETURNS_DEFAULTS)),
           ProgressionViewModel(mock(ProgressionRepository::class.java, RETURNS_DEFAULTS)),
-          TextModerationViewModel(mock(TextModerationRepository::class.java, RETURNS_DEFAULTS))
-          ,
+          TextModerationViewModel(mock(TextModerationRepository::class.java, RETURNS_DEFAULTS)),
           true)
     }
 

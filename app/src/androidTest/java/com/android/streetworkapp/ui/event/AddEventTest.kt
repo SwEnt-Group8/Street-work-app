@@ -19,11 +19,6 @@ import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
-import com.android.streetworkapp.ui.event.AddEventScreen
-import com.android.streetworkapp.ui.event.EventDescriptionSelection
-import com.android.streetworkapp.ui.event.EventTitleSelection
-import com.android.streetworkapp.ui.event.ParticipantNumberSelection
-import com.android.streetworkapp.ui.event.TimeSelection
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import org.junit.Before
@@ -103,7 +98,9 @@ class AddEventTest {
   @Test
   fun titleSelectionUpdatesEvent() {
     val eventCopy = event.copy()
-    composeTestRule.setContent { EventTitleSelection(eventCopy, mutableStateOf(false), mutableStateOf(false)) }
+    composeTestRule.setContent {
+      EventTitleSelection(eventCopy, mutableStateOf(false), mutableStateOf(false))
+    }
     composeTestRule.onNodeWithTag("titleTag").performTextClearance()
     composeTestRule.onNodeWithTag("titleTag").performTextInput("test")
 
@@ -124,7 +121,8 @@ class AddEventTest {
   fun addEventScreenIsDisplayed() {
     `when`(eventViewModel.getNewEid()).thenReturn("test")
     composeTestRule.setContent {
-      AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel)
+      AddEventScreen(
+          navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel)
     }
 
     composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
@@ -135,7 +133,8 @@ class AddEventTest {
   fun addEventScreenWithUnchangedTimeDoesNotChangeScreen() {
     `when`(eventViewModel.getNewEid()).thenReturn("test")
     composeTestRule.setContent {
-      AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel)
+      AddEventScreen(
+          navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel)
     }
 
     composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
@@ -150,7 +149,8 @@ class AddEventTest {
   fun addEventScreenWithUnchangedTitleDoesNotChangeScreen() {
     `when`(eventViewModel.getNewEid()).thenReturn("test")
     composeTestRule.setContent {
-      AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel)
+      AddEventScreen(
+          navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel)
     }
 
     composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
@@ -166,5 +166,4 @@ class AddEventTest {
         .assertIsDisplayed() // we want that a click with changes in the time but no changes in the
     // default value of the title does not make the user leave the screen
   }
-
 }

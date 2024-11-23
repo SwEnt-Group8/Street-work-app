@@ -234,22 +234,24 @@ class PerspectiveAPIRepositoryTest {
   }
 
   @Test
-  fun evaluateTextReturnsErrorAndCorrectErrorMessageOnAPIResponseSuccessAndDeserializationError() = runTest {
-    whenever(okHttpClient.newCall(any())).thenReturn(call)
-    whenever(call.execute()).thenReturn(response)
-    whenever(response.code).thenReturn(HTTP_OK)
-    whenever(response.body).thenReturn(responseBody)
-    whenever(responseBody.string()).thenReturn("###@@@#§") // making the deserialization fail
+  fun evaluateTextReturnsErrorAndCorrectErrorMessageOnAPIResponseSuccessAndDeserializationError() =
+      runTest {
+        whenever(okHttpClient.newCall(any())).thenReturn(call)
+        whenever(call.execute()).thenReturn(response)
+        whenever(response.code).thenReturn(HTTP_OK)
+        whenever(response.body).thenReturn(responseBody)
+        whenever(responseBody.string()).thenReturn("###@@@#§") // making the deserialization fail
 
-    when (val result =
-        perspectiveAPIRepository.evaluateText(
-            "content", PerspectiveAPIThresholds.DEFAULT_THRESHOLD_VALUES)) {
-      is TextEvaluation.Error ->
-          assert(
-              result.errorMessage == PerspectiveApiErrors.JSON_DESERIALIZATION_ERROR.errorMessage)
-      is TextEvaluation.Result -> assert(false)
-    }
-  }
+        when (val result =
+            perspectiveAPIRepository.evaluateText(
+                "content", PerspectiveAPIThresholds.DEFAULT_THRESHOLD_VALUES)) {
+          is TextEvaluation.Error ->
+              assert(
+                  result.errorMessage ==
+                      PerspectiveApiErrors.JSON_DESERIALIZATION_ERROR.errorMessage)
+          is TextEvaluation.Result -> assert(false)
+        }
+      }
 
   @Test
   fun evaluateTextReturnsResultAndTrueOnAPIResponseSuccessAndUnderThresholdValues() = runTest {

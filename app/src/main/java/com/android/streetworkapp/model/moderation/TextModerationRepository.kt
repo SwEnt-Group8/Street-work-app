@@ -9,5 +9,8 @@ interface TextModerationRepository {
    *   probability of the text being included in this tag, ranges from 0-1.
    * @return True if the text is under the thresholds for all tags, false otherwise
    */
-  suspend fun evaluateText(content: String, thresholds: Map<TextModerationTags, Double>): TextEvaluation
+  suspend fun evaluateText(
+      content: String,
+      thresholds: Map<TextModerationTags, Double>
+  ): TextEvaluation
 }

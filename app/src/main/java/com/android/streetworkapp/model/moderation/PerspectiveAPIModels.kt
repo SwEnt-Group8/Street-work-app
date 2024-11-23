@@ -108,6 +108,6 @@ enum class PerspectiveApiErrors(val errorMessage: String) {
 
   /** Received an empty body as API response */
   EMPTY_BODY_RESPONSE("Received an empty body in Perspective API response"),
-    /** Got an exception after executing network call **/
-    NETWORK_ERROR("Something went wrong with the network request")
+  /** Got an exception after executing network call * */
+  NETWORK_ERROR("Something went wrong with the network request")
 }
