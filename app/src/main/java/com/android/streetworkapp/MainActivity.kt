@@ -9,6 +9,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,7 +32,9 @@ import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.authentication.SignInScreen
 import com.android.streetworkapp.ui.event.AddEventScreen
+import com.android.streetworkapp.ui.event.EventInfoContent
 import com.android.streetworkapp.ui.event.EventOverviewScreen
+import com.android.streetworkapp.ui.map.MapInfoContent
 import com.android.streetworkapp.ui.map.MapScreen
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenu
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenuType
@@ -44,12 +47,17 @@ import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.navigation.ScreenParams
 import com.android.streetworkapp.ui.navigation.TopAppBarManager
 import com.android.streetworkapp.ui.navigation.TopAppBarWrapper
+import com.android.streetworkapp.ui.park.ParkOverviewInfoContent
 import com.android.streetworkapp.ui.park.ParkOverviewScreen
+import com.android.streetworkapp.ui.profile.AddFriendInfoContent
 import com.android.streetworkapp.ui.profile.AddFriendScreen
+import com.android.streetworkapp.ui.profile.ProfileInfoContent
 import com.android.streetworkapp.ui.profile.ProfileScreen
+import com.android.streetworkapp.ui.progress.ProgressInfoContent
 import com.android.streetworkapp.ui.progress.ProgressScreen
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.ui.utils.CustomDialog
+import com.android.streetworkapp.ui.utils.DialogType
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.Date
@@ -183,8 +191,18 @@ fun StreetWorkApp(
               }
               navigation(startDestination = Screen.PROGRESSION, route = Route.PROGRESSION) {
                 composable(Screen.PROGRESSION) {
+                  val showInfo = remember { mutableStateOf(false) }
+                  setUpInfoAction(showInfo, screenParams?.topAppBarManager)
+
                   ProgressScreen(
                       navigationActions, userViewModel, progressionViewModel, innerPadding)
+
+                  CustomDialog(
+                      showInfo,
+                      DialogType.INFO,
+                      title = "What is the Progression ?",
+                      tag = "ProgressInfo",
+                      Content = { ProgressInfoContent() })
                 }
               }
               navigation(
@@ -192,22 +210,50 @@ fun StreetWorkApp(
                   route = Route.MAP,
               ) {
                 composable(Screen.MAP) {
+                  val showInfo = remember { mutableStateOf(false) }
+                  setUpInfoAction(showInfo, screenParams?.topAppBarManager)
+
                   MapScreen(
                       parkLocationViewModel,
                       parkViewModel,
                       navigationActions,
                       mapCallbackOnMapLoaded,
                       innerPadding)
+
+                  CustomDialog(
+                      showInfo,
+                      DialogType.INFO,
+                      title = "What is the Map ?",
+                      tag = "MapInfo",
+                      Content = { MapInfoContent() })
                 }
                 composable(Screen.PARK_OVERVIEW) {
+                  val showInfo = remember { mutableStateOf(false) }
+                  setUpInfoAction(showInfo, screenParams?.topAppBarManager)
+
                   ParkOverviewScreen(
                       parkViewModel, innerPadding, navigationActions, eventViewModel, userViewModel)
+                  CustomDialog(
+                      showInfo,
+                      DialogType.INFO,
+                      title = "How does parks work ?",
+                      tag = "ParkInfo",
+                      Content = { ParkOverviewInfoContent() })
                 }
                 composable(Screen.ADD_EVENT) {
                   AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
                 }
                 composable(Screen.EVENT_OVERVIEW) {
+                  val showInfo = remember { mutableStateOf(false) }
+                  setUpInfoAction(showInfo, screenParams?.topAppBarManager)
+
                   EventOverviewScreen(eventViewModel, parkViewModel, innerPadding)
+                  CustomDialog(
+                      showInfo,
+                      DialogType.INFO,
+                      title = "How does events work ?",
+                      tag = "EventInfo",
+                      Content = { EventInfoContent() })
                 }
               }
 
@@ -219,6 +265,9 @@ fun StreetWorkApp(
                 composable(Screen.PROFILE) {
                   ProfileScreen(navigationActions, userViewModel, innerPadding)
                   val showSettingsDialog = remember { mutableStateOf(false) }
+
+                  val showInfo = remember { mutableStateOf(false) }
+                  setUpInfoAction(showInfo, screenParams?.topAppBarManager)
 
                   screenParams?.topAppBarManager?.setActionCallback(
                       TopAppBarManager.TopAppBarAction.SETTINGS) {
@@ -232,9 +281,27 @@ fun StreetWorkApp(
                       tag = "Settings",
                       Content = { Text("Settings to be implemented") },
                   )
+
+                  CustomDialog(
+                      showInfo,
+                      DialogType.INFO,
+                      title = "What is the Profile ?",
+                      tag = "ProfileInfo",
+                      Content = { ProfileInfoContent() })
                 }
                 // screen for adding friend
-                composable(Screen.ADD_FRIEND) { AddFriendScreen(userViewModel, innerPadding) }
+                composable(Screen.ADD_FRIEND) {
+                  val showInfo = remember { mutableStateOf(false) }
+                  setUpInfoAction(showInfo, screenParams?.topAppBarManager)
+
+                  AddFriendScreen(userViewModel, innerPadding)
+                  CustomDialog(
+                      showInfo,
+                      DialogType.INFO,
+                      title = "How can I add friends ?",
+                      tag = "AddFriendInfo",
+                      Content = { AddFriendInfoContent() })
+                }
               }
             }
 
@@ -245,4 +312,10 @@ fun StreetWorkApp(
           navigationActions.apply(navTestInvokation)
         }
       }
+}
+
+fun setUpInfoAction(showInfo: MutableState<Boolean>, topAppBarManager: TopAppBarManager?) {
+  topAppBarManager!!.setActionCallback(TopAppBarManager.TopAppBarAction.INFO) {
+    showInfo.value = true
+  }
 }

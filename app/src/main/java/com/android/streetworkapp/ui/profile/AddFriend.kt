@@ -196,3 +196,9 @@ fun FriendRequestDialog(username: String, onAccept: () -> Unit, onRefuse: () -> 
       containerColor = PRINCIPLE_BACKGROUND_COLOR,
       modifier = Modifier.testTag("FriendRequestDialog"))
 }
+
+@Composable
+fun AddFriendInfoContent() {
+  Text(
+      "This is where you can add a friend. \n\n To add, you need to have a friend nearby and activate bluetooth and location services. \n\n Once you are friends you will be able to do workouts with each other. \n\n Have fun together !")
+}

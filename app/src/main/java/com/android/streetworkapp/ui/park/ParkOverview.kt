@@ -400,3 +400,9 @@ fun EventItem(event: Event, eventViewModel: EventViewModel, navigationActions: N
       })
   HorizontalDivider()
 }
+
+@Composable
+fun ParkOverviewInfoContent() {
+  Text(
+      "This is the park overview, here you can see the park's details and the events that are planned in it. \n\n You can create an event or join an already existing one. You can also rate the park !")
+}
