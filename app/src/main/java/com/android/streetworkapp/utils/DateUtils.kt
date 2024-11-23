@@ -45,8 +45,7 @@ fun Long.toFormattedString(): String {
 /**
  * Convert a [String] of format "dd/MM/yyyy HH:mm" to a long.
  *
- * @param  The formatted date-time string.
- * @return the.
+ * @return The epoch timestamp.
  */
 fun String.toEpochTimestamp(): Long {
   val pattern = "dd/MM/yyyy HH:mm"
