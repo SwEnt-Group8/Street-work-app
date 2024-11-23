@@ -1,6 +1,7 @@
 package com.android.streetworkapp.ui.event
 
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -12,6 +13,8 @@ import androidx.compose.ui.test.swipeRight
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventRepository
 import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.moderation.TextModerationRepository
+import com.android.streetworkapp.model.moderation.TextModerationViewModel
 import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.user.UserRepository
@@ -42,6 +45,9 @@ class AddEventTest {
   private lateinit var eventRepository: EventRepository
   private lateinit var eventViewModel: EventViewModel
 
+  private lateinit var textModerationRepository: TextModerationRepository
+  private lateinit var textModerationViewModel: TextModerationViewModel
+
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
@@ -55,6 +61,9 @@ class AddEventTest {
 
     eventRepository = mock(EventRepository::class.java)
     eventViewModel = EventViewModel(eventRepository)
+
+    textModerationRepository = mock(TextModerationRepository::class.java)
+    textModerationViewModel = mock(TextModerationViewModel::class.java)
 
     event =
         Event(
@@ -83,7 +92,7 @@ class AddEventTest {
   fun timeSelectionUpdatesEvent() {
     val eventCopy = event.copy()
     assert(eventCopy.date == Timestamp(0, 0))
-    composeTestRule.setContent { TimeSelection(eventCopy) }
+    composeTestRule.setContent { TimeSelection(eventCopy, mutableStateOf(false)) }
     composeTestRule.onNodeWithTag("dateIcon").performClick()
     composeTestRule.onNodeWithTag("validateDate").performClick()
     composeTestRule.onNodeWithTag("timeIcon").performClick()
@@ -94,7 +103,7 @@ class AddEventTest {
   @Test
   fun titleSelectionUpdatesEvent() {
     val eventCopy = event.copy()
-    composeTestRule.setContent { EventTitleSelection(eventCopy) }
+    composeTestRule.setContent { EventTitleSelection(eventCopy, mutableStateOf(false), mutableStateOf(false)) }
     composeTestRule.onNodeWithTag("titleTag").performTextClearance()
     composeTestRule.onNodeWithTag("titleTag").performTextInput("test")
 
@@ -104,7 +113,7 @@ class AddEventTest {
   @Test
   fun descriptionSelectionUpdatesEvent() {
     val eventCopy = event.copy()
-    composeTestRule.setContent { EventDescriptionSelection(eventCopy) }
+    composeTestRule.setContent { EventDescriptionSelection(eventCopy, mutableStateOf(false)) }
     composeTestRule.onNodeWithTag("descriptionTag").performTextClearance()
     composeTestRule.onNodeWithTag("descriptionTag").performTextInput("test")
 
@@ -115,7 +124,7 @@ class AddEventTest {
   fun addEventScreenIsDisplayed() {
     `when`(eventViewModel.getNewEid()).thenReturn("test")
     composeTestRule.setContent {
-      AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
+      AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel)
     }
 
     composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
@@ -126,7 +135,7 @@ class AddEventTest {
   fun addEventScreenWithUnchangedTimeDoesNotChangeScreen() {
     `when`(eventViewModel.getNewEid()).thenReturn("test")
     composeTestRule.setContent {
-      AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
+      AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel)
     }
 
     composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
@@ -141,7 +150,7 @@ class AddEventTest {
   fun addEventScreenWithUnchangedTitleDoesNotChangeScreen() {
     `when`(eventViewModel.getNewEid()).thenReturn("test")
     composeTestRule.setContent {
-      AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
+      AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel)
     }
 
     composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
