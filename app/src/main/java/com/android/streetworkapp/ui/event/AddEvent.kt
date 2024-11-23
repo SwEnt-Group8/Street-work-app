@@ -72,7 +72,7 @@ import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.delay
 
 object AddEventParams {
-  const val TEXT_EVALUATION_DISPLAY_TIME = 7500L // ns
+  const val TEXT_EVALUATION_DISPLAY_TIME = 5000L // ns
 }
 
 object AddEventFormErrorMessages {
@@ -113,8 +113,8 @@ fun AddEventScreen(
             EventConstants.MIN_NUMBER_PARTICIPANTS,
             Timestamp
                 .now(), // note: the time in the time picker is not based on this, it's also the
-                        // current time. If we were to modify one of them it would not match
-                        // anymore. Something to keep in mid
+            // current time. If we were to modify one of them it would not match
+            // anymore. Something to keep in mid
             "unknown"))
   }
 
@@ -132,7 +132,7 @@ fun AddEventScreen(
   val isTitleEmptyError = remember {
     mutableStateOf(false)
   } // we keep track of the mutable state since we need to reset it in the fields below (thus
-    // passing it as param)
+  // passing it as param)
   val isTextEvaluationOverThresholdsError = remember { mutableStateOf(false) } // same here
   val isDateBackInTimeError = remember { mutableStateOf(false) } // same here
   var isTextEvaluationError by remember {
@@ -209,8 +209,8 @@ fun AddEventScreen(
                     // thresholds
                     val formattedTextInput =
                         "Title: ${event.title}. Description: ${event.description}" // we format it
-                                                                                   // to do only one
-                                                                                   // api call
+                    // to do only one
+                    // api call
                     textModerationViewModel.analyzeText(
                         formattedTextInput,
                         { isTextUnderThresholds ->
@@ -263,7 +263,7 @@ fun EventTitleSelection(
         isTitleEmptyError.value = false
         isTextEvaluationError.value = false
       },
-      label = { Text("What's your event's title? *") },
+      label = { Text("What's your event's title?*") },
       isError = isTitleEmptyError.value || isTextEvaluationError.value,
       modifier = Modifier.testTag("titleTag").fillMaxWidth(0.9f))
 }
@@ -359,7 +359,7 @@ fun TimeSelection(event: Event, isDateError: MutableState<Boolean>) {
         value = selectedDate,
         onValueChange = {},
         isError = isDateError.value,
-        label = { Text("When do you want your event to be? *") },
+        label = { Text("When do you want your event to be?*") },
         readOnly = true,
         trailingIcon = {
           Row {
