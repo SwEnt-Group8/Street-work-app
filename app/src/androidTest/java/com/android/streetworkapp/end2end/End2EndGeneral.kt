@@ -11,6 +11,7 @@ import androidx.test.rule.GrantPermissionRule
 import com.android.streetworkapp.StreetWorkApp
 import com.android.streetworkapp.model.event.EventRepository
 import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.moderation.TextModerationViewModel
 import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.ParkLocationRepository
@@ -113,7 +114,9 @@ class End2EndGeneral {
           userViewModel,
           ParkViewModel(mock(ParkRepository::class.java)),
           EventViewModel(mock(EventRepository::class.java)),
-          progressionViewModel)
+          progressionViewModel,
+          mock(TextModerationViewModel::class.java)
+          )
     }
 
     composeTestRule.waitForIdle()
