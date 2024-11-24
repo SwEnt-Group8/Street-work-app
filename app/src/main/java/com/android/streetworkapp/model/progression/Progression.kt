@@ -47,28 +47,36 @@ enum class Ranks(val score: Int) {
 
 /** Represents a type of achievement based on points obtained */
 enum class MedalsAchievement(val achievement: Achievement) {
-  NONE(Achievement(R.drawable.place_holder_achievement_icon, "No medal", emptyList(), "No medal")),
+  NONE(
+      Achievement(
+          R.drawable.place_holder_achievement_icon,
+          "No Medal",
+          emptyList(),
+          "You have no medal yet!")),
   BRONZE(
       Achievement(
           R.drawable.place_holder_achievement_icon,
-          "Bronze medal",
+          "Bronze Medal",
           listOf("Bronze"),
-          "First medal")),
+          "You obtained 100 Points!")),
   SILVER(
       Achievement(
           R.drawable.place_holder_achievement_icon,
-          "Silver medal",
+          "Silver Medal",
           listOf("Silver"),
-          "Second medal")),
+          "You obtained 1000 Points!")),
   GOLD(
       Achievement(
-          R.drawable.place_holder_achievement_icon, "Gold medal", listOf("Gold"), "Third medal")),
+          R.drawable.place_holder_achievement_icon,
+          "Gold Medal",
+          listOf("Gold"),
+          "You obtained 10000 Points!")),
   PLATINUM(
       Achievement(
           R.drawable.place_holder_achievement_icon,
-          "Platinum medal",
+          "Platinum Medal",
           listOf("Platinum"),
-          "Last medal"))
+          "You obtained 100000 Points!"))
 }
 
 /** Represents a type of achievement linked to the performance of the user on different exercises */
