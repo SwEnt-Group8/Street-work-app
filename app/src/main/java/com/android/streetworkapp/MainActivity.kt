@@ -257,7 +257,10 @@ fun StreetWorkApp(
                   )
                 }
                 // screen for adding friend
-                composable(Screen.ADD_FRIEND) { AddFriendScreen(userViewModel, innerPadding) }
+                composable(Screen.ADD_FRIEND) {
+                  AddFriendScreen(
+                      userViewModel, navigationActions, scope, snackbarHostState, innerPadding)
+                }
               }
             }
 

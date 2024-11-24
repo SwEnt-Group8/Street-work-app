@@ -1,7 +1,6 @@
 package com.android.streetworkapp.ui.profile
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -24,6 +24,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,16 +40,23 @@ import com.android.sample.R
 import com.android.streetworkapp.device.bluetooth.BluetoothClient
 import com.android.streetworkapp.device.bluetooth.BluetoothConstants
 import com.android.streetworkapp.device.bluetooth.BluetoothServer
+import com.android.streetworkapp.model.progression.ScoreIncrease
 import com.android.streetworkapp.model.user.UserViewModel
+import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.progress.updateAndDisplayPoints
 import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_DARK
 import com.android.streetworkapp.ui.theme.ColorPalette.PRIMARY_TEXT_COLOR
 import com.android.streetworkapp.ui.theme.ColorPalette.PRINCIPLE_BACKGROUND_COLOR
 import com.android.streetworkapp.ui.theme.ColorPalette.SECONDARY_TEXT_COLOR
 import com.android.streetworkapp.ui.theme.LightGray
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun AddFriendScreen(
     userViewModel: UserViewModel,
+    navigationActions: NavigationActions? = null,
+    scope: CoroutineScope = rememberCoroutineScope(),
+    snackbarHostState: SnackbarHostState? = null,
     innerPaddingValues: PaddingValues = PaddingValues(0.dp)
 ) {
   // context for Toast
@@ -88,7 +96,16 @@ fun AddFriendScreen(
         username = user.username,
         onAccept = {
           userViewModel.addFriend(uid, receivedRequestUid)
-          Toast.makeText(context, "Friend added.", Toast.LENGTH_SHORT).show()
+          // Toast.makeText(context, "Friend added.", Toast.LENGTH_SHORT).show()
+          if (snackbarHostState != null && navigationActions != null) {
+            updateAndDisplayPoints(
+                userViewModel,
+                navigationActions,
+                ScoreIncrease.ADD_FRIEND.scoreAdded,
+                scope,
+                snackbarHostState)
+          }
+
           showRequestDialog = false
         },
         onRefuse = { showRequestDialog = false })
