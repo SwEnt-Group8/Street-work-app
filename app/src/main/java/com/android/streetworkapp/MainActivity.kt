@@ -6,12 +6,15 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -117,6 +120,10 @@ fun StreetWorkApp(
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
 
+  // To display SnackBars
+  val scope = rememberCoroutineScope()
+  val snackbarHostState = remember { SnackbarHostState() }
+
   val currentScreenName = remember {
     mutableStateOf<String?>(null)
   } // not using by here since I want to pass the mutableState to a fn
@@ -152,6 +159,7 @@ fun StreetWorkApp(
             ?.takeIf { it }
             ?.let { TopAppBarWrapper(navigationActions, screenParams?.topAppBarManager) }
       },
+      snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
       bottomBar = {
         screenParams
             ?.takeIf { it.isBottomBarVisible }
@@ -204,7 +212,13 @@ fun StreetWorkApp(
                       parkViewModel, innerPadding, navigationActions, eventViewModel, userViewModel)
                 }
                 composable(Screen.ADD_EVENT) {
-                  AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
+                  AddEventScreen(
+                      navigationActions,
+                      parkViewModel,
+                      eventViewModel,
+                      userViewModel,
+                      scope,
+                      snackbarHostState)
                 }
                 composable(Screen.EVENT_OVERVIEW) {
                   EventOverviewScreen(eventViewModel, parkViewModel, innerPadding)
