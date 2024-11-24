@@ -47,33 +47,35 @@ enum class Ranks(val score: Int) {
 
 /** Represents a type of achievement based on points obtained */
 enum class MedalsAchievement(val achievement: Achievement) {
+  // Note: Bronze is used as a place holder for missing medals in the Figma (will be updated once
+  // the figma is updated)
   NONE(
       Achievement(
-          R.drawable.place_holder_achievement_icon,
+          R.drawable.bronze_achievement_icon,
           "No Medal",
           emptyList(),
-          "You have no medal yet!")),
+          "You have no medal yet, try to obtain more points!")),
   BRONZE(
       Achievement(
-          R.drawable.place_holder_achievement_icon,
+          R.drawable.bronze_achievement_icon,
           "Bronze Medal",
           listOf("Bronze"),
           "You obtained 100 Points!")),
   SILVER(
       Achievement(
-          R.drawable.place_holder_achievement_icon,
+          R.drawable.silver_achievement_icon,
           "Silver Medal",
           listOf("Silver"),
           "You obtained 1000 Points!")),
   GOLD(
       Achievement(
-          R.drawable.place_holder_achievement_icon,
+          R.drawable.gold_achievement_icon,
           "Gold Medal",
           listOf("Gold"),
           "You obtained 10000 Points!")),
   PLATINUM(
       Achievement(
-          R.drawable.place_holder_achievement_icon,
+          R.drawable.bronze_achievement_icon,
           "Platinum Medal",
           listOf("Platinum"),
           "You obtained 100000 Points!"))
