@@ -81,7 +81,7 @@ fun AddEventScreen(
     eventViewModel: EventViewModel,
     userViewModel: UserViewModel,
     scope: CoroutineScope = rememberCoroutineScope(),
-    snackbarHostState: SnackbarHostState? = null,
+    host: SnackbarHostState? = null,
     paddingValues: PaddingValues = PaddingValues(0.dp),
 ) {
 
@@ -138,13 +138,9 @@ fun AddEventScreen(
               eventViewModel.addEvent(event)
               parkViewModel.addEventToPark(event.parkId, event.eid)
 
-              if (snackbarHostState != null) {
+              if (host != null) {
                 updateAndDisplayPoints(
-                    userViewModel,
-                    navigationActions,
-                    ScoreIncrease.CREATE_EVENT.scoreAdded,
-                    scope,
-                    snackbarHostState)
+                    userViewModel, navigationActions, ScoreIncrease.ADD_EVENT.points, scope, host)
               }
 
               navigationActions.goBack()

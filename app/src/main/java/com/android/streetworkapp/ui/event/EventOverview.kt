@@ -262,7 +262,7 @@ fun JoinEventButton(
           updateAndDisplayPoints(
               userViewModel,
               navigationActions,
-              ScoreIncrease.JOIN_EVENT.scoreAdded,
+              ScoreIncrease.JOIN_EVENT.points,
               scope,
               snackbarHostState)
         }

@@ -101,7 +101,7 @@ fun AddFriendScreen(
             updateAndDisplayPoints(
                 userViewModel,
                 navigationActions,
-                ScoreIncrease.ADD_FRIEND.scoreAdded,
+                ScoreIncrease.ADD_FRIEND.points,
                 scope,
                 snackbarHostState)
           }
