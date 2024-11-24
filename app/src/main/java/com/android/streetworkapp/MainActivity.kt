@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -159,7 +160,13 @@ fun StreetWorkApp(
             ?.takeIf { it }
             ?.let { TopAppBarWrapper(navigationActions, screenParams?.topAppBarManager) }
       },
-      snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+      snackbarHost = {
+        SnackbarHost(
+            hostState = snackbarHostState,
+            snackbar = { data ->
+              Snackbar(actionColor = ColorPalette.INTERACTION_COLOR_DARK, snackbarData = data)
+            })
+      },
       bottomBar = {
         screenParams
             ?.takeIf { it.isBottomBarVisible }

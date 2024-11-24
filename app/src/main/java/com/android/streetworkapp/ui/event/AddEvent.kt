@@ -154,7 +154,11 @@ fun AddEventScreen(
 
               if (snackbarHostState != null) {
                 updateAndDisplayPoints(
-                    userViewModel, ScoreIncrease.CREATE_EVENT.scoreAdded, scope, snackbarHostState)
+                    userViewModel,
+                    navigationActions,
+                    ScoreIncrease.CREATE_EVENT.scoreAdded,
+                    scope,
+                    snackbarHostState)
               }
 
               navigationActions.goBack()
