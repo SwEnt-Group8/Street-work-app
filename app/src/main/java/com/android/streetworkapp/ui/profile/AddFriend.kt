@@ -56,7 +56,7 @@ fun AddFriendScreen(
     userViewModel: UserViewModel,
     navigationActions: NavigationActions? = null,
     scope: CoroutineScope = rememberCoroutineScope(),
-    snackbarHostState: SnackbarHostState? = null,
+    host: SnackbarHostState? = null,
     innerPaddingValues: PaddingValues = PaddingValues(0.dp)
 ) {
   // context for Toast
@@ -97,13 +97,9 @@ fun AddFriendScreen(
         onAccept = {
           userViewModel.addFriend(uid, receivedRequestUid)
           // Toast.makeText(context, "Friend added.", Toast.LENGTH_SHORT).show()
-          if (snackbarHostState != null && navigationActions != null) {
+          if (host != null && navigationActions != null) {
             updateAndDisplayPoints(
-                userViewModel,
-                navigationActions,
-                ScoreIncrease.ADD_FRIEND.points,
-                scope,
-                snackbarHostState)
+                userViewModel, navigationActions, ScoreIncrease.ADD_FRIEND.points, scope, host)
           }
 
           showRequestDialog = false
