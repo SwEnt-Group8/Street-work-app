@@ -138,20 +138,6 @@ fun AddEventScreen(
               eventViewModel.addEvent(event)
               parkViewModel.addEventToPark(event.parkId, event.eid)
 
-              // Used for the gamification feature
-              // userViewModel.increaseUserScore(event.owner, ScoreIncrease.CREATE_EVENT.scoreAdded)
-              // Note: temporary value to use the progression screen. Should be update once
-              // the gamification is completed
-
-              /*
-              Toast.makeText(
-                      context,
-                      "+" + ScoreIncrease.CREATE_EVENT.scoreAdded + " Points",
-                      Toast.LENGTH_SHORT)
-                  .show()
-
-                 */
-
               if (snackbarHostState != null) {
                 updateAndDisplayPoints(
                     userViewModel,
