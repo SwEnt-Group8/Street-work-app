@@ -258,7 +258,6 @@ fun JoinEventButton(
 
   Button(
       onClick = {
-        Toast.makeText(context, "You have joined this event", Toast.LENGTH_LONG).show()
         if (snackbarHostState != null) {
           updateAndDisplayPoints(
               userViewModel,
