@@ -74,8 +74,6 @@ private val uiState: MutableStateFlow<DashboardState> = MutableStateFlow(Dashboa
 fun EventOverviewScreen(
     eventViewModel: EventViewModel,
     parkViewModel: ParkViewModel,
-    scope: CoroutineScope = rememberCoroutineScope(),
-    snackbarHostState: SnackbarHostState? = null,
     paddingValues: PaddingValues = PaddingValues(0.dp)
 ) {
 
