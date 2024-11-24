@@ -123,7 +123,7 @@ fun StreetWorkApp(
 
   // To display SnackBars
   val scope = rememberCoroutineScope()
-  val snackbarHostState = remember { SnackbarHostState() }
+  val host = remember { SnackbarHostState() }
 
   val currentScreenName = remember {
     mutableStateOf<String?>(null)
@@ -162,7 +162,7 @@ fun StreetWorkApp(
       },
       snackbarHost = {
         SnackbarHost(
-            hostState = snackbarHostState,
+            hostState = host,
             snackbar = { data ->
               Snackbar(actionColor = ColorPalette.INTERACTION_COLOR_DARK, snackbarData = data)
             })
@@ -178,8 +178,7 @@ fun StreetWorkApp(
                       tabList = LIST_TOP_LEVEL_DESTINATION)
                 }
                 BottomNavigationMenuType.EVENT_OVERVIEW -> {
-                  EventBottomBar(
-                      eventViewModel, userViewModel, navigationActions, scope, snackbarHostState)
+                  EventBottomBar(eventViewModel, userViewModel, navigationActions, scope, host)
                   // selected
                 }
                 BottomNavigationMenuType
@@ -221,16 +220,10 @@ fun StreetWorkApp(
                 }
                 composable(Screen.ADD_EVENT) {
                   AddEventScreen(
-                      navigationActions,
-                      parkViewModel,
-                      eventViewModel,
-                      userViewModel,
-                      scope,
-                      snackbarHostState)
+                      navigationActions, parkViewModel, eventViewModel, userViewModel, scope, host)
                 }
                 composable(Screen.EVENT_OVERVIEW) {
-                  EventOverviewScreen(
-                      eventViewModel, parkViewModel, scope, snackbarHostState, innerPadding)
+                  EventOverviewScreen(eventViewModel, parkViewModel, scope, host, innerPadding)
                 }
               }
 
@@ -258,8 +251,7 @@ fun StreetWorkApp(
                 }
                 // screen for adding friend
                 composable(Screen.ADD_FRIEND) {
-                  AddFriendScreen(
-                      userViewModel, navigationActions, scope, snackbarHostState, innerPadding)
+                  AddFriendScreen(userViewModel, navigationActions, scope, host, innerPadding)
                 }
               }
             }
