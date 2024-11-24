@@ -72,7 +72,8 @@ import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.delay
 
 object AddEventParams {
-  const val TEXT_EVALUATION_DISPLAY_TIME = 5000L // ns
+  const val TEXT_EVALUATION_DISPLAY_TIME = 5000L // in ns
+  const val EVENT_INIT_TIME_CREATION_OFFSET = 1 // in hours
 }
 
 object AddEventFormErrorMessages {
@@ -103,6 +104,7 @@ fun AddEventScreen(
   val context = LocalContext.current
 
   val eid = eventViewModel.getNewEid()
+
   val event by remember {
     mutableStateOf<Event>(
         Event(
@@ -111,8 +113,12 @@ fun AddEventScreen(
             "",
             1, // set to one by default, because the owner is also a participant
             EventConstants.MIN_NUMBER_PARTICIPANTS,
-            Timestamp
-                .now(), // note: the time in the time picker is not based on this, it's also the
+            Timestamp(
+                Calendar.getInstance()
+                    .apply {
+                      add(Calendar.HOUR_OF_DAY, AddEventParams.EVENT_INIT_TIME_CREATION_OFFSET)
+                    }
+                    .time), // note: the time in the time picker is not based on this, it's also the
             // current time. If we were to modify one of them it would not match
             // anymore. Something to keep in mid
             "unknown"))
@@ -198,7 +204,7 @@ fun AddEventScreen(
                         contentColor = ColorPalette.PRIMARY_TEXT_COLOR),
                 modifier = Modifier.testTag("addEventButton"),
                 onClick = {
-                  if (event.date.toDate() < Calendar.getInstance().time) {
+                  if (event.date.seconds < Timestamp(Calendar.getInstance().time).seconds) {
                     isDateBackInTimeError.value = true
                     formErrorMessage = AddEventFormErrorMessages.IS_DATE_BACK_IN_TIME_ERROR
                   } else if (event.title.isEmpty()) {
@@ -337,19 +343,27 @@ fun TimeSelection(event: Event, isDateError: MutableState<Boolean>) {
   var showDatePicker by remember { mutableStateOf(false) }
   var showTimePicker by remember { mutableStateOf(false) }
 
-  val currentTime = Calendar.getInstance()
-  val datePickerState = rememberDatePickerState(event.date.toDate().time)
+  val initialTime = Calendar.getInstance().apply { timeInMillis = event.date.toDate().time }
+  val datePickerState = rememberDatePickerState(initialTime.timeInMillis)
   val timePickerState =
       rememberTimePickerState(
-          initialHour = currentTime.get(Calendar.HOUR_OF_DAY),
-          initialMinute = currentTime.get(Calendar.MINUTE),
+          initialHour = initialTime.get(Calendar.HOUR_OF_DAY),
+          initialMinute = initialTime.get(Calendar.MINUTE),
           is24Hour = false,
       )
 
   val currentTimeSelection =
-      datePickerState.selectedDateMillis?.plus(
-          (TimeUnit.HOURS.toMillis(timePickerState.hour.toLong()) +
-              TimeUnit.MINUTES.toMillis(timePickerState.minute.toLong())))
+      datePickerState.selectedDateMillis?.let { selectedDateMillis ->
+        val calendar =
+            Calendar.getInstance().apply {
+              timeInMillis = selectedDateMillis
+              set(Calendar.HOUR_OF_DAY, timePickerState.hour)
+              set(Calendar.MINUTE, timePickerState.minute)
+              set(Calendar.SECOND, 0)
+              set(Calendar.MILLISECOND, 0)
+            }
+        calendar.timeInMillis
+      }
 
   val selectedDate =
       datePickerState.selectedDateMillis?.let { convertMillisToDate(currentTimeSelection!!) } ?: ""
@@ -437,7 +451,7 @@ fun TimeSelection(event: Event, isDateError: MutableState<Boolean>) {
 
 private fun convertMillisToDate(millis: Long): String {
   val formatter = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
-  formatter.timeZone = TimeZone.getTimeZone("UTC")
+  formatter.timeZone = TimeZone.getDefault()
   return formatter.format(Date(millis))
 }
 
