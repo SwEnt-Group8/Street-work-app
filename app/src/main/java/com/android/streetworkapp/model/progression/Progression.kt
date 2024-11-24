@@ -79,7 +79,7 @@ enum class ExerciseAchievement(val achievement: Achievement) {
 
 /** Represents the number of points obtained for different actions in the app */
 enum class ScoreIncrease(val scoreAdded: Int) {
-  CREATE_EVENT(10),
-  JOIN_EVENT(5),
-  ADD_FRIEND(10)
+  CREATE_EVENT(30),
+  JOIN_EVENT(30),
+  ADD_FRIEND(60)
 }
