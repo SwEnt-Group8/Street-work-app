@@ -178,7 +178,8 @@ fun StreetWorkApp(
                       tabList = LIST_TOP_LEVEL_DESTINATION)
                 }
                 BottomNavigationMenuType.EVENT_OVERVIEW -> {
-                  EventBottomBar(eventViewModel, userViewModel, navigationActions)
+                  EventBottomBar(
+                      eventViewModel, userViewModel, navigationActions, scope, snackbarHostState)
                   // selected
                 }
                 BottomNavigationMenuType
@@ -228,7 +229,8 @@ fun StreetWorkApp(
                       snackbarHostState)
                 }
                 composable(Screen.EVENT_OVERVIEW) {
-                  EventOverviewScreen(eventViewModel, parkViewModel, innerPadding)
+                  EventOverviewScreen(
+                      eventViewModel, parkViewModel, scope, snackbarHostState, innerPadding)
                 }
               }
 
