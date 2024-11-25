@@ -395,25 +395,30 @@ fun TimeSelection(event: Event, isDateError: MutableState<Boolean>) {
       Popup(onDismissRequest = { showDatePicker = false }, alignment = Alignment.TopStart) {
         Box(
             modifier =
-                Modifier.fillMaxWidth()
+                Modifier.fillMaxSize()
                     .shadow(elevation = 4.dp)
                     .background(MaterialTheme.colorScheme.surface)
-                    .padding(16.dp)) {
-              DatePicker(state = datePickerState, showModeToggle = false)
-            }
+                    .padding(vertical = 16.dp)) {
+              Column(
+                  horizontalAlignment = Alignment.CenterHorizontally,
+                  verticalArrangement =
+                      Arrangement.spacedBy(0.dp) // Adds space between the DatePicker and the button
+                  ) {
+                    DatePicker(state = datePickerState, showModeToggle = false)
+                    Button(
+                        modifier = Modifier.testTag("validateDate"),
+                        colors = ButtonColors(Color.Blue, Color.White, Color.Blue, Color.White),
+                        onClick = {
+                          showDatePicker = false
 
-        Button(
-            modifier = Modifier.offset(x = 280.dp, y = 140.dp).testTag("validateDate"),
-            colors = ButtonColors(Color.Blue, Color.White, Color.Blue, Color.White),
-            onClick = {
-              showDatePicker = false
-
-              event.date =
-                  datePickerState.selectedDateMillis
-                      ?.let { TimeUnit.MILLISECONDS.toSeconds(currentTimeSelection!!) }
-                      ?.let { Timestamp(it, 0) }!!
-            }) {
-              Text("Validate")
+                          event.date =
+                              datePickerState.selectedDateMillis
+                                  ?.let { TimeUnit.MILLISECONDS.toSeconds(currentTimeSelection!!) }
+                                  ?.let { Timestamp(it, 0) }!!
+                        }) {
+                          Text("Validate")
+                        }
+                  }
             }
       }
     }
