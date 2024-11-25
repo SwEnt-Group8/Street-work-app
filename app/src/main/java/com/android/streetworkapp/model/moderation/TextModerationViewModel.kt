@@ -18,7 +18,7 @@ open class TextModerationViewModel(val repository: TextModerationRepository) : V
    * @param thresholds A map of threshold values for different text moderation tags. If not
    *   provided, default values are used.
    */
-  fun analyzeText(
+  open fun analyzeText(
       content: String,
       onTextEvaluationResult: (Boolean) -> Unit,
       onTextEvaluationError: () -> Unit,
