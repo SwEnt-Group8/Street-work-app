@@ -13,6 +13,7 @@ object Route {
   const val MAP = "Map"
   const val PROFILE = "Profile"
   const val PROGRESSION = "Progression"
+  const val TRAIN_HUB = "TrainHub"
   const val UNK = "TBD" // TODO: not yet defined
 }
 
@@ -25,6 +26,10 @@ object Screen {
   const val ADD_EVENT = "Add Event Screen"
   const val EVENT_OVERVIEW = "Event Overview Screen"
   const val PROGRESSION = "Progression Screen"
+  const val TRAIN_HUB = "Train Hub Screen"
+  const val TRAIN_SOLO = "Train Solo Screen"
+  const val TRAIN_COACH = "Train Coach Screen"
+  const val TRAIN_CHALLENGE = "Train Challenge Screen"
   const val UNK = "TBD Screen" // TODO: not yet defined
 }
 
@@ -104,6 +109,13 @@ data class ScreenParams(
             BottomNavigationMenuType.DEFAULT,
             isTopBarVisible = true,
             TopAppBarManager("My Progress", hasNavigationIcon = false))
+    val TRAIN_HUB =
+        ScreenParams(
+            screenName = Screen.TRAIN_HUB,
+            isBottomBarVisible = true,
+            bottomBarType = BottomNavigationMenuType.DEFAULT,
+            isTopBarVisible = true,
+            TopAppBarManager("Training hub", hasNavigationIcon = true))
   }
 }
 
@@ -116,7 +128,8 @@ val LIST_OF_SCREENS =
         ScreenParams.PARK_OVERVIEW,
         ScreenParams.ADD_EVENT,
         ScreenParams.EVENT_OVERVIEW,
-        ScreenParams.PROGRESSION)
+        ScreenParams.PROGRESSION,
+        ScreenParams.TRAIN_HUB)
 
 /**
  * Represents a top-level destination in the app's navigation.

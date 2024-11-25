@@ -27,6 +27,8 @@ import com.android.streetworkapp.model.progression.ProgressionRepositoryFirestor
 import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
+import com.android.streetworkapp.model.workout.WorkoutRepositoryFirestore
+import com.android.streetworkapp.model.workout.WorkoutViewModel
 import com.android.streetworkapp.ui.authentication.SignInScreen
 import com.android.streetworkapp.ui.event.AddEventScreen
 import com.android.streetworkapp.ui.event.EventOverviewScreen
@@ -46,6 +48,7 @@ import com.android.streetworkapp.ui.profile.AddFriendScreen
 import com.android.streetworkapp.ui.profile.ProfileScreen
 import com.android.streetworkapp.ui.progress.ProgressScreen
 import com.android.streetworkapp.ui.theme.ColorPalette
+import com.android.streetworkapp.ui.train.TrainHubScreen
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.Date
@@ -87,6 +90,10 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
   val progressionRepository = ProgressionRepositoryFirestore(firestoreDB)
   val progressionViewModel = ProgressionViewModel(progressionRepository)
 
+  // Instantiate the workout repository
+  val workoutRepository = WorkoutRepositoryFirestore(firestoreDB)
+  val workoutViewModel = WorkoutViewModel(workoutRepository)
+
   StreetWorkApp(
       parkLocationViewModel,
       testInvokation,
@@ -94,7 +101,8 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
       userViewModel,
       parkViewModel,
       eventViewModel,
-      progressionViewModel)
+      progressionViewModel,
+      workoutViewModel)
 }
 
 @Composable
@@ -106,6 +114,7 @@ fun StreetWorkApp(
     parkViewModel: ParkViewModel,
     eventViewModel: EventViewModel,
     progressionViewModel: ProgressionViewModel,
+    workOutViewModel: WorkoutViewModel,
     navTestInvokationOnEachRecompose: Boolean = false,
     e2eEventTesting: Boolean = false
 ) {
@@ -216,6 +225,18 @@ fun StreetWorkApp(
                 }
                 // screen for adding friend
                 composable(Screen.ADD_FRIEND) { AddFriendScreen(userViewModel, innerPadding) }
+              }
+
+              navigation(
+                  startDestination = Screen.TRAIN_HUB,
+                  route = Route.TRAIN_HUB,
+              ) {
+                composable(Screen.TRAIN_HUB) {
+                  TrainHubScreen(navigationActions, workOutViewModel, innerPadding)
+                }
+                composable(Screen.TRAIN_SOLO) {}
+                composable(Screen.TRAIN_COACH) {}
+                composable(Screen.TRAIN_CHALLENGE) {}
               }
             }
 
