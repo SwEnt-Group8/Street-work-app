@@ -1,8 +1,8 @@
 package com.android.streetworkapp.ui.event
 
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -26,6 +26,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
+import org.mockito.kotlin.any
+import org.mockito.kotlin.whenever
 
 class AddEventTest {
 
@@ -152,5 +154,51 @@ class AddEventTest {
         .onNodeWithTag("addEventScreen")
         .assertIsDisplayed() // we want that a click with changes in the time but no changes in the
     // default value of the title does not make the user leave the screen
+  }
+
+  @Test
+  fun emptyTitleDisplaysCorrectErrorMessage() {
+    whenever(eventViewModel.getNewEid()).thenReturn("test")
+    composeTestRule.setContent {
+      AddEventScreen(
+          navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel)
+    }
+
+    composeTestRule.onNodeWithTag("addEventButton").performClick()
+    composeTestRule
+        .onNodeWithTag("errorMessage")
+        .assertTextEquals(AddEventFormErrorMessages.TITLE_EMPTY_ERROR_MESSAGE)
+  }
+
+  @Test
+  fun textEvaluationOnEvaluationErrorDisplaysCorrectErrorMessage() {
+    whenever(eventViewModel.getNewEid()).thenReturn("test")
+    whenever(textModerationViewModel.analyzeText(any(), any(), any(), any())).thenAnswer {
+        invocation ->
+      val onErrorCallback = invocation.getArgument<() -> Unit>(2) // Get the onError lambda
+      onErrorCallback() // Call it with a mock error
+    }
+  }
+
+  @Test
+  fun textEvaluationIsOverThresholdDisplaysCorrectErrorMessage() {
+    whenever(eventViewModel.getNewEid()).thenReturn("test")
+    whenever(textModerationViewModel.analyzeText(any(), any(), any(), any())).thenAnswer {
+        invocation ->
+      val onTextEvaluationResult =
+          invocation.getArgument<(Boolean) -> Unit>(1) // Get the callback lambda
+      onTextEvaluationResult(false) // Set to over threshold
+    }
+
+    composeTestRule.setContent {
+      AddEventScreen(
+          navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel)
+    }
+
+    composeTestRule.onNodeWithTag("titleTag").performTextInput("dummy title")
+    composeTestRule.onNodeWithTag("addEventButton").performClick()
+    composeTestRule
+        .onNodeWithTag("errorMessage")
+        .assertTextEquals(AddEventFormErrorMessages.TEXT_EVALUATION_OVER_THRESHOLDS_ERROR)
   }
 }
