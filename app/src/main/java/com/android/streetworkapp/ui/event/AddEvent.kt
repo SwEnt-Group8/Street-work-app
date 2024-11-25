@@ -77,9 +77,9 @@ object AddEventParams {
 }
 
 object AddEventFormErrorMessages {
-  const val IS_TITLE_EMPTY_ERROR_MESSAGE = "Event title cannot be empty."
-  const val IS_DATE_BACK_IN_TIME_ERROR = "Date cannot be in the past."
-  const val IS_TEXT_EVALUATION_OVER_THRESHOLDS_ERROR =
+  const val TITLE_EMPTY_ERROR_MESSAGE = "Event title cannot be empty."
+  const val DATE_BACK_IN_TIME_ERROR = "Date cannot be in the past."
+  const val TEXT_EVALUATION_OVER_THRESHOLDS_ERROR =
       "Your event's title and/or description contains language that may not meet our guidelines. Please review and make sure it's respectful and appropriate before submitting again."
   const val TEXT_EVALUATION_ERROR =
       "It looks like something went wrong on our end. This could be due to a network issue or an unexpected error. Please try again in a moment."
@@ -118,9 +118,7 @@ fun AddEventScreen(
                     .apply {
                       add(Calendar.HOUR_OF_DAY, AddEventParams.EVENT_INIT_TIME_CREATION_OFFSET)
                     }
-                    .time), // note: the time in the time picker is not based on this, it's also the
-            // current time. If we were to modify one of them it would not match
-            // anymore. Something to keep in mid
+                    .time), // this is the time that's used as default in time selection as well
             "unknown"))
   }
 
@@ -191,7 +189,8 @@ fun AddEventScreen(
                   color = MaterialTheme.colorScheme.error,
                   text = formErrorMessage)
             }
-            // for non users related errors, we only show the message for a brief amount of time
+            // for non users-related-input errors, we only show the message for a brief amount of
+            // time
             LaunchedEffect(isTextEvaluationError) {
               delay(AddEventParams.TEXT_EVALUATION_DISPLAY_TIME)
               isTextEvaluationError = false
@@ -206,10 +205,10 @@ fun AddEventScreen(
                 onClick = {
                   if (event.date.seconds < Timestamp(Calendar.getInstance().time).seconds) {
                     isDateBackInTimeError.value = true
-                    formErrorMessage = AddEventFormErrorMessages.IS_DATE_BACK_IN_TIME_ERROR
+                    formErrorMessage = AddEventFormErrorMessages.DATE_BACK_IN_TIME_ERROR
                   } else if (event.title.isEmpty()) {
                     isTitleEmptyError.value = true
-                    formErrorMessage = AddEventFormErrorMessages.IS_TITLE_EMPTY_ERROR_MESSAGE
+                    formErrorMessage = AddEventFormErrorMessages.TITLE_EMPTY_ERROR_MESSAGE
                   } else {
                     // making sure the description & title are valid according to our evaluation
                     // thresholds
@@ -231,7 +230,7 @@ fun AddEventScreen(
                           } else {
                             isTextEvaluationOverThresholdsError.value = true
                             formErrorMessage =
-                                AddEventFormErrorMessages.IS_TEXT_EVALUATION_OVER_THRESHOLDS_ERROR
+                                AddEventFormErrorMessages.TEXT_EVALUATION_OVER_THRESHOLDS_ERROR
                           }
                         },
                         {
