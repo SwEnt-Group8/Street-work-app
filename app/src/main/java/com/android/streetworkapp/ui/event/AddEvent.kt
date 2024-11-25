@@ -203,7 +203,8 @@ fun AddEventScreen(
                         contentColor = ColorPalette.PRIMARY_TEXT_COLOR),
                 modifier = Modifier.testTag("addEventButton"),
                 onClick = {
-                  if (event.date.seconds < Timestamp(Calendar.getInstance().time).seconds) {
+                  if (event.date.seconds <
+                      Timestamp(Calendar.getInstance(TimeZone.getDefault()).time).seconds) {
                     isDateBackInTimeError.value = true
                     formErrorMessage = AddEventFormErrorMessages.DATE_BACK_IN_TIME_ERROR
                   } else if (event.title.isEmpty()) {
@@ -448,11 +449,10 @@ fun TimeSelection(event: Event, isDateError: MutableState<Boolean>) {
   }
 }
 
-private fun convertMillisToDate(millis: Long): String {
-  val formatter = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
-  formatter.timeZone = TimeZone.getDefault()
-  return formatter.format(Date(millis))
-}
+private fun convertMillisToDate(millis: Long): String =
+    SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+        .apply { timeZone = TimeZone.getDefault() }
+        .format(Date(millis))
 
 private fun createEvent(
     event: Event,
