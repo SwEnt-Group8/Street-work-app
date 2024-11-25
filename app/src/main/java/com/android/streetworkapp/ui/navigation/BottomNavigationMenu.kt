@@ -11,8 +11,10 @@ import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
@@ -23,6 +25,7 @@ import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.event.JoinEventButton
 import com.android.streetworkapp.ui.event.LeaveEventButton
 import com.android.streetworkapp.ui.theme.ColorPalette
+import kotlinx.coroutines.CoroutineScope
 
 enum class BottomNavigationMenuType {
   NONE,
@@ -93,7 +96,9 @@ fun BottomNavigationMenu(
 fun EventBottomBar(
     eventViewModel: EventViewModel,
     userViewModel: UserViewModel,
-    navigationActions: NavigationActions
+    navigationActions: NavigationActions,
+    scope: CoroutineScope = rememberCoroutineScope(),
+    snackbarHostState: SnackbarHostState? = null
 ) {
   val event = eventViewModel.currentEvent.collectAsState()
   val user = userViewModel.currentUser.collectAsState()
@@ -109,7 +114,14 @@ fun EventBottomBar(
                   if (event.listParticipants.contains(user.uid)) {
                     LeaveEventButton(event, eventViewModel, user, navigationActions)
                   } else {
-                    JoinEventButton(event, eventViewModel, user, navigationActions)
+                    JoinEventButton(
+                        event,
+                        eventViewModel,
+                        userViewModel,
+                        user,
+                        navigationActions,
+                        scope,
+                        snackbarHostState)
                   }
                 }
               }

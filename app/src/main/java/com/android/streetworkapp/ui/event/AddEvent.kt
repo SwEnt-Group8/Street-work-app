@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
@@ -38,6 +39,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,6 +57,7 @@ import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.progression.ScoreIncrease
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.progress.updateAndDisplayPoints
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
@@ -63,6 +66,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * Display a view that is used to add a new Event to a given park.
@@ -76,7 +80,9 @@ fun AddEventScreen(
     parkViewModel: ParkViewModel,
     eventViewModel: EventViewModel,
     userViewModel: UserViewModel,
-    paddingValues: PaddingValues = PaddingValues(0.dp)
+    scope: CoroutineScope = rememberCoroutineScope(),
+    host: SnackbarHostState? = null,
+    paddingValues: PaddingValues = PaddingValues(0.dp),
 ) {
 
   val context = LocalContext.current
@@ -132,15 +138,10 @@ fun AddEventScreen(
               eventViewModel.addEvent(event)
               parkViewModel.addEventToPark(event.parkId, event.eid)
 
-              // Used for the gamification feature
-              userViewModel.increaseUserScore(event.owner, ScoreIncrease.CREATE_EVENT.scoreAdded)
-              // Note: temporary value to use the progression screen. Should be update once
-              // the gamification is completed
-              Toast.makeText(
-                      context,
-                      "+" + ScoreIncrease.CREATE_EVENT.scoreAdded + " Points",
-                      Toast.LENGTH_SHORT)
-                  .show()
+              if (host != null) {
+                updateAndDisplayPoints(
+                    userViewModel, navigationActions, ScoreIncrease.ADD_EVENT.points, scope, host)
+              }
 
               navigationActions.goBack()
             }
