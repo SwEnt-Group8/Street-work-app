@@ -24,7 +24,7 @@ fun updateAndDisplayPoints(
             message = "You obtained $points Points!",
             actionLabel = "See Progression",
             withDismissAction = true,
-            duration = SnackbarDuration.Indefinite)
+            duration = SnackbarDuration.Short)
 
     when (result) {
       SnackbarResult.Dismissed -> {}

@@ -36,6 +36,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.rememberNavController
 import com.android.sample.R
 import com.android.streetworkapp.device.bluetooth.BluetoothClient
 import com.android.streetworkapp.device.bluetooth.BluetoothConstants
@@ -54,7 +55,7 @@ import kotlinx.coroutines.CoroutineScope
 @Composable
 fun AddFriendScreen(
     userViewModel: UserViewModel,
-    navigationActions: NavigationActions? = null,
+    navigationActions: NavigationActions = NavigationActions(rememberNavController()),
     scope: CoroutineScope = rememberCoroutineScope(),
     host: SnackbarHostState? = null,
     innerPaddingValues: PaddingValues = PaddingValues(0.dp)
@@ -97,7 +98,7 @@ fun AddFriendScreen(
         onAccept = {
           userViewModel.addFriend(uid, receivedRequestUid)
           // Toast.makeText(context, "Friend added.", Toast.LENGTH_SHORT).show()
-          if (host != null && navigationActions != null) {
+          if (host != null) {
             updateAndDisplayPoints(
                 userViewModel, navigationActions, ScoreIncrease.ADD_FRIEND.points, scope, host)
           }
