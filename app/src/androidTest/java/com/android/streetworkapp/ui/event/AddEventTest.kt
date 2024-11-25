@@ -21,12 +21,15 @@ import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class AddEventTest {
@@ -45,6 +48,8 @@ class AddEventTest {
   private lateinit var textModerationRepository: TextModerationRepository
   private lateinit var textModerationViewModel: TextModerationViewModel
 
+  lateinit var mockJob: Job
+
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
@@ -56,11 +61,13 @@ class AddEventTest {
     parkRepository = mock(ParkRepository::class.java)
     parkViewModel = ParkViewModel(parkRepository)
 
-    eventRepository = mock(EventRepository::class.java)
-    eventViewModel = EventViewModel(eventRepository)
+    // eventRepository = mock(EventRepository::class.java)
+    eventViewModel = mock(EventViewModel::class.java)
 
     textModerationRepository = mock(TextModerationRepository::class.java)
     textModerationViewModel = mock(TextModerationViewModel::class.java)
+
+    mockJob = mock(Job::class.java)
 
     event =
         Event(
@@ -195,10 +202,34 @@ class AddEventTest {
           navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel)
     }
 
-    composeTestRule.onNodeWithTag("titleTag").performTextInput("dummy title")
+    composeTestRule.onNodeWithTag("titleTag").performTextInput("dummy text over threshold")
     composeTestRule.onNodeWithTag("addEventButton").performClick()
     composeTestRule
         .onNodeWithTag("errorMessage")
         .assertTextEquals(AddEventFormErrorMessages.TEXT_EVALUATION_OVER_THRESHOLDS_ERROR)
+  }
+
+  @Test
+  fun textEvaluationOverThresholdAndOtherConditionsValidCallCreateEvent() = runTest {
+    whenever(eventViewModel.getNewEid()).thenReturn("test")
+    whenever(eventViewModel.addEvent(any())).thenAnswer {
+      mockJob
+    } // do nothing, we just want to check that it gets called correctly
+    whenever(textModerationViewModel.analyzeText(any(), any(), any(), any())).thenAnswer {
+        invocation ->
+      val onTextEvaluationResult =
+          invocation.getArgument<(Boolean) -> Unit>(1) // Get the callback lambda
+      onTextEvaluationResult(true) // Set to under thresholds
+    }
+
+    composeTestRule.setContent {
+      AddEventScreen(
+          navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel)
+    }
+
+    composeTestRule.onNodeWithTag("titleTag").performTextInput("dummy title")
+    composeTestRule.onNodeWithTag("addEventButton").performClick()
+    composeTestRule.onNodeWithTag("errorMessage").assertDoesNotExist()
+    verify(eventViewModel).addEvent(any())
   }
 }
