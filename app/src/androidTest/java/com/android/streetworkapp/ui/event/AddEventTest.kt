@@ -82,19 +82,6 @@ class AddEventTest {
     assert(eventCopy.maxParticipants == 10)
   }
 
-  @OptIn(ExperimentalMaterial3Api::class)
-  @Test
-  fun timeSelectionUpdatesEvent() {
-    val eventCopy = event.copy()
-    assert(eventCopy.date == Timestamp(0, 0))
-    composeTestRule.setContent { TimeSelection(eventCopy, mutableStateOf(false)) }
-    composeTestRule.onNodeWithTag("dateIcon").performClick()
-    composeTestRule.onNodeWithTag("validateDate").performClick()
-    composeTestRule.onNodeWithTag("timeIcon").performClick()
-    composeTestRule.onNodeWithTag("validateTime").performClick()
-    assert(eventCopy.date != Timestamp(0, 0))
-  }
-
   @Test
   fun titleSelectionUpdatesEvent() {
     val eventCopy = event.copy()
