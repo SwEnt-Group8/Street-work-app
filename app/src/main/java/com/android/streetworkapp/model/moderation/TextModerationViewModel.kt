@@ -14,20 +14,20 @@ open class TextModerationViewModel(val repository: TextModerationRepository) : V
    *   successfully evaluated. The value passed as parameter is true if the text is under all
    *   thresholds, false otherwise
    * @param onTextEvaluationError A callback function to be executed if an error occurs during the
-   *   request. The error message is passed as parameter
+   *   request.
    * @param thresholds A map of threshold values for different text moderation tags. If not
    *   provided, default values are used.
    */
   fun analyzeText(
       content: String,
       onTextEvaluationResult: (Boolean) -> Unit,
-      onTextEvaluationError: (String) -> Unit,
+      onTextEvaluationError: () -> Unit,
       thresholds: Map<TextModerationTags, Double> =
           PerspectiveAPIThresholds.DEFAULT_THRESHOLD_VALUES
   ) {
     viewModelScope.launch {
       when (val result = repository.evaluateText(content, thresholds)) {
-        is TextEvaluation.Error -> onTextEvaluationError(result.errorMessage)
+        is TextEvaluation.Error -> onTextEvaluationError()
         is TextEvaluation.Result -> onTextEvaluationResult(result.isTextUnderThresholds)
       }
     }
