@@ -61,7 +61,8 @@ data class ScreenParams(
             isBottomBarVisible = true,
             BottomNavigationMenuType.DEFAULT,
             isTopBarVisible = true,
-            TopAppBarManager("My Profile"))
+            TopAppBarManager(
+                "My Profile", actions = listOf(TopAppBarManager.TopAppBarAction.SETTINGS)))
     val ADD_FRIEND =
         ScreenParams(
             Screen.ADD_FRIEND,
