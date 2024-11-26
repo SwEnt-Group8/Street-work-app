@@ -22,7 +22,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.android.streetworkapp.device.datastore.DataStoreManager
-import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.NominatimParkNameRepository
@@ -55,9 +54,9 @@ import com.android.streetworkapp.ui.profile.ProfileScreen
 import com.android.streetworkapp.ui.progress.ProgressScreen
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.ui.utils.CustomDialog
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
-import java.util.Date
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 
 class MainActivity : ComponentActivity() {
@@ -100,6 +99,9 @@ fun StreetWorkAppMain(
   val progressionRepository = ProgressionRepositoryFirestore(firestoreDB)
   val progressionViewModel = ProgressionViewModel(progressionRepository)
 
+  val isLoggedIn = runBlocking { dataStoreManager.isLoggedInFlow.first() }
+  val startDestination = if (isLoggedIn) Route.MAP else Route.AUTH
+
   StreetWorkApp(
       parkLocationViewModel,
       testInvokation,
@@ -108,7 +110,9 @@ fun StreetWorkAppMain(
       parkViewModel,
       eventViewModel,
       progressionViewModel,
-      dataStoreManager)
+      dataStoreManager,
+      startDestination,
+  )
 }
 
 @SuppressLint("UnrememberedMutableState")
@@ -122,6 +126,7 @@ fun StreetWorkApp(
     eventViewModel: EventViewModel,
     progressionViewModel: ProgressionViewModel,
     dataStoreManager: DataStoreManager,
+    startDestination: String,
     navTestInvokationOnEachRecompose: Boolean = false,
     e2eEventTesting: Boolean = false
 ) {
@@ -141,23 +146,6 @@ fun StreetWorkApp(
 
   navigationActions.registerStringListenerOnDestinationChange(currentScreenName)
   screenParams = LIST_OF_SCREENS.find { currentScreenName.value == it.screenName }
-
-  // Park with no events
-  val sampleEvent =
-      Event(
-          eid = "event123",
-          title = "Community Park Cleanup",
-          // description = "Join us for a day of community service to clean up the local park!",
-          description =
-              "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eget leo vitae enim facilisis fringilla. Morbi feugiat scelerisque nisl, vel vehicula sem malesuada et. Proin id arcu eget nisi congue facilisis. Integer feugiat, ex eu vestibulum sagittis, erat felis scelerisque dui, id varius turpis magna in nisi. Suspendisse potenti. Pellentesque quis posuere elit. Vivamus tincidunt dui vel risus dignissim, sit amet dignissim velit cursus. Nam sodales nulla non semper pharetra. Aliquam erat volutpat. Morbi pharetra odio id facilisis pulvinar. Mauris aliquet ipsum eu dolor ultrices, id sodales sapien dictum. Nam facilisis vestibulum viverra.\n" +
-                  "\n" +
-                  "Sed elementum risus in tempor accumsan. Integer egestas, eros at venenatis ultricies, quam nunc dictum urna, a aliquam odio erat at lacus. In lacinia mauris sit amet orci accumsan, in bibendum arcu condimentum. In ut lacus et ipsum tincidunt condimentum. Fusce non magna ut urna vestibulum gravida at ut felis. Nullam auctor dapibus sem, ut rhoncus turpis gravida non. Pellentesque elementum erat a libero luctus feugiat. Aenean tincidunt fermentum nisl, in rhoncus ex iaculis nec. Vestibulum gravida, est vel scelerisque varius, magna erat pharetra risus, a sollicitudin libero orci nec lectus. Fusce lobortis magna in arcu vehicula, sit amet fermentum leo interdum",
-          participants = 15,
-          maxParticipants = 50,
-          date = Timestamp(Date()), // Current date and time
-          owner = "ownerUserId",
-          listParticipants = listOf("user1", "user2", "user3"),
-          parkId = "park567")
 
   Scaffold(
       containerColor = ColorPalette.PRINCIPLE_BACKGROUND_COLOR,
@@ -194,76 +182,73 @@ fun StreetWorkApp(
               }
             }
       }) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = Route.AUTH) { // TODO: handle start destination based on signIn logic
-              navigation(
-                  startDestination = Screen.AUTH,
-                  route = Route.AUTH,
-              ) {
-                composable(Screen.AUTH) {
-                  SignInScreen(navigationActions, userViewModel, dataStoreManager)
-                }
-              }
-              navigation(startDestination = Screen.PROGRESSION, route = Route.PROGRESSION) {
-                composable(Screen.PROGRESSION) {
-                  ProgressScreen(
-                      navigationActions, userViewModel, progressionViewModel, innerPadding)
-                }
-              }
-              navigation(
-                  startDestination = Screen.MAP,
-                  route = Route.MAP,
-              ) {
-                composable(Screen.MAP) {
-                  MapScreen(
-                      parkLocationViewModel,
-                      parkViewModel,
-                      navigationActions,
-                      mapCallbackOnMapLoaded,
-                      innerPadding)
-                }
-                composable(Screen.PARK_OVERVIEW) {
-                  ParkOverviewScreen(
-                      parkViewModel, innerPadding, navigationActions, eventViewModel, userViewModel)
-                }
-                composable(Screen.ADD_EVENT) {
-                  AddEventScreen(
-                      navigationActions, parkViewModel, eventViewModel, userViewModel, scope, host)
-                }
-                composable(Screen.EVENT_OVERVIEW) {
-                  EventOverviewScreen(eventViewModel, parkViewModel, innerPadding)
-                }
-              }
-
-              navigation(
-                  startDestination = Screen.PROFILE,
-                  route = Route.PROFILE,
-              ) {
-                // profile screen + list of friend
-                composable(Screen.PROFILE) {
-                  ProfileScreen(navigationActions, userViewModel, innerPadding)
-                  val showSettingsDialog = remember { mutableStateOf(false) }
-
-                  screenParams?.topAppBarManager?.setActionCallback(
-                      TopAppBarManager.TopAppBarAction.SETTINGS) {
-                        showSettingsDialog.value = true
-                      }
-
-                  // The settings "in" the profile screen
-                  // TODO : Implement the dialog Content composable
-                  CustomDialog(
-                      showSettingsDialog,
-                      "Settings",
-                      Content = { Text("Settings to be implemented") },
-                  )
-                }
-                // screen for adding friend
-                composable(Screen.ADD_FRIEND) {
-                  AddFriendScreen(userViewModel, navigationActions, scope, host, innerPadding)
-                }
-              }
+        NavHost(navController = navController, startDestination = startDestination) {
+          navigation(
+              startDestination = Screen.AUTH,
+              route = Route.AUTH,
+          ) {
+            composable(Screen.AUTH) {
+              SignInScreen(navigationActions, userViewModel, dataStoreManager)
             }
+          }
+          navigation(startDestination = Screen.PROGRESSION, route = Route.PROGRESSION) {
+            composable(Screen.PROGRESSION) {
+              ProgressScreen(navigationActions, userViewModel, progressionViewModel, innerPadding)
+            }
+          }
+          navigation(
+              startDestination = Screen.MAP,
+              route = Route.MAP,
+          ) {
+            composable(Screen.MAP) {
+              MapScreen(
+                  parkLocationViewModel,
+                  parkViewModel,
+                  navigationActions,
+                  mapCallbackOnMapLoaded,
+                  innerPadding)
+            }
+            composable(Screen.PARK_OVERVIEW) {
+              ParkOverviewScreen(
+                  parkViewModel, innerPadding, navigationActions, eventViewModel, userViewModel)
+            }
+            composable(Screen.ADD_EVENT) {
+              AddEventScreen(
+                  navigationActions, parkViewModel, eventViewModel, userViewModel, scope, host)
+            }
+            composable(Screen.EVENT_OVERVIEW) {
+              EventOverviewScreen(eventViewModel, parkViewModel, innerPadding)
+            }
+          }
+
+          navigation(
+              startDestination = Screen.PROFILE,
+              route = Route.PROFILE,
+          ) {
+            // profile screen + list of friend
+            composable(Screen.PROFILE) {
+              ProfileScreen(navigationActions, userViewModel, innerPadding)
+              val showSettingsDialog = remember { mutableStateOf(false) }
+
+              screenParams?.topAppBarManager?.setActionCallback(
+                  TopAppBarManager.TopAppBarAction.SETTINGS) {
+                    showSettingsDialog.value = true
+                  }
+
+              // The settings "in" the profile screen
+              // TODO : Implement the dialog Content composable
+              CustomDialog(
+                  showSettingsDialog,
+                  "Settings",
+                  Content = { Text("Settings to be implemented") },
+              )
+            }
+            // screen for adding friend
+            composable(Screen.ADD_FRIEND) {
+              AddFriendScreen(userViewModel, navigationActions, scope, host, innerPadding)
+            }
+          }
+        }
 
         if (e2eEventTesting) {
           LaunchedEffect(navTestInvokation) { navigationActions.apply(navTestInvokation) }
