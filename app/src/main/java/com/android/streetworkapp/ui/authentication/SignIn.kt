@@ -93,6 +93,8 @@ fun SignInScreen(
     user?.let {
       dataStoreManager.saveLoginState(true)
       dataStoreManager.saveUid(user!!.uid)
+      dataStoreManager.saveName(user!!.username)
+      dataStoreManager.saveScore(user!!.score)
       userViewModel.setCurrentUser(it)
       Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
       navigationActions.navigateTo(Screen.MAP)
