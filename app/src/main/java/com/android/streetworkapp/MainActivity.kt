@@ -6,12 +6,16 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -125,6 +129,10 @@ fun StreetWorkApp(
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
 
+  // To display SnackBars
+  val scope = rememberCoroutineScope()
+  val host = remember { SnackbarHostState() }
+
   val currentScreenName = remember {
     mutableStateOf<String?>(null)
   } // not using by here since I want to pass the mutableState to a fn
@@ -160,6 +168,13 @@ fun StreetWorkApp(
             ?.takeIf { it }
             ?.let { TopAppBarWrapper(navigationActions, screenParams?.topAppBarManager) }
       },
+      snackbarHost = {
+        SnackbarHost(
+            hostState = host,
+            snackbar = { data ->
+              Snackbar(actionColor = ColorPalette.INTERACTION_COLOR_DARK, snackbarData = data)
+            })
+      },
       bottomBar = {
         screenParams
             ?.takeIf { it.isBottomBarVisible }
@@ -171,7 +186,7 @@ fun StreetWorkApp(
                       tabList = LIST_TOP_LEVEL_DESTINATION)
                 }
                 BottomNavigationMenuType.EVENT_OVERVIEW -> {
-                  EventBottomBar(eventViewModel, userViewModel, navigationActions)
+                  EventBottomBar(eventViewModel, userViewModel, navigationActions, scope, host)
                   // selected
                 }
                 BottomNavigationMenuType
@@ -213,12 +228,7 @@ fun StreetWorkApp(
                 }
                 composable(Screen.ADD_EVENT) {
                   AddEventScreen(
-                      navigationActions,
-                      parkViewModel,
-                      eventViewModel,
-                      userViewModel,
-                      textModerationViewModel,
-                      innerPadding)
+                      navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel, scope, host, innerPadding)
                 }
                 composable(Screen.EVENT_OVERVIEW) {
                   EventOverviewScreen(eventViewModel, parkViewModel, innerPadding)
@@ -248,7 +258,9 @@ fun StreetWorkApp(
                   )
                 }
                 // screen for adding friend
-                composable(Screen.ADD_FRIEND) { AddFriendScreen(userViewModel, innerPadding) }
+                composable(Screen.ADD_FRIEND) {
+                  AddFriendScreen(userViewModel, navigationActions, scope, host, innerPadding)
+                }
               }
             }
 

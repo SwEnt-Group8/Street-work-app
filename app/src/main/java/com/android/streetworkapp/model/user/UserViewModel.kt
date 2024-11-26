@@ -158,7 +158,14 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @param points The number of points to add to the user's score.
    */
   fun increaseUserScore(uid: String, points: Int) =
-      viewModelScope.launch { repository.increaseUserScore(uid, points) }
+      viewModelScope.launch {
+        repository.increaseUserScore(uid, points)
+
+        _currentUser.value?.let {
+          val updatedUser = it.copy(score = it.score + points)
+          _currentUser.value = updatedUser
+        }
+      }
 
   /**
    * Adds a friend to both the user's and friend's friend lists in Firestore.
