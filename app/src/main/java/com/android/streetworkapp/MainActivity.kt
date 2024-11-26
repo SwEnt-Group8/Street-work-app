@@ -21,6 +21,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.android.streetworkapp.device.datastore.DataStoreManager
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
 import com.android.streetworkapp.model.event.EventViewModel
@@ -62,15 +63,19 @@ import okhttp3.OkHttpClient
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    val dataStoreManager = DataStoreManager(this)
     Log.d("MainActivity", "Setup content")
-    setContent(parent = null) { StreetWorkAppMain() }
+    setContent(parent = null) { StreetWorkAppMain(dataStoreManager = dataStoreManager) }
   }
 }
 
 // the testInvokation is super ugly but I have NOT found any other way to test the navigation from a
 // ui perspective since we don't use fragments
 @Composable
-fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
+fun StreetWorkAppMain(
+    testInvokation: NavigationActions.() -> Unit = {},
+    dataStoreManager: DataStoreManager
+) {
 
   // repositories
   val overpassParkLocationRepo = OverpassParkLocationRepository(OkHttpClient())
@@ -102,7 +107,8 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
       userViewModel,
       parkViewModel,
       eventViewModel,
-      progressionViewModel)
+      progressionViewModel,
+      dataStoreManager)
 }
 
 @SuppressLint("UnrememberedMutableState")
@@ -115,6 +121,7 @@ fun StreetWorkApp(
     parkViewModel: ParkViewModel,
     eventViewModel: EventViewModel,
     progressionViewModel: ProgressionViewModel,
+    dataStoreManager: DataStoreManager,
     navTestInvokationOnEachRecompose: Boolean = false,
     e2eEventTesting: Boolean = false
 ) {
