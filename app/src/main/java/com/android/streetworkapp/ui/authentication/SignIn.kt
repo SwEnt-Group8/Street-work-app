@@ -91,6 +91,8 @@ fun SignInScreen(
   // as the current user and navigating to the map screen
   LaunchedEffect(user) {
     user?.let {
+      dataStoreManager.saveLoginState(true)
+      dataStoreManager.saveUid(user!!.uid)
       userViewModel.setCurrentUser(it)
       Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
       navigationActions.navigateTo(Screen.MAP)
