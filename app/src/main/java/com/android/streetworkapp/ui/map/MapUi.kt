@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -106,10 +105,4 @@ fun MapScreen(
           }
         }
   }
-}
-
-@Composable
-fun MapInfoContent() {
-  Text(
-      "This is the map, here you can see each park that is near you. \n\n You can navigate to see more. Click on a park to see its details, such as their events !")
 }

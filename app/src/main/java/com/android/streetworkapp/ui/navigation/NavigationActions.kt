@@ -93,7 +93,8 @@ data class ScreenParams(
             TopAppBarManager(
                 "Event Creation",
                 hasNavigationIcon = true,
-                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
+                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON,
+                actions = listOf(TopAppBarManager.TopAppBarAction.INFO)))
     val EVENT_OVERVIEW =
         ScreenParams(
             Screen.EVENT_OVERVIEW,
@@ -164,6 +165,10 @@ object TopLevelDestinations {
 
 val LIST_TOP_LEVEL_DESTINATION =
     listOf(TopLevelDestinations.PROGRESSION, TopLevelDestinations.MAP, TopLevelDestinations.PROFILE)
+
+fun getScreens(): Screen {
+  return Screen
+}
 
 open class NavigationActions(
     private val navController: NavHostController,

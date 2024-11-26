@@ -250,10 +250,3 @@ fun DisplayUserPicture(user: User?, size: Dp, testTag: String) {
                 .testTag(testTag))
   }
 }
-
-@Composable
-fun ProfileInfoContent() {
-  Text(
-      text =
-          "This is your profile page, you can see your friends and your score. \n\n You can also add friends using the 'Add friend' button and you can also access your settings by clicking the gear icon on the top right.")
-}

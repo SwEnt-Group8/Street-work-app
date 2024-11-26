@@ -342,12 +342,6 @@ fun DashBoardBarProgression() {
       }
 }
 
-@Composable
-fun ProgressInfoContent() {
-  Text(
-      "This is the progression screen, here you can see your progression and achievements. \n\n There is your record for each exercise in Training, click on it to see more details !")
-}
-
 /** Represents the different states of the progression dashboard */
 sealed class DashboardStateProgression {
   data object Training : DashboardStateProgression()

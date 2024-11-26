@@ -297,12 +297,6 @@ fun LeaveEventButton(
       }
 }
 
-@Composable
-fun EventInfoContent() {
-  Text(
-      "This is the event overview, here you can access all of the information that you need. \n\n You are free to join the event if you want to participate !")
-}
-
 /** Represents the different states of the event dashboard */
 sealed class DashboardState {
   data object Details : DashboardState()
