@@ -8,8 +8,8 @@ import com.android.streetworkapp.ui.utils.CustomDialog
 import com.android.streetworkapp.ui.utils.DialogType
 
 /**
- * This class manages the InfoDialogs that are displayed when the user clicks on the info action.
- * It is responsible for displaying the correct dialog for the current screen.
+ * This class manages the InfoDialogs that are displayed when the user clicks on the info action. It
+ * is responsible for displaying the correct dialog for the current screen.
  *
  * @param showDialog - The display state of the InfoDialogs.
  * @param screenName - The name of the current screen.
