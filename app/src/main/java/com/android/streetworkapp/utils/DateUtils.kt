@@ -13,7 +13,7 @@ import java.util.TimeZone
 fun Timestamp.toFormattedString(): String {
   val pattern = "dd/MM/yyyy HH:mm"
   val sdf = SimpleDateFormat(pattern, Locale.getDefault())
-  sdf.timeZone = TimeZone.getTimeZone("UTC") // Set to UTC to avoid timezone issues
+  sdf.timeZone = TimeZone.getDefault()
   return sdf.format(this.toDate())
 }
 
@@ -25,7 +25,7 @@ fun Timestamp.toFormattedString(): String {
 fun String.toTimestamp(): Timestamp {
   val pattern = "dd/MM/yyyy HH:mm"
   val sdf = SimpleDateFormat(pattern, Locale.getDefault())
-  sdf.timeZone = TimeZone.getTimeZone("UTC") // Set to UTC to avoid timezone issues
+  sdf.timeZone = TimeZone.getDefault()
   val date = sdf.parse(this)
   return Timestamp(date!!)
 }

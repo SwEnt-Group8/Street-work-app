@@ -23,6 +23,7 @@ import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventRepository
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
 import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.moderation.TextModerationViewModel
 import com.android.streetworkapp.model.park.NominatimParkNameRepository
 import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.park.ParkRepositoryFirestore
@@ -131,6 +132,7 @@ class End2EndCreateEvent {
           parkViewModel,
           eventViewModel,
           progressionViewModel,
+          mock(TextModerationViewModel::class.java),
           true)
     }
   }

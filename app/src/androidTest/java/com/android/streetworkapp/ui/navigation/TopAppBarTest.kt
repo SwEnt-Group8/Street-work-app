@@ -9,6 +9,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import com.android.streetworkapp.StreetWorkApp
 import com.android.streetworkapp.model.event.EventRepository
 import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.moderation.TextModerationRepository
+import com.android.streetworkapp.model.moderation.TextModerationViewModel
 import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.ParkLocationRepository
@@ -53,6 +55,7 @@ class TopAppBarTest {
           ParkViewModel(mock(ParkRepository::class.java, RETURNS_DEFAULTS)),
           EventViewModel(mock(EventRepository::class.java, RETURNS_DEFAULTS)),
           ProgressionViewModel(mock(ProgressionRepository::class.java, RETURNS_DEFAULTS)),
+          TextModerationViewModel(mock(TextModerationRepository::class.java)),
           true)
     }
 
