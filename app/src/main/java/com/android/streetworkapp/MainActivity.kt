@@ -228,7 +228,14 @@ fun StreetWorkApp(
                 }
                 composable(Screen.ADD_EVENT) {
                   AddEventScreen(
-                      navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel, scope, host, innerPadding)
+                      navigationActions,
+                      parkViewModel,
+                      eventViewModel,
+                      userViewModel,
+                      textModerationViewModel,
+                      scope,
+                      host,
+                      innerPadding)
                 }
                 composable(Screen.EVENT_OVERVIEW) {
                   EventOverviewScreen(eventViewModel, parkViewModel, innerPadding)

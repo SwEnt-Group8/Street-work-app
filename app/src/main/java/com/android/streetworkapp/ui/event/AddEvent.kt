@@ -1,7 +1,5 @@
 package com.android.streetworkapp.ui.event
 
-import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -73,7 +71,6 @@ import java.util.Locale
 import java.util.TimeZone
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineScope
-
 import kotlinx.coroutines.delay
 
 object AddEventParams {
@@ -456,10 +453,10 @@ private fun createEvent(
   eventViewModel.addEvent(event)
   parkViewModel.addEventToPark(event.parkId, event.eid)
 
-    if (host != null) {
-        updateAndDisplayPoints(
-            userViewModel, navigationActions, ScoreIncrease.ADD_EVENT.points, coroutineScope, host)
-    }
+  if (host != null) {
+    updateAndDisplayPoints(
+        userViewModel, navigationActions, ScoreIncrease.ADD_EVENT.points, coroutineScope, host)
+  }
 }
 
 /**
@@ -522,7 +519,14 @@ fun onAddEventClickHandler(
         { isTextUnderThresholds ->
           if (isTextUnderThresholds) {
             // If text is under thresholds, proceed with event creation
-            createEvent(event, navigationActions, eventViewModel, userViewModel, parkViewModel, coroutineScope, snackBarHostState)
+            createEvent(
+                event,
+                navigationActions,
+                eventViewModel,
+                userViewModel,
+                parkViewModel,
+                coroutineScope,
+                snackBarHostState)
             navigationActions.goBack()
           } else {
             // If text exceeds thresholds, set the error flag and message
