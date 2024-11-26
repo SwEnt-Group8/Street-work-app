@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -13,9 +14,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
@@ -51,7 +55,10 @@ import com.android.streetworkapp.ui.profile.AddFriendScreen
 import com.android.streetworkapp.ui.profile.ProfileScreen
 import com.android.streetworkapp.ui.progress.ProgressScreen
 import com.android.streetworkapp.ui.theme.ColorPalette
+import com.android.streetworkapp.ui.train.TrainChallengeScreen
+import com.android.streetworkapp.ui.train.TrainCoachScreen
 import com.android.streetworkapp.ui.train.TrainHubScreen
+import com.android.streetworkapp.ui.train.TrainSoloScreen
 import com.android.streetworkapp.ui.utils.CustomDialog
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
@@ -109,6 +116,24 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
       workoutViewModel)
 }
 
+fun NavGraphBuilder.trainComposable(
+    route: String,
+    workoutViewModel: WorkoutViewModel,
+    innerPadding: PaddingValues,
+    content: @Composable (activity: String, isTimeDependent: Boolean) -> Unit
+) {
+  composable(
+      route = route,
+      arguments =
+          listOf(
+              navArgument("activity") { type = NavType.StringType },
+              navArgument("isTimeDependent") { type = NavType.BoolType })) { backStackEntry ->
+        val activity = backStackEntry.arguments?.getString("activity") ?: "Unknown"
+        val isTimeDependent = backStackEntry.arguments?.getBoolean("isTimeDependent") ?: false
+        content(activity, isTimeDependent)
+      }
+}
+
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun StreetWorkApp(
@@ -119,7 +144,7 @@ fun StreetWorkApp(
     parkViewModel: ParkViewModel,
     eventViewModel: EventViewModel,
     progressionViewModel: ProgressionViewModel,
-    workOutViewModel: WorkoutViewModel,
+    workoutViewModel: WorkoutViewModel,
     navTestInvokationOnEachRecompose: Boolean = false,
     e2eEventTesting: Boolean = false
 ) {
@@ -251,11 +276,29 @@ fun StreetWorkApp(
                   route = Route.TRAIN_HUB,
               ) {
                 composable(Screen.TRAIN_HUB) {
-                  TrainHubScreen(navigationActions, workOutViewModel, innerPadding)
+                  TrainHubScreen(navigationActions, workoutViewModel, userViewModel, innerPadding)
                 }
-                composable(Screen.TRAIN_SOLO) {}
-                composable(Screen.TRAIN_COACH) {}
-                composable(Screen.TRAIN_CHALLENGE) {}
+                trainComposable(
+                    route = Screen.TRAIN_SOLO,
+                    workoutViewModel = workoutViewModel,
+                    innerPadding = innerPadding) { activity, isTimeDependent ->
+                      TrainSoloScreen(activity, isTimeDependent, workoutViewModel, innerPadding)
+                    }
+
+                trainComposable(
+                    route = Screen.TRAIN_COACH,
+                    workoutViewModel = workoutViewModel,
+                    innerPadding = innerPadding) { activity, isTimeDependent ->
+                      TrainCoachScreen(activity, isTimeDependent, workoutViewModel, innerPadding)
+                    }
+
+                trainComposable(
+                    route = Screen.TRAIN_CHALLENGE,
+                    workoutViewModel = workoutViewModel,
+                    innerPadding = innerPadding) { activity, isTimeDependent ->
+                      TrainChallengeScreen(
+                          activity, isTimeDependent, workoutViewModel, innerPadding)
+                    }
               }
             }
 
