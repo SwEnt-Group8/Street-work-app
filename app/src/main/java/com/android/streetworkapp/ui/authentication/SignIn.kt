@@ -42,6 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
+import com.android.streetworkapp.device.datastore.DataStoreManager
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
@@ -53,7 +54,11 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
 @Composable
-fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewModel) {
+fun SignInScreen(
+    navigationActions: NavigationActions,
+    userViewModel: UserViewModel,
+    dataStoreManager: DataStoreManager
+) {
 
   val user by userViewModel.user.collectAsState()
 
