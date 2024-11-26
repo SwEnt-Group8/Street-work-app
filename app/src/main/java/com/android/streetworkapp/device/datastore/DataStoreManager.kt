@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import java.io.IOException
@@ -24,6 +25,7 @@ class DataStoreManager(context: Context) {
     val IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
     val SAVED_UID = stringPreferencesKey("saved_uid")
     val SAVED_NAME = stringPreferencesKey("saved_name")
+    val SAVED_SCORE = intPreferencesKey("saved_score")
   }
 
   /** A flow that emits the login state of the user. */
@@ -68,6 +70,20 @@ class DataStoreManager(context: Context) {
           }
           .map { preferences -> preferences[SAVED_NAME] ?: "" }
 
+  /** A flow that emits the user's score. */
+  val savedScoreFlow: Flow<Int> =
+      dataStore.data
+          .catch { exception ->
+            // Handle exceptions
+            if (exception is IOException) {
+              emit(emptyPreferences())
+              Log.d("DataStoreManager", "An IO exception occurred, emitting empty preferences.")
+            } else {
+              Log.d("DataStoreManager", exception.message.toString())
+            }
+          }
+          .map { preferences -> preferences[SAVED_SCORE] ?: 0 }
+
   /**
    * Saves the login state of the user in preferences.
    *
@@ -93,5 +109,14 @@ class DataStoreManager(context: Context) {
    */
   suspend fun saveName(name: String) {
     dataStore.edit { preferences -> preferences[SAVED_NAME] = name }
+  }
+
+  /**
+   * Saves the user's score in preferences.
+   *
+   * @param score: The user's score
+   */
+  suspend fun saveScore(score: Int) {
+    dataStore.edit { preferences -> preferences[SAVED_SCORE] = score }
   }
 }
