@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
+import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.model.workout.WorkoutViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.theme.ColorPalette.BORDER_COLOR
@@ -27,8 +28,16 @@ import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_DARK
 fun TrainHubScreen(
     navigationActions: NavigationActions,
     workoutViewModel: WorkoutViewModel,
+    userViewModel: UserViewModel,
     paddingValues: PaddingValues = PaddingValues(0.dp)
 ) {
+  var selectedType by remember { mutableStateOf<String?>(null) }
+  var selectedActivity by remember { mutableStateOf<Pair<String, Boolean>?>(null) }
+
+  val currentUser by userViewModel.currentUser.collectAsState()
+  // Loading the user workout data in the hub allows us to gains some speed on the next screen
+  currentUser?.uid?.let { workoutViewModel.getOrAddWorkoutData(it) }
+
   BoxWithConstraints {
     val screenWidth = maxWidth
     val screenHeight = maxHeight
@@ -38,10 +47,7 @@ fun TrainHubScreen(
     val gridSpacing = if (screenWidth < 360.dp) 4.dp else 8.dp
 
     Column(
-        modifier =
-            Modifier.fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp), // Adjust padding for proper layout
+        modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp),
         verticalArrangement = Arrangement.SpaceBetween) {
           Column(modifier = Modifier.fillMaxWidth()) {
             // Section: Choose Your Role
@@ -56,7 +62,7 @@ fun TrainHubScreen(
                 buttonWidth = buttonWidth,
                 buttonHeight = buttonHeight,
                 gridSpacing = gridSpacing,
-                onRoleSelected = { /* TODO: Handle Role Selection */})
+                onRoleSelected = { role -> selectedType = role })
 
             Spacer(modifier = Modifier.height(16.dp))
             HorizontalDivider(
@@ -73,29 +79,37 @@ fun TrainHubScreen(
             ActivitySelectionGrid(
                 activities =
                     listOf(
-                        "Push-ups",
-                        "Dips",
-                        "Burpee",
-                        "Lunge",
-                        "Planks",
-                        "Handstand",
-                        "Front lever",
-                        "Flag",
-                        "Muscle-up"),
+                        "Push-ups" to false,
+                        "Dips" to false,
+                        "Burpee" to false,
+                        "Lunge" to false,
+                        "Planks" to true,
+                        "Handstand" to true,
+                        "Front lever" to true,
+                        "Flag" to true,
+                        "Muscle-up" to false),
                 buttonWidth = buttonWidth,
                 buttonHeight = buttonHeight,
                 gridSpacing = gridSpacing,
-                onActivitySelected = { /* TODO: Handle Activity Selection */})
+                onActivitySelected = { activity -> selectedActivity = activity })
           }
 
           // Confirm Button
           Button(
               onClick = {
-                // TODO: Handle confirmation action
+                if (selectedType != null && selectedActivity != null) {
+                  val (activity, isTimeDependent) = selectedActivity!!
+                  when (selectedType) {
+                    "Solo" -> navigationActions.navigateToSoloScreen(activity, isTimeDependent)
+                    "Coach" -> navigationActions.navigateToCoachScreen(activity, isTimeDependent)
+                    "Challenge" ->
+                        navigationActions.navigateToChallengeScreen(activity, isTimeDependent)
+                  }
+                } else {
+                  // Handle case where not all selections are made
+                }
               },
-              modifier =
-                  Modifier.fillMaxWidth(0.5f) // Ensure the button size is visible
-                      .align(Alignment.CenterHorizontally), // Center the button
+              modifier = Modifier.fillMaxWidth(0.5f).align(Alignment.CenterHorizontally),
               shape = RoundedCornerShape(50),
               colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK)) {
                 Text(
@@ -146,29 +160,29 @@ fun RoleSelectionRow(
 
 @Composable
 fun ActivitySelectionGrid(
-    activities: List<String>,
+    activities: List<Pair<String, Boolean>>,
     buttonWidth: Dp,
     buttonHeight: Dp,
     gridSpacing: Dp,
-    onActivitySelected: (String) -> Unit
+    onActivitySelected: (Pair<String, Boolean>) -> Unit
 ) {
-  var selectedActivity by remember { mutableStateOf<String?>(null) }
+  var selectedActivity by remember { mutableStateOf<Pair<String, Boolean>?>(null) }
 
   LazyVerticalGrid(
       columns = GridCells.Adaptive(buttonWidth + gridSpacing),
       modifier = Modifier.fillMaxWidth(),
       horizontalArrangement = Arrangement.spacedBy(gridSpacing),
       verticalArrangement = Arrangement.spacedBy(gridSpacing)) {
-        items(activities) { activity ->
+        items(activities) { (activity, isTimeDependent) ->
           ActivityButton(
               text = activity,
-              isSelected = selectedActivity == activity,
+              isSelected = selectedActivity?.first == activity,
               imageResId = R.drawable.pushup,
               buttonWidth = buttonWidth,
               buttonHeight = buttonHeight,
               onClick = {
-                selectedActivity = activity
-                onActivitySelected(activity)
+                selectedActivity = activity to isTimeDependent
+                onActivitySelected(activity to isTimeDependent)
               })
         }
       }
