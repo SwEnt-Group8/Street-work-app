@@ -1,7 +1,6 @@
 package com.android.streetworkapp.ui.profile
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -24,6 +24,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,20 +36,28 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.rememberNavController
 import com.android.sample.R
 import com.android.streetworkapp.device.bluetooth.BluetoothClient
 import com.android.streetworkapp.device.bluetooth.BluetoothConstants
 import com.android.streetworkapp.device.bluetooth.BluetoothServer
+import com.android.streetworkapp.model.progression.ScoreIncrease
 import com.android.streetworkapp.model.user.UserViewModel
+import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.progress.updateAndDisplayPoints
 import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_DARK
 import com.android.streetworkapp.ui.theme.ColorPalette.PRIMARY_TEXT_COLOR
 import com.android.streetworkapp.ui.theme.ColorPalette.PRINCIPLE_BACKGROUND_COLOR
 import com.android.streetworkapp.ui.theme.ColorPalette.SECONDARY_TEXT_COLOR
 import com.android.streetworkapp.ui.theme.LightGray
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun AddFriendScreen(
     userViewModel: UserViewModel,
+    navigationActions: NavigationActions = NavigationActions(rememberNavController()),
+    scope: CoroutineScope = rememberCoroutineScope(),
+    host: SnackbarHostState? = null,
     innerPaddingValues: PaddingValues = PaddingValues(0.dp)
 ) {
   // context for Toast
@@ -88,7 +97,12 @@ fun AddFriendScreen(
         username = user.username,
         onAccept = {
           userViewModel.addFriend(uid, receivedRequestUid)
-          Toast.makeText(context, "Friend added.", Toast.LENGTH_SHORT).show()
+          // Toast.makeText(context, "Friend added.", Toast.LENGTH_SHORT).show()
+          if (host != null) {
+            updateAndDisplayPoints(
+                userViewModel, navigationActions, ScoreIncrease.ADD_FRIEND.points, scope, host)
+          }
+
           showRequestDialog = false
         },
         onRefuse = { showRequestDialog = false })

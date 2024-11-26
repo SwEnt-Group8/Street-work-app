@@ -24,9 +24,11 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,8 +42,11 @@ import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkViewModel
+import com.android.streetworkapp.model.progression.ScoreIncrease
 import com.android.streetworkapp.model.user.User
+import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.progress.updateAndDisplayPoints
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.utils.toFormattedString
 import com.google.android.gms.maps.model.CameraPosition
@@ -50,6 +55,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 
 // Mutable dashboard state
@@ -240,14 +246,25 @@ fun DashBoardBar() {
 fun JoinEventButton(
     event: Event,
     eventViewModel: EventViewModel,
+    userViewModel: UserViewModel,
     user: User,
-    navigationActions: NavigationActions
+    navigationActions: NavigationActions,
+    scope: CoroutineScope = rememberCoroutineScope(),
+    snackbarHostState: SnackbarHostState? = null,
 ) {
   val context = LocalContext.current
 
   Button(
       onClick = {
-        Toast.makeText(context, "You have joined this event", Toast.LENGTH_LONG).show()
+        if (snackbarHostState != null) {
+          updateAndDisplayPoints(
+              userViewModel,
+              navigationActions,
+              ScoreIncrease.JOIN_EVENT.points,
+              scope,
+              snackbarHostState)
+        }
+
         eventViewModel.addParticipantToEvent(event.eid, user.uid)
         navigationActions.goBack()
       },

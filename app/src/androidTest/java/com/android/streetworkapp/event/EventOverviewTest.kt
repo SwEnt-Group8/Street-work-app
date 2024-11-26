@@ -1,5 +1,8 @@
 package com.android.streetworkapp.event
 
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
@@ -180,5 +183,28 @@ class EventOverviewTest {
 
     verify(eventRepository).removeParticipantFromEvent(any(), any())
     verify(navigationActions).goBack()
+  }
+
+  @Test
+  fun joinEventButtonUsesIncreaseScore() = runTest {
+    eventViewModel.setCurrentEvent(event)
+    userViewModel.setCurrentUser(joiner)
+    composeTestRule.setContent {
+      val scope = rememberCoroutineScope()
+      val snackbarHostState = remember { SnackbarHostState() }
+
+      EventBottomBar(eventViewModel, userViewModel, navigationActions, scope, snackbarHostState)
+    }
+
+    composeTestRule.waitForIdle()
+
+    composeTestRule.onNodeWithTag("leaveEventButton").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("joinEventButton").assertIsDisplayed().performClick()
+
+    composeTestRule.waitForIdle()
+
+    verify(eventRepository).addParticipantToEvent(any(), any())
+    verify(navigationActions).goBack()
+    verify(userRepository).increaseUserScore(any(), any())
   }
 }
