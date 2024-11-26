@@ -23,6 +23,7 @@ class DataStoreManager(context: Context) {
   companion object {
     val IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
     val SAVED_UID = stringPreferencesKey("saved_uid")
+    val SAVED_NAME = stringPreferencesKey("saved_name")
   }
 
   /** A flow that emits the login state of the user. */
@@ -53,6 +54,20 @@ class DataStoreManager(context: Context) {
           }
           .map { preferences -> preferences[SAVED_UID] ?: "" }
 
+  /** A flow that emits the user's name. */
+  val savedNameFlow: Flow<String> =
+      dataStore.data
+          .catch { exception ->
+            // Handle exceptions
+            if (exception is IOException) {
+              emit(emptyPreferences())
+              Log.d("DataStoreManager", "An IO exception occurred, emitting empty preferences.")
+            } else {
+              Log.d("DataStoreManager", exception.message.toString())
+            }
+          }
+          .map { preferences -> preferences[SAVED_NAME] ?: "" }
+
   /**
    * Saves the login state of the user in preferences.
    *
@@ -69,5 +84,14 @@ class DataStoreManager(context: Context) {
    */
   suspend fun saveUid(uid: String) {
     dataStore.edit { preferences -> preferences[SAVED_UID] = uid }
+  }
+
+  /**
+   * Saves the user's name in preferences.
+   *
+   * @param name: The user's name
+   */
+  suspend fun saveName(name: String) {
+    dataStore.edit { preferences -> preferences[SAVED_NAME] = name }
   }
 }
