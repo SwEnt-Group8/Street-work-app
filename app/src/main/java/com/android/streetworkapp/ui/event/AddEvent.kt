@@ -139,10 +139,10 @@ fun AddEventScreen(
   // passing it as param)
   val isTextEvaluationOverThresholdsError = remember { mutableStateOf(false) } // same here
   val isDateBackInTimeError = remember { mutableStateOf(false) } // same here
-  var isTextEvaluationError by remember {
+  var isTextEvaluationError = remember {
     mutableStateOf(false)
   } // for api error, deserialization error or network issues
-  var formErrorMessage by remember {
+  var formErrorMessage = remember {
     mutableStateOf("")
   } // message to be displayed at bottom of form in case of form error
 
@@ -154,7 +154,7 @@ fun AddEventScreen(
           isTitleEmptyError.value,
           isTextEvaluationOverThresholdsError.value,
           isDateBackInTimeError.value,
-          isTextEvaluationError)
+          isTextEvaluationError.value)
 
   Box(
       modifier = Modifier.padding(paddingValues).background(MaterialTheme.colorScheme.background),
@@ -187,13 +187,13 @@ fun AddEventScreen(
                       Modifier.padding(vertical = 0.dp, horizontal = 25.dp).testTag("errorMessage"),
                   textAlign = TextAlign.Center,
                   color = MaterialTheme.colorScheme.error,
-                  text = formErrorMessage)
+                  text = formErrorMessage.value)
             }
             // for non users-related-input errors, we only show the message for a brief amount of
             // time
-            LaunchedEffect(isTextEvaluationError) {
+            LaunchedEffect(isTextEvaluationError.value) {
               delay(AddEventParams.TEXT_EVALUATION_DISPLAY_TIME)
-              isTextEvaluationError = false
+              isTextEvaluationError.value = false
             }
 
             Button(
@@ -203,42 +203,19 @@ fun AddEventScreen(
                         contentColor = ColorPalette.PRIMARY_TEXT_COLOR),
                 modifier = Modifier.testTag("addEventButton"),
                 onClick = {
-                  if (event.date.seconds <
-                      Timestamp(Calendar.getInstance(TimeZone.getDefault()).time).seconds) {
-                    isDateBackInTimeError.value = true
-                    formErrorMessage = AddEventFormErrorMessages.DATE_BACK_IN_TIME_ERROR
-                  } else if (event.title.isEmpty()) {
-                    isTitleEmptyError.value = true
-                    formErrorMessage = AddEventFormErrorMessages.TITLE_EMPTY_ERROR_MESSAGE
-                  } else {
-                    // making sure the description & title are valid according to our evaluation
-                    // thresholds
-                    val formattedTextInput =
-                        "Title: ${event.title}. Description: ${event.description}" // we format it
-                    // to do only one
-                    // api call
-                    textModerationViewModel.analyzeText(
-                        formattedTextInput,
-                        { isTextUnderThresholds ->
-                          if (isTextUnderThresholds) {
-                            createEvent(
-                                event,
-                                navigationActions,
-                                eventViewModel,
-                                userViewModel,
-                                parkViewModel,
-                                context)
-                          } else {
-                            isTextEvaluationOverThresholdsError.value = true
-                            formErrorMessage =
-                                AddEventFormErrorMessages.TEXT_EVALUATION_OVER_THRESHOLDS_ERROR
-                          }
-                        },
-                        {
-                          isTextEvaluationError = true
-                          formErrorMessage = AddEventFormErrorMessages.TEXT_EVALUATION_ERROR
-                        })
-                  }
+                  onAddEventClickHandler(
+                      event,
+                      navigationActions,
+                      eventViewModel,
+                      userViewModel,
+                      parkViewModel,
+                      textModerationViewModel,
+                      context,
+                      isDateBackInTimeError,
+                      isTitleEmptyError,
+                      isTextEvaluationOverThresholdsError,
+                      isTextEvaluationError,
+                      formErrorMessage)
                 }) {
                   Text("Add new event")
                 }
@@ -347,8 +324,8 @@ fun TimeSelection(event: Event, isDateError: MutableState<Boolean>) {
   val datePickerState = rememberDatePickerState(initialTime.timeInMillis)
   val timePickerState =
       rememberTimePickerState(
-          initialHour = initialTime.get(Calendar.HOUR_OF_DAY),
-          initialMinute = initialTime.get(Calendar.MINUTE),
+          initialHour = initialTime[Calendar.HOUR_OF_DAY],
+          initialMinute = initialTime[Calendar.MINUTE],
           is24Hour = false,
       )
 
@@ -461,7 +438,6 @@ private fun convertMillisToDate(millis: Long): String =
 
 private fun createEvent(
     event: Event,
-    navigationActions: NavigationActions,
     eventViewModel: EventViewModel,
     userViewModel: UserViewModel,
     parkViewModel: ParkViewModel,
@@ -477,6 +453,77 @@ private fun createEvent(
   Toast.makeText(
           context, "+" + ScoreIncrease.CREATE_EVENT.scoreAdded + " Points", Toast.LENGTH_SHORT)
       .show()
+}
 
-  navigationActions.goBack()
+/**
+ * Handles the click event for adding a new event. It performs the following validations:
+ * - Checks if the event date is in the past.
+ * - Ensures that the event title is not empty.
+ * - Analyzes the event title and description to ensure they meet the required thresholds.
+ *
+ * If any validation fails, appropriate error flags and messages are set. If all validations pass,
+ * the event creation process is triggered.
+ *
+ * @param event The event to be added, containing the user's input.
+ * @param navigationActions the instance that handles our app's navigation.
+ * @param eventViewModel The view model to handle event-related data.
+ * @param userViewModel The view model to handle user-related data.
+ * @param parkViewModel The view model to handle park-related data.
+ * @param textModerationViewModel The viewmodel to handle text moderation
+ * @param isDateBackInTimeError A [MutableState] flag to indicate if the event date is in the past.
+ * @param isTitleEmptyError A [MutableState] flag to indicate if the event title is empty.
+ * @param isTextEvaluationOverThresholdsError A [MutableState] flag to indicate if the text
+ *   evaluation has exceeded the acceptable thresholds.
+ * @param isTextEvaluationError A [MutableState] to indicate if there was an error during text
+ *   evaluation (network issue, api not responding...).
+ * @param formErrorMessage A [MutableState] string holding the error message related to form
+ *   validation.
+ */
+fun onAddEventClickHandler(
+    event: Event,
+    navigationActions: NavigationActions,
+    eventViewModel: EventViewModel,
+    userViewModel: UserViewModel,
+    parkViewModel: ParkViewModel,
+    textModerationViewModel: TextModerationViewModel,
+    context: Context,
+    isDateBackInTimeError: MutableState<Boolean>,
+    isTitleEmptyError: MutableState<Boolean>,
+    isTextEvaluationOverThresholdsError: MutableState<Boolean>,
+    isTextEvaluationError: MutableState<Boolean>,
+    formErrorMessage: MutableState<String>,
+) {
+  // Check if the event date is in the past
+  if (event.date.seconds < Timestamp(Calendar.getInstance(TimeZone.getDefault()).time).seconds) {
+    isDateBackInTimeError.value = true
+    formErrorMessage.value = AddEventFormErrorMessages.DATE_BACK_IN_TIME_ERROR
+  }
+  // Check if the event title is empty
+  else if (event.title.isEmpty()) {
+    isTitleEmptyError.value = true
+    formErrorMessage.value = AddEventFormErrorMessages.TITLE_EMPTY_ERROR_MESSAGE
+  } else {
+    // Format the text input for title and description
+    val formattedTextInput = "Title: ${event.title}. Description: ${event.description}"
+
+    // Analyze the text input for validation against moderation thresholds
+    textModerationViewModel.analyzeText(
+        formattedTextInput,
+        { isTextUnderThresholds ->
+          if (isTextUnderThresholds) {
+            // If text is under thresholds, proceed with event creation
+            createEvent(event, eventViewModel, userViewModel, parkViewModel, context)
+            navigationActions.goBack()
+          } else {
+            // If text exceeds thresholds, set the error flag and message
+            isTextEvaluationOverThresholdsError.value = true
+            formErrorMessage.value = AddEventFormErrorMessages.TEXT_EVALUATION_OVER_THRESHOLDS_ERROR
+          }
+        },
+        {
+          // If there's an error in text evaluation, set the error flag and message
+          isTextEvaluationError.value = true
+          formErrorMessage.value = AddEventFormErrorMessages.TEXT_EVALUATION_ERROR
+        })
+  }
 }

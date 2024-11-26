@@ -15,7 +15,9 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 
 class PerspectiveAPIRepository(private val client: OkHttpClient) : TextModerationRepository {
-  private val DEBUG_PREFIX = "PerspectiveAPIRepository:"
+  companion object {
+    private const val DEBUG_PREFIX = "PerspectiveAPIRepository:"
+  }
 
   /**
    * Evaluates the text
@@ -32,7 +34,7 @@ class PerspectiveAPIRepository(private val client: OkHttpClient) : TextModeratio
 
     when (val result = this.getTextAnnotations(content)) {
       is PerspectiveAPIEvaluationResult.Error -> {
-        Log.d(this.DEBUG_PREFIX, result.errorType.errorMessage)
+        Log.d(DEBUG_PREFIX, result.errorType.errorMessage)
         return TextEvaluation.Error(result.errorType.errorMessage)
       }
       is PerspectiveAPIEvaluationResult.Success -> {
@@ -59,7 +61,7 @@ class PerspectiveAPIRepository(private val client: OkHttpClient) : TextModeratio
    *   TextEvaluationResult.Error if an error was encountered
    */
   private suspend fun getTextAnnotations(content: String): PerspectiveAPIEvaluationResult {
-    return withContext(Dispatchers.IO) {
+    return withContext(Dispatchers.Default) {
       try {
         // Prepare the request
         val requestMediaType = "application/json; charset=utf-8".toMediaType()
@@ -135,7 +137,7 @@ class PerspectiveAPIRepository(private val client: OkHttpClient) : TextModeratio
 
       return tagsAnnotations
     } catch (e: Exception) {
-      Log.d(this.DEBUG_PREFIX, "Failed to map response body into valid List<TagAnnotation>")
+      Log.d(DEBUG_PREFIX, "Failed to map response body into valid List<TagAnnotation>")
       return null
     }
   }
