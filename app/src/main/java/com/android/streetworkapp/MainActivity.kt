@@ -207,10 +207,7 @@ fun StreetWorkApp(
                   startDestination = Screen.AUTH,
                   route = Route.AUTH,
               ) {
-                composable(Screen.AUTH) {
-                  infoManager.Display()
-                  SignInScreen(navigationActions, userViewModel)
-                }
+                composable(Screen.AUTH) { SignInScreen(navigationActions, userViewModel) }
               }
               navigation(startDestination = Screen.PROGRESSION, route = Route.PROGRESSION) {
                 composable(Screen.PROGRESSION) {
