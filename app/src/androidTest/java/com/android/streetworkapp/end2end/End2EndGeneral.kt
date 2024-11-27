@@ -9,6 +9,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.rule.GrantPermissionRule
 import com.android.streetworkapp.StreetWorkApp
+import com.android.streetworkapp.device.datastore.DataStoreManager
 import com.android.streetworkapp.model.event.EventRepository
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.moderation.TextModerationViewModel
@@ -115,7 +116,9 @@ class End2EndGeneral {
           ParkViewModel(mock(ParkRepository::class.java)),
           EventViewModel(mock(EventRepository::class.java)),
           progressionViewModel,
-          mock(TextModerationViewModel::class.java))
+          mock(TextModerationViewModel::class.java),
+          mock(DataStoreManager::class.java),
+          Route.AUTH)
     }
 
     composeTestRule.waitForIdle()

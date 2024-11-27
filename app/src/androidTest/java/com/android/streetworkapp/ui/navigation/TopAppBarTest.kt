@@ -7,6 +7,7 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import com.android.streetworkapp.StreetWorkApp
+import com.android.streetworkapp.device.datastore.DataStoreManager
 import com.android.streetworkapp.model.event.EventRepository
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.moderation.TextModerationRepository
@@ -56,7 +57,8 @@ class TopAppBarTest {
           EventViewModel(mock(EventRepository::class.java, RETURNS_DEFAULTS)),
           ProgressionViewModel(mock(ProgressionRepository::class.java, RETURNS_DEFAULTS)),
           TextModerationViewModel(mock(TextModerationRepository::class.java)),
-          true)
+          mock(DataStoreManager::class.java),
+          Route.AUTH)
     }
 
     for (screenParam in LIST_OF_SCREENS) {

@@ -16,6 +16,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.printToLog
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.streetworkapp.StreetWorkApp
+import com.android.streetworkapp.device.datastore.DataStoreManager
 import com.android.streetworkapp.model.event.EventRepository
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.moderation.TextModerationRepository
@@ -112,7 +113,8 @@ class BottomNavigationTest {
           EventViewModel(mock(EventRepository::class.java, RETURNS_DEFAULTS)),
           ProgressionViewModel(mock(ProgressionRepository::class.java, RETURNS_DEFAULTS)),
           TextModerationViewModel(mock(TextModerationRepository::class.java, RETURNS_DEFAULTS)),
-          true)
+          mock(DataStoreManager::class.java),
+          Route.AUTH)
     }
 
     val bottomNavTypeToTest =

@@ -19,6 +19,7 @@ import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiObjectNotFoundException
 import androidx.test.uiautomator.UiSelector
 import com.android.streetworkapp.StreetWorkApp
+import com.android.streetworkapp.device.datastore.DataStoreManager
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventRepository
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
@@ -34,6 +35,7 @@ import com.android.streetworkapp.model.progression.ProgressionRepository
 import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
+import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
@@ -133,7 +135,8 @@ class End2EndCreateEvent {
           eventViewModel,
           progressionViewModel,
           mock(TextModerationViewModel::class.java),
-          true)
+          mock(DataStoreManager::class.java),
+          Route.MAP)
     }
   }
 
