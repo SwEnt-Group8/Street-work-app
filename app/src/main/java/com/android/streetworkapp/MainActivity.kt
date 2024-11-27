@@ -2,6 +2,7 @@ package com.android.streetworkapp
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.Scaffold
@@ -33,6 +34,7 @@ import com.android.streetworkapp.model.parklocation.OverpassParkLocationReposito
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
 import com.android.streetworkapp.model.progression.ProgressionRepositoryFirestore
 import com.android.streetworkapp.model.progression.ProgressionViewModel
+import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.authentication.SignInScreen
@@ -110,6 +112,20 @@ fun StreetWorkAppMain(
 
   val isLoggedIn = runBlocking { dataStoreManager.isLoggedInFlow.first() }
   val startDestination = if (isLoggedIn) Route.MAP else Route.AUTH
+
+  if (isLoggedIn) {
+    val uid = runBlocking { dataStoreManager.savedUidFlow.first() }
+    if (internetAvailable) {
+      Log.d("MainActivity", "Internet is available, fetching user from database")
+      userViewModel.getUserByUidAndSetAsCurrentUser(uid)
+    } else {
+      Log.d("MainActivity", "Internet is not available, fetching user from datastore")
+      val username = runBlocking { dataStoreManager.savedNameFlow.first() }
+      val score = runBlocking { dataStoreManager.savedScoreFlow.first() }
+      val offlineUser = User(uid, username, "", score, emptyList(), "")
+      userViewModel.setCurrentUser(offlineUser)
+    }
+  }
 
   StreetWorkApp(
       parkLocationViewModel,
