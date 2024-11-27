@@ -10,6 +10,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_DARK
+import com.android.streetworkapp.ui.theme.ColorPalette.PRINCIPLE_BACKGROUND_COLOR
 import kotlinx.coroutines.delay
 
 @Composable
@@ -17,7 +19,7 @@ fun CircularTimer(
     totalTime: Int = 30, // Total time in seconds
     onTimeUp: () -> Unit = {}
 ) {
-  var timeRemaining by remember { mutableStateOf(totalTime) }
+  var timeRemaining by remember { mutableIntStateOf(totalTime) }
   val progress = remember { Animatable(1f) }
   val coroutineScope = rememberCoroutineScope()
 
@@ -35,14 +37,14 @@ fun CircularTimer(
     // Circular progress bar
     Canvas(modifier = Modifier.size(200.dp)) {
       drawArc(
-          color = Color(0xFFB0BEC5), // Background arc color
+          color = PRINCIPLE_BACKGROUND_COLOR, // Background arc color
           startAngle = -90f,
           sweepAngle = 360f,
           useCenter = false,
           style = androidx.compose.ui.graphics.drawscope.Stroke(12.dp.toPx()))
 
       drawArc(
-          color = Color(0xFF1E88E5), // Progress arc color
+          color = INTERACTION_COLOR_DARK, // Progress arc color
           startAngle = -90f,
           sweepAngle = 360f * progress.value,
           useCenter = false,
