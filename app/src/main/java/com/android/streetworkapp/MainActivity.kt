@@ -110,9 +110,12 @@ fun StreetWorkAppMain(
   val textModerationRepository = PerspectiveAPIRepository(OkHttpClient())
   val textModerationViewModel = TextModerationViewModel(textModerationRepository)
 
+  // Check if the user is logged in and set the start destination accordingly
   val isLoggedIn = runBlocking { dataStoreManager.isLoggedInFlow.first() }
   val startDestination = if (isLoggedIn) Route.MAP else Route.AUTH
 
+  // If the user is logged in, fetch the user from the database or the datastore depending on the
+  // internet connection
   if (isLoggedIn) {
     val uid = runBlocking { dataStoreManager.savedUidFlow.first() }
     if (internetAvailable) {
