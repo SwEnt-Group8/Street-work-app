@@ -2,7 +2,6 @@ package com.android.streetworkapp
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.Scaffold
@@ -22,6 +21,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.android.streetworkapp.device.datastore.DataStoreManager
+import com.android.streetworkapp.device.network.isInternetAvailable
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.moderation.PerspectiveAPIRepository
@@ -65,8 +65,10 @@ class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     val dataStoreManager = DataStoreManager(this)
-    Log.d("MainActivity", "Setup content")
-    setContent(parent = null) { StreetWorkAppMain(dataStoreManager = dataStoreManager) }
+    val internetAvailable = isInternetAvailable(this)
+    setContent(parent = null) {
+      StreetWorkAppMain(dataStoreManager = dataStoreManager, internetAvailable = internetAvailable)
+    }
   }
 }
 
@@ -75,7 +77,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun StreetWorkAppMain(
     testInvokation: NavigationActions.() -> Unit = {},
-    dataStoreManager: DataStoreManager
+    dataStoreManager: DataStoreManager,
+    internetAvailable: Boolean
 ) {
 
   // repositories
