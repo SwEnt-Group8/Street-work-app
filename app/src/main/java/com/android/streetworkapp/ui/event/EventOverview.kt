@@ -12,11 +12,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.twotone.Face
 import androidx.compose.material3.Button
@@ -35,17 +36,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventViewModel
-import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.progression.ScoreIncrease
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.navigation.Screen
+import com.android.streetworkapp.ui.profile.DisplayUserPicture
 import com.android.streetworkapp.ui.progress.updateAndDisplayPoints
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.utils.toFormattedString
@@ -74,21 +77,22 @@ private val uiState: MutableStateFlow<DashboardState> = MutableStateFlow(Dashboa
 fun EventOverviewScreen(
     eventViewModel: EventViewModel,
     parkViewModel: ParkViewModel,
+    userViewModel: UserViewModel,
+    navigationActions: NavigationActions,
     paddingValues: PaddingValues = PaddingValues(0.dp)
 ) {
 
   val event = eventViewModel.currentEvent.collectAsState()
-  val park = parkViewModel.currentPark.collectAsState()
 
   Box(modifier = Modifier.fillMaxSize().padding(paddingValues).testTag("eventOverviewScreen")) {
     Column(modifier = Modifier.fillMaxHeight().testTag("eventContent")) {
-      event.value?.let { EventDetails(it) }
+      event.value?.let { EventDetails(it, userViewModel) }
 
       HorizontalDivider(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp))
 
-      event.value?.let { EventDashboard(it) }
+      event.value?.let { EventDashboard(it, userViewModel) }
 
-      park.value?.let { EventMap(it) }
+      event.value?.let { EventMap(it, parkViewModel, navigationActions) }
     }
   }
 }
@@ -99,7 +103,10 @@ fun EventOverviewScreen(
  * @param event The event to display.
  */
 @Composable
-fun EventDetails(event: Event) {
+fun EventDetails(event: Event, userViewModel: UserViewModel) {
+  userViewModel.getUserByUid(event.owner)
+  val user = userViewModel.user.collectAsState().value
+
   Column {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
       Text(
@@ -113,11 +120,8 @@ fun EventDetails(event: Event) {
         modifier = Modifier.padding(top = 16.dp).fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically) {
-          Icon(
-              Icons.Outlined.AccountCircle,
-              contentDescription = "User",
-              modifier = Modifier.padding(horizontal = 8.dp).testTag("ownerIcon"))
-          Text("Organized by: ${event.owner}", modifier = Modifier.testTag("eventOwner"))
+          DisplayUserPicture(user, 48.dp, "eventOwnerPicture")
+          Text("Organized by: ${user?.username}", modifier = Modifier.testTag("eventOwner"))
         }
 
     Row(
@@ -134,7 +138,7 @@ fun EventDetails(event: Event) {
               contentDescription = "participants",
               modifier = Modifier.padding(start = 64.dp).testTag("participantsIcon"))
           Text(
-              "Participants: ${event.participants}/${event.maxParticipants}",
+              "Participants: ${event.listParticipants.size}/${event.maxParticipants}",
               modifier = Modifier.padding(8.dp).testTag("participants"))
         }
   }
@@ -143,15 +147,18 @@ fun EventDetails(event: Event) {
 /**
  * Displays a map showing the location of the event.
  *
- * @param park The park where the event takes place.
+ * @param event The event to display.
+ * @param parkViewModel The park where the event takes place.
  */
 @Composable
-fun EventMap(park: Park) {
-  val parkLatLng = LatLng(park.location.lat, park.location.lon)
+fun EventMap(event: Event, parkViewModel: ParkViewModel, navigationActions: NavigationActions) {
+  parkViewModel.getParkByPid(event.parkId)
+  val park = parkViewModel.park.collectAsState().value
+  val parkLatLng = park?.location?.let { LatLng(it.lat, it.lon) }
 
   // Create a CameraPositionState to control the camera position
   val cameraPositionState = rememberCameraPositionState {
-    position = CameraPosition.Builder().target(parkLatLng).zoom(15f).build()
+    position = parkLatLng?.let { CameraPosition.Builder().target(it).zoom(15f).build() }!!
   }
 
   Row(
@@ -161,15 +168,23 @@ fun EventMap(park: Park) {
             Icons.Outlined.LocationOn,
             contentDescription = "location",
             modifier = Modifier.padding(horizontal = 8.dp).testTag("locationIcon"))
-        Text("at ${park.name}", modifier = Modifier.testTag("location"))
+        Text("at ${park?.name}", modifier = Modifier.testTag("location"))
       }
 
   GoogleMap(
       modifier = Modifier.testTag("googleMap").fillMaxSize(),
       cameraPositionState = cameraPositionState) {
         Marker(
-            contentDescription = "Marker",
-            state = MarkerState(position = LatLng(parkLatLng.latitude, parkLatLng.longitude)))
+            contentDescription = "Event location",
+            state = MarkerState(position = parkLatLng ?: LatLng(0.0, 0.0)),
+            onClick = {
+              park?.location?.let {
+                parkViewModel.getOrCreateParkByLocation(it)
+                parkViewModel.setParkLocation(it)
+                navigationActions.navigateTo(Screen.PARK_OVERVIEW)
+              }
+              true
+            })
       }
 }
 
@@ -179,7 +194,7 @@ fun EventMap(park: Park) {
  * @param event The event to display
  */
 @Composable
-fun EventDashboard(event: Event) {
+fun EventDashboard(event: Event, userViewModel: UserViewModel) {
   // Main container column with a fixed height and scrollable inner content
   Column(
       modifier =
@@ -190,28 +205,26 @@ fun EventDashboard(event: Event) {
 
         // Top bar
         DashBoardBar()
-
-        // Scrollable content area
-        Column(
-            modifier =
-                Modifier.fillMaxWidth()
-                    .padding(10.dp)
-                    .testTag("dashboardContent")
-                    .verticalScroll(rememberScrollState()) // Make the content scrollable
-            ) {
-              when (uiState.collectAsState().value) {
-                DashboardState.Details -> {
+        when (uiState.collectAsState().value) {
+          DashboardState.Details -> {
+            // Scrollable content area
+            Column(
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .padding(10.dp)
+                        .testTag("dashboardContent")
+                        .verticalScroll(rememberScrollState()) // Make the content scrollable
+                ) {
                   Text(
                       text = event.description,
                       modifier = Modifier.padding(10.dp).testTag("eventDescription"))
                 }
-                DashboardState.Participants -> {
-                  Text(
-                      text = "Show participants",
-                      modifier = Modifier.padding(10.dp).testTag("participantsList"))
-                }
-              }
-            }
+          }
+          DashboardState.Participants -> {
+            userViewModel.getUsersByUids(event.listParticipants)
+            ParticipantsList(userViewModel.userList.collectAsState().value)
+          }
+        }
       }
 }
 
@@ -252,8 +265,6 @@ fun JoinEventButton(
     scope: CoroutineScope = rememberCoroutineScope(),
     snackbarHostState: SnackbarHostState? = null,
 ) {
-  val context = LocalContext.current
-
   Button(
       onClick = {
         if (snackbarHostState != null) {
@@ -295,6 +306,36 @@ fun LeaveEventButton(
       colors = ColorPalette.BUTTON_COLOR.copy(containerColor = Color.Red)) {
         Text("Leave this event")
       }
+}
+
+/**
+ * This function displays the friends list.
+ *
+ * @param participants - The list of friends to display.
+ */
+@Composable
+fun ParticipantsList(participants: List<User?>) {
+  LazyColumn(modifier = Modifier.fillMaxSize().testTag("friendList")) {
+    items(participants) { friend ->
+      if (friend != null) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically) {
+              // Friend's avatar
+              DisplayUserPicture(friend, 48.dp, "participantProfilePicture")
+
+              // Friend's info (name, score, status)
+              Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = friend.username,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(8.dp).testTag("participantName"))
+              }
+            }
+      }
+    }
+  }
 }
 
 /** Represents the different states of the event dashboard */
