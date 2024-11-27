@@ -192,12 +192,15 @@ fun StreetWorkApp(
       }) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = startDestination) { // TODO: handle start destination based on signIn logic
+            startDestination =
+                startDestination) { // TODO: handle start destination based on signIn logic
               navigation(
                   startDestination = Screen.AUTH,
                   route = Route.AUTH,
               ) {
-                composable(Screen.AUTH) { SignInScreen(navigationActions, userViewModel) }
+                composable(Screen.AUTH) {
+                  SignInScreen(navigationActions, userViewModel, dataStoreManager)
+                }
               }
               navigation(startDestination = Screen.PROGRESSION, route = Route.PROGRESSION) {
                 composable(Screen.PROGRESSION) {
@@ -237,34 +240,34 @@ fun StreetWorkApp(
                 }
               }
 
-          navigation(
-              startDestination = Screen.PROFILE,
-              route = Route.PROFILE,
-          ) {
-            // profile screen + list of friend
-            composable(Screen.PROFILE) {
-              ProfileScreen(navigationActions, userViewModel, innerPadding)
-              val showSettingsDialog = remember { mutableStateOf(false) }
+              navigation(
+                  startDestination = Screen.PROFILE,
+                  route = Route.PROFILE,
+              ) {
+                // profile screen + list of friend
+                composable(Screen.PROFILE) {
+                  ProfileScreen(navigationActions, userViewModel, innerPadding)
+                  val showSettingsDialog = remember { mutableStateOf(false) }
 
-              screenParams?.topAppBarManager?.setActionCallback(
-                  TopAppBarManager.TopAppBarAction.SETTINGS) {
-                    showSettingsDialog.value = true
-                  }
+                  screenParams?.topAppBarManager?.setActionCallback(
+                      TopAppBarManager.TopAppBarAction.SETTINGS) {
+                        showSettingsDialog.value = true
+                      }
 
-              // The settings "in" the profile screen
-              // TODO : Implement the dialog Content composable
-              CustomDialog(
-                  showSettingsDialog,
-                  "Settings",
-                  Content = { Text("Settings to be implemented") },
-              )
+                  // The settings "in" the profile screen
+                  // TODO : Implement the dialog Content composable
+                  CustomDialog(
+                      showSettingsDialog,
+                      "Settings",
+                      Content = { Text("Settings to be implemented") },
+                  )
+                }
+                // screen for adding friend
+                composable(Screen.ADD_FRIEND) {
+                  AddFriendScreen(userViewModel, navigationActions, scope, host, innerPadding)
+                }
+              }
             }
-            // screen for adding friend
-            composable(Screen.ADD_FRIEND) {
-              AddFriendScreen(userViewModel, navigationActions, scope, host, innerPadding)
-            }
-          }
-        }
 
         if (e2eEventTesting) {
           LaunchedEffect(navTestInvokation) { navigationActions.apply(navTestInvokation) }
