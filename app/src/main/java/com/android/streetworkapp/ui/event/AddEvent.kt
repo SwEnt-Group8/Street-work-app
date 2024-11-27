@@ -1,43 +1,46 @@
 package com.android.streetworkapp.ui.event
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,16 +48,20 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventConstants
 import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.moderation.TextModerationViewModel
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.progression.ScoreIncrease
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.progress.updateAndDisplayPoints
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
@@ -63,6 +70,22 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+
+object AddEventParams {
+  const val TEXT_EVALUATION_DISPLAY_TIME = 5000L // in ns
+  const val EVENT_INIT_TIME_CREATION_OFFSET = 1 // in hours
+}
+
+object AddEventFormErrorMessages {
+  const val TITLE_EMPTY_ERROR_MESSAGE = "Event title cannot be empty."
+  const val DATE_BACK_IN_TIME_ERROR = "Date cannot be in the past."
+  const val TEXT_EVALUATION_OVER_THRESHOLDS_ERROR =
+      "Your event's title and/or description contains language that may not meet our guidelines. Please review and make sure it's respectful and appropriate before submitting again."
+  const val TEXT_EVALUATION_ERROR =
+      "It looks like something went wrong on our end. This could be due to a network issue or an unexpected error. Please try again in a moment."
+}
 
 /**
  * Display a view that is used to add a new Event to a given park.
@@ -76,21 +99,32 @@ fun AddEventScreen(
     parkViewModel: ParkViewModel,
     eventViewModel: EventViewModel,
     userViewModel: UserViewModel,
-    paddingValues: PaddingValues = PaddingValues(0.dp)
+    textModerationViewModel: TextModerationViewModel,
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
+    snackBarHostState: SnackbarHostState? = null,
+    paddingValues: PaddingValues = PaddingValues(0.dp),
 ) {
 
   val context = LocalContext.current
 
   val eid = eventViewModel.getNewEid()
-  val event =
-      Event(
-          eid,
-          "",
-          "",
-          1, // set to one by default, because the owner is also a participant
-          EventConstants.MIN_NUMBER_PARTICIPANTS,
-          Timestamp(0, 0),
-          "unknown")
+
+  val event by remember {
+    mutableStateOf<Event>(
+        Event(
+            eid,
+            "",
+            "",
+            1, // set to one by default, because the owner is also a participant
+            EventConstants.MIN_NUMBER_PARTICIPANTS,
+            Timestamp(
+                Calendar.getInstance()
+                    .apply {
+                      add(Calendar.HOUR_OF_DAY, AddEventParams.EVENT_INIT_TIME_CREATION_OFFSET)
+                    }
+                    .time), // this is the time that's used as default in time selection as well
+            "unknown"))
+  }
 
   val owner = userViewModel.currentUser.collectAsState().value?.uid
   if (!owner.isNullOrEmpty()) {
@@ -103,57 +137,93 @@ fun AddEventScreen(
     event.parkId = parkId
   }
 
+  val isTitleEmptyError = remember {
+    mutableStateOf(false)
+  } // we keep track of the mutable state since we need to reset it in the fields below (thus
+  // passing it as param)
+  val isTextEvaluationOverThresholdsError = remember { mutableStateOf(false) } // same here
+  val isDateBackInTimeError = remember { mutableStateOf(false) } // same here
+  var isTextEvaluationError = remember {
+    mutableStateOf(false)
+  } // for api error, deserialization error or network issues
+  var formErrorMessage = remember {
+    mutableStateOf("")
+  } // message to be displayed at bottom of form in case of form error
+
+  /*
+  If we add another error, just add it in the list for the text error to appear at bottom of form. The formErrorMessage is shown if any one of these is true
+   */
+  val errorStates =
+      listOf(
+          isTitleEmptyError.value,
+          isTextEvaluationOverThresholdsError.value,
+          isDateBackInTimeError.value,
+          isTextEvaluationError.value)
+
   Box(
       modifier = Modifier.padding(paddingValues).background(MaterialTheme.colorScheme.background),
   ) {
-    Box(modifier = Modifier.padding(top = 25.dp).fillMaxSize().testTag("addEventScreen")) {
+    Box(modifier = Modifier.fillMaxSize().testTag("addEventScreen").padding(vertical = 15.dp)) {
       Column(
-          modifier = Modifier.fillMaxWidth(),
+          modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
           verticalArrangement = Arrangement.spacedBy(18.dp),
           horizontalAlignment = Alignment.CenterHorizontally) {
-            Spacer(modifier = Modifier.size(24.dp))
-            EventTitleSelection(event)
-            EventDescriptionSelection(event)
-            TimeSelection(event)
+            EventTitleSelection(event, isTitleEmptyError, isTextEvaluationOverThresholdsError)
+            EventDescriptionSelection(event, isTextEvaluationOverThresholdsError)
+            TimeSelection(event, isDateBackInTimeError)
+
+            Text(
+                text = "* Required fields",
+                color = ColorPalette.SECONDARY_TEXT_COLOR,
+                fontWeight = FontWeight.Normal,
+                fontSize = 12.sp,
+                textAlign = TextAlign.Left,
+                modifier = Modifier.fillMaxWidth(0.9f))
             Text(
                 text = "How many participants do you want?",
                 fontSize = 18.sp,
             )
             ParticipantNumberSelection(event)
-          }
-      FloatingActionButton(
-          onClick = {
-            if (event.date.toDate() < Calendar.getInstance().time) {
-              Toast.makeText(context, "Date cannot be in the past", Toast.LENGTH_SHORT).show()
-            } else if (event.title.isEmpty()) {
-              Toast.makeText(context, "Please fill the title of the event", Toast.LENGTH_SHORT)
-                  .show()
-            } else {
-              eventViewModel.addEvent(event)
-              parkViewModel.addEventToPark(event.parkId, event.eid)
 
-              // Used for the gamification feature
-              userViewModel.increaseUserScore(event.owner, ScoreIncrease.CREATE_EVENT.scoreAdded)
-              // Note: temporary value to use the progression screen. Should be update once
-              // the gamification is completed
-              Toast.makeText(
-                      context,
-                      "+" + ScoreIncrease.CREATE_EVENT.scoreAdded + " Points",
-                      Toast.LENGTH_SHORT)
-                  .show()
-
-              navigationActions.goBack()
+            if (errorStates.any { it }) {
+              Text(
+                  modifier =
+                      Modifier.padding(vertical = 0.dp, horizontal = 25.dp).testTag("errorMessage"),
+                  textAlign = TextAlign.Center,
+                  color = MaterialTheme.colorScheme.error,
+                  text = formErrorMessage.value)
             }
-          },
-          modifier =
-              Modifier.align(Alignment.Center)
-                  .offset(0.dp, 100.dp)
-                  .padding(40.dp)
-                  .size(width = 150.dp, height = 40.dp)
-                  .testTag("addEventButton"),
-          containerColor = ColorPalette.INTERACTION_COLOR_DARK,
-          contentColor = ColorPalette.PRIMARY_TEXT_COLOR) {
-            Text("Add new event")
+            // for non users-related-input errors, we only show the message for a brief amount of
+            // time
+            LaunchedEffect(isTextEvaluationError.value) {
+              delay(AddEventParams.TEXT_EVALUATION_DISPLAY_TIME)
+              isTextEvaluationError.value = false
+            }
+
+            Button(
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = ColorPalette.INTERACTION_COLOR_DARK,
+                        contentColor = ColorPalette.PRIMARY_TEXT_COLOR),
+                modifier = Modifier.testTag("addEventButton"),
+                onClick = {
+                  onAddEventClickHandler(
+                      event,
+                      navigationActions,
+                      eventViewModel,
+                      userViewModel,
+                      parkViewModel,
+                      textModerationViewModel,
+                      snackBarHostState,
+                      coroutineScope,
+                      isDateBackInTimeError,
+                      isTitleEmptyError,
+                      isTextEvaluationOverThresholdsError,
+                      isTextEvaluationError,
+                      formErrorMessage)
+                }) {
+                  Text("Add new event")
+                }
           }
     }
   }
@@ -165,7 +235,11 @@ fun AddEventScreen(
  * @param event the event that will be updated
  */
 @Composable
-fun EventTitleSelection(event: Event) {
+fun EventTitleSelection(
+    event: Event,
+    isTitleEmptyError: MutableState<Boolean>,
+    isTextEvaluationError: MutableState<Boolean>
+) {
   var title by remember { mutableStateOf("") }
 
   OutlinedTextField(
@@ -173,10 +247,13 @@ fun EventTitleSelection(event: Event) {
       onValueChange = {
         title = it
         event.title = title
+        // reset the field errors
+        isTitleEmptyError.value = false
+        isTextEvaluationError.value = false
       },
-      label = { Text("What kind of event do you want to create?") },
-      modifier = Modifier.testTag("titleTag").fillMaxWidth(0.9f).height(64.dp),
-  )
+      label = { Text("What's your event's title?*") },
+      isError = isTitleEmptyError.value || isTextEvaluationError.value,
+      modifier = Modifier.testTag("titleTag").fillMaxWidth(0.9f))
 }
 
 /**
@@ -185,7 +262,7 @@ fun EventTitleSelection(event: Event) {
  * @param event the event that will be updated
  */
 @Composable
-fun EventDescriptionSelection(event: Event) {
+fun EventDescriptionSelection(event: Event, isTextEvaluationError: MutableState<Boolean>) {
   var description by remember { mutableStateOf("") }
 
   OutlinedTextField(
@@ -193,8 +270,10 @@ fun EventDescriptionSelection(event: Event) {
       onValueChange = {
         description = it
         event.description = description
+        isTextEvaluationError.value = false // reset the field error
       },
-      label = { Text("Describe your event:") },
+      label = { Text("Describe your event") },
+      isError = isTextEvaluationError.value,
       modifier = Modifier.testTag("descriptionTag").fillMaxWidth(0.9f).height(128.dp))
 }
 
@@ -242,32 +321,41 @@ fun ParticipantNumberSelection(event: Event) {
  */
 @ExperimentalMaterial3Api
 @Composable
-fun TimeSelection(event: Event) {
+fun TimeSelection(event: Event, isDateError: MutableState<Boolean>) {
   var showDatePicker by remember { mutableStateOf(false) }
   var showTimePicker by remember { mutableStateOf(false) }
 
-  val currentTime = Calendar.getInstance()
-  val datePickerState = rememberDatePickerState(currentTime.timeInMillis)
+  val initialTime = Calendar.getInstance().apply { timeInMillis = event.date.toDate().time }
+  val datePickerState = rememberDatePickerState(initialTime.timeInMillis)
   val timePickerState =
       rememberTimePickerState(
-          initialHour = currentTime.get(Calendar.HOUR_OF_DAY),
-          initialMinute = currentTime.get(Calendar.MINUTE),
+          initialHour = initialTime[Calendar.HOUR_OF_DAY],
+          initialMinute = initialTime[Calendar.MINUTE],
           is24Hour = false,
       )
 
   val currentTimeSelection =
-      datePickerState.selectedDateMillis?.plus(
-          (TimeUnit.HOURS.toMillis(timePickerState.hour.toLong()) +
-              TimeUnit.MINUTES.toMillis(timePickerState.minute.toLong())))
+      datePickerState.selectedDateMillis?.let { selectedDateMillis ->
+        val calendar =
+            Calendar.getInstance().apply {
+              timeInMillis = selectedDateMillis
+              set(Calendar.HOUR_OF_DAY, timePickerState.hour)
+              set(Calendar.MINUTE, timePickerState.minute)
+              set(Calendar.SECOND, 0)
+              set(Calendar.MILLISECOND, 0)
+            }
+        calendar.timeInMillis
+      }
 
   val selectedDate =
       datePickerState.selectedDateMillis?.let { convertMillisToDate(currentTimeSelection!!) } ?: ""
 
-  Box(modifier = Modifier.fillMaxWidth(0.9f)) {
+  Box(modifier = Modifier.fillMaxWidth(0.9f).padding(bottom = 0.dp)) {
     OutlinedTextField(
         value = selectedDate,
         onValueChange = {},
-        label = { Text("When do you want to train?") },
+        isError = isDateError.value,
+        label = { Text("When do you want your event to be?*") },
         readOnly = true,
         trailingIcon = {
           Row {
@@ -283,31 +371,36 @@ fun TimeSelection(event: Event) {
                 }
           }
         },
-        modifier = Modifier.fillMaxWidth().height(64.dp))
+        modifier = Modifier.fillMaxWidth())
 
     if (showDatePicker) {
       Popup(onDismissRequest = { showDatePicker = false }, alignment = Alignment.TopStart) {
         Box(
             modifier =
-                Modifier.fillMaxWidth()
+                Modifier.fillMaxSize()
                     .shadow(elevation = 4.dp)
                     .background(MaterialTheme.colorScheme.surface)
-                    .padding(16.dp)) {
-              DatePicker(state = datePickerState, showModeToggle = false)
-            }
+                    .padding(vertical = 16.dp)) {
+              Column(
+                  horizontalAlignment = Alignment.CenterHorizontally,
+                  verticalArrangement =
+                      Arrangement.spacedBy(0.dp) // Adds space between the DatePicker and the button
+                  ) {
+                    DatePicker(state = datePickerState, showModeToggle = false)
+                    Button(
+                        modifier = Modifier.testTag("validateDate"),
+                        colors = ButtonColors(Color.Blue, Color.White, Color.Blue, Color.White),
+                        onClick = {
+                          showDatePicker = false
 
-        Button(
-            modifier = Modifier.offset(x = 280.dp, y = 140.dp).testTag("validateDate"),
-            colors = ButtonColors(Color.Blue, Color.White, Color.Blue, Color.White),
-            onClick = {
-              showDatePicker = false
-
-              event.date =
-                  datePickerState.selectedDateMillis
-                      ?.let { TimeUnit.MILLISECONDS.toSeconds(currentTimeSelection!!) }
-                      ?.let { Timestamp(it, 0) }!!
-            }) {
-              Text("Validate")
+                          event.date =
+                              datePickerState.selectedDateMillis
+                                  ?.let { TimeUnit.MILLISECONDS.toSeconds(currentTimeSelection!!) }
+                                  ?.let { Timestamp(it, 0) }!!
+                        }) {
+                          Text("Validate")
+                        }
+                  }
             }
       }
     }
@@ -328,6 +421,7 @@ fun TimeSelection(event: Event) {
                   colors = ButtonColors(Color.Blue, Color.White, Color.Blue, Color.White),
                   onClick = {
                     showTimePicker = false
+                    isDateError.value = false // reset the field error
 
                     event.date =
                         datePickerState.selectedDateMillis
@@ -342,8 +436,108 @@ fun TimeSelection(event: Event) {
   }
 }
 
-private fun convertMillisToDate(millis: Long): String {
-  val formatter = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
-  formatter.timeZone = TimeZone.getTimeZone("UTC")
-  return formatter.format(Date(millis))
+private fun convertMillisToDate(millis: Long): String =
+    SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+        .apply { timeZone = TimeZone.getDefault() }
+        .format(Date(millis))
+
+private fun createEvent(
+    event: Event,
+    navigationActions: NavigationActions,
+    eventViewModel: EventViewModel,
+    userViewModel: UserViewModel,
+    parkViewModel: ParkViewModel,
+    coroutineScope: CoroutineScope,
+    host: SnackbarHostState?
+) {
+  eventViewModel.addEvent(event)
+  parkViewModel.addEventToPark(event.parkId, event.eid)
+
+  if (host != null) {
+    updateAndDisplayPoints(
+        userViewModel, navigationActions, ScoreIncrease.ADD_EVENT.points, coroutineScope, host)
+  }
+}
+
+/**
+ * Handles the click event for adding a new event. It performs the following validations:
+ * - Checks if the event date is in the past.
+ * - Ensures that the event title is not empty.
+ * - Analyzes the event title and description to ensure they meet the required thresholds.
+ *
+ * If any validation fails, appropriate error flags and messages are set. If all validations pass,
+ * the event creation process is triggered.
+ *
+ * @param event The event to be added, containing the user's input.
+ * @param navigationActions the instance that handles our app's navigation.
+ * @param eventViewModel The view model to handle event-related data.
+ * @param userViewModel The view model to handle user-related data.
+ * @param parkViewModel The view model to handle park-related data.
+ * @param textModerationViewModel The viewmodel to handle text moderation
+ * @param snackBarHostState the host state from MainActivity
+ * @param coroutineScope the coroutineScope to launch the snackBar
+ * @param isDateBackInTimeError A [MutableState] flag to indicate if the event date is in the past.
+ * @param isTitleEmptyError A [MutableState] flag to indicate if the event title is empty.
+ * @param isTextEvaluationOverThresholdsError A [MutableState] flag to indicate if the text
+ *   evaluation has exceeded the acceptable thresholds.
+ * @param isTextEvaluationError A [MutableState] to indicate if there was an error during text
+ *   evaluation (network issue, api not responding...).
+ * @param formErrorMessage A [MutableState] string holding the error message related to form
+ *   validation.
+ */
+fun onAddEventClickHandler(
+    event: Event,
+    navigationActions: NavigationActions,
+    eventViewModel: EventViewModel,
+    userViewModel: UserViewModel,
+    parkViewModel: ParkViewModel,
+    textModerationViewModel: TextModerationViewModel,
+    snackBarHostState: SnackbarHostState?,
+    coroutineScope: CoroutineScope,
+    isDateBackInTimeError: MutableState<Boolean>,
+    isTitleEmptyError: MutableState<Boolean>,
+    isTextEvaluationOverThresholdsError: MutableState<Boolean>,
+    isTextEvaluationError: MutableState<Boolean>,
+    formErrorMessage: MutableState<String>,
+) {
+  // Check if the event date is in the past
+  if (event.date.seconds < Timestamp(Calendar.getInstance(TimeZone.getDefault()).time).seconds) {
+    isDateBackInTimeError.value = true
+    formErrorMessage.value = AddEventFormErrorMessages.DATE_BACK_IN_TIME_ERROR
+  }
+  // Check if the event title is empty
+  else if (event.title.isEmpty()) {
+    isTitleEmptyError.value = true
+    formErrorMessage.value = AddEventFormErrorMessages.TITLE_EMPTY_ERROR_MESSAGE
+  } else {
+    // Format the text input for title and description
+    val formattedTextInput = "Title: ${event.title}. Description: ${event.description}"
+
+    // Analyze the text input for validation against moderation thresholds
+    textModerationViewModel.analyzeText(
+        formattedTextInput,
+        { isTextUnderThresholds ->
+          if (isTextUnderThresholds) {
+            // If text is under thresholds, proceed with event creation
+            createEvent(
+                event,
+                navigationActions,
+                eventViewModel,
+                userViewModel,
+                parkViewModel,
+                coroutineScope,
+                snackBarHostState)
+            navigationActions.goBack()
+          } else {
+            // If text exceeds thresholds, set the error flag and message
+            isTextEvaluationOverThresholdsError.value = true
+            formErrorMessage.value = AddEventFormErrorMessages.TEXT_EVALUATION_OVER_THRESHOLDS_ERROR
+          }
+        },
+        {
+          // If there's an error in text evaluation, set the error flag and message
+          isTextEvaluationError.value = true
+          formErrorMessage.value = AddEventFormErrorMessages.TEXT_EVALUATION_ERROR
+        })
+  }
 }

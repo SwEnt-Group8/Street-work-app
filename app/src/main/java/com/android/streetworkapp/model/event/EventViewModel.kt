@@ -40,7 +40,7 @@ open class EventViewModel(private val repository: EventRepository) : ViewModel()
    *
    * @return A new event ID.
    */
-  fun getNewEid(): String {
+  open fun getNewEid(): String {
     return repository.getNewEid()
   }
 
@@ -65,7 +65,7 @@ open class EventViewModel(private val repository: EventRepository) : ViewModel()
    *
    * @param event The event to add.
    */
-  fun addEvent(event: Event) = viewModelScope.launch { repository.addEvent(event) }
+  open fun addEvent(event: Event) = viewModelScope.launch { repository.addEvent(event) }
 
   /**
    * Add a participant to an event.

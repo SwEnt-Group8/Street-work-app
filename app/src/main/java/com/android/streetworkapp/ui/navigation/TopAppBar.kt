@@ -1,5 +1,6 @@
 package com.android.streetworkapp.ui.navigation
 
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -9,6 +10,8 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import com.android.streetworkapp.ui.theme.ColorPalette
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -19,6 +22,15 @@ fun TopAppBarWrapper(navigationActions: NavigationActions, topAppBarManager: Top
         modifier = Modifier.testTag("topAppBar"),
         title = {
           Text(modifier = Modifier.testTag("topAppBarTitle"), text = it.getTopAppBarTitle())
+        },
+        actions = {
+          topAppBarManager.getTopAppBarActions().forEach { action ->
+            IconButton(
+                onClick = { topAppBarManager.onActionClick(action) },
+                modifier = Modifier.testTag(action.testTag).size(32.dp)) {
+                  Icon(painterResource(action.icon), contentDescription = action.contentDescription)
+                }
+          }
         },
         colors =
             TopAppBarDefaults.topAppBarColors(

@@ -15,7 +15,7 @@ const val DATE_TIME_PATTERN = "dd/MM/yyyy HH:mm"
  */
 fun Timestamp.toFormattedString(): String {
   val sdf = SimpleDateFormat(DATE_TIME_PATTERN, Locale.getDefault())
-  sdf.timeZone = TimeZone.getTimeZone("UTC") // Set to UTC to avoid timezone issues
+  sdf.timeZone = TimeZone.getDefault()
   return sdf.format(this.toDate())
 }
 
@@ -26,7 +26,7 @@ fun Timestamp.toFormattedString(): String {
  */
 fun String.toTimestamp(): Timestamp {
   val sdf = SimpleDateFormat(DATE_TIME_PATTERN, Locale.getDefault())
-  sdf.timeZone = TimeZone.getTimeZone("UTC") // Set to UTC to avoid timezone issues
+  sdf.timeZone = TimeZone.getDefault()
   val date = sdf.parse(this)
   return Timestamp(date!!)
 }
@@ -38,7 +38,7 @@ fun String.toTimestamp(): Timestamp {
  */
 fun Long.toFormattedString(): String {
   val sdf = SimpleDateFormat(DATE_TIME_PATTERN, Locale.getDefault())
-  sdf.timeZone = TimeZone.getTimeZone("UTC")
+  sdf.timeZone = TimeZone.getDefault()
   return sdf.format(this)
 }
 
@@ -49,6 +49,6 @@ fun Long.toFormattedString(): String {
  */
 fun String.toEpochTimestamp(): Long {
   val sdf = SimpleDateFormat(DATE_TIME_PATTERN, Locale.getDefault())
-  sdf.timeZone = TimeZone.getTimeZone("UTC")
+  sdf.timeZone = TimeZone.getDefault()
   return sdf.parse(this)?.time ?: throw IllegalArgumentException("Invalid date format")
 }

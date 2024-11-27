@@ -82,6 +82,21 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
   }
 
   /**
+   * Retrieves a user from Firestore based on the provided uid and set it as the current user.
+   *
+   * @param uid The unique ID of the user to retrieve.
+   * @return The User object if found, or null if the user doesn't exist or an error occurs.
+   */
+  fun getUserByUidAndSetAsCurrentUser(uid: String) {
+    viewModelScope.launch {
+      val user = repository.getUserByUid(uid)
+      if (user != null) {
+        _currentUser.value = user
+      }
+    }
+  }
+
+  /**
    * Retrieves a user from Firestore based on the provided email.
    *
    * @param email The email of the user to retrieve.
@@ -158,7 +173,14 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @param points The number of points to add to the user's score.
    */
   fun increaseUserScore(uid: String, points: Int) =
-      viewModelScope.launch { repository.increaseUserScore(uid, points) }
+      viewModelScope.launch {
+        repository.increaseUserScore(uid, points)
+
+        _currentUser.value?.let {
+          val updatedUser = it.copy(score = it.score + points)
+          _currentUser.value = updatedUser
+        }
+      }
 
   /**
    * Adds a friend to both the user's and friend's friend lists in Firestore.

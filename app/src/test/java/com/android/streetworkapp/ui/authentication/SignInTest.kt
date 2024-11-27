@@ -16,14 +16,14 @@ class SignInTest {
   fun setUp() {
     firebaseUser = Mockito.mock(FirebaseUser::class.java)
     Mockito.`when`(firebaseUser.photoUrl).thenReturn(Uri.EMPTY)
+    Mockito.`when`(firebaseUser.displayName).thenReturn("Test User")
+    Mockito.`when`(firebaseUser.email).thenReturn("testuser@example.com")
   }
 
   @Test
   fun testCreateUserFromFirebaseUser() {
     // Mock the FirebaseUser properties
     Mockito.`when`(firebaseUser.uid).thenReturn("testUid")
-    Mockito.`when`(firebaseUser.displayName).thenReturn("Test User")
-    Mockito.`when`(firebaseUser.email).thenReturn("testuser@example.com")
 
     // Call the method to test
     val user = createNewUserFromFirebaseUser(firebaseUser)
@@ -41,8 +41,6 @@ class SignInTest {
   fun testCreateUserFromFirebaseUserWithEmptyUid() {
     // Mock the FirebaseUser properties with an empty UID
     Mockito.`when`(firebaseUser.uid).thenReturn("")
-    Mockito.`when`(firebaseUser.displayName).thenReturn("Test User")
-    Mockito.`when`(firebaseUser.email).thenReturn("testuser@example.com")
 
     // Verify that an exception is thrown
     assertThrows(IllegalArgumentException::class.java) {

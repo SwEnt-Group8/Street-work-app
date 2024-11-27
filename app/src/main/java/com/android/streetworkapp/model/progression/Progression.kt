@@ -47,28 +47,38 @@ enum class Ranks(val score: Int) {
 
 /** Represents a type of achievement based on points obtained */
 enum class MedalsAchievement(val achievement: Achievement) {
-  NONE(Achievement(R.drawable.place_holder_achievement_icon, "No medal", emptyList(), "No medal")),
+  // Note: Bronze is used as a place holder for missing medals in the Figma (will be updated once
+  // the figma is updated)
+  NONE(
+      Achievement(
+          R.drawable.bronze_achievement_icon,
+          "No Medal",
+          emptyList(),
+          "You have no medal yet, try to obtain more points!")),
   BRONZE(
       Achievement(
-          R.drawable.place_holder_achievement_icon,
-          "Bronze medal",
+          R.drawable.bronze_achievement_icon,
+          "Bronze Medal",
           listOf("Bronze"),
-          "First medal")),
+          "You obtained 100 Points!")),
   SILVER(
       Achievement(
-          R.drawable.place_holder_achievement_icon,
-          "Silver medal",
+          R.drawable.silver_achievement_icon,
+          "Silver Medal",
           listOf("Silver"),
-          "Second medal")),
+          "You obtained 1000 Points!")),
   GOLD(
       Achievement(
-          R.drawable.place_holder_achievement_icon, "Gold medal", listOf("Gold"), "Third medal")),
+          R.drawable.gold_achievement_icon,
+          "Gold Medal",
+          listOf("Gold"),
+          "You obtained 10000 Points!")),
   PLATINUM(
       Achievement(
-          R.drawable.place_holder_achievement_icon,
-          "Platinum medal",
+          R.drawable.bronze_achievement_icon,
+          "Platinum Medal",
           listOf("Platinum"),
-          "Last medal"))
+          "You obtained 100000 Points!"))
 }
 
 /** Represents a type of achievement linked to the performance of the user on different exercises */
@@ -78,8 +88,8 @@ enum class ExerciseAchievement(val achievement: Achievement) {
 }
 
 /** Represents the number of points obtained for different actions in the app */
-enum class ScoreIncrease(val scoreAdded: Int) {
-  CREATE_EVENT(10),
-  JOIN_EVENT(5),
-  ADD_FRIEND(10)
+enum class ScoreIncrease(val points: Int) {
+  ADD_EVENT(30),
+  JOIN_EVENT(60),
+  ADD_FRIEND(90)
 }
