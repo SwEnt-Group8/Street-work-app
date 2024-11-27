@@ -24,9 +24,20 @@ import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_DARK
 import kotlin.math.abs
 
 data class GraphData(val x: Float, val y: Float)
-
+/**
+ * Data class for configuring the properties of a graph.
+ *
+ * @property graphColor The color of the graph lines. Default is [INTERACTION_COLOR_DARK].
+ * @property axisColor The color of the X and Y axes. Default is [Color.Black].
+ * @property xUnitLabel The label for the X-axis. Default is "Time".
+ * @property yUnitLabel The label for the Y-axis. Default is "Reps".
+ * @property dataPoints A list of [GraphData] points (x, y) to plot on the graph. Default is an
+ *   empty list.
+ * @property strokeWidth The width of the graph lines in pixels. Default is 4f.
+ * @property showDashedLines Determines whether dashed gridlines are shown. Default is true.
+ */
 class GraphConfiguration(
-    var graphColor: Color = Color.Blue,
+    var graphColor: Color = INTERACTION_COLOR_DARK,
     var axisColor: Color = Color.Black,
     var xUnitLabel: String = "Time",
     var yUnitLabel: String = "Reps",
@@ -34,7 +45,13 @@ class GraphConfiguration(
     var strokeWidth: Float = 4f,
     var showDashedLines: Boolean = true
 )
-
+/**
+ * A composable function that renders an interactive graph based on the provided configuration.
+ *
+ * @param modifier The [Modifier] to apply layout attributes such as size and padding. Default is an
+ *   empty modifier.
+ * @param graphConfiguration The [GraphConfiguration] object containing the graph's settings
+ */
 @SuppressLint("DefaultLocale")
 @Composable
 fun Graph(modifier: Modifier = Modifier, graphConfiguration: GraphConfiguration) {
