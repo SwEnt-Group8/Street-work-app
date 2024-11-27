@@ -24,6 +24,8 @@ import androidx.navigation.navigation
 import com.android.streetworkapp.device.datastore.DataStoreManager
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
 import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.moderation.PerspectiveAPIRepository
+import com.android.streetworkapp.model.moderation.TextModerationViewModel
 import com.android.streetworkapp.model.park.NominatimParkNameRepository
 import com.android.streetworkapp.model.park.ParkRepositoryFirestore
 import com.android.streetworkapp.model.park.ParkViewModel
@@ -99,6 +101,10 @@ fun StreetWorkAppMain(
   val progressionRepository = ProgressionRepositoryFirestore(firestoreDB)
   val progressionViewModel = ProgressionViewModel(progressionRepository)
 
+  // Instantiate Text Moderation
+  val textModerationRepository = PerspectiveAPIRepository(OkHttpClient())
+  val textModerationViewModel = TextModerationViewModel(textModerationRepository)
+
   val isLoggedIn = runBlocking { dataStoreManager.isLoggedInFlow.first() }
   val startDestination = if (isLoggedIn) Route.MAP else Route.AUTH
 
@@ -110,6 +116,7 @@ fun StreetWorkAppMain(
       parkViewModel,
       eventViewModel,
       progressionViewModel,
+      textModerationViewModel,
       dataStoreManager,
       startDestination,
   )
@@ -125,6 +132,7 @@ fun StreetWorkApp(
     parkViewModel: ParkViewModel,
     eventViewModel: EventViewModel,
     progressionViewModel: ProgressionViewModel,
+    textModerationViewModel: TextModerationViewModel,
     dataStoreManager: DataStoreManager,
     startDestination: String,
     navTestInvokationOnEachRecompose: Boolean = false,
@@ -182,44 +190,52 @@ fun StreetWorkApp(
               }
             }
       }) { innerPadding ->
-        NavHost(navController = navController, startDestination = startDestination) {
-          navigation(
-              startDestination = Screen.AUTH,
-              route = Route.AUTH,
-          ) {
-            composable(Screen.AUTH) {
-              SignInScreen(navigationActions, userViewModel, dataStoreManager)
-            }
-          }
-          navigation(startDestination = Screen.PROGRESSION, route = Route.PROGRESSION) {
-            composable(Screen.PROGRESSION) {
-              ProgressScreen(navigationActions, userViewModel, progressionViewModel, innerPadding)
-            }
-          }
-          navigation(
-              startDestination = Screen.MAP,
-              route = Route.MAP,
-          ) {
-            composable(Screen.MAP) {
-              MapScreen(
-                  parkLocationViewModel,
-                  parkViewModel,
-                  navigationActions,
-                  mapCallbackOnMapLoaded,
-                  innerPadding)
-            }
-            composable(Screen.PARK_OVERVIEW) {
-              ParkOverviewScreen(
-                  parkViewModel, innerPadding, navigationActions, eventViewModel, userViewModel)
-            }
-            composable(Screen.ADD_EVENT) {
-              AddEventScreen(
-                  navigationActions, parkViewModel, eventViewModel, userViewModel, scope, host)
-            }
-            composable(Screen.EVENT_OVERVIEW) {
-              EventOverviewScreen(eventViewModel, parkViewModel, innerPadding)
-            }
-          }
+        NavHost(
+            navController = navController,
+            startDestination = startDestination) { // TODO: handle start destination based on signIn logic
+              navigation(
+                  startDestination = Screen.AUTH,
+                  route = Route.AUTH,
+              ) {
+                composable(Screen.AUTH) { SignInScreen(navigationActions, userViewModel) }
+              }
+              navigation(startDestination = Screen.PROGRESSION, route = Route.PROGRESSION) {
+                composable(Screen.PROGRESSION) {
+                  ProgressScreen(
+                      navigationActions, userViewModel, progressionViewModel, innerPadding)
+                }
+              }
+              navigation(
+                  startDestination = Screen.MAP,
+                  route = Route.MAP,
+              ) {
+                composable(Screen.MAP) {
+                  MapScreen(
+                      parkLocationViewModel,
+                      parkViewModel,
+                      navigationActions,
+                      mapCallbackOnMapLoaded,
+                      innerPadding)
+                }
+                composable(Screen.PARK_OVERVIEW) {
+                  ParkOverviewScreen(
+                      parkViewModel, innerPadding, navigationActions, eventViewModel, userViewModel)
+                }
+                composable(Screen.ADD_EVENT) {
+                  AddEventScreen(
+                      navigationActions,
+                      parkViewModel,
+                      eventViewModel,
+                      userViewModel,
+                      textModerationViewModel,
+                      scope,
+                      host,
+                      innerPadding)
+                }
+                composable(Screen.EVENT_OVERVIEW) {
+                  EventOverviewScreen(eventViewModel, parkViewModel, innerPadding)
+                }
+              }
 
           navigation(
               startDestination = Screen.PROFILE,
