@@ -4,9 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -35,14 +33,17 @@ fun TrainSoloScreen(
   var isStopped by remember { mutableStateOf(false) }
 
   Column(
-      modifier = Modifier.fillMaxSize().padding(paddingValues).testTag("TrainSoloScreen"),
+      modifier =
+          Modifier.fillMaxSize()
+              .padding(paddingValues)
+              .padding(16.dp) // Apply padding once here for the entire column
+              .testTag("TrainSoloScreen"),
       horizontalAlignment = Alignment.CenterHorizontally,
-      verticalArrangement = Arrangement.Center) {
+      verticalArrangement = Arrangement.spacedBy(16.dp) // Space between items
+      ) {
         Text("Train Solo", modifier = Modifier.testTag("TrainSoloTitle"))
         Text("Activity: $activity", modifier = Modifier.testTag("ActivityText"))
         Text("Time Dependent: $isTimeDependent", modifier = Modifier.testTag("TimeDependentText"))
-
-        Spacer(modifier = Modifier.height(16.dp))
 
         if (isTimeDependent) {
           // Timer
@@ -51,8 +52,6 @@ fun TrainSoloScreen(
           } else {
             Text("Time's Up!", modifier = Modifier.testTag("TimeUpText"))
           }
-
-          Spacer(modifier = Modifier.height(16.dp))
 
           Button(
               onClick = { isStopped = true },
@@ -69,23 +68,23 @@ fun TrainSoloScreen(
               style = androidx.compose.material3.MaterialTheme.typography.displayLarge,
               modifier = Modifier.testTag("CounterText"))
 
-          Spacer(modifier = Modifier.height(16.dp))
+          Row(
+              horizontalArrangement = Arrangement.spacedBy(16.dp),
+              verticalAlignment = Alignment.CenterVertically) {
+                Button(
+                    onClick = { if (count > 0) count-- },
+                    colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
+                    modifier = Modifier.testTag("DecrementButton")) {
+                      Text("-1", color = PRINCIPLE_BACKGROUND_COLOR)
+                    }
 
-          Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            Button(
-                onClick = { if (count > 0) count-- },
-                colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
-                modifier = Modifier.testTag("DecrementButton")) {
-                  Text("-1", color = PRINCIPLE_BACKGROUND_COLOR)
-                }
-
-            Button(
-                onClick = { count++ },
-                colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
-                modifier = Modifier.testTag("IncrementButton")) {
-                  Text("+1", color = PRINCIPLE_BACKGROUND_COLOR)
-                }
-          }
+                Button(
+                    onClick = { count++ },
+                    colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
+                    modifier = Modifier.testTag("IncrementButton")) {
+                      Text("+1", color = PRINCIPLE_BACKGROUND_COLOR)
+                    }
+              }
         }
       }
 }
