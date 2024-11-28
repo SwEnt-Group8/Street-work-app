@@ -39,7 +39,7 @@ fun CustomDialog(
 
   if (showDialog.value) {
     AlertDialog(
-        modifier = Modifier.testTag(tag + "Dialog"),
+        modifier = Modifier.testTag("${tag}Dialog"),
         onDismissRequest = {
           onDismiss()
           showDialog.value = false
@@ -52,7 +52,7 @@ fun CustomDialog(
                   Toast.makeText(context, "Submitted", Toast.LENGTH_SHORT).show()
                   showDialog.value = false
                 },
-                modifier = Modifier.testTag(tag + "DialogSubmitButton")) {
+                modifier = Modifier.testTag("${tag}DialogSubmitButton")) {
                   Text("Submit", color = ColorPalette.SECONDARY_TEXT_COLOR)
                 }
           }
@@ -64,7 +64,7 @@ fun CustomDialog(
                   onDismiss()
                   showDialog.value = false
                 },
-                modifier = Modifier.testTag(tag + "DialogCancelButton")) {
+                modifier = Modifier.testTag("${tag}DialogCancelButton")) {
                   Text("Cancel", color = Color.Red)
                 }
           }
@@ -73,7 +73,7 @@ fun CustomDialog(
           Text(
               title,
               color = ColorPalette.PRIMARY_TEXT_COLOR,
-              modifier = Modifier.testTag(tag + "DialogTitle"))
+              modifier = Modifier.testTag("${tag}DialogTitle"))
         },
         text = { Content() },
         properties =

@@ -29,18 +29,18 @@ class InfoDialogsTest {
     // Verifying that everything is displayed correctly :
     composeTestRule.onNodeWithTag(dialogTag + "Dialog").assertIsDisplayed()
     composeTestRule
-        .onNodeWithTag(dialogTag + "DialogTitle")
+        .onNodeWithTag("${dialogTag}DialogTitle")
         .assertIsDisplayed()
         .assertTextEquals(title)
     composeTestRule
-        .onNodeWithTag(dialogTag + "DialogContent")
+        .onNodeWithTag("${dialogTag}DialogContent")
         .assertIsDisplayed()
         .assertTextEquals(content)
 
     // Changing the state will hide the dialog :
     show.value = false
     composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag(dialogTag + "Dialog").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("${dialogTag}Dialog").assertIsNotDisplayed()
   }
 
   @Test
@@ -49,7 +49,7 @@ class InfoDialogsTest {
 
     composeTestRule.setContent { dialog.DisplayInfoContent(dialog.content) }
     composeTestRule
-        .onNodeWithTag(dialog.tag + "InfoDialogContent")
+        .onNodeWithTag("${dialog.tag}InfoDialogContent")
         .assertIsDisplayed()
         .assertTextEquals(dialog.content)
   }
@@ -100,7 +100,7 @@ class InfoDialogsTest {
       Log.d("InfoDialogsTest", "Fetching dialog : : $dialog")
       if (dialog == null) dialog = infoDialogManager.defaultInfoDialog() // if not supported
 
-      val screenTag = dialog.tag + "Info"
+      val screenTag = "${dialog.tag}Info"
       val screenTestTag = screenTag + "Dialog"
 
       Log.d(
@@ -114,9 +114,9 @@ class InfoDialogsTest {
           .assertTextEquals(dialog.title)
       Log.d(
           "InfoDialogsTest",
-          "Verifying content with testTag : ${screenTestTag + "Content"} == ${dialog.tag + "InfoDialogContent"}")
+          "Verifying content with testTag : ${screenTestTag}Content == ${dialog.tag}InfoDialogContent")
       composeTestRule
-          .onNodeWithTag(screenTestTag + "Content") // tag + "InfoDialogContent"
+          .onNodeWithTag("${screenTestTag}Content") // tag + "InfoDialogContent"
           .assertIsDisplayed()
           .assertTextEquals(dialog.content)
     }

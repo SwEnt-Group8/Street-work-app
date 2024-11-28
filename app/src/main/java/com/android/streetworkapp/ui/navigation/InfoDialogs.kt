@@ -24,6 +24,7 @@ class InfoDialogManager(
 ) {
   private val screens = getScreens()
 
+  // TODO: Replace the strings by R.strings and solve its context issue.
   // Mapping Screen to InfoDialog
   private val infoDialogs: MutableMap<String, InfoDialog> =
       mutableMapOf(
@@ -124,7 +125,7 @@ class InfoDialog(val tag: String, val title: String, val content: String) {
     CustomDialog(
         showDialog,
         dialogType = DialogType.INFO,
-        tag + "Info",
+        "${tag}Info",
         title,
         Content = { DisplayInfoContent(content) })
   }
@@ -132,6 +133,6 @@ class InfoDialog(val tag: String, val title: String, val content: String) {
   /** Function wrapper to allow more customization later on */
   @Composable
   fun DisplayInfoContent(content: String) {
-    Text(content, modifier = Modifier.testTag(tag + "InfoDialogContent"))
+    Text(content, modifier = Modifier.testTag("${tag}InfoDialogContent"))
   }
 }
