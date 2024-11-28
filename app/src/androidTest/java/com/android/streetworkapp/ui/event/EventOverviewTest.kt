@@ -53,9 +53,6 @@ class EventOverviewTest {
   private lateinit var userViewModel: UserViewModel
   private lateinit var screenParams: ScreenParams
 
-  // cannot be tested right now
-  // private lateinit var fullevent: Event
-
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
@@ -69,7 +66,6 @@ class EventOverviewTest {
     screenParams = LIST_OF_SCREENS.last()
 
     navigationActions = mock(NavigationActions::class.java)
-    // fullevent = event.copy(participants = 10, maxParticipants = 10)
 
     // Park with events
     park =

@@ -52,6 +52,7 @@ import com.android.streetworkapp.ui.profile.DisplayUserPicture
 import com.android.streetworkapp.ui.progress.updateAndDisplayPoints
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.utils.toFormattedString
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -177,6 +178,7 @@ fun EventMap(event: Event, parkViewModel: ParkViewModel, navigationActions: Navi
         Marker(
             contentDescription = "Event location",
             state = MarkerState(position = parkLatLng ?: LatLng(0.0, 0.0)),
+            icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE),
             onClick = {
               park?.location?.let {
                 parkViewModel.getOrCreateParkByLocation(it)
