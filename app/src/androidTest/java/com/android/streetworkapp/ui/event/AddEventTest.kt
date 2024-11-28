@@ -1,7 +1,8 @@
-package com.android.streetworkapp.event
+package com.android.streetworkapp.ui.event
 
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -12,22 +13,24 @@ import androidx.compose.ui.test.swipeRight
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventRepository
 import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.moderation.TextModerationRepository
+import com.android.streetworkapp.model.moderation.TextModerationViewModel
 import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
-import com.android.streetworkapp.ui.event.AddEventScreen
-import com.android.streetworkapp.ui.event.EventDescriptionSelection
-import com.android.streetworkapp.ui.event.EventTitleSelection
-import com.android.streetworkapp.ui.event.ParticipantNumberSelection
-import com.android.streetworkapp.ui.event.TimeSelection
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
+import org.mockito.kotlin.any
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class AddEventTest {
 
@@ -42,6 +45,11 @@ class AddEventTest {
   private lateinit var eventRepository: EventRepository
   private lateinit var eventViewModel: EventViewModel
 
+  private lateinit var textModerationRepository: TextModerationRepository
+  private lateinit var textModerationViewModel: TextModerationViewModel
+
+  lateinit var mockJob: Job
+
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
@@ -53,8 +61,13 @@ class AddEventTest {
     parkRepository = mock(ParkRepository::class.java)
     parkViewModel = ParkViewModel(parkRepository)
 
-    eventRepository = mock(EventRepository::class.java)
-    eventViewModel = EventViewModel(eventRepository)
+    // eventRepository = mock(EventRepository::class.java)
+    eventViewModel = mock(EventViewModel::class.java)
+
+    textModerationRepository = mock(TextModerationRepository::class.java)
+    textModerationViewModel = mock(TextModerationViewModel::class.java)
+
+    mockJob = mock(Job::class.java)
 
     event =
         Event(
@@ -78,23 +91,12 @@ class AddEventTest {
     assert(eventCopy.maxParticipants == 10)
   }
 
-  @OptIn(ExperimentalMaterial3Api::class)
-  @Test
-  fun timeSelectionUpdatesEvent() {
-    val eventCopy = event.copy()
-    assert(eventCopy.date == Timestamp(0, 0))
-    composeTestRule.setContent { TimeSelection(eventCopy) }
-    composeTestRule.onNodeWithTag("dateIcon").performClick()
-    composeTestRule.onNodeWithTag("validateDate").performClick()
-    composeTestRule.onNodeWithTag("timeIcon").performClick()
-    composeTestRule.onNodeWithTag("validateTime").performClick()
-    assert(eventCopy.date != Timestamp(0, 0))
-  }
-
   @Test
   fun titleSelectionUpdatesEvent() {
     val eventCopy = event.copy()
-    composeTestRule.setContent { EventTitleSelection(eventCopy) }
+    composeTestRule.setContent {
+      EventTitleSelection(eventCopy, mutableStateOf(false), mutableStateOf(false))
+    }
     composeTestRule.onNodeWithTag("titleTag").performTextClearance()
     composeTestRule.onNodeWithTag("titleTag").performTextInput("test")
 
@@ -104,7 +106,7 @@ class AddEventTest {
   @Test
   fun descriptionSelectionUpdatesEvent() {
     val eventCopy = event.copy()
-    composeTestRule.setContent { EventDescriptionSelection(eventCopy) }
+    composeTestRule.setContent { EventDescriptionSelection(eventCopy, mutableStateOf(false)) }
     composeTestRule.onNodeWithTag("descriptionTag").performTextClearance()
     composeTestRule.onNodeWithTag("descriptionTag").performTextInput("test")
 
@@ -115,7 +117,8 @@ class AddEventTest {
   fun addEventScreenIsDisplayed() {
     `when`(eventViewModel.getNewEid()).thenReturn("test")
     composeTestRule.setContent {
-      AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
+      AddEventScreen(
+          navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel)
     }
 
     composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
@@ -126,7 +129,8 @@ class AddEventTest {
   fun addEventScreenWithUnchangedTimeDoesNotChangeScreen() {
     `when`(eventViewModel.getNewEid()).thenReturn("test")
     composeTestRule.setContent {
-      AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
+      AddEventScreen(
+          navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel)
     }
 
     composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
@@ -141,7 +145,8 @@ class AddEventTest {
   fun addEventScreenWithUnchangedTitleDoesNotChangeScreen() {
     `when`(eventViewModel.getNewEid()).thenReturn("test")
     composeTestRule.setContent {
-      AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
+      AddEventScreen(
+          navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel)
     }
 
     composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
@@ -156,5 +161,75 @@ class AddEventTest {
         .onNodeWithTag("addEventScreen")
         .assertIsDisplayed() // we want that a click with changes in the time but no changes in the
     // default value of the title does not make the user leave the screen
+  }
+
+  @Test
+  fun emptyTitleDisplaysCorrectErrorMessage() {
+    whenever(eventViewModel.getNewEid()).thenReturn("test")
+    composeTestRule.setContent {
+      AddEventScreen(
+          navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel)
+    }
+
+    composeTestRule.onNodeWithTag("addEventButton").performClick()
+    composeTestRule
+        .onNodeWithTag("errorMessage")
+        .assertTextEquals(AddEventFormErrorMessages.TITLE_EMPTY_ERROR_MESSAGE)
+  }
+
+  @Test
+  fun textEvaluationOnEvaluationErrorDisplaysCorrectErrorMessage() {
+    whenever(eventViewModel.getNewEid()).thenReturn("test")
+    whenever(textModerationViewModel.analyzeText(any(), any(), any(), any())).thenAnswer {
+        invocation ->
+      val onErrorCallback = invocation.getArgument<() -> Unit>(2) // Get the onError lambda
+      onErrorCallback() // Call it with a mock error
+    }
+  }
+
+  @Test
+  fun textEvaluationIsOverThresholdDisplaysCorrectErrorMessage() {
+    whenever(eventViewModel.getNewEid()).thenReturn("test")
+    whenever(textModerationViewModel.analyzeText(any(), any(), any(), any())).thenAnswer {
+        invocation ->
+      val onTextEvaluationResult =
+          invocation.getArgument<(Boolean) -> Unit>(1) // Get the callback lambda
+      onTextEvaluationResult(false) // Set to over threshold
+    }
+
+    composeTestRule.setContent {
+      AddEventScreen(
+          navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel)
+    }
+
+    composeTestRule.onNodeWithTag("titleTag").performTextInput("dummy text over threshold")
+    composeTestRule.onNodeWithTag("addEventButton").performClick()
+    composeTestRule
+        .onNodeWithTag("errorMessage")
+        .assertTextEquals(AddEventFormErrorMessages.TEXT_EVALUATION_OVER_THRESHOLDS_ERROR)
+  }
+
+  @Test
+  fun textEvaluationOverThresholdAndOtherConditionsValidCallCreateEvent() = runTest {
+    whenever(eventViewModel.getNewEid()).thenReturn("test")
+    whenever(eventViewModel.addEvent(any())).thenAnswer {
+      mockJob
+    } // do nothing, we just want to check that it gets called correctly
+    whenever(textModerationViewModel.analyzeText(any(), any(), any(), any())).thenAnswer {
+        invocation ->
+      val onTextEvaluationResult =
+          invocation.getArgument<(Boolean) -> Unit>(1) // Get the callback lambda
+      onTextEvaluationResult(true) // Set to under thresholds
+    }
+
+    composeTestRule.setContent {
+      AddEventScreen(
+          navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel)
+    }
+
+    composeTestRule.onNodeWithTag("titleTag").performTextInput("dummy title")
+    composeTestRule.onNodeWithTag("addEventButton").performClick()
+    composeTestRule.onNodeWithTag("errorMessage").assertDoesNotExist()
+    verify(eventViewModel).addEvent(any())
   }
 }

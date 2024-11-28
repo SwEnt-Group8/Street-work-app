@@ -24,6 +24,8 @@ import androidx.navigation.navigation
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
 import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.moderation.PerspectiveAPIRepository
+import com.android.streetworkapp.model.moderation.TextModerationViewModel
 import com.android.streetworkapp.model.park.NominatimParkNameRepository
 import com.android.streetworkapp.model.park.ParkRepositoryFirestore
 import com.android.streetworkapp.model.park.ParkViewModel
@@ -96,6 +98,10 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
   val progressionRepository = ProgressionRepositoryFirestore(firestoreDB)
   val progressionViewModel = ProgressionViewModel(progressionRepository)
 
+  // Instantiate Text Moderation
+  val textModerationRepository = PerspectiveAPIRepository(OkHttpClient())
+  val textModerationViewModel = TextModerationViewModel(textModerationRepository)
+
   StreetWorkApp(
       parkLocationViewModel,
       testInvokation,
@@ -103,7 +109,8 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
       userViewModel,
       parkViewModel,
       eventViewModel,
-      progressionViewModel)
+      progressionViewModel,
+      textModerationViewModel)
 }
 
 @SuppressLint("UnrememberedMutableState")
@@ -116,6 +123,7 @@ fun StreetWorkApp(
     parkViewModel: ParkViewModel,
     eventViewModel: EventViewModel,
     progressionViewModel: ProgressionViewModel,
+    textModerationViewModel: TextModerationViewModel,
     navTestInvokationOnEachRecompose: Boolean = false,
     e2eEventTesting: Boolean = false
 ) {
@@ -237,11 +245,19 @@ fun StreetWorkApp(
                 composable(Screen.ADD_EVENT) {
                   infoManager.Display()
                   AddEventScreen(
-                      navigationActions, parkViewModel, eventViewModel, userViewModel, scope, host)
+                      navigationActions,
+                      parkViewModel,
+                      eventViewModel,
+                      userViewModel,
+                      textModerationViewModel,
+                      scope,
+                      host,
+                      innerPadding)
                 }
                 composable(Screen.EVENT_OVERVIEW) {
-                  infoManager.Display()
-                  EventOverviewScreen(eventViewModel, parkViewModel, innerPadding)
+                    infoManager.Display()
+                  EventOverviewScreen(
+                      eventViewModel, parkViewModel, userViewModel, navigationActions, innerPadding)
                 }
               }
 
