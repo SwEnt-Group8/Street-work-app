@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_DARK
@@ -72,6 +73,7 @@ fun CircularTimer(totalTime: Float = 30f, onTimeUp: () -> Unit = {}) {
     // Display remaining time or message when time is up
     Text(
         text = if (!isTimeUp) String.format("%.0fs", timeRemaining) else "Time's Up!",
+        modifier = Modifier.testTag("TimeRemainingText"),
         color = PRIMARY_TEXT_COLOR,
         fontSize = 24.sp)
   }
