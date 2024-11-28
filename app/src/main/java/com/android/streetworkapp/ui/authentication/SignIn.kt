@@ -84,7 +84,7 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
     user?.let {
       userViewModel.setCurrentUser(it)
       Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
-      navigationActions.navigateTo(Screen.TUTO_EVENT)
+      navigationActions.navigateTo(Screen.MAP)
     }
   }
 
