@@ -44,6 +44,17 @@ class InfoDialogsTest {
   }
 
   @Test
+  fun isDisplayInfoContentCorrect() {
+    val dialog = InfoDialog("Tag", "Title", "Content")
+
+    composeTestRule.setContent { dialog.DisplayInfoContent(dialog.content) }
+    composeTestRule
+        .onNodeWithTag(dialog.tag + "InfoDialogContent")
+        .assertIsDisplayed()
+        .assertTextEquals(dialog.content)
+  }
+
+  @Test
   fun isManagerWorkingCorrectly() {
     val topAppBarManager =
         TopAppBarManager("any title", actions = listOf(TopAppBarManager.TopAppBarAction.INFO))

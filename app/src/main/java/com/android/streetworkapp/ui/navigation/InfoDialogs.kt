@@ -131,7 +131,7 @@ class InfoDialog(val tag: String, val title: String, val content: String) {
 
   /** Function wrapper to allow more customization later on */
   @Composable
-  private fun DisplayInfoContent(content: String) {
+  fun DisplayInfoContent(content: String) {
     Text(content, modifier = Modifier.testTag(tag + "InfoDialogContent"))
   }
 }
