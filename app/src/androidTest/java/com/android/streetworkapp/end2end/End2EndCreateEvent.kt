@@ -39,6 +39,7 @@ import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
+import io.mockk.mockk
 import okhttp3.OkHttpClient
 import org.junit.Before
 import org.junit.Ignore
@@ -135,7 +136,7 @@ class End2EndCreateEvent {
           eventViewModel,
           progressionViewModel,
           mock(TextModerationViewModel::class.java),
-          mock(DataStoreManager::class.java),
+          mockk<DataStoreManager>(),
           Route.MAP)
     }
   }

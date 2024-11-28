@@ -26,6 +26,7 @@ import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.Route
+import io.mockk.mockk
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -117,7 +118,7 @@ class End2EndGeneral {
           EventViewModel(mock(EventRepository::class.java)),
           progressionViewModel,
           mock(TextModerationViewModel::class.java),
-          mock(DataStoreManager::class.java),
+          mockk<DataStoreManager>(),
           Route.AUTH)
     }
 
