@@ -41,8 +41,8 @@ fun AnimatedCounter(
                   slideOutVertically { it } + fadeOut())
             }
           },
-          label = "") { char ->
-            Text(text = char.toString(), style = style, softWrap = false)
+          label = "") { c ->
+            Text(text = c.toString(), style = style, softWrap = false)
           }
     }
   }
