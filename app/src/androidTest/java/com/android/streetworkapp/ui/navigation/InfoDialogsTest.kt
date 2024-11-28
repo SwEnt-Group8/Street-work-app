@@ -70,7 +70,7 @@ class InfoDialogsTest {
     assert(!showDialog.value) // should be false so far
     topAppBarManager.onActionClick(TopAppBarManager.TopAppBarAction.INFO)
 
-    val infoDialogs = infoDialogManager.getInfoDialogs()
+    val infoDialogs = infoDialogManager.infoDialogs
 
     // Verifying correct behavior when screen changing :
 

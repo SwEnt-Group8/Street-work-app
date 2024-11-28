@@ -26,7 +26,7 @@ class InfoDialogManager(
 
   // TODO: Replace the strings by R.strings and solve its context issue.
   // Mapping Screen to InfoDialog
-  private val infoDialogs: MutableMap<String, InfoDialog> =
+  private val _infoDialogs: MutableMap<String, InfoDialog> =
       mutableMapOf(
           "default" to defaultInfoDialog(),
           screens.MAP to
@@ -69,6 +69,9 @@ class InfoDialogManager(
           // Add more if needed
           )
 
+  val infoDialogs: MutableMap<String, InfoDialog>
+    get() = _infoDialogs
+
   /** Returns the default InfoDialog (for screens that are not supported). */
   fun defaultInfoDialog(): InfoDialog {
     return InfoDialog(
@@ -97,7 +100,7 @@ class InfoDialogManager(
   @Composable
   fun Display() {
     Log.d("InfoDialog", "Displaying info dialog ${showDialog.value} for screen ${screenName.value}")
-    val func = infoDialogs[screenName.value]
+    val func = _infoDialogs[screenName.value]
     if (func != null) {
       Log.d("InfoDialog", "Displaying info dialog : ${func.title}")
       func.DisplayInfoDialog(showDialog)
@@ -105,11 +108,6 @@ class InfoDialogManager(
       Log.d("InfoDialog", "Displaying default info dialog : ${defaultInfoDialog().title}")
       defaultInfoDialog().DisplayInfoDialog(showDialog)
     }
-  }
-
-  /** Returns the InfoDialogs mapping */
-  fun getInfoDialogs(): MutableMap<String, InfoDialog> {
-    return infoDialogs
   }
 }
 
