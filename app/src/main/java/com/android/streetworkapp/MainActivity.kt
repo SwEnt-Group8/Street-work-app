@@ -59,7 +59,6 @@ import com.android.streetworkapp.ui.progress.ProgressScreen
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.ui.utils.CustomDialog
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
@@ -112,12 +111,12 @@ fun StreetWorkAppMain(
   val textModerationViewModel = TextModerationViewModel(textModerationRepository)
 
   // Check if the user is logged in and set the start destination accordingly
-  val isLoggedIn = runBlocking { dataStoreManager.isLoggedInFlow.first() }
-  val startDestination = if (isLoggedIn) Route.MAP else Route.AUTH
+  val isLoggedIn = runBlocking { dataStoreManager.isLoggedInFlow.firstOrNull() }
+  val startDestination = if (isLoggedIn ?: false) Route.MAP else Route.AUTH
 
   // If the user is logged in, fetch the user from the database or the datastore depending on the
   // internet connection
-  if (isLoggedIn) {
+  if (isLoggedIn ?: false) {
     val uid = runBlocking { dataStoreManager.savedUidFlow.firstOrNull() }
     if (internetAvailable) {
       Log.d("MainActivity", "Internet is available, fetching user from database")
