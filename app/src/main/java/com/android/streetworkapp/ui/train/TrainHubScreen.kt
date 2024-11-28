@@ -42,27 +42,32 @@ fun TrainHubScreen(
     val screenWidth = maxWidth
     val screenHeight = maxHeight
 
-    val buttonHeight = if (screenHeight < 600.dp) 70.dp else 100.dp
-    val buttonWidth = if (screenWidth < 360.dp) 80.dp else 100.dp
-    val gridSpacing = if (screenWidth < 360.dp) 4.dp else 8.dp
+    val buttonSize =
+        ButtonSize(
+            width = if (screenWidth < 360.dp) 80.dp else 100.dp,
+            height = if (screenHeight < 600.dp) 70.dp else 100.dp,
+            spacing = if (screenWidth < 360.dp) 4.dp else 8.dp)
 
     Column(
         modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp),
         verticalArrangement = Arrangement.SpaceBetween) {
           Column(modifier = Modifier.fillMaxWidth()) {
-            // Section: Choose Your Role
-            Text(
-                text = "Choose your training type",
-                fontSize = if (screenWidth < 360.dp) 14.sp else 16.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 16.dp).testTag("RoleSelectionTitle"))
-
-            RoleSelectionRow(
-                roles = listOf("Solo", "Coach", "Challenge"),
-                buttonWidth = buttonWidth,
-                buttonHeight = buttonHeight,
-                gridSpacing = gridSpacing,
-                onRoleSelected = { role -> selectedType = role })
+            // Role selection
+            SectionTitle(title = "Choose your training type", testTag = "RoleSelectionTitle")
+            SelectionGrid(
+                items = listOf("Solo", "Coach", "Challenge"),
+                buttonSize = buttonSize,
+                onItemSelected = { selectedType = it },
+                getItemImageRes = { role ->
+                  when (role) {
+                    "Solo" -> R.drawable.training_solo
+                    "Coach" -> R.drawable.training_coach
+                    "Challenge" -> R.drawable.training_challenge
+                    else -> R.drawable.pushup
+                  }
+                },
+                isSelected = { it == selectedType },
+                testTagPrefix = "Role_")
 
             Spacer(modifier = Modifier.height(16.dp))
             HorizontalDivider(
@@ -70,193 +75,140 @@ fun TrainHubScreen(
                 thickness = 1.dp,
                 color = BORDER_COLOR)
 
-            Text(
-                text = "Choose your activity",
-                fontSize = if (screenWidth < 360.dp) 14.sp else 16.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 16.dp).testTag("ActivitySelectionTitle"))
-
-            ActivitySelectionGrid(
-                activities =
+            // Activity selection
+            SectionTitle(title = "Choose your activity", testTag = "ActivitySelectionTitle")
+            SelectionGrid(
+                items =
                     listOf(
-                        "Push-ups" to false,
-                        "Dips" to false,
-                        "Burpee" to false,
-                        "Lunge" to false,
-                        "Planks" to true,
-                        "Handstand" to true,
-                        "Front lever" to true,
-                        "Flag" to true,
-                        "Muscle-up" to false),
-                buttonWidth = buttonWidth,
-                buttonHeight = buttonHeight,
-                gridSpacing = gridSpacing,
-                onActivitySelected = { activity -> selectedActivity = activity })
+                            "Push-ups" to false,
+                            "Dips" to false,
+                            "Burpee" to false,
+                            "Lunge" to false,
+                            "Planks" to true,
+                            "Handstand" to true,
+                            "Front lever" to true,
+                            "Flag" to true,
+                            "Muscle-up" to false)
+                        .map { it.first },
+                buttonSize = buttonSize,
+                onItemSelected = { activity ->
+                  selectedActivity =
+                      listOf(
+                              "Push-ups" to false,
+                              "Dips" to false,
+                              "Burpee" to false,
+                              "Lunge" to false,
+                              "Planks" to true,
+                              "Handstand" to true,
+                              "Front lever" to true,
+                              "Flag" to true,
+                              "Muscle-up" to false)
+                          .first { it.first == activity }
+                },
+                getItemImageRes = { R.drawable.pushup },
+                isSelected = { selectedActivity?.first == it },
+                testTagPrefix = "Activity_")
           }
 
-          // Confirm Button
-          Button(
-              onClick = {
-                if (selectedType != null && selectedActivity != null) {
-                  val (activity, isTimeDependent) = selectedActivity!!
-                  when (selectedType) {
-                    "Solo" -> navigationActions.navigateToSoloScreen(activity, isTimeDependent)
-                    "Coach" -> navigationActions.navigateToCoachScreen(activity, isTimeDependent)
-                    "Challenge" ->
-                        navigationActions.navigateToChallengeScreen(activity, isTimeDependent)
+          // Confirm button
+          Box(modifier = Modifier.fillMaxWidth()) {
+            ConfirmButton(
+                modifier = Modifier.align(Alignment.Center),
+                onClick = {
+                  selectedType?.let { type ->
+                    selectedActivity?.let { (activity, isTimeDependent) ->
+                      when (type) {
+                        "Solo" -> navigationActions.navigateToSoloScreen(activity, isTimeDependent)
+                        "Coach" ->
+                            navigationActions.navigateToCoachScreen(activity, isTimeDependent)
+                        "Challenge" ->
+                            navigationActions.navigateToChallengeScreen(activity, isTimeDependent)
+                      }
+                    }
                   }
-                } else {
-                  // Handle case where not all selections are made
-                }
-              },
-              modifier =
-                  Modifier.fillMaxWidth(0.5f)
-                      .align(Alignment.CenterHorizontally)
-                      .testTag("ConfirmButton"),
-              shape = RoundedCornerShape(50),
-              colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK)) {
-                Text(
-                    text = "Confirm",
-                    color = Color.White,
-                    fontSize = if (screenWidth < 360.dp) 12.sp else 14.sp,
-                    fontWeight = FontWeight.Bold)
-              }
+                })
+          }
         }
   }
 }
 
 @Composable
-fun RoleSelectionRow(
-    roles: List<String>,
-    buttonWidth: Dp,
-    buttonHeight: Dp,
-    gridSpacing: Dp,
-    onRoleSelected: (String) -> Unit
+fun SectionTitle(title: String, testTag: String) {
+  Text(
+      text = title,
+      fontSize = 16.sp,
+      fontWeight = FontWeight.Bold,
+      modifier = Modifier.padding(bottom = 16.dp).testTag(testTag))
+}
+
+@Composable
+fun SelectionGrid(
+    items: List<String>,
+    buttonSize: ButtonSize,
+    onItemSelected: (String) -> Unit,
+    getItemImageRes: (String) -> Int,
+    isSelected: (String) -> Boolean,
+    testTagPrefix: String
 ) {
-  var selectedRole by remember { mutableStateOf<String?>(null) }
-
-  val roleImages =
-      mapOf(
-          "Solo" to R.drawable.training_solo,
-          "Coach" to R.drawable.training_coach,
-          "Challenge" to R.drawable.training_challenge)
-
   LazyVerticalGrid(
-      columns = GridCells.Adaptive(buttonWidth + gridSpacing),
-      modifier = Modifier.fillMaxWidth().testTag("RoleSelectionGrid"),
-      horizontalArrangement = Arrangement.spacedBy(gridSpacing),
-      verticalArrangement = Arrangement.spacedBy(gridSpacing)) {
-        items(roles) { role ->
+      columns = GridCells.Adaptive(buttonSize.width + buttonSize.spacing),
+      modifier = Modifier.fillMaxWidth().testTag("${testTagPrefix}Grid"),
+      horizontalArrangement = Arrangement.spacedBy(buttonSize.spacing),
+      verticalArrangement = Arrangement.spacedBy(buttonSize.spacing)) {
+        items(items) { item ->
           SelectionButton(
-              text = role,
-              isSelected = selectedRole == role,
-              imageResId = roleImages[role] ?: R.drawable.pushup,
-              buttonWidth = buttonWidth,
-              buttonHeight = buttonHeight,
-              onClick = {
-                selectedRole = role
-                onRoleSelected(role)
-              },
-              modifier = Modifier.testTag("Role_$role"))
+              text = item,
+              imageResId = getItemImageRes(item),
+              buttonSize = buttonSize,
+              onClick = { onItemSelected(item) },
+              isSelected = isSelected(item),
+              testTag = "$testTagPrefix$item")
         }
-      }
-}
-
-@Composable
-fun ActivitySelectionGrid(
-    activities: List<Pair<String, Boolean>>,
-    buttonWidth: Dp,
-    buttonHeight: Dp,
-    gridSpacing: Dp,
-    onActivitySelected: (Pair<String, Boolean>) -> Unit
-) {
-  var selectedActivity by remember { mutableStateOf<Pair<String, Boolean>?>(null) }
-
-  LazyVerticalGrid(
-      columns = GridCells.Adaptive(buttonWidth + gridSpacing),
-      modifier = Modifier.fillMaxWidth().testTag("ActivitySelectionGrid"),
-      horizontalArrangement = Arrangement.spacedBy(gridSpacing),
-      verticalArrangement = Arrangement.spacedBy(gridSpacing)) {
-        items(activities) { (activity, isTimeDependent) ->
-          ActivityButton(
-              text = activity,
-              isSelected = selectedActivity?.first == activity,
-              imageResId = R.drawable.pushup,
-              buttonWidth = buttonWidth,
-              buttonHeight = buttonHeight,
-              onClick = {
-                selectedActivity = activity to isTimeDependent
-                onActivitySelected(activity to isTimeDependent)
-              },
-              modifier = Modifier.testTag("Activity_$activity"))
-        }
-      }
-}
-
-@Composable
-fun ActivityButton(
-    text: String,
-    isSelected: Boolean,
-    imageResId: Int,
-    buttonWidth: Dp,
-    buttonHeight: Dp,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-  Column(
-      horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier.width(buttonWidth)) {
-        Button(
-            onClick = onClick,
-            modifier =
-                Modifier.size(width = buttonWidth, height = buttonHeight)
-                    .border(
-                        width = if (isSelected) 2.dp else 1.dp,
-                        color = if (isSelected) INTERACTION_COLOR_DARK else Color.Gray,
-                        shape = RoundedCornerShape(20.dp)),
-            shape = RoundedCornerShape(20.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)) {
-              Image(
-                  painter = painterResource(id = imageResId),
-                  contentDescription = text,
-                  modifier = Modifier.size(buttonWidth * 0.4f))
-            }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(text = text, fontSize = 12.sp, fontWeight = FontWeight.Medium)
       }
 }
 
 @Composable
 fun SelectionButton(
     text: String,
-    isSelected: Boolean,
     imageResId: Int,
-    buttonWidth: Dp,
-    buttonHeight: Dp,
+    buttonSize: ButtonSize,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    isSelected: Boolean,
+    testTag: String
 ) {
   Column(
-      horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier.width(buttonWidth)) {
+      horizontalAlignment = Alignment.CenterHorizontally,
+      modifier = Modifier.width(buttonSize.width)) {
         Button(
             onClick = onClick,
             modifier =
-                Modifier.size(width = buttonWidth, height = buttonHeight)
+                Modifier.size(buttonSize.width, buttonSize.height)
                     .border(
                         width = if (isSelected) 2.dp else 1.dp,
                         color = if (isSelected) INTERACTION_COLOR_DARK else Color.Gray,
-                        shape = RoundedCornerShape(20.dp)),
+                        shape = RoundedCornerShape(20.dp))
+                    .testTag(testTag),
             shape = RoundedCornerShape(20.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)) {
               Image(
                   painter = painterResource(id = imageResId),
                   contentDescription = text,
-                  modifier = Modifier.size(buttonWidth * 0.4f))
+                  modifier = Modifier.size(buttonSize.width * 0.4f))
             }
-
         Spacer(modifier = Modifier.height(8.dp))
-
         Text(text = text, fontSize = 14.sp, fontWeight = FontWeight.Medium)
       }
 }
+
+@Composable
+fun ConfirmButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
+  Button(
+      onClick = onClick,
+      modifier = modifier.fillMaxWidth(0.5f).testTag("ConfirmButton"),
+      shape = RoundedCornerShape(50),
+      colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK)) {
+        Text(text = "Confirm", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+      }
+}
+
+data class ButtonSize(val width: Dp, val height: Dp, val spacing: Dp)

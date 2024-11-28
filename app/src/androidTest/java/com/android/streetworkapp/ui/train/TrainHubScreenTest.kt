@@ -46,24 +46,18 @@ class TrainHubScreenTest {
           userViewModel = userViewModel)
     }
 
-    // Verify RoleSelectionTitle is displayed
+    // Verify Section Titles
     composeTestRule.onNodeWithTag("RoleSelectionTitle").assertExists()
+    composeTestRule.onNodeWithTag("ActivitySelectionTitle").assertExists()
 
-    // Verify RoleSelectionGrid is displayed
-    composeTestRule.onNodeWithTag("RoleSelectionGrid").assertExists()
-
-    // Verify each role button is displayed
+    // Verify RoleSelectionGrid
+    composeTestRule.onNodeWithTag("Role_Grid").assertExists()
     listOf("Solo", "Coach", "Challenge").forEach { role ->
       composeTestRule.onNodeWithTag("Role_$role").assertExists()
     }
 
-    // Verify ActivitySelectionTitle is displayed
-    composeTestRule.onNodeWithTag("ActivitySelectionTitle").assertExists()
-
-    // Verify ActivitySelectionGrid is displayed
-    composeTestRule.onNodeWithTag("ActivitySelectionGrid").assertExists()
-
-    // Verify each activity button is displayed
+    // Verify ActivitySelectionGrid
+    composeTestRule.onNodeWithTag("Activity_Grid").assertExists()
     listOf(
             "Push-ups",
             "Dips",
@@ -76,10 +70,10 @@ class TrainHubScreenTest {
             "Muscle-up")
         .forEach { activity -> composeTestRule.onNodeWithTag("Activity_$activity").assertExists() }
 
-    // Verify ConfirmButton is displayed
-    composeTestRule.onNodeWithTag("ConfirmButton").assertExists()
-
-    // Verify Divider is displayed
+    // Verify Divider
     composeTestRule.onNodeWithTag("Divider").assertExists()
+
+    // Verify ConfirmButton
+    composeTestRule.onNodeWithTag("ConfirmButton").assertExists()
   }
 }
