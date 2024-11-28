@@ -137,9 +137,7 @@ class TutorialEventTest {
   }
 
   private fun swipeToLeft() {
-    composeTestRule.onNodeWithTag("tutoPageContainer").performTouchInput {
-      swipeLeft()
-    }
+    composeTestRule.onNodeWithTag("tutoPageContainer").performTouchInput { swipeLeft() }
     composeTestRule.waitForIdle()
   }
 }

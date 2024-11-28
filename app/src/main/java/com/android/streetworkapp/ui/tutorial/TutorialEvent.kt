@@ -26,7 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -54,25 +53,25 @@ fun TutorialEvent(navigationActions: NavigationActions) {
 
   // Tutorial text for each page
   val tutoText1 = buildAnnotatedString {
-    withStyle(style = SpanStyle(color = Color.Red)) { append("Click") }
+    withStyle(style = SpanStyle(color = ColorPalette.TUTORIAL_INTERACTION_1)) { append("Click") }
     append(" on your favorite park")
   }
 
   val tutoText2 = buildAnnotatedString {
-    withStyle(style = SpanStyle(color = Color.Green)) { append("Look") }
+    withStyle(style = SpanStyle(ColorPalette.TUTORIAL_INTERACTION_2)) { append("Look") }
     append(" for others events in the park\nOr ")
-    withStyle(style = SpanStyle(color = Color.Red)) { append("start") }
+    withStyle(style = SpanStyle(color = ColorPalette.TUTORIAL_INTERACTION_1)) { append("start") }
     append(" one yourself")
   }
 
   val tutoText3 = buildAnnotatedString {
-    withStyle(style = SpanStyle(color = Color.Green)) { append("Join") }
+    withStyle(style = SpanStyle(ColorPalette.TUTORIAL_INTERACTION_2)) { append("Join") }
     append(" an already ongoing event")
   }
 
   val tutoText4 = buildAnnotatedString {
     append("Or ")
-    withStyle(style = SpanStyle(color = Color.Red)) { append("create") }
+    withStyle(style = SpanStyle(color = ColorPalette.TUTORIAL_INTERACTION_1)) { append("create") }
     append(" your own event")
   }
 
@@ -121,7 +120,9 @@ fun TutorialEvent(navigationActions: NavigationActions) {
                           Modifier.size(if (isSelected) 12.dp else 12.dp)
                               .padding(4.dp)
                               .clip(CircleShape)
-                              .background(if (isSelected) Color.Blue else Color.Gray))
+                              .background(
+                                  if (isSelected) ColorPalette.INTERACTION_COLOR_DARK
+                                  else ColorPalette.BORDER_COLOR))
                 }
               }
         }
@@ -142,7 +143,7 @@ fun Page1() {
                     fontSize = 26.sp,
                     lineHeight = 26.sp,
                     fontWeight = FontWeight(500),
-                    color = Color.Black,
+                    color = ColorPalette.PRIMARY_TEXT_COLOR,
                     textAlign = TextAlign.Center,
                 ),
             modifier =
@@ -167,7 +168,7 @@ fun PageTuto(id: Int, text: AnnotatedString, columnTag: String, imageTag: String
                 fontSize = 18.sp,
                 lineHeight = 24.sp,
                 fontWeight = FontWeight(500),
-                color = Color.Black,
+                color = ColorPalette.PRIMARY_TEXT_COLOR,
                 textAlign = TextAlign.Center,
             ),
         modifier = Modifier.fillMaxWidth().testTag(textTag).padding(15.dp))

@@ -173,18 +173,13 @@ class LoginTest : TestCase() {
     composeTestRule.onNodeWithTag("introColumn1").assertExists().assertIsDisplayed()
   }
 
-
   private fun swipeToLeft() {
-    composeTestRule.onNodeWithTag("introScreenBoxContainer").performTouchInput {
-      swipeLeft()
-    }
+    composeTestRule.onNodeWithTag("introScreenBoxContainer").performTouchInput { swipeLeft() }
     composeTestRule.waitForIdle()
   }
 
   private fun swipeToRight() {
-    composeTestRule.onNodeWithTag("introScreenBoxContainer").performTouchInput {
-      swipeRight()
-    }
+    composeTestRule.onNodeWithTag("introScreenBoxContainer").performTouchInput { swipeRight() }
     composeTestRule.waitForIdle()
   }
 }

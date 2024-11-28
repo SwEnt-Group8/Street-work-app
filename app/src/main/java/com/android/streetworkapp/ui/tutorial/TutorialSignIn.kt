@@ -22,13 +22,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.android.sample.R
 import com.android.streetworkapp.ui.authentication.IconAndTextRow
+import com.android.streetworkapp.ui.theme.ColorPalette
 
 @Composable
 fun TutorialSignIn() {
@@ -58,7 +58,9 @@ fun TutorialSignIn() {
                   Modifier.size(if (isSelected) 12.dp else 12.dp)
                       .padding(4.dp)
                       .clip(CircleShape)
-                      .background(if (isSelected) Color.Blue else Color.Gray))
+                      .background(
+                          if (isSelected) ColorPalette.INTERACTION_COLOR_DARK
+                          else ColorPalette.BORDER_COLOR))
         }
       }
 }
