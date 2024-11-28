@@ -57,7 +57,7 @@ class TopAppBarTest {
           EventViewModel(mock(EventRepository::class.java, RETURNS_DEFAULTS)),
           ProgressionViewModel(mock(ProgressionRepository::class.java, RETURNS_DEFAULTS)),
           TextModerationViewModel(mock(TextModerationRepository::class.java)),
-          mock(DataStoreManager::class.java),
+          mockk<DataStoreManager>(),
           Route.AUTH)
     }
 

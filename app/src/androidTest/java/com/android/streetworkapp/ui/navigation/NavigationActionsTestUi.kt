@@ -7,10 +7,10 @@ import androidx.test.espresso.contrib.NavigationViewActions.navigateTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.streetworkapp.StreetWorkAppMain
 import com.android.streetworkapp.device.datastore.DataStoreManager
+import io.mockk.mockk
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.mock
 
 @RunWith(AndroidJUnit4::class)
 class NavigationActionsTestUi {
@@ -28,7 +28,7 @@ class NavigationActionsTestUi {
             "dummy") // dummy top level dest for testing
     composeTestRule.setContent {
       StreetWorkAppMain(
-          dataStoreManager = mock(DataStoreManager::class.java),
+          dataStoreManager = mockk<DataStoreManager>(),
           internetAvailable = false,
           testInvokation = { navigateTo(topLevelDestWithInvalidRouteName) })
     }
