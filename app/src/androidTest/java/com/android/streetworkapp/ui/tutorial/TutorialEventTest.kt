@@ -39,37 +39,25 @@ class TutorialEventTest {
     tutoComponentsDisplayedOnPage1()
 
     // Simulate swipe to the left to move from page 1 -> page 2
-    composeTestRule.onNodeWithTag("tutoPageContainer").performTouchInput { swipeLeft() }
-
-    // Wait for UI
-    composeTestRule.waitForIdle()
+    swipeToLeft()
 
     // Check all component on the current page is displayed
     tutoComponentsDisplayedOnPage2()
 
     // Simulate swipe to the left to move from page 2 -> page 3
-    composeTestRule.onNodeWithTag("tutoPageContainer").performTouchInput { swipeLeft() }
-
-    // Wait for UI
-    composeTestRule.waitForIdle()
+    swipeToLeft()
 
     // Check all component on the current page is displayed
     tutoComponentsDisplayedOnPage3()
 
     // Simulate swipe to the left to move from page 3 -> page 4
-    composeTestRule.onNodeWithTag("tutoPageContainer").performTouchInput { swipeLeft() }
-
-    // Wait for UI
-    composeTestRule.waitForIdle()
+    swipeToLeft()
 
     // Check all component on the current page is displayed
     tutoComponentsDisplayedOnPage4()
 
     // Simulate swipe to the left to move from page 4 -> page 5
-    composeTestRule.onNodeWithTag("tutoPageContainer").performTouchInput { swipeLeft() }
-
-    // Wait for UI
-    composeTestRule.waitForIdle()
+    swipeToLeft()
 
     // Check all component on the current page is displayed
     tutoComponentsDisplayedOnEndingPage()
@@ -146,5 +134,12 @@ class TutorialEventTest {
     composeTestRule
         .onNodeWithTag("tutoCloseButtonText", useUnmergedTree = true)
         .assertTextEquals("Close")
+  }
+
+  private fun swipeToLeft() {
+    composeTestRule.onNodeWithTag("tutoPageContainer").performTouchInput {
+      swipeLeft()
+    }
+    composeTestRule.waitForIdle()
   }
 }
