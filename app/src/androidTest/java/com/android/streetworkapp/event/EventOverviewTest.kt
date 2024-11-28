@@ -3,10 +3,12 @@ package com.android.streetworkapp.event
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -33,11 +35,13 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
 
 class EventOverviewTest {
   private lateinit var park: Park
+  private lateinit var owner: User
   private lateinit var participant: User
   private lateinit var joiner: User
   private lateinit var navigationActions: NavigationActions
@@ -66,6 +70,25 @@ class EventOverviewTest {
     screenParams = LIST_OF_SCREENS.last()
 
     navigationActions = mock(NavigationActions::class.java)
+    // fullevent = event.copy(participants = 10, maxParticipants = 10)
+
+    // Park with events
+    park =
+        Park(
+            pid = "123",
+            name = "Sample Park",
+            location = ParkLocation(10.0, 10.0, "321"),
+            imageReference = "parks/sample.png",
+            rating = 4.0f,
+            nbrRating = 2,
+            capacity = 10,
+            occupancy = 5,
+            events = emptyList())
+
+    participant = User("123", "test", "test", 0, listOf(), "test")
+    joiner = participant.copy(uid = "joiner")
+    owner = participant.copy(uid = "124", username = "owner")
+
     val eventList =
         EventList(
             events =
@@ -81,38 +104,28 @@ class EventOverviewTest {
                         10,
                         Timestamp.now(),
                         "124",
-                        listOf("123"))))
+                        listOf(participant.uid))))
 
     event = eventList.events.first()
-    // fullevent = event.copy(participants = 10, maxParticipants = 10)
-
-    // Park with events
-    park =
-        Park(
-            pid = "123",
-            name = "Sample Park",
-            location = ParkLocation(0.0, 0.0, "321"),
-            imageReference = "parks/sample.png",
-            rating = 4.0f,
-            nbrRating = 2,
-            capacity = 10,
-            occupancy = 5,
-            events = emptyList())
-    participant = User("123", "test", "test", 0, listOf(), "test")
-    joiner = participant.copy(uid = "joiner")
   }
 
   @Test
   fun everyImmutableComposableAreDisplayed() = runTest {
     eventViewModel.setCurrentEvent(event)
     parkViewModel.setCurrentPark(park)
-    composeTestRule.setContent { EventOverviewScreen(eventViewModel, parkViewModel) }
+
+    `when`(parkRepository.getParkByPid(any())).thenReturn(park)
+    `when`(userRepository.getUserByUid(owner.uid)).thenReturn(owner)
+
+    composeTestRule.setContent {
+      EventOverviewScreen(eventViewModel, parkViewModel, userViewModel, navigationActions)
+    }
 
     composeTestRule.onNodeWithTag("eventOverviewScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("eventContent").assertIsDisplayed()
     composeTestRule.onNodeWithTag("eventTitle").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("ownerIcon").assertIsDisplayed()
     composeTestRule.onNodeWithTag("eventOwner").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("eventOwnerPicture").assertIsDisplayed()
     composeTestRule.onNodeWithTag("dateIcon").assertIsDisplayed()
     composeTestRule.onNodeWithTag("date").assertIsDisplayed()
     composeTestRule.onNodeWithTag("participantsIcon").assertIsDisplayed()
@@ -121,11 +134,11 @@ class EventOverviewTest {
     composeTestRule.onNodeWithTag("location").assertIsDisplayed()
     composeTestRule.onNodeWithTag("googleMap").assertIsDisplayed()
 
-    composeTestRule.onNodeWithTag("eventOwner").assertTextEquals("Organized by: ${event.owner}")
+    composeTestRule.onNodeWithTag("eventOwner").assertTextEquals("Organized by: ${owner.username}")
     composeTestRule.onNodeWithTag("date").assertTextEquals(event.date.toFormattedString())
     composeTestRule
         .onNodeWithTag("participants")
-        .assertTextEquals("Participants: ${event.participants}/${event.maxParticipants}")
+        .assertTextEquals("Participants: ${event.listParticipants.size}/${event.maxParticipants}")
     composeTestRule.onNodeWithTag("location").assertTextEquals("at ${park.name}")
   }
 
@@ -133,7 +146,14 @@ class EventOverviewTest {
   fun everythingIsDisplayedInDashBoard() = runTest {
     eventViewModel.setCurrentEvent(event)
     parkViewModel.setCurrentPark(park)
-    composeTestRule.setContent { EventOverviewScreen(eventViewModel, parkViewModel) }
+
+    `when`(parkRepository.getParkByPid(any())).thenReturn(park)
+    `when`(userRepository.getUserByUid(owner.uid)).thenReturn(owner)
+    `when`(userRepository.getUsersByUids(any())).thenReturn(listOf(participant))
+
+    composeTestRule.setContent {
+      EventOverviewScreen(eventViewModel, parkViewModel, userViewModel, navigationActions)
+    }
 
     composeTestRule.onNodeWithTag("eventDashboard").assertIsDisplayed()
     composeTestRule.onNodeWithTag("dashboard").assertIsDisplayed()
@@ -144,7 +164,9 @@ class EventOverviewTest {
     composeTestRule.onNodeWithTag("participantsList").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("participantsTab").assertIsDisplayed().performClick()
     composeTestRule.onNodeWithTag("participantsList").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("eventDescription").assertIsNotDisplayed()
+    composeTestRule
+        .onAllNodesWithTag("participantItem")
+        .assertCountEquals(event.listParticipants.size)
     composeTestRule.onNodeWithTag("detailsTab").assertIsDisplayed().performClick()
     composeTestRule.onNodeWithTag("participantsList").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("eventDescription").assertIsDisplayed()
@@ -154,6 +176,7 @@ class EventOverviewTest {
   fun joinEventButtonIsDisplayed() = runTest {
     eventViewModel.setCurrentEvent(event)
     userViewModel.setCurrentUser(joiner)
+
     composeTestRule.setContent { EventBottomBar(eventViewModel, userViewModel, navigationActions) }
 
     composeTestRule.waitForIdle()

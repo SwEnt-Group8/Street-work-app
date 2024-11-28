@@ -315,11 +315,12 @@ fun LeaveEventButton(
  */
 @Composable
 fun ParticipantsList(participants: List<User?>) {
-  LazyColumn(modifier = Modifier.fillMaxSize().testTag("friendList")) {
+  LazyColumn(modifier = Modifier.fillMaxSize().testTag("participantsList")) {
     items(participants) { friend ->
       if (friend != null) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            modifier =
+                Modifier.fillMaxWidth().padding(horizontal = 16.dp).testTag("participantItem"),
             verticalAlignment = Alignment.CenterVertically) {
               // Friend's avatar
               DisplayUserPicture(friend, 48.dp, "participantProfilePicture")
