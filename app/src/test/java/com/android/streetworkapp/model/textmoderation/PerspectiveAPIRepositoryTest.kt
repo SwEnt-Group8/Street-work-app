@@ -10,6 +10,7 @@ import java.net.HttpURLConnection.HTTP_OK
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import okhttp3.Call
 import okhttp3.OkHttpClient
@@ -183,7 +184,7 @@ class PerspectiveAPIRepositoryTest {
   }
 
   @Test
-  fun evaluateTextReturnsErrorAndCorrectErrorMessageOnUnhandledHTPPResponseCode() {
+  fun evaluateTextReturnsErrorAndCorrectErrorMessageOnUnhandledHTPPResponseCode() = runTest {
     whenever(okHttpClient.newCall(any())).thenReturn(call)
     whenever(call.execute()).thenReturn(response)
     whenever(response.code).thenReturn(-1)
@@ -198,7 +199,7 @@ class PerspectiveAPIRepositoryTest {
   }
 
   @Test
-  fun evaluateTextReturnsErrorOnInvalidParameterRequestAndCorrectErrorMessage() {
+  fun evaluateTextReturnsErrorOnInvalidParameterRequestAndCorrectErrorMessage() = runTest {
     whenever(okHttpClient.newCall(any())).thenReturn(call)
     whenever(call.execute()).thenReturn(response)
     whenever(response.code).thenReturn(HTTP_BAD_REQUEST)
@@ -215,7 +216,7 @@ class PerspectiveAPIRepositoryTest {
   }
 
   @Test
-  fun evaluateTextReturnsErrorAndCorrectErrorMessageOnDeserializationError() {
+  fun evaluateTextReturnsErrorAndCorrectErrorMessageOnDeserializationError() = runTest {
     whenever(okHttpClient.newCall(any())).thenReturn(call)
     whenever(call.execute()).thenReturn(response)
     whenever(response.code).thenReturn(HTTP_BAD_REQUEST)
@@ -233,25 +234,27 @@ class PerspectiveAPIRepositoryTest {
   }
 
   @Test
-  fun evaluateTextReturnsErrorAndCorrectErrorMessageOnAPIResponseSuccessAndDeserializationError() {
-    whenever(okHttpClient.newCall(any())).thenReturn(call)
-    whenever(call.execute()).thenReturn(response)
-    whenever(response.code).thenReturn(HTTP_OK)
-    whenever(response.body).thenReturn(responseBody)
-    whenever(responseBody.string()).thenReturn("###@@@#§") // making the deserialization fail
+  fun evaluateTextReturnsErrorAndCorrectErrorMessageOnAPIResponseSuccessAndDeserializationError() =
+      runTest {
+        whenever(okHttpClient.newCall(any())).thenReturn(call)
+        whenever(call.execute()).thenReturn(response)
+        whenever(response.code).thenReturn(HTTP_OK)
+        whenever(response.body).thenReturn(responseBody)
+        whenever(responseBody.string()).thenReturn("###@@@#§") // making the deserialization fail
 
-    when (val result =
-        perspectiveAPIRepository.evaluateText(
-            "content", PerspectiveAPIThresholds.DEFAULT_THRESHOLD_VALUES)) {
-      is TextEvaluation.Error ->
-          assert(
-              result.errorMessage == PerspectiveApiErrors.JSON_DESERIALIZATION_ERROR.errorMessage)
-      is TextEvaluation.Result -> assert(false)
-    }
-  }
+        when (val result =
+            perspectiveAPIRepository.evaluateText(
+                "content", PerspectiveAPIThresholds.DEFAULT_THRESHOLD_VALUES)) {
+          is TextEvaluation.Error ->
+              assert(
+                  result.errorMessage ==
+                      PerspectiveApiErrors.JSON_DESERIALIZATION_ERROR.errorMessage)
+          is TextEvaluation.Result -> assert(false)
+        }
+      }
 
   @Test
-  fun evaluateTextReturnsResultAndTrueOnAPIResponseSuccessAndUnderThresholdValues() {
+  fun evaluateTextReturnsResultAndTrueOnAPIResponseSuccessAndUnderThresholdValues() = runTest {
     whenever(okHttpClient.newCall(any())).thenReturn(call)
     whenever(call.execute()).thenReturn(response)
     whenever(response.code).thenReturn(HTTP_OK)
@@ -267,7 +270,7 @@ class PerspectiveAPIRepositoryTest {
   }
 
   @Test
-  fun evaluateTextReturnsResultAndFalseOnAPIResponseSuccessAndOverThresholdValues() {
+  fun evaluateTextReturnsResultAndFalseOnAPIResponseSuccessAndOverThresholdValues() = runTest {
     whenever(okHttpClient.newCall(any())).thenReturn(call)
     whenever(call.execute()).thenReturn(response)
     whenever(response.code).thenReturn(HTTP_OK)

@@ -5,15 +5,17 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
 
+// Define a constant for the date-time pattern
+const val DATE_TIME_PATTERN = "dd/MM/yyyy HH:mm"
+
 /**
  * Convert a [Timestamp] to a formatted string of format "dd/MM/yyyy HH:mm".
  *
  * @return The formatted string.
  */
 fun Timestamp.toFormattedString(): String {
-  val pattern = "dd/MM/yyyy HH:mm"
-  val sdf = SimpleDateFormat(pattern, Locale.getDefault())
-  sdf.timeZone = TimeZone.getTimeZone("UTC") // Set to UTC to avoid timezone issues
+  val sdf = SimpleDateFormat(DATE_TIME_PATTERN, Locale.getDefault())
+  sdf.timeZone = TimeZone.getDefault()
   return sdf.format(this.toDate())
 }
 
@@ -23,9 +25,8 @@ fun Timestamp.toFormattedString(): String {
  * @return The [Timestamp] object.
  */
 fun String.toTimestamp(): Timestamp {
-  val pattern = "dd/MM/yyyy HH:mm"
-  val sdf = SimpleDateFormat(pattern, Locale.getDefault())
-  sdf.timeZone = TimeZone.getTimeZone("UTC") // Set to UTC to avoid timezone issues
+  val sdf = SimpleDateFormat(DATE_TIME_PATTERN, Locale.getDefault())
+  sdf.timeZone = TimeZone.getDefault()
   val date = sdf.parse(this)
   return Timestamp(date!!)
 }
@@ -36,9 +37,8 @@ fun String.toTimestamp(): Timestamp {
  * @return The formatted string.
  */
 fun Long.toFormattedString(): String {
-  val pattern = "dd/MM/yyyy HH:mm"
-  val sdf = SimpleDateFormat(pattern, Locale.getDefault())
-  sdf.timeZone = TimeZone.getTimeZone("UTC")
+  val sdf = SimpleDateFormat(DATE_TIME_PATTERN, Locale.getDefault())
+  sdf.timeZone = TimeZone.getDefault()
   return sdf.format(this)
 }
 
@@ -48,8 +48,7 @@ fun Long.toFormattedString(): String {
  * @return The epoch timestamp.
  */
 fun String.toEpochTimestamp(): Long {
-  val pattern = "dd/MM/yyyy HH:mm"
-  val sdf = SimpleDateFormat(pattern, Locale.getDefault())
-  sdf.timeZone = TimeZone.getTimeZone("UTC")
+  val sdf = SimpleDateFormat(DATE_TIME_PATTERN, Locale.getDefault())
+  sdf.timeZone = TimeZone.getDefault()
   return sdf.parse(this)?.time ?: throw IllegalArgumentException("Invalid date format")
 }
