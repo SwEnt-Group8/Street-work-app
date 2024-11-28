@@ -25,9 +25,6 @@ import kotlin.math.abs
 
 data class GraphData(val x: Float, val y: Float)
 
-class GraphConfiguration(
-    var graphColor: Color = Color.Blue,
-=======
 /**
  * Data class for configuring the properties of a graph.
  *
