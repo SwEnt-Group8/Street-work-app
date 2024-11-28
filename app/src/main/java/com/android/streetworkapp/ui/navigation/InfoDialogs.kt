@@ -47,13 +47,13 @@ class InfoDialogManager(
           screens.PARK_OVERVIEW to
               InfoDialog(
                   "ParkOverview",
-                  "How does parks work ?",
+                  "how do parks work?",
                   "This is the park overview, here you can see the park's details and the events that are planned in it. \n\n You can create an event or join an already existing one. You can also rate the park !"),
           screens.ADD_EVENT to
               InfoDialog(
                   "AddEvent",
                   "How to create an event ?",
-                  "This is your firsts steps towards creating an event ! \n\n You simply have to add a cool title, then, describe your event : What are you going to do there ? \n\n Finally, set the date and time and you are good to go !"),
+                  "This is your first step towards creating an event ! \n\n You simply have to add a cool title, then, describe your event : What are you going to do there ? \n\n Finally, set the date and time and you are good to go !"),
           screens.EVENT_OVERVIEW to
               InfoDialog(
                   "EventOverview",
