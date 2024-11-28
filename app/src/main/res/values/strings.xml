@@ -3,4 +3,32 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_second">SecondActivity</string>
     <string name="default_web_client_id">949532445294-2cvshtbsgubvrn54cg9301rrs2pe8dth.apps.googleusercontent.com</string>
+
+
+    // Helping dialogs(INFO)
+
+    // Default Info
+    <string name="DefaultInfoTitle">Screen not supported yet</string>
+    <string name="DefaultInfoContent">Information about this screen is not available. Please explore to learn more!</string>
+    // Map Info
+    <string name="MapInfoTitle">How does the map work ?</string>
+    <string name="MapInfoContent">This is the map, here you can see each park that is near you. \n\n You can navigate to see more. Click on a park to see its details, such as their events !</string>
+    // Profile Info
+    <string name="ProfileInfoTitle">What is the Profile ?</string>
+    <string name="ProfileInfoContent">This is your profile page, you can see your friends and your score. \n\n You can also add friends using the "'Add friend' button and you can also access your settings by clicking the gear icon on the top right.</string>
+    // AddFriend Info
+    <string name="AddFriendInfoTitle">How do friends work ?</string>
+    <string name="AddFriendInfoContent">This is where you can add a friend.\n\nTo add, you need to have a friend nearby and activate bluetooth and location services.\n\nOnce you are friends you will be able to do workouts with each other.\n\nHave fun together !</string>
+    // ParkOverview Info
+    <string name="ParkOverviewInfoTitle">How does parks work ?</string>
+    <string name="ParkOverviewInfoContent">This is the park overview page, here you can see the park details and the events that are happening there.\n\nYou can create an event or join an already existing one. You can also rate the park !</string>
+    // AddEventInfo
+    <string name="AddEventInfoTitle">How to create an event ?</string>
+    <string name="AddEventInfoContent">This is your firsts steps towards creating an event ! \n\n You simply have to add a cool title, then, describe your event : What are you going to do there ? \n\n Finally, set the date and time and you are good to go !</string>
+    // EventOverview Info
+    <string name="EventOverviewInfoTitle">What is the Event Overview ?</string>
+    <string name="EventOverviewInfoContent">This is the event overview, here you can access all of the information that you need. \n\n You are free to join the event if you want to participate !</string>
+    // Progression Info
+    <string name="ProgressionInfoTitle">What is the Progression ?</string>
+    <string name="ProgressionInfoContent">This is the progression screen, here you can see your progression and achievements. \n\n There is your record for each exercise in Training, click on it to see more details !</string>
 </resources>

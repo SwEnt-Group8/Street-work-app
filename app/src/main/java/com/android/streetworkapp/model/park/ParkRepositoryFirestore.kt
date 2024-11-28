@@ -321,7 +321,12 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore, testing: Boolea
     return try {
       val pid = document.id
       val name = document["name"] as? String ?: ""
-      val location = document["location"] as? ParkLocation ?: ParkLocation(0.0, 0.0, "0")
+      val locationMap = document["location"] as? Map<*, *> ?: emptyMap<String, Any>()
+      val location =
+          ParkLocation(
+              locationMap["lat"] as? Double ?: 0.0,
+              locationMap["lon"] as? Double ?: 0.0,
+              locationMap["id"] as? String ?: "")
       val imageReference = document["imageReference"] as? String ?: ""
       val rating = (document["rating"] as? Double)?.toFloat() ?: 0.0f
       val nbrRating = (document["nbrRating"] as? Long)?.toInt() ?: 0

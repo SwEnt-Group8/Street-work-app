@@ -42,6 +42,7 @@ import com.android.streetworkapp.ui.map.MapScreen
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenu
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenuType
 import com.android.streetworkapp.ui.navigation.EventBottomBar
+import com.android.streetworkapp.ui.navigation.InfoDialogManager
 import com.android.streetworkapp.ui.navigation.LIST_OF_SCREENS
 import com.android.streetworkapp.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.streetworkapp.ui.navigation.NavigationActions
@@ -144,6 +145,13 @@ fun StreetWorkApp(
   navigationActions.registerStringListenerOnDestinationChange(currentScreenName)
   screenParams = LIST_OF_SCREENS.find { currentScreenName.value == it.screenName }
 
+  // Instantiate info manager and its components :
+  val showInfoDialog = remember { mutableStateOf(false) }
+  Log.d("InfoDialog", "Main - Instantiating the InfoDialogManager")
+  val infoManager =
+      InfoDialogManager(
+          showInfoDialog, currentScreenName, topAppBarManager = screenParams?.topAppBarManager)
+
   // Park with no events
   val sampleEvent =
       Event(
@@ -167,7 +175,12 @@ fun StreetWorkApp(
         screenParams
             ?.isTopBarVisible
             ?.takeIf { it }
-            ?.let { TopAppBarWrapper(navigationActions, screenParams?.topAppBarManager) }
+            ?.let {
+              TopAppBarWrapper(navigationActions, screenParams?.topAppBarManager)
+              // setup the InfoDialogManager in topBar, because it relies on the topAppBarManager.
+              Log.d("InfoDialog", "Main - Setting up the InfoDialogManager")
+              infoManager.setUp()
+            }
       },
       snackbarHost = {
         SnackbarHost(
@@ -207,6 +220,7 @@ fun StreetWorkApp(
               }
               navigation(startDestination = Screen.PROGRESSION, route = Route.PROGRESSION) {
                 composable(Screen.PROGRESSION) {
+                  infoManager.Display()
                   ProgressScreen(
                       navigationActions, userViewModel, progressionViewModel, innerPadding)
                 }
@@ -216,6 +230,7 @@ fun StreetWorkApp(
                   route = Route.MAP,
               ) {
                 composable(Screen.MAP) {
+                  infoManager.Display()
                   MapScreen(
                       parkLocationViewModel,
                       parkViewModel,
@@ -224,10 +239,12 @@ fun StreetWorkApp(
                       innerPadding)
                 }
                 composable(Screen.PARK_OVERVIEW) {
+                  infoManager.Display()
                   ParkOverviewScreen(
                       parkViewModel, innerPadding, navigationActions, eventViewModel, userViewModel)
                 }
                 composable(Screen.ADD_EVENT) {
+                  infoManager.Display()
                   AddEventScreen(
                       navigationActions,
                       parkViewModel,
@@ -239,7 +256,9 @@ fun StreetWorkApp(
                       innerPadding)
                 }
                 composable(Screen.EVENT_OVERVIEW) {
-                  EventOverviewScreen(eventViewModel, parkViewModel, innerPadding)
+                  infoManager.Display()
+                  EventOverviewScreen(
+                      eventViewModel, parkViewModel, userViewModel, navigationActions, innerPadding)
                 }
                 composable(Screen.TUTO_EVENT) { TutorialEvent(navigationActions) }
               }
@@ -250,6 +269,7 @@ fun StreetWorkApp(
               ) {
                 // profile screen + list of friend
                 composable(Screen.PROFILE) {
+                  infoManager.Display()
                   ProfileScreen(navigationActions, userViewModel, innerPadding)
                   val showSettingsDialog = remember { mutableStateOf(false) }
 
@@ -262,12 +282,13 @@ fun StreetWorkApp(
                   // TODO : Implement the dialog Content composable
                   CustomDialog(
                       showSettingsDialog,
-                      "Settings",
+                      tag = "Settings",
                       Content = { Text("Settings to be implemented") },
                   )
                 }
                 // screen for adding friend
                 composable(Screen.ADD_FRIEND) {
+                  infoManager.Display()
                   AddFriendScreen(userViewModel, navigationActions, scope, host, innerPadding)
                 }
               }
