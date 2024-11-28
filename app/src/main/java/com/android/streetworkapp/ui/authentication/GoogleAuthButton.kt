@@ -45,7 +45,10 @@ fun GoogleAuthButton(
       modifier =
           Modifier.width(250.dp)
               .height(40.dp)
-              .border(width = 1.dp, color = LightGray, shape = RoundedCornerShape(20.dp))
+              .border(
+                  width = 5.dp,
+                  color = ColorPalette.INTERACTION_COLOR_DARK,
+                  shape = RoundedCornerShape(20.dp))
               .background(color = White, shape = RoundedCornerShape(20.dp))
               .testTag("loginButton"),
       colors = ButtonDefaults.buttonColors(containerColor = White, contentColor = DarkGray)) {
