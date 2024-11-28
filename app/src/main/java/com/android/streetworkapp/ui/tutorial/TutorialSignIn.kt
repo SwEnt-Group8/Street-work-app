@@ -74,6 +74,7 @@ fun IntroPage1() {
         Box(modifier = Modifier.fillMaxWidth().testTag("introBox1")) {
 
           // Background image
+          // Source : https://kengurupro.eu/about/
           Image(
               painter = painterResource(id = R.drawable.intro_1),
               contentDescription = "Background image 1",
@@ -111,6 +112,7 @@ fun IntroPage2() {
         Box(modifier = Modifier.fillMaxWidth().testTag("introBox2")) {
 
           // Background image
+          // Source : https://verticaltechnik.ch/en/cms/8/street-workout
           Image(
               painter = painterResource(id = R.drawable.intro_2),
               contentDescription = "Background image 2",
@@ -147,6 +149,7 @@ fun IntroPage3() {
         Box(modifier = Modifier.fillMaxWidth().testTag("introBox3")) {
 
           // Background image
+          // Source : https://www.urbanmovement.info/what-is-street-work-out/
           Image(
               painter = painterResource(id = R.drawable.intro_3),
               contentDescription = "Background image 3",
