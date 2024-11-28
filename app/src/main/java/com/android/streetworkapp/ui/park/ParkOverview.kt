@@ -60,6 +60,7 @@ import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.ui.utils.CustomDialog
+import com.android.streetworkapp.utils.dateDifference
 import com.android.streetworkapp.utils.toFormattedString
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -116,7 +117,7 @@ fun ParkOverviewScreen(
 
       CustomDialog(
           showRatingDialog,
-          "Rating",
+          tag = "Rating",
           Content = { InteractiveRatingComponent(starRating) },
           onSubmit = {
             Log.d("ParkOverview", "RatingDialog: Submitting rating")
@@ -370,13 +371,13 @@ fun EventItem(event: Event, eventViewModel: EventViewModel, navigationActions: N
       headlineContent = { Text(text = event.title) },
       supportingContent = {
         Text(
-            "Participants ${event.participants}/${event.maxParticipants}",
+            "Participants ${event.listParticipants.size}/${event.maxParticipants}",
             fontWeight = FontWeight.Light,
             modifier = Modifier.testTag("participantsText"))
       },
       overlineContent = {
         Text(
-            text = event.date.toFormattedString(),
+            text = dateDifference(event.date.toFormattedString()),
             fontWeight = FontWeight.Bold,
             modifier = Modifier.testTag("dateText"))
       },

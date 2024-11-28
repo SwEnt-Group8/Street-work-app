@@ -57,7 +57,7 @@ data class ScreenParams(
             isBottomBarVisible = true,
             BottomNavigationMenuType.DEFAULT,
             isTopBarVisible = true,
-            TopAppBarManager("Map"))
+            TopAppBarManager("Map", actions = listOf(TopAppBarManager.TopAppBarAction.INFO)))
     val PROFILE =
         ScreenParams(
             Screen.PROFILE,
@@ -65,7 +65,11 @@ data class ScreenParams(
             BottomNavigationMenuType.DEFAULT,
             isTopBarVisible = true,
             TopAppBarManager(
-                "My Profile", actions = listOf(TopAppBarManager.TopAppBarAction.SETTINGS)))
+                "My Profile",
+                actions =
+                    listOf(
+                        TopAppBarManager.TopAppBarAction.SETTINGS,
+                        TopAppBarManager.TopAppBarAction.INFO)))
     val ADD_FRIEND =
         ScreenParams(
             Screen.ADD_FRIEND,
@@ -75,7 +79,8 @@ data class ScreenParams(
             TopAppBarManager(
                 "Add a new Friend",
                 hasNavigationIcon = true,
-                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
+                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON,
+                actions = listOf(TopAppBarManager.TopAppBarAction.INFO)))
     val PARK_OVERVIEW =
         ScreenParams(
             Screen.PARK_OVERVIEW,
@@ -85,7 +90,8 @@ data class ScreenParams(
             TopAppBarManager(
                 "Park Overview",
                 hasNavigationIcon = true,
-                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
+                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON,
+                actions = listOf(TopAppBarManager.TopAppBarAction.INFO)))
     val ADD_EVENT =
         ScreenParams(
             Screen.ADD_EVENT,
@@ -95,7 +101,8 @@ data class ScreenParams(
             TopAppBarManager(
                 "Event Creation",
                 hasNavigationIcon = true,
-                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
+                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON,
+                actions = listOf(TopAppBarManager.TopAppBarAction.INFO)))
     val EVENT_OVERVIEW =
         ScreenParams(
             Screen.EVENT_OVERVIEW,
@@ -105,14 +112,18 @@ data class ScreenParams(
             TopAppBarManager(
                 "Event Overview",
                 hasNavigationIcon = true,
-                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
+                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON,
+                actions = listOf(TopAppBarManager.TopAppBarAction.INFO)))
     val PROGRESSION =
         ScreenParams(
             Screen.PROGRESSION,
             isBottomBarVisible = true,
             BottomNavigationMenuType.DEFAULT,
             isTopBarVisible = true,
-            TopAppBarManager("My Progress", hasNavigationIcon = false))
+            TopAppBarManager(
+                "My Progress",
+                hasNavigationIcon = false,
+                actions = listOf(TopAppBarManager.TopAppBarAction.INFO)))
     val TRAIN_HUB =
         ScreenParams(
             screenName = Screen.TRAIN_HUB,
@@ -141,6 +152,7 @@ data class ScreenParams(
             bottomBarType = BottomNavigationMenuType.DEFAULT,
             isTopBarVisible = true,
             TopAppBarManager("Challenge with your friend", hasNavigationIcon = true))
+
   }
 }
 
@@ -194,6 +206,10 @@ object TopLevelDestinations {
 
 val LIST_TOP_LEVEL_DESTINATION =
     listOf(TopLevelDestinations.PROGRESSION, TopLevelDestinations.MAP, TopLevelDestinations.PROFILE)
+
+fun getScreens(): Screen {
+  return Screen
+}
 
 open class NavigationActions(
     private val navController: NavHostController,

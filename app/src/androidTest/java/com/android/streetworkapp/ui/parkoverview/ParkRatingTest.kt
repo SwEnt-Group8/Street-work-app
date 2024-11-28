@@ -40,7 +40,7 @@ class ParkRatingTest {
 
       CustomDialog(
           showRatingDialog,
-          "Rating",
+          tag = "Rating",
           Content = { /* No content needed */},
           onSubmit = { /* submit function not called */},
           onDismiss = { /* dismiss function not called */})
