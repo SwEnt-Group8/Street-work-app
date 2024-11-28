@@ -13,15 +13,17 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.streetworkapp.model.workout.WorkoutViewModel
 import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_DARK
+import com.android.streetworkapp.ui.theme.ColorPalette.PRINCIPLE_BACKGROUND_COLOR
 
 @Composable
 fun TrainSoloScreen(
@@ -33,51 +35,55 @@ fun TrainSoloScreen(
   var isStopped by remember { mutableStateOf(false) }
 
   Column(
-      modifier = Modifier.fillMaxSize().padding(paddingValues),
+      modifier = Modifier.fillMaxSize().padding(paddingValues).testTag("TrainSoloScreen"),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center) {
-        Text("Train Solo")
-        Text("Activity: $activity")
-        Text("Time Dependent: $isTimeDependent")
+        Text("Train Solo", modifier = Modifier.testTag("TrainSoloTitle"))
+        Text("Activity: $activity", modifier = Modifier.testTag("ActivityText"))
+        Text("Time Dependent: $isTimeDependent", modifier = Modifier.testTag("TimeDependentText"))
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Show the timer if the activity is time-dependent
         if (isTimeDependent) {
+          // Timer
           if (!isStopped) {
             CircularTimer(totalTime = 30, onTimeUp = { isStopped = true })
           } else {
-            Text("Time's Up!")
+            Text("Time's Up!", modifier = Modifier.testTag("TimeUpText"))
           }
 
           Spacer(modifier = Modifier.height(16.dp))
 
           Button(
               onClick = { isStopped = true },
-              colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK)) {
-                Text("I stopped", color = Color.White)
+              colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
+              modifier = Modifier.testTag("StopButton")) {
+                Text("I stopped", color = PRINCIPLE_BACKGROUND_COLOR)
               }
         } else {
-          // Manual increment/decrement buttons for non-time-dependent activities
-          var count by remember { mutableStateOf(0) }
+          // Counter
+          var count by remember { mutableIntStateOf(0) }
 
           AnimatedCounter(
               count = count,
-              style = androidx.compose.material3.MaterialTheme.typography.displayLarge)
+              style = androidx.compose.material3.MaterialTheme.typography.displayLarge,
+              modifier = Modifier.testTag("CounterText"))
 
           Spacer(modifier = Modifier.height(16.dp))
 
           Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             Button(
-                onClick = { if (count > 0) count-- }, // Decrement
-                colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK)) {
-                  Text("-1", color = Color.White)
+                onClick = { if (count > 0) count-- },
+                colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
+                modifier = Modifier.testTag("DecrementButton")) {
+                  Text("-1", color = PRINCIPLE_BACKGROUND_COLOR)
                 }
 
             Button(
-                onClick = { count++ }, // Increment
-                colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK)) {
-                  Text("+1", color = Color.White)
+                onClick = { count++ },
+                colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
+                modifier = Modifier.testTag("IncrementButton")) {
+                  Text("+1", color = PRINCIPLE_BACKGROUND_COLOR)
                 }
           }
         }
