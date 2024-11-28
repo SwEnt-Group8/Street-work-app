@@ -117,7 +117,7 @@ fun ParkOverviewScreen(
 
       CustomDialog(
           showRatingDialog,
-          "Rating",
+          tag = "Rating",
           Content = { InteractiveRatingComponent(starRating) },
           onSubmit = {
             Log.d("ParkOverview", "RatingDialog: Submitting rating")
