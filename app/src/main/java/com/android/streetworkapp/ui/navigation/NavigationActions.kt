@@ -26,6 +26,7 @@ object Screen {
   const val EVENT_OVERVIEW = "Event Overview Screen"
   const val PROGRESSION = "Progression Screen"
   const val UNK = "TBD Screen" // TODO: not yet defined
+  const val TUTO_EVENT = "Tutorial event Screen"
 }
 
 data class ScreenParams(
@@ -105,6 +106,13 @@ data class ScreenParams(
             BottomNavigationMenuType.DEFAULT,
             isTopBarVisible = true,
             TopAppBarManager("My Progress", hasNavigationIcon = false))
+    val TUTO_EVENT =
+        ScreenParams(
+            Screen.TUTO_EVENT,
+            isBottomBarVisible = false,
+            BottomNavigationMenuType.NONE,
+            isTopBarVisible = false,
+            null)
   }
 }
 
@@ -117,7 +125,8 @@ val LIST_OF_SCREENS =
         ScreenParams.PARK_OVERVIEW,
         ScreenParams.ADD_EVENT,
         ScreenParams.EVENT_OVERVIEW,
-        ScreenParams.PROGRESSION)
+        ScreenParams.PROGRESSION,
+        ScreenParams.TUTO_EVENT)
 
 /**
  * Represents a top-level destination in the app's navigation.
