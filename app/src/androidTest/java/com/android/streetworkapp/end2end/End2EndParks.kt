@@ -37,6 +37,7 @@ import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
 import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.user.UserViewModel
+import com.android.streetworkapp.model.workout.WorkoutViewModel
 import com.android.streetworkapp.ui.navigation.Route
 import io.mockk.every
 import io.mockk.mockk
@@ -110,6 +111,7 @@ class End2EndParks {
           ParkViewModel(mockk()),
           EventViewModel(mockk()),
           ProgressionViewModel(mockk()),
+          WorkoutViewModel(mockk()),
           TextModerationViewModel(mockk()))
       // setup so as we're already on the MAP route
     }
