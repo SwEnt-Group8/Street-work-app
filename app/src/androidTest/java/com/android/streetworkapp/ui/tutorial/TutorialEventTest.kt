@@ -93,7 +93,7 @@ class TutorialEventTest {
     // UX - Text values for page 3:
     composeTestRule
         .onNodeWithTag("tutoText2")
-        .assertTextEquals("Look for others events in the park\n" + "Or start one yourself")
+        .assertTextEquals("Look for other people's events in the park\n" + "Or start one yourself")
   }
 
   private fun tutoComponentsDisplayedOnPage4() {
