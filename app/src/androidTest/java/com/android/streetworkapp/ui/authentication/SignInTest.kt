@@ -1,6 +1,5 @@
 package com.android.streetworkapp.ui.authentication
 
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
@@ -8,7 +7,8 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
-import androidx.compose.ui.test.swipe
+import androidx.compose.ui.test.swipeLeft
+import androidx.compose.ui.test.swipeRight
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
 import androidx.test.espresso.intent.rule.IntentsTestRule
@@ -87,19 +87,11 @@ class LoginTest : TestCase() {
   @Test
   fun uiComponentsDisplayedOnSecondPage() {
 
-    val metrics = composeTestRule.activity.resources.displayMetrics
-    val screenWidth = metrics.widthPixels.toFloat()
-    val screenHeight = metrics.heightPixels.toFloat()
-
     // Ensure the page 1 is displayed
     composeTestRule.onNodeWithTag("introColumn1").assertExists().assertIsDisplayed()
 
     // Simulate swipe to the left to move from page 1 -> page 2
-    composeTestRule.onNodeWithTag("introScreenBoxContainer").performTouchInput {
-      swipe(
-          start = Offset(screenWidth * 0.75f, screenHeight / 2),
-          end = Offset(screenWidth * 0.25f, screenHeight / 2))
-    }
+    composeTestRule.onNodeWithTag("introScreenBoxContainer").performTouchInput { swipeLeft() }
 
     // Wait for UI
     composeTestRule.waitForIdle()
@@ -124,19 +116,11 @@ class LoginTest : TestCase() {
   @Test
   fun uiComponentsDisplayedOnThirdPage() {
 
-    val metrics = composeTestRule.activity.resources.displayMetrics
-    val screenWidth = metrics.widthPixels.toFloat()
-    val screenHeight = metrics.heightPixels.toFloat()
-
     // Ensure the page 1 is displayed
     composeTestRule.onNodeWithTag("introColumn1").assertExists().assertIsDisplayed()
 
     // Simulate swipe to the left to move from page 1 -> page 2
-    composeTestRule.onNodeWithTag("introScreenBoxContainer").performTouchInput {
-      swipe(
-          start = Offset(screenWidth * 0.75f, screenHeight / 2),
-          end = Offset(screenWidth * 0.25f, screenHeight / 2))
-    }
+    composeTestRule.onNodeWithTag("introScreenBoxContainer").performTouchInput { swipeLeft() }
 
     // Wait for UI
     composeTestRule.waitForIdle()
@@ -145,11 +129,7 @@ class LoginTest : TestCase() {
     composeTestRule.onNodeWithTag("introColumn2").assertExists().assertIsDisplayed()
 
     // Simulate swipe to the left to move from page 2 -> page 3
-    composeTestRule.onNodeWithTag("introScreenBoxContainer").performTouchInput {
-      swipe(
-          start = Offset(screenWidth * 0.75f, screenHeight / 2),
-          end = Offset(screenWidth * 0.25f, screenHeight / 2))
-    }
+    composeTestRule.onNodeWithTag("introScreenBoxContainer").performTouchInput { swipeLeft() }
 
     // Wait for UI
     composeTestRule.waitForIdle()
@@ -174,19 +154,11 @@ class LoginTest : TestCase() {
   @Test
   fun testPagerWork() {
 
-    val metrics = composeTestRule.activity.resources.displayMetrics
-    val screenWidth = metrics.widthPixels.toFloat()
-    val screenHeight = metrics.heightPixels.toFloat()
-
     // Ensure the page 1 is displayed
     composeTestRule.onNodeWithTag("introColumn1").assertExists().assertIsDisplayed()
 
     // Simulate swipe to the left to move from page 1 -> page 2
-    composeTestRule.onNodeWithTag("introScreenBoxContainer").performTouchInput {
-      swipe(
-          start = Offset(screenWidth * 0.75f, screenHeight / 2),
-          end = Offset(screenWidth * 0.25f, screenHeight / 2))
-    }
+    composeTestRule.onNodeWithTag("introScreenBoxContainer").performTouchInput { swipeLeft() }
 
     // Wait for UI
     composeTestRule.waitForIdle()
@@ -195,11 +167,7 @@ class LoginTest : TestCase() {
     composeTestRule.onNodeWithTag("introColumn2").assertExists().assertIsDisplayed()
 
     // Simulate swipe to the left to move from page 2 -> page 3
-    composeTestRule.onNodeWithTag("introScreenBoxContainer").performTouchInput {
-      swipe(
-          start = Offset(screenWidth * 0.75f, screenHeight / 2),
-          end = Offset(screenWidth * 0.25f, screenHeight / 2))
-    }
+    composeTestRule.onNodeWithTag("introScreenBoxContainer").performTouchInput { swipeLeft() }
 
     // Wait for UI
     composeTestRule.waitForIdle()
@@ -208,11 +176,7 @@ class LoginTest : TestCase() {
     composeTestRule.onNodeWithTag("introColumn3").assertExists().assertIsDisplayed()
 
     // Simulate swipe to the right to move from page 3 -> page 2
-    composeTestRule.onNodeWithTag("introScreenBoxContainer").performTouchInput {
-      swipe(
-          start = Offset(screenWidth * 0.25f, screenHeight / 2),
-          end = Offset(screenWidth * 0.75f, screenHeight / 2))
-    }
+    composeTestRule.onNodeWithTag("introScreenBoxContainer").performTouchInput { swipeRight() }
 
     // Wait for UI
     composeTestRule.waitForIdle()
@@ -221,11 +185,7 @@ class LoginTest : TestCase() {
     composeTestRule.onNodeWithTag("introColumn2").assertExists().assertIsDisplayed()
 
     // Simulate swipe to the right to move from page 2 -> page 1
-    composeTestRule.onNodeWithTag("introScreenBoxContainer").performTouchInput {
-      swipe(
-          start = Offset(screenWidth * 0.25f, screenHeight / 2),
-          end = Offset(screenWidth * 0.75f, screenHeight / 2))
-    }
+    composeTestRule.onNodeWithTag("introScreenBoxContainer").performTouchInput { swipeRight() }
 
     // Wait for UI
     composeTestRule.waitForIdle()

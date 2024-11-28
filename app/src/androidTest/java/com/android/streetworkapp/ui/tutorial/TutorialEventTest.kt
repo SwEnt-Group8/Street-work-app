@@ -1,14 +1,12 @@
 package com.android.streetworkapp.ui.tutorial
 
-import android.util.DisplayMetrics
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTouchInput
-import androidx.compose.ui.test.swipe
+import androidx.compose.ui.test.swipeLeft
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import org.junit.Before
 import org.junit.Rule
@@ -29,14 +27,6 @@ class TutorialEventTest {
 
   @Test
   fun testTutorial() {
-    // mock Emulator Default Screen Size
-    val mockMetrics =
-        DisplayMetrics().apply {
-          widthPixels = 1080 // Mock width
-          heightPixels = 1920 // Mock height
-        }
-    val screenWidth = mockMetrics.widthPixels.toFloat()
-    val screenHeight = mockMetrics.heightPixels.toFloat()
 
     // Assert the box and column of the screen display
     composeTestRule.onNodeWithTag("tutoScreenBoxContainer").assertExists().assertIsDisplayed()
@@ -49,11 +39,7 @@ class TutorialEventTest {
     tutoComponentsDisplayedOnPage1()
 
     // Simulate swipe to the left to move from page 1 -> page 2
-    composeTestRule.onNodeWithTag("tutoPageContainer").performTouchInput {
-      swipe(
-          start = Offset(screenWidth * 0.75f, screenHeight / 2),
-          end = Offset(screenWidth * 0.25f, screenHeight / 2))
-    }
+    composeTestRule.onNodeWithTag("tutoPageContainer").performTouchInput { swipeLeft() }
 
     // Wait for UI
     composeTestRule.waitForIdle()
@@ -62,11 +48,7 @@ class TutorialEventTest {
     tutoComponentsDisplayedOnPage2()
 
     // Simulate swipe to the left to move from page 2 -> page 3
-    composeTestRule.onNodeWithTag("tutoPageContainer").performTouchInput {
-      swipe(
-          start = Offset(screenWidth * 0.75f, screenHeight / 2),
-          end = Offset(screenWidth * 0.25f, screenHeight / 2))
-    }
+    composeTestRule.onNodeWithTag("tutoPageContainer").performTouchInput { swipeLeft() }
 
     // Wait for UI
     composeTestRule.waitForIdle()
@@ -75,11 +57,7 @@ class TutorialEventTest {
     tutoComponentsDisplayedOnPage3()
 
     // Simulate swipe to the left to move from page 3 -> page 4
-    composeTestRule.onNodeWithTag("tutoPageContainer").performTouchInput {
-      swipe(
-          start = Offset(screenWidth * 0.75f, screenHeight / 2),
-          end = Offset(screenWidth * 0.25f, screenHeight / 2))
-    }
+    composeTestRule.onNodeWithTag("tutoPageContainer").performTouchInput { swipeLeft() }
 
     // Wait for UI
     composeTestRule.waitForIdle()
@@ -88,11 +66,7 @@ class TutorialEventTest {
     tutoComponentsDisplayedOnPage4()
 
     // Simulate swipe to the left to move from page 4 -> page 5
-    composeTestRule.onNodeWithTag("tutoPageContainer").performTouchInput {
-      swipe(
-          start = Offset(screenWidth * 0.75f, screenHeight / 2),
-          end = Offset(screenWidth * 0.25f, screenHeight / 2))
-    }
+    composeTestRule.onNodeWithTag("tutoPageContainer").performTouchInput { swipeLeft() }
 
     // Wait for UI
     composeTestRule.waitForIdle()
