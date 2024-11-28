@@ -17,7 +17,7 @@ class CircularTimerTest {
   fun circularTimer_decrementsTime() = runTest {
     var timeUpCalled = false
     // Small timer for testing
-    composeTestRule.setContent { CircularTimer(totalTime = 3, onTimeUp = { timeUpCalled = true }) }
+    composeTestRule.setContent { CircularTimer(totalTime = 3f, onTimeUp = { timeUpCalled = true }) }
 
     // Initial state
     composeTestRule.onNodeWithText("3s").assertExists()
@@ -45,7 +45,7 @@ class CircularTimerTest {
     var callbackInvoked = false
 
     composeTestRule.setContent {
-      CircularTimer(totalTime = 1, onTimeUp = { callbackInvoked = true })
+      CircularTimer(totalTime = 1f, onTimeUp = { callbackInvoked = true })
     }
 
     // Wait for the timer to complete

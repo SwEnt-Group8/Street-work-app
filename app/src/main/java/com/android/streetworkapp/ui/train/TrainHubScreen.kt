@@ -53,7 +53,7 @@ fun TrainHubScreen(
         verticalArrangement = Arrangement.SpaceBetween) {
           Column(modifier = Modifier.fillMaxWidth()) {
             // Role selection
-            SectionTitle(title = "Choose your training type", testTag = "RoleSelectionTitle")
+            SelectionTitle(title = "Choose your training type", testTag = "RoleSelectionTitle")
             SelectionGrid(
                 items = listOf("Solo", "Coach", "Challenge"),
                 buttonSize = buttonSize,
@@ -76,7 +76,7 @@ fun TrainHubScreen(
                 color = BORDER_COLOR)
 
             // Activity selection
-            SectionTitle(title = "Choose your activity", testTag = "ActivitySelectionTitle")
+            SelectionTitle(title = "Choose your activity", testTag = "ActivitySelectionTitle")
             SelectionGrid(
                 items =
                     listOf(
@@ -110,30 +110,16 @@ fun TrainHubScreen(
                 testTagPrefix = "Activity_")
           }
 
-          // Confirm button
-          Box(modifier = Modifier.fillMaxWidth()) {
-            ConfirmButton(
-                modifier = Modifier.align(Alignment.Center),
-                onClick = {
-                  selectedType?.let { type ->
-                    selectedActivity?.let { (activity, isTimeDependent) ->
-                      when (type) {
-                        "Solo" -> navigationActions.navigateToSoloScreen(activity, isTimeDependent)
-                        "Coach" ->
-                            navigationActions.navigateToCoachScreen(activity, isTimeDependent)
-                        "Challenge" ->
-                            navigationActions.navigateToChallengeScreen(activity, isTimeDependent)
-                      }
-                    }
-                  }
-                })
-          }
+          ConfirmButtonSection(
+              selectedType = selectedType,
+              selectedActivity = selectedActivity,
+              navigationActions = navigationActions)
         }
   }
 }
 
 @Composable
-fun SectionTitle(title: String, testTag: String) {
+fun SelectionTitle(title: String, testTag: String) {
   Text(
       text = title,
       fontSize = 16.sp,
@@ -198,6 +184,30 @@ fun SelectionButton(
         Spacer(modifier = Modifier.height(8.dp))
         Text(text = text, fontSize = 14.sp, fontWeight = FontWeight.Medium)
       }
+}
+
+@Composable
+fun ConfirmButtonSection(
+    selectedType: String?,
+    selectedActivity: Pair<String, Boolean>?,
+    navigationActions: NavigationActions
+) {
+  Box(modifier = Modifier.fillMaxWidth()) {
+    ConfirmButton(
+        modifier = Modifier.align(Alignment.Center),
+        onClick = {
+          selectedType?.let { type ->
+            selectedActivity?.let { (activity, isTimeDependent) ->
+              when (type) {
+                "Solo" -> navigationActions.navigateToSoloScreen(activity, isTimeDependent)
+                "Coach" -> navigationActions.navigateToCoachScreen(activity, isTimeDependent)
+                "Challenge" ->
+                    navigationActions.navigateToChallengeScreen(activity, isTimeDependent)
+              }
+            }
+          }
+        })
+  }
 }
 
 @Composable

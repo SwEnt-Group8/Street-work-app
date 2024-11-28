@@ -47,7 +47,7 @@ fun TrainSoloScreen(
         if (isTimeDependent) {
           // Timer
           if (!isStopped) {
-            CircularTimer(totalTime = 30, onTimeUp = { isStopped = true })
+            CircularTimer(totalTime = 30f, onTimeUp = { isStopped = true })
           } else {
             Text("Time's Up!", modifier = Modifier.testTag("TimeUpText"))
           }
