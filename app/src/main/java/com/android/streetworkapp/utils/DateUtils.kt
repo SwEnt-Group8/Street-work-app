@@ -76,9 +76,9 @@ fun dateDifference(endTimestamp: String): String {
   return if (days > 0) {
     "in $days day(s)"
   } else {
-    if(hours == 0L) {
+    if (hours == 0L) {
       "in less than an hour"
-    } else if(hours < 0) {
+    } else if (hours < 0) {
       "expired"
     } else {
       "in $hours hour(s)"
