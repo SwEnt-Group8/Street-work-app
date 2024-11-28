@@ -59,7 +59,7 @@ fun TutorialEvent(navigationActions: NavigationActions) {
 
   val tutoText2 = buildAnnotatedString {
     withStyle(style = SpanStyle(ColorPalette.TUTORIAL_INTERACTION_2)) { append("Look") }
-    append(" for others events in the park\nOr ")
+    append(" for other people's events in the park\nOr ")
     withStyle(style = SpanStyle(color = ColorPalette.TUTORIAL_INTERACTION_1)) { append("start") }
     append(" one yourself")
   }
