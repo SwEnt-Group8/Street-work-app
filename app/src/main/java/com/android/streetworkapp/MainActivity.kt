@@ -55,6 +55,7 @@ import com.android.streetworkapp.ui.profile.AddFriendScreen
 import com.android.streetworkapp.ui.profile.ProfileScreen
 import com.android.streetworkapp.ui.progress.ProgressScreen
 import com.android.streetworkapp.ui.theme.ColorPalette
+import com.android.streetworkapp.ui.tutorial.TutorialEvent
 import com.android.streetworkapp.ui.utils.CustomDialog
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
@@ -240,6 +241,7 @@ fun StreetWorkApp(
                 composable(Screen.EVENT_OVERVIEW) {
                   EventOverviewScreen(eventViewModel, parkViewModel, innerPadding)
                 }
+                composable(Screen.TUTO_EVENT) { TutorialEvent(navigationActions) }
               }
 
               navigation(
