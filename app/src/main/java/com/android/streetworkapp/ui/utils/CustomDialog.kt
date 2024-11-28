@@ -45,7 +45,7 @@ fun CustomDialog(
           showDialog.value = false
         },
         confirmButton = {
-          if (dialogType.shouldShowSubmitButton()) {
+          if (dialogType.shouldShowButton()) {
             TextButton(
                 onClick = {
                   onSubmit()
@@ -58,7 +58,7 @@ fun CustomDialog(
           }
         },
         dismissButton = {
-          if (dialogType.shouldShowCancelButton()) {
+          if (dialogType.shouldShowButton()) {
             TextButton(
                 onClick = {
                   onDismiss()
@@ -87,11 +87,7 @@ enum class DialogType {
   QUERY, // Have submit / cancel buttons + use OnSubmit / onDismiss.
   INFO; // Only display the content + use onDismiss.
 
-  fun shouldShowSubmitButton(): Boolean {
-    return this == QUERY
-  }
-
-  fun shouldShowCancelButton(): Boolean {
+  fun shouldShowButton(): Boolean {
     return this == QUERY
   }
 }
