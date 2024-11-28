@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -35,7 +36,6 @@ fun TrainHubScreen(
   var selectedActivity by remember { mutableStateOf<Pair<String, Boolean>?>(null) }
 
   val currentUser by userViewModel.currentUser.collectAsState()
-  // Loading the user workout data in the hub allows us to gains some speed on the next screen
   currentUser?.uid?.let { workoutViewModel.getOrAddWorkoutData(it) }
 
   BoxWithConstraints {
@@ -55,7 +55,7 @@ fun TrainHubScreen(
                 text = "Choose your training type",
                 fontSize = if (screenWidth < 360.dp) 14.sp else 16.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 16.dp))
+                modifier = Modifier.padding(bottom = 16.dp).testTag("RoleSelectionTitle"))
 
             RoleSelectionRow(
                 roles = listOf("Solo", "Coach", "Challenge"),
@@ -66,7 +66,7 @@ fun TrainHubScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
             HorizontalDivider(
-                modifier = Modifier.padding(vertical = 16.dp),
+                modifier = Modifier.padding(vertical = 16.dp).testTag("Divider"),
                 thickness = 1.dp,
                 color = BORDER_COLOR)
 
@@ -74,7 +74,7 @@ fun TrainHubScreen(
                 text = "Choose your activity",
                 fontSize = if (screenWidth < 360.dp) 14.sp else 16.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 16.dp))
+                modifier = Modifier.padding(bottom = 16.dp).testTag("ActivitySelectionTitle"))
 
             ActivitySelectionGrid(
                 activities =
@@ -109,7 +109,10 @@ fun TrainHubScreen(
                   // Handle case where not all selections are made
                 }
               },
-              modifier = Modifier.fillMaxWidth(0.5f).align(Alignment.CenterHorizontally),
+              modifier =
+                  Modifier.fillMaxWidth(0.5f)
+                      .align(Alignment.CenterHorizontally)
+                      .testTag("ConfirmButton"),
               shape = RoundedCornerShape(50),
               colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK)) {
                 Text(
@@ -140,7 +143,7 @@ fun RoleSelectionRow(
 
   LazyVerticalGrid(
       columns = GridCells.Adaptive(buttonWidth + gridSpacing),
-      modifier = Modifier.fillMaxWidth(),
+      modifier = Modifier.fillMaxWidth().testTag("RoleSelectionGrid"),
       horizontalArrangement = Arrangement.spacedBy(gridSpacing),
       verticalArrangement = Arrangement.spacedBy(gridSpacing)) {
         items(roles) { role ->
@@ -153,7 +156,8 @@ fun RoleSelectionRow(
               onClick = {
                 selectedRole = role
                 onRoleSelected(role)
-              })
+              },
+              modifier = Modifier.testTag("Role_$role"))
         }
       }
 }
@@ -170,7 +174,7 @@ fun ActivitySelectionGrid(
 
   LazyVerticalGrid(
       columns = GridCells.Adaptive(buttonWidth + gridSpacing),
-      modifier = Modifier.fillMaxWidth(),
+      modifier = Modifier.fillMaxWidth().testTag("ActivitySelectionGrid"),
       horizontalArrangement = Arrangement.spacedBy(gridSpacing),
       verticalArrangement = Arrangement.spacedBy(gridSpacing)) {
         items(activities) { (activity, isTimeDependent) ->
@@ -183,7 +187,8 @@ fun ActivitySelectionGrid(
               onClick = {
                 selectedActivity = activity to isTimeDependent
                 onActivitySelected(activity to isTimeDependent)
-              })
+              },
+              modifier = Modifier.testTag("Activity_$activity"))
         }
       }
 }
@@ -195,10 +200,11 @@ fun ActivityButton(
     imageResId: Int,
     buttonWidth: Dp,
     buttonHeight: Dp,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
   Column(
-      horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(buttonWidth)) {
+      horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier.width(buttonWidth)) {
         Button(
             onClick = onClick,
             modifier =
@@ -228,10 +234,11 @@ fun SelectionButton(
     imageResId: Int,
     buttonWidth: Dp,
     buttonHeight: Dp,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
   Column(
-      horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(buttonWidth)) {
+      horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier.width(buttonWidth)) {
         Button(
             onClick = onClick,
             modifier =
