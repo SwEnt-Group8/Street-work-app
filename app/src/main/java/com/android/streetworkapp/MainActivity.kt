@@ -255,7 +255,7 @@ fun StreetWorkApp(
                       innerPadding)
                 }
                 composable(Screen.EVENT_OVERVIEW) {
-                    infoManager.Display()
+                  infoManager.Display()
                   EventOverviewScreen(
                       eventViewModel, parkViewModel, userViewModel, navigationActions, innerPadding)
                 }
