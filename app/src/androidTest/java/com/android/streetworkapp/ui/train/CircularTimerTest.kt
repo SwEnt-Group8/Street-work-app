@@ -3,7 +3,6 @@ package com.android.streetworkapp.ui.train
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -17,10 +16,8 @@ class CircularTimerTest {
   @Test
   fun circularTimer_decrementsTime() = runTest {
     var timeUpCalled = false
-    //Small timer for testing
-    composeTestRule.setContent {
-      CircularTimer(totalTime = 3, onTimeUp = { timeUpCalled = true })
-    }
+    // Small timer for testing
+    composeTestRule.setContent { CircularTimer(totalTime = 3, onTimeUp = { timeUpCalled = true }) }
 
     // Initial state
     composeTestRule.onNodeWithText("3s").assertExists()
