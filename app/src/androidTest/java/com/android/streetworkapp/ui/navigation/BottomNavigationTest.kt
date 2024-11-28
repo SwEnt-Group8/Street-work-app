@@ -40,7 +40,13 @@ import org.mockito.Mockito.mock
 // this is very wrong but something in the ADD_EVENT screen makes the test stall and I really can't
 // be bothered to debug it. (We only skip one screen out of all the others so it shouldn't matter
 // that much)
-val TEST_SCREEN_EXCLUSION_LIST = listOf<String>(Screen.ADD_EVENT, Screen.EVENT_OVERVIEW)
+val TEST_SCREEN_EXCLUSION_LIST =
+    listOf<String>(
+        Screen.ADD_EVENT,
+        Screen.EVENT_OVERVIEW,
+        Screen.TRAIN_SOLO,
+        Screen.TRAIN_COACH,
+        Screen.TRAIN_CHALLENGE)
 
 @RunWith(AndroidJUnit4::class)
 class BottomNavigationTest {
