@@ -11,6 +11,7 @@ import androidx.test.rule.GrantPermissionRule
 import com.android.streetworkapp.StreetWorkApp
 import com.android.streetworkapp.model.event.EventRepository
 import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.moderation.TextModerationRepository
 import com.android.streetworkapp.model.moderation.TextModerationViewModel
 import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.park.ParkViewModel
@@ -94,12 +95,6 @@ class End2EndGeneral {
   fun setUp() {
     MockitoAnnotations.openMocks(this)
     userViewModel.setCurrentUser(mockedUser)
-  }
-
-  /** Tests everything included up to M2 except for everything that involves parks */
-  @Test
-  fun e2eNavigationAndDisplaysCorrectDetailsExceptForParks() {
-
     // mock the mockedUser's progression
     wheneverBlocking { progressionRepository.getOrAddProgression(mockedUser.uid) }
         .thenReturn(mockedUserProgression)
@@ -107,6 +102,11 @@ class End2EndGeneral {
     // mock the mockedUser's friends
     wheneverBlocking { userRepository.getFriendsByUid(mockedUser.uid) }
         .thenReturn(mockedFriendsForMockedUser)
+  }
+
+  /** Tests everything included up to M2 except for everything that involves parks */
+  @Test
+  fun e2eNavigationAndDisplaysCorrectDetailsExceptForParks() {
 
     composeTestRule.setContent {
       StreetWorkApp(
@@ -118,10 +118,11 @@ class End2EndGeneral {
           EventViewModel(mock(EventRepository::class.java)),
           progressionViewModel,
           WorkoutViewModel(mock(WorkoutRepository::class.java)),
-          mock(TextModerationViewModel::class.java))
+          TextModerationViewModel(mock(TextModerationRepository::class.java)))
     }
 
     composeTestRule.waitForIdle()
+
     // already on map here
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
 
