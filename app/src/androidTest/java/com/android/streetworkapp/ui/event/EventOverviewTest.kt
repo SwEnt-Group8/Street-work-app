@@ -1,4 +1,4 @@
-package com.android.streetworkapp.event
+package com.android.streetworkapp.ui.event
 
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.remember
@@ -23,7 +23,6 @@ import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
-import com.android.streetworkapp.ui.event.EventOverviewScreen
 import com.android.streetworkapp.ui.navigation.EventBottomBar
 import com.android.streetworkapp.ui.navigation.LIST_OF_SCREENS
 import com.android.streetworkapp.ui.navigation.NavigationActions
