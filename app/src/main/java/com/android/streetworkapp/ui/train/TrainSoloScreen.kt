@@ -12,7 +12,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,7 +30,6 @@ fun TrainSoloScreen(
     workoutViewModel: WorkoutViewModel,
     paddingValues: PaddingValues = PaddingValues(0.dp)
 ) {
-  var count by remember { mutableStateOf(30) } // Initial count (can be 0 for non-time-dependent)
   var isStopped by remember { mutableStateOf(false) }
 
   Column(
@@ -44,21 +42,13 @@ fun TrainSoloScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Show the timer with decrement animation if time-dependent
+        // Show the timer if the activity is time-dependent
         if (isTimeDependent) {
           if (!isStopped) {
-            AnimatedCounter(
-                count = count,
-                style = androidx.compose.material3.MaterialTheme.typography.displayLarge)
-            // Countdown logic
-            LaunchedEffect(count) {
-              if (count > 0) {
-                kotlinx.coroutines.delay(1000L) // 1-second delay
-                count--
-              } else {
-                isStopped = true // Stop the countdown when it reaches 0
-              }
-            }
+            CircularTimer(
+                totalTime = 30,
+                onTimeUp = { isStopped = true }
+                )
           } else {
             Text("Time's Up!")
           }
@@ -72,6 +62,8 @@ fun TrainSoloScreen(
               }
         } else {
           // Manual increment/decrement buttons for non-time-dependent activities
+          var count by remember { mutableStateOf(0) }
+
           AnimatedCounter(
               count = count,
               style = androidx.compose.material3.MaterialTheme.typography.displayLarge)
