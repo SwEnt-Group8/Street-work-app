@@ -28,6 +28,8 @@ import com.android.streetworkapp.model.progression.ProgressionRepository
 import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
+import com.android.streetworkapp.model.workout.WorkoutRepository
+import com.android.streetworkapp.model.workout.WorkoutViewModel
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
@@ -111,6 +113,7 @@ class BottomNavigationTest {
           ParkViewModel(mock(ParkRepository::class.java, RETURNS_DEFAULTS)),
           EventViewModel(mock(EventRepository::class.java, RETURNS_DEFAULTS)),
           ProgressionViewModel(mock(ProgressionRepository::class.java, RETURNS_DEFAULTS)),
+          WorkoutViewModel(mock(WorkoutRepository::class.java, RETURNS_DEFAULTS)),
           TextModerationViewModel(mock(TextModerationRepository::class.java, RETURNS_DEFAULTS)),
           true)
     }

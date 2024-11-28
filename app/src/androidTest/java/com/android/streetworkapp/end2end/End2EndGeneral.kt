@@ -24,6 +24,7 @@ import com.android.streetworkapp.model.progression.Ranks
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
+import com.android.streetworkapp.model.workout.WorkoutViewModel
 import com.android.streetworkapp.ui.navigation.Route
 import org.junit.Before
 import org.junit.Rule
@@ -115,6 +116,7 @@ class End2EndGeneral {
           ParkViewModel(mock(ParkRepository::class.java)),
           EventViewModel(mock(EventRepository::class.java)),
           progressionViewModel,
+          mock(WorkoutViewModel::class.java),
           mock(TextModerationViewModel::class.java))
     }
 
