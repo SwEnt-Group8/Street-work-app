@@ -45,10 +45,7 @@ fun TrainSoloScreen(
         // Show the timer if the activity is time-dependent
         if (isTimeDependent) {
           if (!isStopped) {
-            CircularTimer(
-                totalTime = 30,
-                onTimeUp = { isStopped = true }
-                )
+            CircularTimer(totalTime = 30, onTimeUp = { isStopped = true })
           } else {
             Text("Time's Up!")
           }

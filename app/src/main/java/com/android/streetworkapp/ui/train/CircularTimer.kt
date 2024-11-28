@@ -20,10 +20,7 @@ import kotlinx.coroutines.delay
  * The CircularTimer composable displays a circular timer that counts down from a specified time.
  */
 @Composable
-fun CircularTimer(
-    totalTime: Int = 30,
-    onTimeUp: () -> Unit = {}
-) {
+fun CircularTimer(totalTime: Int = 30, onTimeUp: () -> Unit = {}) {
   var timeRemaining by remember { mutableIntStateOf(totalTime) }
   val progress = remember { Animatable(1f) }
 
@@ -31,8 +28,7 @@ fun CircularTimer(
     if (timeRemaining > 0) {
       progress.animateTo(
           targetValue = timeRemaining / totalTime.toFloat(),
-          animationSpec = tween(durationMillis = 1000)
-          )
+          animationSpec = tween(durationMillis = 1000))
       delay(1000L)
       timeRemaining--
     } else {
