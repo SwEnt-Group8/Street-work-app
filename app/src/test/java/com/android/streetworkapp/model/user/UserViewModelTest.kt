@@ -218,4 +218,12 @@ class UserViewModelTest {
     val observedUser = userViewModel.user.first()
     assertEquals(user, observedUser)
   }
+
+  @Test
+  fun getUsersByUidsCallsRepository() = runTest {
+    val uids = listOf("user123", "user456")
+    userViewModel.getUsersByUids(uids)
+    testDispatcher.scheduler.advanceUntilIdle()
+    verify(repository).getUsersByUids(any())
+  }
 }
