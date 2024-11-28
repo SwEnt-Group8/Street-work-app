@@ -60,6 +60,7 @@ import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.ui.utils.CustomDialog
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 
@@ -117,15 +118,16 @@ fun StreetWorkAppMain(
   // If the user is logged in, fetch the user from the database or the datastore depending on the
   // internet connection
   if (isLoggedIn) {
-    val uid = runBlocking { dataStoreManager.savedUidFlow.first() }
+    val uid = runBlocking { dataStoreManager.savedUidFlow.firstOrNull() }
     if (internetAvailable) {
       Log.d("MainActivity", "Internet is available, fetching user from database")
-      userViewModel.getUserByUidAndSetAsCurrentUser(uid)
+      userViewModel.getUserByUidAndSetAsCurrentUser(uid ?: "")
     } else {
       Log.d("MainActivity", "Internet is not available, fetching user from datastore")
-      val username = runBlocking { dataStoreManager.savedNameFlow.first() }
-      val score = runBlocking { dataStoreManager.savedScoreFlow.first() }
-      val offlineUser = User(uid, username, "", score, emptyList(), "")
+      val username = runBlocking { dataStoreManager.savedNameFlow.firstOrNull() }
+      val score = runBlocking { dataStoreManager.savedScoreFlow.firstOrNull() }
+      val offlineUser =
+          User(uid ?: "", username ?: "Anonymous user", "", score ?: 0, emptyList(), "")
       userViewModel.setCurrentUser(offlineUser)
     }
   }
