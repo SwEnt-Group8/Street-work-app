@@ -7,12 +7,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -24,6 +28,8 @@ import androidx.navigation.navigation
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
 import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.moderation.PerspectiveAPIRepository
+import com.android.streetworkapp.model.moderation.TextModerationViewModel
 import com.android.streetworkapp.model.park.NominatimParkNameRepository
 import com.android.streetworkapp.model.park.ParkRepositoryFirestore
 import com.android.streetworkapp.model.park.ParkViewModel
@@ -105,6 +111,10 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
   val workoutRepository = WorkoutRepositoryFirestore(firestoreDB)
   val workoutViewModel = WorkoutViewModel(workoutRepository)
 
+  // Instantiate Text Moderation
+  val textModerationRepository = PerspectiveAPIRepository(OkHttpClient())
+  val textModerationViewModel = TextModerationViewModel(textModerationRepository)
+
   StreetWorkApp(
       parkLocationViewModel,
       testInvokation,
@@ -113,7 +123,8 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
       parkViewModel,
       eventViewModel,
       progressionViewModel,
-      workoutViewModel)
+      workoutViewModel,
+      textModerationViewModel)
 }
 
 fun NavGraphBuilder.trainComposable(
@@ -145,11 +156,16 @@ fun StreetWorkApp(
     eventViewModel: EventViewModel,
     progressionViewModel: ProgressionViewModel,
     workoutViewModel: WorkoutViewModel,
+    textModerationViewModel: TextModerationViewModel,
     navTestInvokationOnEachRecompose: Boolean = false,
     e2eEventTesting: Boolean = false
 ) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
+
+  // To display SnackBars
+  val scope = rememberCoroutineScope()
+  val host = remember { SnackbarHostState() }
 
   val currentScreenName = remember {
     mutableStateOf<String?>(null)
@@ -186,6 +202,13 @@ fun StreetWorkApp(
             ?.takeIf { it }
             ?.let { TopAppBarWrapper(navigationActions, screenParams?.topAppBarManager) }
       },
+      snackbarHost = {
+        SnackbarHost(
+            hostState = host,
+            snackbar = { data ->
+              Snackbar(actionColor = ColorPalette.INTERACTION_COLOR_DARK, snackbarData = data)
+            })
+      },
       bottomBar = {
         screenParams
             ?.takeIf { it.isBottomBarVisible }
@@ -197,7 +220,7 @@ fun StreetWorkApp(
                       tabList = LIST_TOP_LEVEL_DESTINATION)
                 }
                 BottomNavigationMenuType.EVENT_OVERVIEW -> {
-                  EventBottomBar(eventViewModel, userViewModel, navigationActions)
+                  EventBottomBar(eventViewModel, userViewModel, navigationActions, scope, host)
                   // selected
                 }
                 BottomNavigationMenuType
@@ -238,7 +261,15 @@ fun StreetWorkApp(
                       parkViewModel, innerPadding, navigationActions, eventViewModel, userViewModel)
                 }
                 composable(Screen.ADD_EVENT) {
-                  AddEventScreen(navigationActions, parkViewModel, eventViewModel, userViewModel)
+                  AddEventScreen(
+                      navigationActions,
+                      parkViewModel,
+                      eventViewModel,
+                      userViewModel,
+                      textModerationViewModel,
+                      scope,
+                      host,
+                      innerPadding)
                 }
                 composable(Screen.EVENT_OVERVIEW) {
                   EventOverviewScreen(eventViewModel, parkViewModel, innerPadding)
@@ -268,7 +299,9 @@ fun StreetWorkApp(
                   )
                 }
                 // screen for adding friend
-                composable(Screen.ADD_FRIEND) { AddFriendScreen(userViewModel, innerPadding) }
+                composable(Screen.ADD_FRIEND) {
+                  AddFriendScreen(userViewModel, navigationActions, scope, host, innerPadding)
+                }
               }
 
               navigation(

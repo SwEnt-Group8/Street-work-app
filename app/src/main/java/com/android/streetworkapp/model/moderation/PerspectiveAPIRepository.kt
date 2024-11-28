@@ -4,6 +4,8 @@ import android.util.Log
 import com.android.sample.BuildConfig
 import java.net.HttpURLConnection.HTTP_BAD_REQUEST
 import java.net.HttpURLConnection.HTTP_OK
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
 import okhttp3.HttpUrl
@@ -13,7 +15,9 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 
 class PerspectiveAPIRepository(private val client: OkHttpClient) : TextModerationRepository {
-  private val DEBUG_PREFIX = "PerspectiveAPIRepository:"
+  companion object {
+    private const val DEBUG_PREFIX = "PerspectiveAPIRepository:"
+  }
 
   /**
    * Evaluates the text
@@ -22,7 +26,7 @@ class PerspectiveAPIRepository(private val client: OkHttpClient) : TextModeratio
    * @return True if the text is under all thresholds, false if the text is over at least one
    *   threshold
    */
-  override fun evaluateText(
+  override suspend fun evaluateText(
       content: String,
       thresholds: Map<TextModerationTags, Double>
   ): TextEvaluation {
@@ -30,7 +34,7 @@ class PerspectiveAPIRepository(private val client: OkHttpClient) : TextModeratio
 
     when (val result = this.getTextAnnotations(content)) {
       is PerspectiveAPIEvaluationResult.Error -> {
-        Log.d(this.DEBUG_PREFIX, result.errorType.errorMessage)
+        Log.d(DEBUG_PREFIX, result.errorType.errorMessage)
         return TextEvaluation.Error(result.errorType.errorMessage)
       }
       is PerspectiveAPIEvaluationResult.Success -> {
@@ -56,56 +60,55 @@ class PerspectiveAPIRepository(private val client: OkHttpClient) : TextModeratio
    * @return TextEvaluationResult.Success if the API could process the content,
    *   TextEvaluationResult.Error if an error was encountered
    */
-  private fun getTextAnnotations(content: String): PerspectiveAPIEvaluationResult {
-    // I don't perform any checks on the content, I'll let the api handle the error checking
+  private suspend fun getTextAnnotations(content: String): PerspectiveAPIEvaluationResult {
+    return withContext(Dispatchers.Default) {
+      try {
+        // Prepare the request
+        val requestMediaType = "application/json; charset=utf-8".toMediaType()
+        val requestBody = formatPostRequestBody(content).toRequestBody(requestMediaType)
 
-    val requestMediaType = "application/json; charset=utf-8".toMediaType()
-    val requestBody = this.formatPostRequestBody(content).toRequestBody(requestMediaType)
+        val url =
+            HttpUrl.Builder()
+                .scheme("https")
+                .host("commentanalyzer.googleapis.com")
+                .addPathSegment("v1alpha1")
+                .addPathSegment("comments:analyze")
+                .addQueryParameter("key", BuildConfig.PERSPECTIVE_API_KEY)
+                .build()
 
-    // note: someone could get the key by sniffing the packets, but since we can't have a backend
-    // here we are :)
-    val url =
-        HttpUrl.Builder()
-            .scheme("https")
-            .host("commentanalyzer.googleapis.com")
-            .addPathSegment("v1alpha1")
-            .addPathSegment("comments:analyze")
-            .addQueryParameter("key", BuildConfig.PERSPECTIVE_API_KEY)
-            .build()
+        val request = Request.Builder().url(url).post(requestBody).build()
 
-    val request = Request.Builder().url(url).post(requestBody).build()
+        // Execute the request
+        val response = client.newCall(request).execute()
 
-    val response = client.newCall(request).execute()
-    when (response.code) {
-      HTTP_OK -> {
-        val responseBody =
-            response.body?.string()
-                ?: run {
-                  return PerspectiveAPIEvaluationResult.Error(
-                      PerspectiveApiErrors.EMPTY_BODY_RESPONSE)
-                }
-        val annotations = this.extractTagsAndProbabilitiesFromResponseBody(responseBody)
-        annotations?.let {
-          return PerspectiveAPIEvaluationResult.Success(annotations)
+        // Handle response
+        when (response.code) {
+          HTTP_OK -> {
+            val responseBody =
+                response.body?.string()
+                    ?: return@withContext PerspectiveAPIEvaluationResult.Error(
+                        PerspectiveApiErrors.EMPTY_BODY_RESPONSE)
+            val annotations = extractTagsAndProbabilitiesFromResponseBody(responseBody)
+            annotations?.let { PerspectiveAPIEvaluationResult.Success(annotations) }
+                ?: PerspectiveAPIEvaluationResult.Error(
+                    PerspectiveApiErrors.JSON_DESERIALIZATION_ERROR)
+          }
+          HTTP_BAD_REQUEST -> {
+            val responseBody =
+                response.body?.string()
+                    ?: return@withContext PerspectiveAPIEvaluationResult.Error(
+                        PerspectiveApiErrors.EMPTY_BODY_RESPONSE)
+            val error = extractErrorFromResponseBody(responseBody)
+            PerspectiveAPIEvaluationResult.Error(error)
+          }
+          else -> {
+            Log.d(DEBUG_PREFIX, "Received unsupported HTTP code (${response.code}) from API")
+            PerspectiveAPIEvaluationResult.Error(PerspectiveApiErrors.UNSUPPORTED_HTTP_CODE)
+          }
         }
-            ?: run {
-              return PerspectiveAPIEvaluationResult.Error(
-                  PerspectiveApiErrors.JSON_DESERIALIZATION_ERROR)
-            }
-      }
-      HTTP_BAD_REQUEST -> {
-        val responseBody =
-            response.body?.string()
-                ?: run {
-                  return PerspectiveAPIEvaluationResult.Error(
-                      PerspectiveApiErrors.EMPTY_BODY_RESPONSE)
-                }
-        val error = extractErrorFromResponseBody(responseBody)
-        return PerspectiveAPIEvaluationResult.Error(error)
-      }
-      else -> {
-        Log.d(this.DEBUG_PREFIX, "Received unsupported http code (${response.code}) from api")
-        return PerspectiveAPIEvaluationResult.Error(PerspectiveApiErrors.UNSUPPORTED_HTTP_CODE)
+      } catch (e: Exception) {
+        Log.e(DEBUG_PREFIX, "Network error: ${e.message}", e)
+        PerspectiveAPIEvaluationResult.Error(PerspectiveApiErrors.NETWORK_ERROR)
       }
     }
   }
@@ -134,7 +137,7 @@ class PerspectiveAPIRepository(private val client: OkHttpClient) : TextModeratio
 
       return tagsAnnotations
     } catch (e: Exception) {
-      Log.d(this.DEBUG_PREFIX, "Failed to map response body into valid List<TagAnnotation>")
+      Log.d(DEBUG_PREFIX, "Failed to map response body into valid List<TagAnnotation>")
       return null
     }
   }

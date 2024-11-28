@@ -22,6 +22,7 @@ import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.utils.LocationService
 import com.android.streetworkapp.utils.PermissionManager
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -96,6 +97,7 @@ fun MapScreen(
             Marker(
                 contentDescription = "Marker$markerIndex",
                 state = MarkerState(position = LatLng(park.lat, park.lon)),
+                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE),
                 onClick = {
                   parkViewModel.getOrCreateParkByLocation(park)
                   parkViewModel.setParkLocation(park)
