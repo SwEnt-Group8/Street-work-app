@@ -29,70 +29,103 @@ class LoginTest : TestCase() {
   // is deprecated, but it was MUCH faster than using IntentsRule in our tests
   @get:Rule val intentsTestRule = IntentsTestRule(MainActivity::class.java)
 
+
   @Test
-  fun uiComponentsDisplayed() {
+  fun uiComponentsDisplayed1() {
     composeTestRule.waitForIdle()
     // Test uses useUnmerged = true for all children of containers,
     // otherwise will not be accessible for the test using testTags.
 
     // For Box, Text, Image, Buttons, List : check if displayed :
     composeTestRule.onNodeWithTag("loginScreenBoxContainer").assertExists().assertIsDisplayed()
-    print("loginScreenBoxContainer")
     composeTestRule.onNodeWithTag("loginScreenAppLogo").assertExists().assertIsDisplayed()
-    print("loginScreenAppLogo")
     composeTestRule.onNodeWithTag("loginScreenFirstRowIcon").assertExists().assertIsDisplayed()
-    print("loginScreenFirstRowIcon")
     composeTestRule.onNodeWithTag("loginButton").assertExists().assertIsDisplayed()
-    print("loginButton")
+    composeTestRule
+      .onNodeWithTag("loginButtonIcon", useUnmergedTree = true)
+      .assertExists()
+      .assertIsDisplayed()
+  }
+  @Test
+  fun uiComponentsDisplayed2() {
+    // For Pager component
+    composeTestRule.onNodeWithTag("introScreenBoxContainer").assertExists().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("introBox1").assertExists().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("introImage1").assertExists().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("introApp1").assertExists().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("introDotRow").assertExists().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("introColumn1").assertExists().assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("loginButtonText", useUnmergedTree = true).assertIsDisplayed()
+  }
+  @Test
+  fun uiComponentsDisplayed3() {
+    // For columns / rows / spacers : check if exist :
+    composeTestRule.onNodeWithTag("loginScreenColumnContainer").assertExists()
+    composeTestRule.onNodeWithTag("loginScreenFirstSpacer").assertExists()
+    composeTestRule.onNodeWithTag("loginScreenFirstRow").assertExists().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("loginScreenFirstRowSpacer").assertExists()
+    composeTestRule.onNodeWithTag("loginButtonRowContainer", useUnmergedTree = true).assertExists()
+  }
+  @Test
+  fun uiComponentsDisplayed4() {
+    // UX - Text values :
+    composeTestRule
+      .onNodeWithTag("loginScreenFirstRowText")
+      .assertTextEquals("Find nearby parks and events to participate in or create")
+    composeTestRule.onNodeWithTag("loginButton").assertTextEquals("Sign in with Google")
+    composeTestRule
+      .onNodeWithTag("loginButtonText", useUnmergedTree = true)
+      .assertTextEquals("Sign in with Google")
+  }
+
+
+  @Test
+  fun uiComponentsDisplayed() {
+    composeTestRule.waitForIdle()/*
+    // Test uses useUnmerged = true for all children of containers,
+    // otherwise will not be accessible for the test using testTags.
+
+    // For Box, Text, Image, Buttons, List : check if displayed :
+    composeTestRule.onNodeWithTag("loginScreenBoxContainer").assertExists().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("loginScreenAppLogo").assertExists().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("loginScreenFirstRowIcon").assertExists().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("loginButton").assertExists().assertIsDisplayed()
     composeTestRule
         .onNodeWithTag("loginButtonIcon", useUnmergedTree = true)
         .assertExists()
         .assertIsDisplayed()
-    print("loginButtonIcon")
 
     // For Pager component
     composeTestRule.onNodeWithTag("introScreenBoxContainer").assertExists().assertIsDisplayed()
-    print("introScreenBoxContainer")
     composeTestRule.onNodeWithTag("introBox1").assertExists().assertIsDisplayed()
-    print("introBox1")
     composeTestRule.onNodeWithTag("introImage1").assertExists().assertIsDisplayed()
-    print("introImage1")
     composeTestRule.onNodeWithTag("introApp1").assertExists().assertIsDisplayed()
-    print("introApp1")
     composeTestRule.onNodeWithTag("introDotRow").assertExists().assertIsDisplayed()
-    print("introDotRow")
     composeTestRule.onNodeWithTag("introColumn1").assertExists().assertIsDisplayed()
-    print("introColumn1")
 
     composeTestRule.onNodeWithTag("loginButtonText", useUnmergedTree = true).assertIsDisplayed()
-    print("loginButtonText")
+
     // For columns / rows / spacers : check if exist :
     composeTestRule.onNodeWithTag("loginScreenColumnContainer").assertExists()
-    print("loginScreenColumnContainer")
     composeTestRule.onNodeWithTag("loginScreenFirstSpacer").assertExists()
-    print("loginScreenFirstSpacer")
     composeTestRule.onNodeWithTag("loginScreenFirstRow").assertExists().assertIsDisplayed()
-    print("loginScreenFirstRow")
     composeTestRule.onNodeWithTag("loginScreenFirstRowSpacer").assertExists()
-    print("loginScreenFirstRowSpacer")
     composeTestRule.onNodeWithTag("loginButtonRowContainer", useUnmergedTree = true).assertExists()
-    print("loginButtonRowContainer")
+
     // UX elements :
 
     // UX - Text values :
     composeTestRule
         .onNodeWithTag("loginScreenFirstRowText")
         .assertTextEquals("Find nearby parks and events to participate in or create")
-    print("loginScreenFirstRowText")
     composeTestRule.onNodeWithTag("loginButton").assertTextEquals("Sign in with Google")
-    print("loginButton")
     composeTestRule
         .onNodeWithTag("loginButtonText", useUnmergedTree = true)
         .assertTextEquals("Sign in with Google")
-    print("loginButtonText")
+*/
     // UX - Button click action :
     composeTestRule.onNodeWithTag("loginButton").assertHasClickAction()
-    print("loginButton")
   }
 
   @Test
