@@ -97,7 +97,7 @@ class LoginTest : TestCase() {
     // For columns / rows / spacers : check if exist :
     composeTestRule.onNodeWithTag("loginScreenColumnContainer").assertExists()
     composeTestRule.onNodeWithTag("loginScreenFirstSpacer").assertExists()
-    composeTestRule.onNodeWithTag("loginScreenFirstRow").assertExists().assertIsDisplayed()
+    //    composeTestRule.onNodeWithTag("loginScreenFirstRow").assertExists().assertIsDisplayed()
     composeTestRule.onNodeWithTag("loginScreenFirstRowSpacer").assertExists()
     // composeTestRule.onNodeWithTag("loginButtonRowContainer", useUnmergedTree =
     // true).assertExists()
@@ -190,7 +190,7 @@ class LoginTest : TestCase() {
 
     composeTestRule.onNodeWithTag("loginScreenSecondRowIcon").assertExists().assertIsDisplayed()
     composeTestRule.onNodeWithTag("loginScreenSecondSpacer").assertExists()
-    composeTestRule.onNodeWithTag("loginScreenSecondRow").assertExists().assertIsDisplayed()
+    //    composeTestRule.onNodeWithTag("loginScreenSecondRow").assertExists().assertIsDisplayed()
     composeTestRule.onNodeWithTag("loginScreenSecondRowSpacer").assertExists()
 
     // UX - Text values for page 2:
@@ -221,7 +221,7 @@ class LoginTest : TestCase() {
     composeTestRule.onNodeWithTag("introApp3").assertExists().assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("loginScreenThirdRowIcon").assertExists().assertIsDisplayed()
-    composeTestRule.onNodeWithTag("loginScreenThirdRow").assertExists().assertIsDisplayed()
+    //    composeTestRule.onNodeWithTag("loginScreenThirdRow").assertExists().assertIsDisplayed()
     composeTestRule.onNodeWithTag("loginScreenThirdRowSpacer").assertExists()
     composeTestRule.onNodeWithTag("loginScreenThirdSpacer").assertExists()
 

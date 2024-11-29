@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -36,7 +37,7 @@ fun TutorialSignIn() {
   val pagerState = rememberPagerState(pageCount = { 3 })
   Box(
       contentAlignment = Alignment.Center,
-      modifier = Modifier.fillMaxWidth().testTag("introScreenBoxContainer")) {
+      modifier = Modifier.fillMaxWidth().fillMaxHeight(0.7f).testTag("introScreenBoxContainer")) {
         HorizontalPager(state = pagerState) { page ->
           // Display the corresponding page
           when (page) {
