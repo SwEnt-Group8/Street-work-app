@@ -29,7 +29,6 @@ class LoginTest : TestCase() {
   // is deprecated, but it was MUCH faster than using IntentsRule in our tests
   @get:Rule val intentsTestRule = IntentsTestRule(MainActivity::class.java)
 
-
   @Test
   fun uiComponentsDisplayed1() {
     composeTestRule.waitForIdle()
@@ -42,10 +41,11 @@ class LoginTest : TestCase() {
     composeTestRule.onNodeWithTag("loginScreenFirstRowIcon").assertExists().assertIsDisplayed()
     composeTestRule.onNodeWithTag("loginButton").assertExists().assertIsDisplayed()
     composeTestRule
-      .onNodeWithTag("loginButtonIcon", useUnmergedTree = true)
-      .assertExists()
-      .assertIsDisplayed()
+        .onNodeWithTag("loginButtonIcon", useUnmergedTree = true)
+        .assertExists()
+        .assertIsDisplayed()
   }
+
   @Test
   fun uiComponentsDisplayed2() {
     // For Pager component
@@ -58,6 +58,7 @@ class LoginTest : TestCase() {
 
     composeTestRule.onNodeWithTag("loginButtonText", useUnmergedTree = true).assertIsDisplayed()
   }
+
   @Test
   fun uiComponentsDisplayed3() {
     // For columns / rows / spacers : check if exist :
@@ -67,22 +68,22 @@ class LoginTest : TestCase() {
     composeTestRule.onNodeWithTag("loginScreenFirstRowSpacer").assertExists()
     composeTestRule.onNodeWithTag("loginButtonRowContainer", useUnmergedTree = true).assertExists()
   }
+
   @Test
   fun uiComponentsDisplayed4() {
     // UX - Text values :
     composeTestRule
-      .onNodeWithTag("loginScreenFirstRowText")
-      .assertTextEquals("Find nearby parks and events to participate in or create")
+        .onNodeWithTag("loginScreenFirstRowText")
+        .assertTextEquals("Find nearby parks and events to participate in or create")
     composeTestRule.onNodeWithTag("loginButton").assertTextEquals("Sign in with Google")
     composeTestRule
-      .onNodeWithTag("loginButtonText", useUnmergedTree = true)
-      .assertTextEquals("Sign in with Google")
+        .onNodeWithTag("loginButtonText", useUnmergedTree = true)
+        .assertTextEquals("Sign in with Google")
   }
-
 
   @Test
   fun uiComponentsDisplayed() {
-    composeTestRule.waitForIdle()/*
+    composeTestRule.waitForIdle() /*
     // Test uses useUnmerged = true for all children of containers,
     // otherwise will not be accessible for the test using testTags.
 
