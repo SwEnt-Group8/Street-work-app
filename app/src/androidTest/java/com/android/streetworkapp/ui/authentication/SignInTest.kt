@@ -31,6 +31,7 @@ class LoginTest : TestCase() {
 
   @Test
   fun uiComponentsDisplayed() {
+    composeTestRule.waitForIdle()
     // Test uses useUnmerged = true for all children of containers,
     // otherwise will not be accessible for the test using testTags.
 
@@ -78,6 +79,8 @@ class LoginTest : TestCase() {
 
   @Test
   fun googleSignInReturnsValidActivityResult() {
+    composeTestRule.waitForIdle()
+
     composeTestRule.onNodeWithTag("loginButton").performClick()
 
     // assert that an Intent resolving to Google Mobile Services has been sent (for sign-in)
