@@ -46,6 +46,23 @@ class LoginTest : TestCase() {
   }
 
   @Test
+  fun uiComponentsDisplayedthisonehsouldwork() {
+    composeTestRule.waitForIdle()
+    // Test uses useUnmerged = true for all children of containers,
+    // otherwise will not be accessible for the test using testTags.
+
+    // For Box, Text, Image, Buttons, List : check if displayed :
+    composeTestRule.onNodeWithTag("loginScreenBoxContainer").assertExists().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("loginScreenAppLogo").assertExists().assertIsDisplayed()
+    // composeTestRule.onNodeWithTag("loginScreenFirstRowIcon").assertExists().assertIsDisplayed()
+    // composeTestRule.onNodeWithTag("loginButton").assertExists().assertIsDisplayed()
+    // composeTestRule
+    //  .onNodeWithTag("loginButtonIcon", useUnmergedTree = true)
+    //  .assertExists()
+    //  .assertIsDisplayed()
+  }
+
+  @Test
   fun uiComponentsDisplayed1() {
     composeTestRule.waitForIdle()
     // Test uses useUnmerged = true for all children of containers,
