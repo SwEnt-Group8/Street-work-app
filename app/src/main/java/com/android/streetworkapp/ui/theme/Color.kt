@@ -36,6 +36,7 @@ object ColorPalette {
   val SECONDARY_TEXT_COLOR = Color(0xFF666666) // Medium Gray
   val INTERACTION_COLOR_DARK = Color(0xFF007BFF) // Blue
   val INTERACTION_COLOR_LIGHT = Color(0xFFBADBFF) // Light Blue
+  val SHADOW_GREY = Color(0xFFC9C9C9)
   val BORDER_COLOR = Color(0xFFDDDDDD)
   val BUTTON_COLOR =
       ButtonColors(

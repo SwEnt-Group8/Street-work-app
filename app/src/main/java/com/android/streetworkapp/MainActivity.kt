@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
@@ -17,9 +18,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
@@ -35,6 +39,8 @@ import com.android.streetworkapp.model.progression.ProgressionRepositoryFirestor
 import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
+import com.android.streetworkapp.model.workout.WorkoutRepositoryFirestore
+import com.android.streetworkapp.model.workout.WorkoutViewModel
 import com.android.streetworkapp.ui.authentication.SignInScreen
 import com.android.streetworkapp.ui.event.AddEventScreen
 import com.android.streetworkapp.ui.event.EventOverviewScreen
@@ -56,6 +62,10 @@ import com.android.streetworkapp.ui.profile.AddFriendScreen
 import com.android.streetworkapp.ui.profile.ProfileScreen
 import com.android.streetworkapp.ui.progress.ProgressScreen
 import com.android.streetworkapp.ui.theme.ColorPalette
+import com.android.streetworkapp.ui.train.TrainChallengeScreen
+import com.android.streetworkapp.ui.train.TrainCoachScreen
+import com.android.streetworkapp.ui.train.TrainHubScreen
+import com.android.streetworkapp.ui.train.TrainSoloScreen
 import com.android.streetworkapp.ui.tutorial.TutorialEvent
 import com.android.streetworkapp.ui.utils.CustomDialog
 import com.google.firebase.Timestamp
@@ -99,6 +109,10 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
   val progressionRepository = ProgressionRepositoryFirestore(firestoreDB)
   val progressionViewModel = ProgressionViewModel(progressionRepository)
 
+  // Instantiate the workout repository
+  val workoutRepository = WorkoutRepositoryFirestore(firestoreDB)
+  val workoutViewModel = WorkoutViewModel(workoutRepository)
+
   // Instantiate Text Moderation
   val textModerationRepository = PerspectiveAPIRepository(OkHttpClient())
   val textModerationViewModel = TextModerationViewModel(textModerationRepository)
@@ -111,7 +125,26 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
       parkViewModel,
       eventViewModel,
       progressionViewModel,
+      workoutViewModel,
       textModerationViewModel)
+}
+
+fun NavGraphBuilder.trainComposable(
+    route: String,
+    workoutViewModel: WorkoutViewModel,
+    innerPadding: PaddingValues,
+    content: @Composable (activity: String, isTimeDependent: Boolean) -> Unit
+) {
+  composable(
+      route = route,
+      arguments =
+          listOf(
+              navArgument("activity") { type = NavType.StringType },
+              navArgument("isTimeDependent") { type = NavType.BoolType })) { backStackEntry ->
+        val activity = backStackEntry.arguments?.getString("activity") ?: "Unknown"
+        val isTimeDependent = backStackEntry.arguments?.getBoolean("isTimeDependent") ?: false
+        content(activity, isTimeDependent)
+      }
 }
 
 @SuppressLint("UnrememberedMutableState")
@@ -124,6 +157,7 @@ fun StreetWorkApp(
     parkViewModel: ParkViewModel,
     eventViewModel: EventViewModel,
     progressionViewModel: ProgressionViewModel,
+    workoutViewModel: WorkoutViewModel,
     textModerationViewModel: TextModerationViewModel,
     navTestInvokationOnEachRecompose: Boolean = false,
     e2eEventTesting: Boolean = false
@@ -291,6 +325,36 @@ fun StreetWorkApp(
                   infoManager.Display()
                   AddFriendScreen(userViewModel, navigationActions, scope, host, innerPadding)
                 }
+              }
+
+              navigation(
+                  startDestination = Screen.TRAIN_HUB,
+                  route = Route.TRAIN_HUB,
+              ) {
+                composable(Screen.TRAIN_HUB) {
+                  TrainHubScreen(navigationActions, workoutViewModel, userViewModel, innerPadding)
+                }
+                trainComposable(
+                    route = Screen.TRAIN_SOLO,
+                    workoutViewModel = workoutViewModel,
+                    innerPadding = innerPadding) { activity, isTimeDependent ->
+                      TrainSoloScreen(activity, isTimeDependent, workoutViewModel, innerPadding)
+                    }
+
+                trainComposable(
+                    route = Screen.TRAIN_COACH,
+                    workoutViewModel = workoutViewModel,
+                    innerPadding = innerPadding) { activity, isTimeDependent ->
+                      TrainCoachScreen(activity, isTimeDependent, workoutViewModel, innerPadding)
+                    }
+
+                trainComposable(
+                    route = Screen.TRAIN_CHALLENGE,
+                    workoutViewModel = workoutViewModel,
+                    innerPadding = innerPadding) { activity, isTimeDependent ->
+                      TrainChallengeScreen(
+                          activity, isTimeDependent, workoutViewModel, innerPadding)
+                    }
               }
             }
 
