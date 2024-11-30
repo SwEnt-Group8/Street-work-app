@@ -53,4 +53,7 @@ object ColorPalette {
           disabledTextColor = PRIMARY_TEXT_COLOR,
           unselectedIconColor = PRIMARY_TEXT_COLOR,
           unselectedTextColor = PRIMARY_TEXT_COLOR)
+
+  val TUTORIAL_INTERACTION_1 = Color(0xFFFF0000) // red
+  val TUTORIAL_INTERACTION_2 = Color(0xFF00FF00) // green
 }

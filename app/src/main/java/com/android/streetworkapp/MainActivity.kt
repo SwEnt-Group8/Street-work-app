@@ -66,6 +66,7 @@ import com.android.streetworkapp.ui.train.TrainChallengeScreen
 import com.android.streetworkapp.ui.train.TrainCoachScreen
 import com.android.streetworkapp.ui.train.TrainHubScreen
 import com.android.streetworkapp.ui.train.TrainSoloScreen
+import com.android.streetworkapp.ui.tutorial.TutorialEvent
 import com.android.streetworkapp.ui.utils.CustomDialog
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
@@ -293,6 +294,7 @@ fun StreetWorkApp(
                   EventOverviewScreen(
                       eventViewModel, parkViewModel, userViewModel, navigationActions, innerPadding)
                 }
+                composable(Screen.TUTO_EVENT) { TutorialEvent(navigationActions) }
               }
 
               navigation(

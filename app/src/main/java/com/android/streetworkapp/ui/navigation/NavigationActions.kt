@@ -34,6 +34,7 @@ object Screen {
   const val TRAIN_COACH = "TrainCoach/{activity}/{isTimeDependent}"
   const val TRAIN_CHALLENGE = "TrainChallenge/{activity}/{isTimeDependent}"
   const val UNK = "TBD Screen" // TODO: not yet defined
+  const val TUTO_EVENT = "Tutorial event Screen"
 }
 
 data class ScreenParams(
@@ -152,6 +153,13 @@ data class ScreenParams(
             bottomBarType = BottomNavigationMenuType.DEFAULT,
             isTopBarVisible = true,
             TopAppBarManager("Challenge with your friend", hasNavigationIcon = true))
+    val TUTO_EVENT =
+        ScreenParams(
+            Screen.TUTO_EVENT,
+            isBottomBarVisible = false,
+            BottomNavigationMenuType.NONE,
+            isTopBarVisible = false,
+            null)
   }
 }
 
@@ -168,7 +176,8 @@ val LIST_OF_SCREENS =
         ScreenParams.TRAIN_HUB,
         ScreenParams.TRAIN_SOLO,
         ScreenParams.TRAIN_COACH,
-        ScreenParams.TRAIN_CHALLENGE)
+        ScreenParams.TRAIN_CHALLENGE,
+        ScreenParams.TUTO_EVENT)
 
 /**
  * Represents a top-level destination in the app's navigation.
