@@ -62,7 +62,7 @@ fun TutorialSignIn() {
           val isSelected = pagerState.currentPage == index
           Box(
               modifier =
-                  Modifier.size(if (isSelected) 12.dp else 12.dp)
+                  Modifier
                       .padding(4.dp)
                       .clip(CircleShape)
                       .background(
