@@ -3,6 +3,7 @@ package com.android.streetworkapp.ui.image
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -39,13 +40,14 @@ fun AddImageButton(context: Context) {
         )
     }
 
-    // Temporary file for storing the captured image
-    val tempFile = File(context.cacheDir, "temp_image${System.currentTimeMillis()}.jpg").apply {
-        if (exists()) delete()
-        createNewFile()
-    }
+    var showConfirmationDialog by remember { mutableStateOf(false) }
+    var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
 
-    val tempUri = FileProvider.getUriForFile(
+    // Temporary file for storing the captured image
+    //TODO: check to add delete on exit
+    val tempFile = File(context.cacheDir, "temp_image_for_park_upload.jpg")
+
+    capturedImageUri = FileProvider.getUriForFile(
         context,
         "${context.packageName}.provider",
         tempFile
@@ -55,6 +57,7 @@ fun AddImageButton(context: Context) {
         contract = ActivityResultContracts.TakePicture(),
         onResult = { success ->
             if (success) {
+                showConfirmationDialog = true
                 //onImageCaptured(tempUri) // Pass the URI to the parent composable for further processing
             }
         }
@@ -65,7 +68,7 @@ fun AddImageButton(context: Context) {
         onResult = { isGranted ->
             hasCameraPermission = isGranted
             if (isGranted) {
-                cameraLauncher.launch(tempUri)
+                cameraLauncher.launch(capturedImageUri)
             }
         }
     )
@@ -73,7 +76,7 @@ fun AddImageButton(context: Context) {
     IconButton(
         onClick = {
             if (hasCameraPermission)
-                cameraLauncher.launch(tempUri)
+                cameraLauncher.launch(capturedImageUri)
             else
                 permissionLauncher.launch(Manifest.permission.CAMERA)
         },
@@ -94,5 +97,21 @@ fun AddImageButton(context: Context) {
                 modifier = Modifier.align(Alignment.Center).fillMaxSize(0.75f)
             )
         }
+    }
+
+
+    if (showConfirmationDialog && capturedImageUri != null) {
+        ConfirmImageDialog(
+            imageUri = capturedImageUri!!,
+        //TODO: delete image after use
+            onConfirm = {
+                //onImageUploaded(capturedImageUri!!)
+                showConfirmationDialog = false
+            },
+            onCancel = {
+                showConfirmationDialog = false
+            },
+            context
+        )
     }
 }
