@@ -24,8 +24,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.android.sample.R
 import com.android.streetworkapp.ui.authentication.IconAndTextRow
@@ -34,16 +36,20 @@ import com.android.streetworkapp.ui.theme.ColorPalette
 @Composable
 fun TutorialSignIn() {
   // Set number of page
+  // Access screen dimensions
+  val configuration = LocalConfiguration.current
+  val screenHeight = configuration.screenHeightDp.dp
+
   val pagerState = rememberPagerState(pageCount = { 3 })
   Box(
       contentAlignment = Alignment.Center,
-      modifier = Modifier.fillMaxWidth().fillMaxHeight(0.7f).testTag("introScreenBoxContainer")) {
+      modifier = Modifier.fillMaxWidth().testTag("introScreenBoxContainer")) {
         HorizontalPager(state = pagerState) { page ->
           // Display the corresponding page
           when (page) {
-            0 -> IntroPage1()
-            1 -> IntroPage2()
-            2 -> IntroPage3()
+            0 -> IntroPage1(screenHeight)
+            1 -> IntroPage2(screenHeight)
+            2 -> IntroPage3(screenHeight)
           }
         }
       }
@@ -51,7 +57,7 @@ fun TutorialSignIn() {
   Row(
       horizontalArrangement = Arrangement.Center,
       verticalAlignment = Alignment.CenterVertically,
-      modifier = Modifier.padding(16.dp).testTag("introDotRow")) {
+      modifier = Modifier.padding(5.dp).testTag("introDotRow")) {
         repeat(3) { index ->
           val isSelected = pagerState.currentPage == index
           Box(
@@ -67,7 +73,7 @@ fun TutorialSignIn() {
 }
 
 @Composable
-fun IntroPage1() {
+fun IntroPage1(screenHeight: Dp) {
   Column(
       modifier = Modifier.fillMaxWidth().testTag("introColumn1"),
       verticalArrangement = Arrangement.Center,
@@ -79,7 +85,7 @@ fun IntroPage1() {
           Image(
               painter = painterResource(id = R.drawable.intro_1),
               contentDescription = "Background image 1",
-              modifier = Modifier.fillMaxWidth().testTag("introImage1"),
+              modifier = Modifier.fillMaxWidth().fillMaxHeight(0.55f).testTag("introImage1"),
               contentScale = ContentScale.Crop)
 
           // APP image
@@ -90,7 +96,7 @@ fun IntroPage1() {
               modifier =
                   Modifier.align(Alignment.TopCenter)
                       .padding(top = 50.dp)
-                      .size(450.dp)
+                      .size(screenHeight / 2)
                       .testTag("introApp1"))
         }
 
@@ -105,7 +111,7 @@ fun IntroPage1() {
 }
 
 @Composable
-fun IntroPage2() {
+fun IntroPage2(screenHeight: Dp) {
   Column(
       modifier = Modifier.fillMaxWidth().testTag("introColumn2"),
       verticalArrangement = Arrangement.Center,
@@ -117,7 +123,8 @@ fun IntroPage2() {
           Image(
               painter = painterResource(id = R.drawable.intro_2),
               contentDescription = "Background image 2",
-              modifier = Modifier.fillMaxWidth().testTag("IntroImage2"))
+              modifier = Modifier.fillMaxWidth().fillMaxHeight(0.55f).testTag("IntroImage2"),
+              contentScale = ContentScale.Crop)
 
           // APP image
           Image(
@@ -127,7 +134,7 @@ fun IntroPage2() {
               modifier =
                   Modifier.align(Alignment.TopCenter)
                       .padding(top = 50.dp)
-                      .size(450.dp)
+                      .size(screenHeight / 2)
                       .testTag("introApp2"))
         }
 
@@ -142,7 +149,7 @@ fun IntroPage2() {
 }
 
 @Composable
-fun IntroPage3() {
+fun IntroPage3(screenHeight: Dp) {
   Column(
       modifier = Modifier.fillMaxWidth().testTag("introColumn3"),
       verticalArrangement = Arrangement.Center,
@@ -154,7 +161,8 @@ fun IntroPage3() {
           Image(
               painter = painterResource(id = R.drawable.intro_3),
               contentDescription = "Background image 3",
-              modifier = Modifier.fillMaxWidth().testTag("introImage3"))
+              modifier = Modifier.fillMaxWidth().fillMaxHeight(0.55f).testTag("introImage3"),
+              contentScale = ContentScale.Crop)
 
           // APP image
           Image(
@@ -165,7 +173,7 @@ fun IntroPage3() {
               modifier =
                   Modifier.align(Alignment.TopCenter)
                       .padding(top = 50.dp)
-                      .size(450.dp)
+                      .size(screenHeight / 2)
                       .testTag("introApp3"))
         }
 
