@@ -116,8 +116,7 @@ fun TutorialEvent(navigationActions: NavigationActions) {
                   val isSelected = pagerState.currentPage == index
                   Box(
                       modifier =
-                          Modifier
-                              .padding(4.dp)
+                          Modifier.padding(4.dp)
                               .clip(CircleShape)
                               .background(
                                   if (isSelected) ColorPalette.INTERACTION_COLOR_DARK
