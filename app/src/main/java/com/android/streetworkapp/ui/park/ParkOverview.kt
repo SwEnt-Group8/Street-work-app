@@ -65,6 +65,7 @@ import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
+import com.android.streetworkapp.ui.image.AddImageButton
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.theme.ColorPalette
@@ -193,73 +194,6 @@ fun ImageTitle(image: Painter?, title: String, context: Context) {
   }
 }
 
-//TODO: setup description for this composable
-@Composable
-fun AddImageButton(context: Context) {
-
-    var hasCameraPermission by remember {
-        mutableStateOf(
-            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
-        )
-    }
-
-    // Temporary file for storing the captured image
-    val tempFile = File(context.cacheDir, "temp_image${System.currentTimeMillis()}.jpg").apply {
-        if (exists()) delete()
-        createNewFile()
-    }
-
-    val tempUri = FileProvider.getUriForFile(
-        context,
-        "${context.packageName}.provider",
-        tempFile
-    )
-
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture(),
-        onResult = { success ->
-            if (success) {
-                //onImageCaptured(tempUri) // Pass the URI to the parent composable for further processing
-            }
-        }
-    )
-
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { isGranted ->
-            hasCameraPermission = isGranted
-            if (isGranted) {
-                cameraLauncher.launch(tempUri)
-            }
-        }
-    )
-
-    IconButton(
-        onClick = {
-            if (hasCameraPermission)
-                cameraLauncher.launch(tempUri)
-            else
-                permissionLauncher.launch(Manifest.permission.CAMERA)
-        },
-    ) {
-        Box(
-            modifier = Modifier
-                .size(36.dp)
-                .background(
-                    color = ColorPalette.INTERACTION_COLOR_DARK,
-                    shape = CircleShape
-                )
-                .padding(4.dp)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.add_a_photo_24px), // Replace with your "add image" icon
-                contentDescription = "Add Image",
-                tint = Color.White,
-                modifier = Modifier.align(Alignment.Center).fillMaxSize(0.75f)
-            )
-        }
-    }
-}
 
 /**
  * Display the details of a park, including the park's rating and occupancy.
