@@ -3,121 +3,34 @@ package com.android.streetworkapp.ui.authentication
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeRight
+import androidx.test.espresso.intent.Intents.intended
+import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
 import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.streetworkapp.MainActivity
-import com.android.streetworkapp.model.user.UserRepository
-import com.android.streetworkapp.model.user.UserViewModel
-import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.mock
 
 @RunWith(AndroidJUnit4::class)
 class LoginTest : TestCase() {
 
-  // @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
+  @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
 
   // The IntentsTestRule simply calls Intents.init() before the @Test block
   // and Intents.release() after the @Test block is completed. IntentsTestRule
   // is deprecated, but it was MUCH faster than using IntentsRule in our tests
   @get:Rule val intentsTestRule = IntentsTestRule(MainActivity::class.java)
 
-  @get:Rule val composeTestRule = createComposeRule()
-  private lateinit var navigationActions: NavigationActions
-  private lateinit var userViewModel: UserViewModel
-  private lateinit var repository: UserRepository // Mocking interface, not concrete class
-
-  @Before
-  fun setUp() {
-    navigationActions = mock(NavigationActions::class.java)
-    // start tutorial screen
-    repository = mock(UserRepository::class.java)
-    userViewModel = UserViewModel(repository)
-    composeTestRule.setContent { SignInScreen(navigationActions, userViewModel) }
-  }
-
-  @Test
-  fun uiComponentsDisplayedthisonehsouldwork() {
-    composeTestRule.waitForIdle()
-    // Test uses useUnmerged = true for all children of containers,
-    // otherwise will not be accessible for the test using testTags.
-
-    // For Box, Text, Image, Buttons, List : check if displayed :
-    composeTestRule.onNodeWithTag("loginScreenBoxContainer").assertExists().assertIsDisplayed()
-    composeTestRule.onNodeWithTag("loginScreenAppLogo").assertExists().assertIsDisplayed()
-    // composeTestRule.onNodeWithTag("loginScreenFirstRowIcon").assertExists().assertIsDisplayed()
-    // composeTestRule.onNodeWithTag("loginButton").assertExists().assertIsDisplayed()
-    // composeTestRule
-    //  .onNodeWithTag("loginButtonIcon", useUnmergedTree = true)
-    //  .assertExists()
-    //  .assertIsDisplayed()
-  }
-
-  @Test
-  fun uiComponentsDisplayed1() {
-    composeTestRule.waitForIdle()
-    // Test uses useUnmerged = true for all children of containers,
-    // otherwise will not be accessible for the test using testTags.
-
-    // For Box, Text, Image, Buttons, List : check if displayed :
-    composeTestRule.onNodeWithTag("loginScreenBoxContainer").assertExists().assertIsDisplayed()
-    composeTestRule.onNodeWithTag("loginScreenAppLogo").assertExists().assertIsDisplayed()
-    composeTestRule.onNodeWithTag("loginScreenFirstRowIcon").assertExists().assertIsDisplayed()
-    // composeTestRule.onNodeWithTag("loginButton").assertExists().assertIsDisplayed()
-    composeTestRule
-        .onNodeWithTag("loginButtonIcon", useUnmergedTree = true)
-        .assertExists()
-        .assertIsDisplayed()
-  }
-
-  @Test
-  fun uiComponentsDisplayed2() {
-    // For Pager component
-    composeTestRule.onNodeWithTag("introScreenBoxContainer").assertExists().assertIsDisplayed()
-    composeTestRule.onNodeWithTag("introBox1").assertExists().assertIsDisplayed()
-    composeTestRule.onNodeWithTag("introImage1").assertExists().assertIsDisplayed()
-    composeTestRule.onNodeWithTag("introApp1").assertExists().assertIsDisplayed()
-    // composeTestRule.onNodeWithTag("introDotRow").assertExists().assertIsDisplayed()
-    composeTestRule.onNodeWithTag("introColumn1").assertExists().assertIsDisplayed()
-
-    composeTestRule.onNodeWithTag("loginButtonText", useUnmergedTree = true).assertIsDisplayed()
-  }
-
-  @Test
-  fun uiComponentsDisplayed3() {
-    // For columns / rows / spacers : check if exist :
-    composeTestRule.onNodeWithTag("loginScreenColumnContainer").assertExists()
-    composeTestRule.onNodeWithTag("loginScreenFirstSpacer").assertExists()
-    //    composeTestRule.onNodeWithTag("loginScreenFirstRow").assertExists().assertIsDisplayed()
-    composeTestRule.onNodeWithTag("loginScreenFirstRowSpacer").assertExists()
-    // composeTestRule.onNodeWithTag("loginButtonRowContainer", useUnmergedTree =
-    // true).assertExists()
-  }
-
-  @Test
-  fun uiComponentsDisplayed4() {
-    // UX - Text values :
-    composeTestRule
-        .onNodeWithTag("loginScreenFirstRowText")
-        .assertTextEquals("Find nearby parks and events to participate in or create")
-    composeTestRule.onNodeWithTag("loginButton").assertTextEquals("Sign in with Google")
-    composeTestRule
-        .onNodeWithTag("loginButtonText", useUnmergedTree = true)
-        .assertTextEquals("Sign in with Google")
-  }
-
   @Test
   fun uiComponentsDisplayed() {
-    composeTestRule.waitForIdle() /*
     // Test uses useUnmerged = true for all children of containers,
     // otherwise will not be accessible for the test using testTags.
 
@@ -158,19 +71,17 @@ class LoginTest : TestCase() {
     composeTestRule
         .onNodeWithTag("loginButtonText", useUnmergedTree = true)
         .assertTextEquals("Sign in with Google")
-*/
+
     // UX - Button click action :
     composeTestRule.onNodeWithTag("loginButton").assertHasClickAction()
   }
 
   @Test
   fun googleSignInReturnsValidActivityResult() {
-    composeTestRule.waitForIdle()
-
-    // composeTestRule.onNodeWithTag("loginButton").performClick()
+    composeTestRule.onNodeWithTag("loginButton").performClick()
 
     // assert that an Intent resolving to Google Mobile Services has been sent (for sign-in)
-    // intended(toPackage("com.google.android.gms"))
+    intended(toPackage("com.google.android.gms"))
   }
 
   @Test
@@ -190,7 +101,7 @@ class LoginTest : TestCase() {
 
     composeTestRule.onNodeWithTag("loginScreenSecondRowIcon").assertExists().assertIsDisplayed()
     composeTestRule.onNodeWithTag("loginScreenSecondSpacer").assertExists()
-    //    composeTestRule.onNodeWithTag("loginScreenSecondRow").assertExists().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("loginScreenSecondRow").assertExists().assertIsDisplayed()
     composeTestRule.onNodeWithTag("loginScreenSecondRowSpacer").assertExists()
 
     // UX - Text values for page 2:
@@ -221,7 +132,7 @@ class LoginTest : TestCase() {
     composeTestRule.onNodeWithTag("introApp3").assertExists().assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("loginScreenThirdRowIcon").assertExists().assertIsDisplayed()
-    //    composeTestRule.onNodeWithTag("loginScreenThirdRow").assertExists().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("loginScreenThirdRow").assertExists().assertIsDisplayed()
     composeTestRule.onNodeWithTag("loginScreenThirdRowSpacer").assertExists()
     composeTestRule.onNodeWithTag("loginScreenThirdSpacer").assertExists()
 

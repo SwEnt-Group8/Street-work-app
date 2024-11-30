@@ -84,7 +84,7 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
     user?.let {
       userViewModel.setCurrentUser(it)
       Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
-      navigationActions.navigateTo(Screen.TUTO_EVENT)
+      navigationActions.navigateTo(Screen.MAP)
     }
   }
 
@@ -93,7 +93,7 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
     // Centralized content
     Column(
         modifier = Modifier.fillMaxSize().testTag("loginScreenColumnContainer"),
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally) {
           Image(
               painter = painterResource(id = R.drawable.title_alpha),
