@@ -263,12 +263,15 @@ fun StreetWorkApp(
       }) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = startDestination) { // TODO: handle start destination based on signIn logic
+            startDestination =
+                startDestination) { // TODO: handle start destination based on signIn logic
               navigation(
                   startDestination = Screen.AUTH,
                   route = Route.AUTH,
               ) {
-                composable(Screen.AUTH) { SignInScreen(navigationActions, userViewModel, dataStoreManager) }
+                composable(Screen.AUTH) {
+                  SignInScreen(navigationActions, userViewModel, dataStoreManager)
+                }
               }
               navigation(startDestination = Screen.PROGRESSION, route = Route.PROGRESSION) {
                 composable(Screen.PROGRESSION) {
@@ -325,10 +328,10 @@ fun StreetWorkApp(
                   ProfileScreen(navigationActions, userViewModel, innerPadding)
                   val showSettingsDialog = remember { mutableStateOf(false) }
 
-              screenParams?.topAppBarManager?.setActionCallback(
-                  TopAppBarManager.TopAppBarAction.SETTINGS) {
-                    showSettingsDialog.value = true
-                  }
+                  screenParams?.topAppBarManager?.setActionCallback(
+                      TopAppBarManager.TopAppBarAction.SETTINGS) {
+                        showSettingsDialog.value = true
+                      }
 
                   // The settings "in" the profile screen
                   // TODO : Implement the dialog Content composable
