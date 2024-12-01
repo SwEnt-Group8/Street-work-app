@@ -99,7 +99,7 @@ class PreferencesRepositoryDataStore(context: Context) : PreferencesRepository {
   /**
    * Saves the login state of the user in preferences.
    *
-   * @param isLoggedIn: The boolean login state of the user
+   * @param loginState: The boolean login state of the user
    */
   override suspend fun setLoginState(loginState: Boolean) {
     dataStore.edit { preferences -> preferences[IS_LOGGED_IN] = loginState }
