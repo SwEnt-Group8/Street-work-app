@@ -27,6 +27,8 @@ class PreferencesRepositoryDataStore(context: Context) : PreferencesRepository {
     val SAVED_UID = stringPreferencesKey("saved_uid")
     val SAVED_NAME = stringPreferencesKey("saved_name")
     val SAVED_SCORE = intPreferencesKey("saved_score")
+
+    private const val IO_ERR = "An IO exception occurred, emitting empty preferences."
   }
 
   /** A flow that emits the login state of the user. */
@@ -36,7 +38,7 @@ class PreferencesRepositoryDataStore(context: Context) : PreferencesRepository {
             // Handle exceptions
             if (exception is IOException) {
               emit(emptyPreferences())
-              Log.d("DataStoreManager", "An IO exception occurred, emitting empty preferences.")
+              Log.d("DataStoreManager", IO_ERR)
             } else {
               Log.d("DataStoreManager", exception.message.toString())
             }
@@ -50,7 +52,7 @@ class PreferencesRepositoryDataStore(context: Context) : PreferencesRepository {
             // Handle exceptions
             if (exception is IOException) {
               emit(emptyPreferences())
-              Log.d("DataStoreManager", "An IO exception occurred, emitting empty preferences.")
+              Log.d("DataStoreManager", IO_ERR)
             } else {
               Log.d("DataStoreManager", exception.message.toString())
             }
@@ -64,7 +66,7 @@ class PreferencesRepositoryDataStore(context: Context) : PreferencesRepository {
             // Handle exceptions
             if (exception is IOException) {
               emit(emptyPreferences())
-              Log.d("DataStoreManager", "An IO exception occurred, emitting empty preferences.")
+              Log.d("DataStoreManager", IO_ERR)
             } else {
               Log.d("DataStoreManager", exception.message.toString())
             }
