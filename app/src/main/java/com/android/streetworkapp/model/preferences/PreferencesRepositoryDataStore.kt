@@ -13,9 +13,10 @@ import androidx.datastore.preferences.preferencesDataStore
 import java.io.IOException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 
-class PreferencesRepositoryDataStore(context: Context) {
+class PreferencesRepositoryDataStore(context: Context) : PreferencesRepository {
 
   private val Context.dataStore: DataStore<Preferences> by
       preferencesDataStore(name = "preferences")
@@ -85,12 +86,30 @@ class PreferencesRepositoryDataStore(context: Context) {
           .map { preferences -> preferences[SAVED_SCORE] ?: 0 }
 
   /**
+   * Returns the login state of the user from preferences.
+   *
+   * @return The boolean login state of the user
+   */
+  override suspend fun getLoginState(): Boolean {
+    return isLoggedInFlow.firstOrNull() ?: false
+  }
+
+  /**
    * Saves the login state of the user in preferences.
    *
    * @param isLoggedIn: The boolean login state of the user
    */
-  suspend fun saveLoginState(isLoggedIn: Boolean) {
-    dataStore.edit { preferences -> preferences[IS_LOGGED_IN] = isLoggedIn }
+  override suspend fun setLoginState(loginState: Boolean) {
+    dataStore.edit { preferences -> preferences[IS_LOGGED_IN] = loginState }
+  }
+
+  /**
+   * Returns the user's uid from preferences.
+   *
+   * @return The user's uid
+   */
+  override suspend fun getUid(): String {
+    return savedUidFlow.firstOrNull() ?: ""
   }
 
   /**
@@ -98,8 +117,17 @@ class PreferencesRepositoryDataStore(context: Context) {
    *
    * @param uid: The user's uid
    */
-  suspend fun saveUid(uid: String) {
+  override suspend fun setUid(uid: String) {
     dataStore.edit { preferences -> preferences[SAVED_UID] = uid }
+  }
+
+  /**
+   * Returns the user's name from preferences.
+   *
+   * @return The user's name
+   */
+  override suspend fun getName(): String {
+    return savedNameFlow.firstOrNull() ?: ""
   }
 
   /**
@@ -107,8 +135,17 @@ class PreferencesRepositoryDataStore(context: Context) {
    *
    * @param name: The user's name
    */
-  suspend fun saveName(name: String) {
+  override suspend fun setName(name: String) {
     dataStore.edit { preferences -> preferences[SAVED_NAME] = name }
+  }
+
+  /**
+   * Returns the user's score from preferences.
+   *
+   * @return The user's score
+   */
+  override suspend fun getScore(): Int {
+    return savedScoreFlow.firstOrNull() ?: 0
   }
 
   /**
@@ -116,7 +153,7 @@ class PreferencesRepositoryDataStore(context: Context) {
    *
    * @param score: The user's score
    */
-  suspend fun saveScore(score: Int) {
+  override suspend fun setScore(score: Int) {
     dataStore.edit { preferences -> preferences[SAVED_SCORE] = score }
   }
 }
