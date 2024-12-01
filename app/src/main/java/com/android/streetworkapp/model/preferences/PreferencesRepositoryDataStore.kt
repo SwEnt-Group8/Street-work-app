@@ -1,4 +1,4 @@
-package com.android.streetworkapp.device.datastore
+package com.android.streetworkapp.model.preferences
 
 import android.content.Context
 import android.util.Log
@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 
-class DataStoreManager(context: Context) {
+class PreferencesRepositoryDataStore(context: Context) {
 
   private val Context.dataStore: DataStore<Preferences> by
       preferencesDataStore(name = "preferences")
