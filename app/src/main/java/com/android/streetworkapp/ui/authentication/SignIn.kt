@@ -3,22 +3,18 @@ package com.android.streetworkapp.ui.authentication
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.DirectionsRun
-import androidx.compose.material.icons.filled.ConnectWithoutContact
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,7 +34,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
@@ -48,6 +43,7 @@ import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.theme.ColorPalette
+import com.android.streetworkapp.ui.tutorial.TutorialSignIn
 import com.android.streetworkapp.utils.GoogleAuthService
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
@@ -106,58 +102,23 @@ fun SignInScreen(
     // Centralized content
     Column(
         modifier = Modifier.fillMaxSize().testTag("loginScreenColumnContainer"),
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally) {
           Image(
-              painter = painterResource(id = R.drawable.app_logo),
+              painter = painterResource(id = R.drawable.title_alpha),
               contentDescription = "App Logo",
-              modifier = Modifier.height(225.dp).width(225.dp).testTag("loginScreenAppLogo"))
+              modifier = Modifier.fillMaxHeight(0.06f).testTag("loginScreenAppLogo"))
 
-          Spacer(modifier = Modifier.height(26.dp).testTag("loginScreenFirstSpacer"))
+          // call the pagers composable
+          TutorialSignIn()
 
-          Text(
-              text = "Welcome to Street WorkApp!",
-              style =
-                  TextStyle(
-                      fontSize = 26.sp,
-                      lineHeight = 26.sp,
-                      fontWeight = FontWeight(500),
-                      color = Color.Black,
-                      textAlign = TextAlign.Center,
-                  ),
-              modifier =
-                  Modifier.height(32.dp)
-                      .aspectRatio(308f / 24f)
-                      .fillMaxWidth()
-                      .testTag("loginTitle"))
+          Spacer(modifier = Modifier.height(5.dp).testTag("loginScreenFourthSpacer"))
 
-          Spacer(modifier = Modifier.height(26.dp).testTag("loginScreenSecondSpacer"))
-
-          IconAndTextRow(
-              imageVector = Icons.Filled.LocationOn,
-              contentDescription = "Location marker icon",
-              text = "Find nearby parks and events to participate in or create",
-              testName = "loginScreenFirstRow")
-
-          IconAndTextRow(
-              imageVector = Icons.AutoMirrored.Filled.DirectionsRun,
-              contentDescription = "Running person icon",
-              text = "Track your activities and learn new skills",
-              testName = "loginScreenSecondRow")
-
-          IconAndTextRow(
-              imageVector = Icons.Filled.ConnectWithoutContact,
-              contentDescription = "People connecting icon",
-              text = "Make new friends, train together and share activities",
-              testName = "loginScreenThirdRow")
-
-          Spacer(modifier = Modifier.height(26.dp).testTag("loginScreenThirdSpacer"))
-
+          // Authentication button
           Box(
               modifier =
                   Modifier.fillMaxWidth()
                       .height(96.dp)
-                      .background(ColorPalette.INTERACTION_COLOR_DARK)
                       .testTag("loginScreenGoogleAuthButtonContainer"),
               contentAlignment = Alignment.Center) {
                 GoogleAuthButton(authService, context, launcher)

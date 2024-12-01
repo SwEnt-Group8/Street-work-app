@@ -1,5 +1,6 @@
 package com.android.streetworkapp.ui.navigation
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -28,7 +29,11 @@ fun TopAppBarWrapper(navigationActions: NavigationActions, topAppBarManager: Top
             IconButton(
                 onClick = { topAppBarManager.onActionClick(action) },
                 modifier = Modifier.testTag(action.testTag).size(32.dp)) {
-                  Icon(painterResource(action.icon), contentDescription = action.contentDescription)
+                  Icon(
+                      painterResource(action.icon),
+                      contentDescription = action.contentDescription,
+                      modifier = Modifier.size(32.dp).fillMaxSize(),
+                  )
                 }
           }
         },

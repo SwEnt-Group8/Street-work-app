@@ -10,6 +10,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.WriteBatch
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -353,6 +354,7 @@ class UserRepositoryFirestoreTest {
     verify(batch).commit()
   }
 
+  @OptIn(ExperimentalCoroutinesApi::class)
   @Test
   fun removeFriendWithValidUidsRemovesFriendSuccessfully() = runTest {
     val userRef = mock<DocumentReference>()
@@ -779,5 +781,18 @@ class UserRepositoryFirestoreTest {
 
     // Assert that the method returns null
     assertNull(user)
+  }
+
+  @Test
+  fun getUsersByUidsWithValidUidsReturnsListOfUsers() = runTest {
+    `when`(db.collection(any())).thenReturn(collection)
+    `when`(collection.document(any())).thenReturn(documentRef)
+    `when`(documentRef.get()).thenReturn(Tasks.forResult(document))
+
+    `when`(document.exists()).thenReturn(true)
+
+    userRepository.getUsersByUids(listOf("123", "456"))
+
+    verify(documentRef, times(2)).get()
   }
 }

@@ -13,6 +13,10 @@ object Route {
   const val MAP = "Map"
   const val PROFILE = "Profile"
   const val PROGRESSION = "Progression"
+  const val TRAIN_HUB = "TrainHub"
+  const val TRAIN_SOLO = "TrainSolo"
+  const val TRAIN_COACH = "TrainCoach"
+  const val TRAIN_CHALLENGE = "TrainChallenge}"
   const val UNK = "TBD" // TODO: not yet defined
 }
 
@@ -25,7 +29,12 @@ object Screen {
   const val ADD_EVENT = "Add Event Screen"
   const val EVENT_OVERVIEW = "Event Overview Screen"
   const val PROGRESSION = "Progression Screen"
+  const val TRAIN_HUB = "Train Hub Screen"
+  const val TRAIN_SOLO = "TrainSolo/{activity}/{isTimeDependent}"
+  const val TRAIN_COACH = "TrainCoach/{activity}/{isTimeDependent}"
+  const val TRAIN_CHALLENGE = "TrainChallenge/{activity}/{isTimeDependent}"
   const val UNK = "TBD Screen" // TODO: not yet defined
+  const val TUTO_EVENT = "Tutorial event Screen"
 }
 
 data class ScreenParams(
@@ -49,7 +58,7 @@ data class ScreenParams(
             isBottomBarVisible = true,
             BottomNavigationMenuType.DEFAULT,
             isTopBarVisible = true,
-            TopAppBarManager("Map"))
+            TopAppBarManager("Map", actions = listOf(TopAppBarManager.TopAppBarAction.INFO)))
     val PROFILE =
         ScreenParams(
             Screen.PROFILE,
@@ -57,7 +66,11 @@ data class ScreenParams(
             BottomNavigationMenuType.DEFAULT,
             isTopBarVisible = true,
             TopAppBarManager(
-                "My Profile", actions = listOf(TopAppBarManager.TopAppBarAction.SETTINGS)))
+                "My Profile",
+                actions =
+                    listOf(
+                        TopAppBarManager.TopAppBarAction.SETTINGS,
+                        TopAppBarManager.TopAppBarAction.INFO)))
     val ADD_FRIEND =
         ScreenParams(
             Screen.ADD_FRIEND,
@@ -67,7 +80,8 @@ data class ScreenParams(
             TopAppBarManager(
                 "Add a new Friend",
                 hasNavigationIcon = true,
-                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
+                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON,
+                actions = listOf(TopAppBarManager.TopAppBarAction.INFO)))
     val PARK_OVERVIEW =
         ScreenParams(
             Screen.PARK_OVERVIEW,
@@ -77,7 +91,8 @@ data class ScreenParams(
             TopAppBarManager(
                 "Park Overview",
                 hasNavigationIcon = true,
-                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
+                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON,
+                actions = listOf(TopAppBarManager.TopAppBarAction.INFO)))
     val ADD_EVENT =
         ScreenParams(
             Screen.ADD_EVENT,
@@ -87,7 +102,8 @@ data class ScreenParams(
             TopAppBarManager(
                 "Event Creation",
                 hasNavigationIcon = true,
-                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
+                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON,
+                actions = listOf(TopAppBarManager.TopAppBarAction.INFO)))
     val EVENT_OVERVIEW =
         ScreenParams(
             Screen.EVENT_OVERVIEW,
@@ -97,14 +113,53 @@ data class ScreenParams(
             TopAppBarManager(
                 "Event Overview",
                 hasNavigationIcon = true,
-                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON))
+                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON,
+                actions = listOf(TopAppBarManager.TopAppBarAction.INFO)))
     val PROGRESSION =
         ScreenParams(
             Screen.PROGRESSION,
             isBottomBarVisible = true,
             BottomNavigationMenuType.DEFAULT,
             isTopBarVisible = true,
-            TopAppBarManager("My Progress", hasNavigationIcon = false))
+            TopAppBarManager(
+                "My Progress",
+                hasNavigationIcon = false,
+                actions = listOf(TopAppBarManager.TopAppBarAction.INFO)))
+    val TRAIN_HUB =
+        ScreenParams(
+            screenName = Screen.TRAIN_HUB,
+            isBottomBarVisible = true,
+            bottomBarType = BottomNavigationMenuType.DEFAULT,
+            isTopBarVisible = true,
+            TopAppBarManager("Training hub", hasNavigationIcon = true))
+    val TRAIN_SOLO =
+        ScreenParams(
+            screenName = Screen.TRAIN_SOLO,
+            isBottomBarVisible = true,
+            bottomBarType = BottomNavigationMenuType.DEFAULT,
+            isTopBarVisible = true,
+            TopAppBarManager("Train Solo", hasNavigationIcon = true))
+    val TRAIN_COACH =
+        ScreenParams(
+            screenName = Screen.TRAIN_COACH,
+            isBottomBarVisible = true,
+            bottomBarType = BottomNavigationMenuType.DEFAULT,
+            isTopBarVisible = true,
+            TopAppBarManager("Train with a friends as coach", hasNavigationIcon = true))
+    val TRAIN_CHALLENGE =
+        ScreenParams(
+            screenName = Screen.TRAIN_CHALLENGE,
+            isBottomBarVisible = true,
+            bottomBarType = BottomNavigationMenuType.DEFAULT,
+            isTopBarVisible = true,
+            TopAppBarManager("Challenge with your friend", hasNavigationIcon = true))
+    val TUTO_EVENT =
+        ScreenParams(
+            Screen.TUTO_EVENT,
+            isBottomBarVisible = false,
+            BottomNavigationMenuType.NONE,
+            isTopBarVisible = false,
+            null)
   }
 }
 
@@ -117,7 +172,12 @@ val LIST_OF_SCREENS =
         ScreenParams.PARK_OVERVIEW,
         ScreenParams.ADD_EVENT,
         ScreenParams.EVENT_OVERVIEW,
-        ScreenParams.PROGRESSION)
+        ScreenParams.PROGRESSION,
+        ScreenParams.TRAIN_HUB,
+        ScreenParams.TRAIN_SOLO,
+        ScreenParams.TRAIN_COACH,
+        ScreenParams.TRAIN_CHALLENGE,
+        ScreenParams.TUTO_EVENT)
 
 /**
  * Represents a top-level destination in the app's navigation.
@@ -154,6 +214,10 @@ object TopLevelDestinations {
 
 val LIST_TOP_LEVEL_DESTINATION =
     listOf(TopLevelDestinations.PROGRESSION, TopLevelDestinations.MAP, TopLevelDestinations.PROFILE)
+
+fun getScreens(): Screen {
+  return Screen
+}
 
 open class NavigationActions(
     private val navController: NavHostController,
@@ -217,5 +281,34 @@ open class NavigationActions(
     navController.addOnDestinationChangedListener { _, dest, _ ->
       currentScreenName.value = dest.route
     }
+  }
+
+  /**
+   * Navigate to the TrainSolo screen.
+   *
+   * @param activity The activity to train.
+   * @param isTimeDependent Whether the activity is time dependent.
+   */
+  fun navigateToSoloScreen(activity: String, isTimeDependent: Boolean) {
+    navController.navigate("TrainSolo/$activity/$isTimeDependent")
+  }
+
+  /**
+   * Navigate to the TrainCoach screen.
+   *
+   * @param activity The activity to train.
+   * @param isTimeDependent Whether the activity is time dependent.
+   */
+  fun navigateToCoachScreen(activity: String, isTimeDependent: Boolean) {
+    navController.navigate("TrainCoach/$activity/$isTimeDependent")
+  }
+  /**
+   * Navigate to the TrainChallenge screen.
+   *
+   * @param activity The activity to train.
+   * @param isTimeDependent Whether the activity is time dependent.
+   */
+  fun navigateToChallengeScreen(activity: String, isTimeDependent: Boolean) {
+    navController.navigate("TrainChallenge/$activity/$isTimeDependent")
   }
 }

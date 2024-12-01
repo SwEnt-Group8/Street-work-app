@@ -23,6 +23,10 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
   val friends: StateFlow<List<User?>>
     get() = _friends
 
+  private val _userList = MutableStateFlow<List<User?>>(emptyList())
+  val userList: StateFlow<List<User?>>
+    get() = _userList
+
   /**
    * Sets the current user to the provided User object.
    *
@@ -113,7 +117,7 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * Retrieves a user from Firestore based on the provided username.
    *
    * @param userName The username of the user to retrieve.
-   * @return The User object if found, or null if the user doesn't exist or an error occurs.
+   * @return A list of users if found, or null if the user doesn't exist or an error occurs.
    */
   fun getUserByUserName(userName: String) {
     viewModelScope.launch {
@@ -130,9 +134,24 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    */
   fun getFriendsByUid(uid: String) {
     viewModelScope.launch {
-      val fetchedFriends = repository.getFriendsByUid(uid)
-      if (fetchedFriends != null) {
-        _friends.value = fetchedFriends
+      val fetchedUsers = repository.getFriendsByUid(uid)
+      if (fetchedUsers != null) {
+        _friends.value = fetchedUsers
+      }
+    }
+  }
+
+  /**
+   * Retrieves a list of users from Firestore based on the provided list of IDs.
+   *
+   * @param uids The list of unique IDs to retrieve users for.
+   * @return A list of User objects representing the users.
+   */
+  fun getUsersByUids(uids: List<String>) {
+    viewModelScope.launch {
+      val fetchedUsers = repository.getUsersByUids(uids)
+      if (fetchedUsers != null) {
+        _userList.value = fetchedUsers
       }
     }
   }

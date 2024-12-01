@@ -50,6 +50,14 @@ jobs:
         run: |
           echo "$DATA" | base64 -d | grep "MAPS_API_KEY" >> local.properties
 
+      # Load the Perspective API Key from GitHub Secrets
+      - name: Load Perspective API Key
+        env:
+          PERSPECTIVE_API_KEY: ${{ secrets.PERSPECTIVE_API_KEY }}
+        run: |
+          echo "::add-mask::$PERSPECTIVE_API_KEY"
+          echo "PERSPECTIVE_API_KEY=${PERSPECTIVE_API_KEY}" >> local.properties
+
       # Load the keystore (.jks) file from GitHub Secrets
       - name: Load Keystore file
         env:

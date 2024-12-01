@@ -9,9 +9,9 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.rule.GrantPermissionRule
 import com.android.streetworkapp.StreetWorkApp
-import com.android.streetworkapp.device.datastore.DataStoreManager
 import com.android.streetworkapp.model.event.EventRepository
 import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.moderation.TextModerationRepository
 import com.android.streetworkapp.model.moderation.TextModerationViewModel
 import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.park.ParkViewModel
@@ -25,8 +25,9 @@ import com.android.streetworkapp.model.progression.Ranks
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
+import com.android.streetworkapp.model.workout.WorkoutRepository
+import com.android.streetworkapp.model.workout.WorkoutViewModel
 import com.android.streetworkapp.ui.navigation.Route
-import io.mockk.mockk
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -94,12 +95,6 @@ class End2EndGeneral {
   fun setUp() {
     MockitoAnnotations.openMocks(this)
     userViewModel.setCurrentUser(mockedUser)
-  }
-
-  /** Tests everything included up to M2 except for everything that involves parks */
-  @Test
-  fun e2eNavigationAndDisplaysCorrectDetailsExceptForParks() {
-
     // mock the mockedUser's progression
     wheneverBlocking { progressionRepository.getOrAddProgression(mockedUser.uid) }
         .thenReturn(mockedUserProgression)
@@ -107,6 +102,11 @@ class End2EndGeneral {
     // mock the mockedUser's friends
     wheneverBlocking { userRepository.getFriendsByUid(mockedUser.uid) }
         .thenReturn(mockedFriendsForMockedUser)
+  }
+
+  /** Tests everything included up to M2 except for everything that involves parks */
+  @Test
+  fun e2eNavigationAndDisplaysCorrectDetailsExceptForParks() {
 
     composeTestRule.setContent {
       StreetWorkApp(
@@ -117,12 +117,12 @@ class End2EndGeneral {
           ParkViewModel(mock(ParkRepository::class.java)),
           EventViewModel(mock(EventRepository::class.java)),
           progressionViewModel,
-          mock(TextModerationViewModel::class.java),
-          mockk<DataStoreManager>(),
-          Route.AUTH)
+          WorkoutViewModel(mock(WorkoutRepository::class.java)),
+          TextModerationViewModel(mock(TextModerationRepository::class.java)))
     }
 
     composeTestRule.waitForIdle()
+
     // already on map here
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
 

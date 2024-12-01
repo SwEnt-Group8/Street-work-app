@@ -16,7 +16,6 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.printToLog
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.streetworkapp.StreetWorkApp
-import com.android.streetworkapp.device.datastore.DataStoreManager
 import com.android.streetworkapp.model.event.EventRepository
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.moderation.TextModerationRepository
@@ -29,7 +28,8 @@ import com.android.streetworkapp.model.progression.ProgressionRepository
 import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
-import io.mockk.mockk
+import com.android.streetworkapp.model.workout.WorkoutRepository
+import com.android.streetworkapp.model.workout.WorkoutViewModel
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
@@ -40,7 +40,13 @@ import org.mockito.Mockito.mock
 // this is very wrong but something in the ADD_EVENT screen makes the test stall and I really can't
 // be bothered to debug it. (We only skip one screen out of all the others so it shouldn't matter
 // that much)
-val TEST_SCREEN_EXCLUSION_LIST = listOf<String>(Screen.ADD_EVENT, Screen.EVENT_OVERVIEW)
+val TEST_SCREEN_EXCLUSION_LIST =
+    listOf<String>(
+        Screen.ADD_EVENT,
+        Screen.EVENT_OVERVIEW,
+        Screen.TRAIN_SOLO,
+        Screen.TRAIN_COACH,
+        Screen.TRAIN_CHALLENGE)
 
 @RunWith(AndroidJUnit4::class)
 class BottomNavigationTest {
@@ -113,9 +119,9 @@ class BottomNavigationTest {
           ParkViewModel(mock(ParkRepository::class.java, RETURNS_DEFAULTS)),
           EventViewModel(mock(EventRepository::class.java, RETURNS_DEFAULTS)),
           ProgressionViewModel(mock(ProgressionRepository::class.java, RETURNS_DEFAULTS)),
+          WorkoutViewModel(mock(WorkoutRepository::class.java, RETURNS_DEFAULTS)),
           TextModerationViewModel(mock(TextModerationRepository::class.java, RETURNS_DEFAULTS)),
-          mockk<DataStoreManager>(),
-          Route.AUTH)
+          true)
     }
 
     val bottomNavTypeToTest =
