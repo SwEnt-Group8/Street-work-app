@@ -30,7 +30,7 @@ class PreferencesRepositoryDataStore(context: Context) : PreferencesRepository {
   }
 
   /** A flow that emits the login state of the user. */
-  val isLoggedInFlow: Flow<Boolean> =
+  val loginStateFlow: Flow<Boolean> =
       dataStore.data
           .catch { exception ->
             // Handle exceptions
@@ -44,7 +44,7 @@ class PreferencesRepositoryDataStore(context: Context) : PreferencesRepository {
           .map { preferences -> preferences[IS_LOGGED_IN] ?: false }
 
   /** A flow that emits the user's uid. */
-  val savedUidFlow: Flow<String> =
+  val uidFlow: Flow<String> =
       dataStore.data
           .catch { exception ->
             // Handle exceptions
@@ -58,7 +58,7 @@ class PreferencesRepositoryDataStore(context: Context) : PreferencesRepository {
           .map { preferences -> preferences[SAVED_UID] ?: "" }
 
   /** A flow that emits the user's name. */
-  val savedNameFlow: Flow<String> =
+  val nameFlow: Flow<String> =
       dataStore.data
           .catch { exception ->
             // Handle exceptions
@@ -72,7 +72,7 @@ class PreferencesRepositoryDataStore(context: Context) : PreferencesRepository {
           .map { preferences -> preferences[SAVED_NAME] ?: "" }
 
   /** A flow that emits the user's score. */
-  val savedScoreFlow: Flow<Int> =
+  val scoreFlow: Flow<Int> =
       dataStore.data
           .catch { exception ->
             // Handle exceptions
@@ -91,7 +91,7 @@ class PreferencesRepositoryDataStore(context: Context) : PreferencesRepository {
    * @return The boolean login state of the user
    */
   override suspend fun getLoginState(): Boolean {
-    return isLoggedInFlow.firstOrNull() ?: false
+    return loginStateFlow.firstOrNull() ?: false
   }
 
   /**
@@ -109,7 +109,7 @@ class PreferencesRepositoryDataStore(context: Context) : PreferencesRepository {
    * @return The user's uid
    */
   override suspend fun getUid(): String {
-    return savedUidFlow.firstOrNull() ?: ""
+    return uidFlow.firstOrNull() ?: ""
   }
 
   /**
@@ -127,7 +127,7 @@ class PreferencesRepositoryDataStore(context: Context) : PreferencesRepository {
    * @return The user's name
    */
   override suspend fun getName(): String {
-    return savedNameFlow.firstOrNull() ?: ""
+    return nameFlow.firstOrNull() ?: ""
   }
 
   /**
@@ -145,7 +145,7 @@ class PreferencesRepositoryDataStore(context: Context) : PreferencesRepository {
    * @return The user's score
    */
   override suspend fun getScore(): Int {
-    return savedScoreFlow.firstOrNull() ?: 0
+    return scoreFlow.firstOrNull() ?: 0
   }
 
   /**
