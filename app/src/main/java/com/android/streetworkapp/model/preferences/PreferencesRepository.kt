@@ -12,9 +12,9 @@ interface PreferencesRepository {
   /**
    * Sets the login state of the user.
    *
-   * @param isLoggedIn True if the user is logged in, false otherwise
+   * @param loginState True if the user is logged in, false otherwise
    */
-  suspend fun setIsLoginState(isLoggedIn: Boolean)
+  suspend fun setLoginState(loginState: Boolean)
 
   /**
    * Returns the user's uid.
@@ -26,9 +26,9 @@ interface PreferencesRepository {
   /**
    * Sets the user's uid.
    *
-   * @param savedUid The user's uid
+   * @param uid The user's uid
    */
-  suspend fun setUid(savedUid: String)
+  suspend fun setUid(uid: String)
 
   /**
    * Returns the user's name.
@@ -40,9 +40,9 @@ interface PreferencesRepository {
   /**
    * Sets the user's name.
    *
-   * @param savedName The user's name
+   * @param name The user's name
    */
-  suspend fun setName(savedName: String)
+  suspend fun setName(name: String)
 
   /**
    * Returns the user's score.
@@ -54,7 +54,7 @@ interface PreferencesRepository {
   /**
    * Sets the user's score.
    *
-   * @param savedScore The user's score
+   * @param score The user's score
    */
-  suspend fun setScore(savedScore: Int)
+  suspend fun setScore(score: Int)
 }
