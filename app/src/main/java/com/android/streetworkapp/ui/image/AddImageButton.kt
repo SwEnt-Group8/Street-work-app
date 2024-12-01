@@ -22,17 +22,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.android.sample.R
+import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.ui.theme.ColorPalette
 import java.io.File
 
 //TODO: setup description for this composable
 @Composable
-fun AddImageButton(context: Context) {
+fun AddImageButton(currentPark : Park?, context: Context) {
 
     var hasCameraPermission by remember {
         mutableStateOf(
@@ -80,6 +82,7 @@ fun AddImageButton(context: Context) {
             else
                 permissionLauncher.launch(Manifest.permission.CAMERA)
         },
+        modifier = Modifier.testTag("addImageIconButton")
     ) {
         Box(
             modifier = Modifier
@@ -99,19 +102,20 @@ fun AddImageButton(context: Context) {
         }
     }
 
-
-    if (showConfirmationDialog && capturedImageUri != null) {
-        ConfirmImageDialog(
-            imageUri = capturedImageUri!!,
-        //TODO: delete image after use
-            onConfirm = {
-                //onImageUploaded(capturedImageUri!!)
-                showConfirmationDialog = false
-            },
-            onCancel = {
-                showConfirmationDialog = false
-            },
-            context
-        )
+    capturedImageUri?.let {
+        if (showConfirmationDialog) {
+            ConfirmImageDialog(
+                imageUri = it,
+                //TODO: delete image after use
+                onConfirm = {
+                    //onImageUploaded(capturedImageUri!!)
+                    showConfirmationDialog = false
+                },
+                onCancel = {
+                    showConfirmationDialog = false
+                },
+                context
+            )
+        }
     }
 }

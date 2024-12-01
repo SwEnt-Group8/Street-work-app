@@ -115,7 +115,7 @@ fun ParkOverviewScreen(
       .fillMaxSize()
       .testTag("parkOverviewScreen")) {
     Column {
-      ImageTitle(image = null, title = currentPark.value?.name ?: "loading...", context)
+      ImageTitle(image = null, park = currentPark.value, context)
       // TODO: Fetch image from Firestore storage
       Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         ParkDetails(park = currentPark.value, showRatingDialog, currentUser)
@@ -153,10 +153,11 @@ fun ParkOverviewScreen(
  * displayed.
  *
  * @param image The image to display.
- * @param title The title to display.
+ * @param park The park object containing the park infos
+ * @param context The current context
  */
 @Composable
-fun ImageTitle(image: Painter?, title: String, context: Context) {
+fun ImageTitle(image: Painter?, park: Park?, context: Context) {
   Box(modifier = Modifier
       .fillMaxWidth()
       .height(220.dp)
@@ -181,7 +182,7 @@ fun ImageTitle(image: Painter?, title: String, context: Context) {
                 )
             ))
     Text(
-        text = title,
+        text = park?.name ?: "loading...",
         color = Color.White,
         fontSize = 24.sp,
         modifier = Modifier
@@ -189,7 +190,7 @@ fun ImageTitle(image: Painter?, title: String, context: Context) {
             .padding(16.dp)
             .testTag("title"))
     Box(modifier = Modifier.align(Alignment.TopEnd).padding(2.dp)) {
-        AddImageButton(context)
+        AddImageButton(park, context)
     }
   }
 }
