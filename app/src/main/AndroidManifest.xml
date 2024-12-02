@@ -14,7 +14,6 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
-    <!-- NOSONAR: Camera permission is required for park photo capture functionality -->
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
