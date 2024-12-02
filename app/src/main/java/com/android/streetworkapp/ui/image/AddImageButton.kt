@@ -105,7 +105,8 @@ fun AddImageButton(currentPark: Park?, context: Context) {
           onConfirm = {
             // TODO: call the viewmodel to upload the file
             showConfirmationDialog = false
-            tempFile.delete() // IMPORTANT: only delete the file when the viewmodel is done with it,
+            // tempFile.delete() // IMPORTANT: only delete the file when the viewmodel is done with
+            // it,
             // will cause race conditions otherwise
           },
           onCancel = {
