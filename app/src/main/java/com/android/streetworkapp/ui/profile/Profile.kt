@@ -325,8 +325,9 @@ fun FriendMenu(
             Icon(
                 painter = painterResource(id = R.drawable.person_remove),
                 contentDescription = "Remove friend",
-                modifier = Modifier.size(24.dp))
-            Text("Remove friend", modifier = Modifier.padding(start = 4.dp))
+                modifier = Modifier.size(24.dp),
+                tint = Color.Red)
+            Text("Remove friend", modifier = Modifier.padding(start = 4.dp), color = Color.Red)
           }
         })
   }
