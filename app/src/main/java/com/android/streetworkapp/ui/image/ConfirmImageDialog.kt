@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -39,6 +40,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.android.streetworkapp.ui.theme.ColorPalette
 
 @Composable
@@ -46,6 +49,7 @@ fun ConfirmImageDialog(
     imageUri: Uri,
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
+    key: String = ""
 ) {
   var isImageLoading by remember { mutableStateOf(true) }
 
@@ -75,7 +79,17 @@ fun ConfirmImageDialog(
                       modifier =
                           Modifier.heightIn(max = this@BoxWithConstraints.maxHeight * 0.5f)) {
                         AsyncImage(
-                            model = imageUri,
+                            model =
+                                ImageRequest.Builder(LocalContext.current)
+                                    .data(imageUri)
+                                    .diskCachePolicy(CachePolicy.DISABLED)
+                                    .memoryCachePolicy(
+                                        CachePolicy
+                                            .DISABLED) // since we reuse the same file (thus same
+                                                       // URI), if we keep things cached it will
+                                                       // keep showing the first image. Since it's
+                                                       // only for one image it's not a big perf hit
+                                    .build(),
                             contentDescription = "Taken camera picture",
                             modifier = Modifier.testTag("pictureShown"),
                             contentScale = ContentScale.Fit,
