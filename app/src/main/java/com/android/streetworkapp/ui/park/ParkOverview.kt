@@ -141,7 +141,6 @@ fun ParkOverviewScreen(
  *
  * @param image The image to display.
  * @param park The park object containing the park infos
- * @param context The current context
  */
 @Composable
 fun ImageTitle(image: Painter?, park: Park?) {

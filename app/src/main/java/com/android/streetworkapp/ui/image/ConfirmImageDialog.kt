@@ -49,7 +49,6 @@ fun ConfirmImageDialog(
     imageUri: Uri,
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
-    key: String = ""
 ) {
   var isImageLoading by remember { mutableStateOf(true) }
 

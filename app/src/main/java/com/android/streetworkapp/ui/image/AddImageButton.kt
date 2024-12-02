@@ -123,8 +123,7 @@ fun AddImageButton(currentPark: Park?) {
             showConfirmationDialog = false
             if (!tempFile.delete())
                 Log.d(AddImageButtonParams.DEBUG_PREFIX, "Failed to delete cached photo file.")
-          },
-          key = it.toString())
+          })
     }
   }
 }
