@@ -86,9 +86,9 @@ fun ConfirmImageDialog(
                                     .memoryCachePolicy(
                                         CachePolicy
                                             .DISABLED) // since we reuse the same file (thus same
-                                                       // URI), if we keep things cached it will
-                                                       // keep showing the first image. Since it's
-                                                       // only for one image it's not a big perf hit
+                                    // URI), if we keep things cached it will
+                                    // keep showing the first image. Since it's
+                                    // only for one image it's not a big perf hit
                                     .build(),
                             contentDescription = "Taken camera picture",
                             modifier = Modifier.testTag("pictureShown"),
