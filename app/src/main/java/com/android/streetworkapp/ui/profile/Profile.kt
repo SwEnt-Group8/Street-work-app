@@ -282,6 +282,7 @@ fun FriendMenu(
     // Add more items here
     val showConfirmDialog = remember { mutableStateOf(false) }
     var onConfirm = {}
+    var onDismiss = {}
 
     // Question : Should I put the Content Text in String.xml using two parts (before/after
     // username), or is it too convoluted ?
@@ -292,6 +293,7 @@ fun FriendMenu(
         title = "Are you sure ?",
         verbose = false,
         onSubmit = { onConfirm() },
+        onDismiss = { onDismiss() },
         Content = ({ Text("Do you really want to remove ${friend.username} from your friends ?") }))
 
     DropdownMenuItem(
@@ -308,6 +310,8 @@ fun FriendMenu(
               Toast.makeText(context, "Removed $friendName from friends", Toast.LENGTH_SHORT).show()
               showMenu.value = false
             }
+
+            onDismiss = { showMenu.value = false }
 
             showConfirmDialog.value = true
           } else {
