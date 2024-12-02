@@ -62,7 +62,12 @@ fun AddImageButton(currentPark: Park?) {
   // Temporary file for storing the captured image
   val tempFile by remember {
     mutableStateOf(
-        File(context.cacheDir, "temp_image_for_park_upload.jpg").apply { if (exists()) delete() })
+        File(context.cacheDir, "temp_image_for_park_upload.jpg").apply {
+          if (exists()) {
+            if (!delete())
+                Log.d(AddImageButtonParams.DEBUG_PREFIX, "Failed to delete cached photo file.")
+          }
+        })
   }
 
   capturedImageUri =
