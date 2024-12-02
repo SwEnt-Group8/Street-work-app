@@ -18,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -254,7 +255,7 @@ fun StreetWorkApp(
               }
               navigation(startDestination = Screen.PROGRESSION, route = Route.PROGRESSION) {
                 composable(Screen.PROGRESSION) {
-                  infoManager.Display()
+                  infoManager.Display(LocalContext.current)
                   ProgressScreen(
                       navigationActions, userViewModel, progressionViewModel, innerPadding)
                 }
@@ -264,7 +265,7 @@ fun StreetWorkApp(
                   route = Route.MAP,
               ) {
                 composable(Screen.MAP) {
-                  infoManager.Display()
+                  infoManager.Display(LocalContext.current)
                   MapScreen(
                       parkLocationViewModel,
                       parkViewModel,
@@ -273,12 +274,12 @@ fun StreetWorkApp(
                       innerPadding)
                 }
                 composable(Screen.PARK_OVERVIEW) {
-                  infoManager.Display()
+                  infoManager.Display(LocalContext.current)
                   ParkOverviewScreen(
                       parkViewModel, innerPadding, navigationActions, eventViewModel, userViewModel)
                 }
                 composable(Screen.ADD_EVENT) {
-                  infoManager.Display()
+                  infoManager.Display(LocalContext.current)
                   AddEventScreen(
                       navigationActions,
                       parkViewModel,
@@ -290,7 +291,7 @@ fun StreetWorkApp(
                       innerPadding)
                 }
                 composable(Screen.EVENT_OVERVIEW) {
-                  infoManager.Display()
+                  infoManager.Display(LocalContext.current)
                   EventOverviewScreen(
                       eventViewModel, parkViewModel, userViewModel, navigationActions, innerPadding)
                 }
@@ -303,7 +304,7 @@ fun StreetWorkApp(
               ) {
                 // profile screen + list of friend
                 composable(Screen.PROFILE) {
-                  infoManager.Display()
+                  infoManager.Display(LocalContext.current)
                   ProfileScreen(navigationActions, userViewModel, innerPadding)
                   val showSettingsDialog = remember { mutableStateOf(false) }
 
@@ -322,7 +323,7 @@ fun StreetWorkApp(
                 }
                 // screen for adding friend
                 composable(Screen.ADD_FRIEND) {
-                  infoManager.Display()
+                  infoManager.Display(LocalContext.current)
                   AddFriendScreen(userViewModel, navigationActions, scope, host, innerPadding)
                 }
               }

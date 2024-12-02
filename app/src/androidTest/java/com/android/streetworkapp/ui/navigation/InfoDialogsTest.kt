@@ -1,72 +1,89 @@
 package com.android.streetworkapp.ui.navigation
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
 class InfoDialogsTest {
   @get:Rule val composeTestRule = createComposeRule()
 
+  private lateinit var topAppBarManager: TopAppBarManager
+  private lateinit var showDialog: MutableState<Boolean>
+  private lateinit var screenName: MutableState<String?>
+  private var context: Context? = null
+  private lateinit var infoDialogManager: InfoDialogManager
+
+  @Before
+  fun setUp() {
+    topAppBarManager =
+        TopAppBarManager("any title", actions = listOf(TopAppBarManager.TopAppBarAction.INFO))
+    showDialog = mutableStateOf(true)
+    screenName = mutableStateOf("WRONG_SCREEN_NAME")
+    infoDialogManager = InfoDialogManager(showDialog, screenName, topAppBarManager)
+  }
+
   @Test
   fun isInfoDialogCorrectlyDisplayed() {
-    val infoTag = "Tag"
-    val title = "Title"
-    val content = "Message"
+    val dialog = infoDialogManager.defaultInfoDialog()
 
-    val dialog = InfoDialog(infoTag, title, content)
     val dialogTag = dialog.tag + "Info"
-    val show = mutableStateOf(true)
 
-    composeTestRule.setContent { dialog.DisplayInfoDialog(show) }
+    composeTestRule.setContent {
+      context = LocalContext.current
+      dialog.DisplayInfoDialog(showDialog, context!!)
+    }
 
     // Verifying that everything is displayed correctly :
     composeTestRule.onNodeWithTag(dialogTag + "Dialog").assertIsDisplayed()
     composeTestRule
         .onNodeWithTag("${dialogTag}DialogTitle")
         .assertIsDisplayed()
-        .assertTextEquals(title)
+        .assertTextEquals(context!!.getString(dialog.title))
     composeTestRule
         .onNodeWithTag("${dialogTag}DialogContent")
         .assertIsDisplayed()
-        .assertTextEquals(content)
+        .assertTextEquals(context!!.getString(dialog.content))
 
     // Changing the state will hide the dialog :
-    show.value = false
+    showDialog.value = false
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("${dialogTag}Dialog").assertIsNotDisplayed()
   }
 
   @Test
   fun isDisplayInfoContentCorrect() {
-    val dialog = InfoDialog("Tag", "Title", "Content")
+    val dialog = infoDialogManager.defaultInfoDialog()
 
-    composeTestRule.setContent { dialog.DisplayInfoContent(dialog.content) }
+    composeTestRule.setContent {
+      context = LocalContext.current
+      dialog.DisplayInfoContent(context!!.getString(dialog.content))
+    }
     composeTestRule
         .onNodeWithTag("${dialog.tag}InfoDialogContent")
         .assertIsDisplayed()
-        .assertTextEquals(dialog.content)
+        .assertTextEquals(context!!.getString(dialog.content))
   }
 
   @Test
   fun isManagerWorkingCorrectly() {
-    val topAppBarManager =
-        TopAppBarManager("any title", actions = listOf(TopAppBarManager.TopAppBarAction.INFO))
-
-    val showDialog = mutableStateOf(false)
-    val screenName: MutableState<String?> = mutableStateOf("WRONG_SCREEN_NAME")
-
-    val infoDialogManager = InfoDialogManager(showDialog, screenName, topAppBarManager)
+    showDialog.value = false // dialog should not be displayed
 
     infoDialogManager.setUp() // callback set show to true
 
-    composeTestRule.setContent { infoDialogManager.Display() }
+    composeTestRule.setContent {
+      context = LocalContext.current
+      infoDialogManager.Display(context!!)
+    }
     assert(!showDialog.value) // should be false so far
     topAppBarManager.onActionClick(TopAppBarManager.TopAppBarAction.INFO)
 
@@ -111,14 +128,14 @@ class InfoDialogsTest {
       composeTestRule
           .onNodeWithTag(screenTestTag + "Title")
           .assertIsDisplayed()
-          .assertTextEquals(dialog.title)
+          .assertTextEquals(context!!.getString(dialog.title))
       Log.d(
           "InfoDialogsTest",
           "Verifying content with testTag : ${screenTestTag}Content == ${dialog.tag}InfoDialogContent")
       composeTestRule
           .onNodeWithTag("${screenTestTag}Content") // tag + "InfoDialogContent"
           .assertIsDisplayed()
-          .assertTextEquals(dialog.content)
+          .assertTextEquals(context!!.getString(dialog.content))
     }
   }
 }
