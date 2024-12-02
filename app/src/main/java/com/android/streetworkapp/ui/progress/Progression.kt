@@ -58,6 +58,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 object ProgressionScreenSettings {
   val PROGRESSION_COLOR_BLUE = Color(0xFF007BFF)
   val PROGRESSION_COLOR_GRAY = Color(0xFFDDDDDD)
+  val ACHIEVEMEMENT_TYPE_SOCIAL = "SOCIAL"
   val progressBarSize = 145.dp
   val columnPadding = PaddingValues(0.dp, progressBarSize * 0.15f, 0.dp, 0.dp)
 }
@@ -163,7 +164,8 @@ fun ProgressScreen(
 
                   Column {
                     currentProgression.achievements.forEach { achievementName ->
-                      if (achievementName.contains("SOCIAL")) {
+                      if (achievementName.contains(
+                          ProgressionScreenSettings.ACHIEVEMEMENT_TYPE_SOCIAL)) {
                         val achievementEnum = enumValueOf<SocialAchievement>(achievementName)
                         Box(modifier = Modifier.testTag("achievementItem")) {
                           AchievementItem(achievementEnum.achievement, false)
