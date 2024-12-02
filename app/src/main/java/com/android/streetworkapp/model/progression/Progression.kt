@@ -88,19 +88,21 @@ enum class ExerciseAchievement(val achievement: Achievement) {
 }
 
 /** Represents a type of achievement linked to the social interactions of the user */
-enum class SocialAchievement(val achievement: Achievement) {
+enum class SocialAchievement(val achievement: Achievement, val numberOfFriends: Int) {
   SOCIAL1(
       Achievement(
           R.drawable.bronze_achievement_icon,
           "First Friend",
           listOf("Social"),
-          "You added your first friend!")),
+          "You added your first friend!"),
+      1),
   SOCIAL3(
       Achievement(
           R.drawable.bronze_achievement_icon,
           "Workout Group",
           listOf("Social"),
-          "You added 3 friends!"))
+          "You added 3 friends!"),
+      3)
 }
 
 /** Represents the number of points obtained for different actions in the app */
