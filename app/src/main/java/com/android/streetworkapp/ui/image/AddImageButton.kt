@@ -1,7 +1,6 @@
 package com.android.streetworkapp.ui.image
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.util.Log
@@ -23,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -46,7 +46,9 @@ object AddImageButtonParams {
  * @param context The current context
  */
 @Composable
-fun AddImageButton(currentPark: Park?, context: Context) {
+fun AddImageButton(currentPark: Park?) {
+
+  val context = LocalContext.current
 
   var hasCameraPermission by remember {
     mutableStateOf(
@@ -58,7 +60,10 @@ fun AddImageButton(currentPark: Park?, context: Context) {
   var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
 
   // Temporary file for storing the captured image
-  val tempFile = File(context.cacheDir, "temp_image_for_park_upload.jpg")
+  val tempFile by remember {
+    mutableStateOf(
+        File(context.cacheDir, "temp_image_for_park_upload.jpg").apply { if (exists()) delete() })
+  }
 
   capturedImageUri =
       FileProvider.getUriForFile(context, "${context.packageName}.provider", tempFile)
@@ -118,7 +123,8 @@ fun AddImageButton(currentPark: Park?, context: Context) {
             showConfirmationDialog = false
             if (!tempFile.delete())
                 Log.d(AddImageButtonParams.DEBUG_PREFIX, "Failed to delete cached photo file.")
-          })
+          },
+          key = it.toString())
     }
   }
 }
