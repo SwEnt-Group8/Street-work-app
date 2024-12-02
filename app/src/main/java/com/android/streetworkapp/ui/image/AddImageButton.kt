@@ -32,7 +32,14 @@ import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.ui.theme.ColorPalette
 import java.io.File
 
-// TODO: setup description for this composable
+/**
+ * IconButton that on onclick will request permission (if not already done) and open the camera to
+ * take a picture. After a picture is taken, a [ConfirmImageDialog] will be shown to prompt the user
+ * to cancel or upload the file
+ *
+ * @param currentPark The info of the park the image will be linked to
+ * @param context The current context
+ */
 @Composable
 fun AddImageButton(currentPark: Park?, context: Context) {
 
@@ -46,7 +53,6 @@ fun AddImageButton(currentPark: Park?, context: Context) {
   var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
 
   // Temporary file for storing the captured image
-  // TODO: check to add delete on exit
   val tempFile = File(context.cacheDir, "temp_image_for_park_upload.jpg")
 
   capturedImageUri =
@@ -58,8 +64,6 @@ fun AddImageButton(currentPark: Park?, context: Context) {
           onResult = { success ->
             if (success) {
               showConfirmationDialog = true
-              // onImageCaptured(tempUri) // Pass the URI to the parent composable for further
-              // processing
             }
           })
 
@@ -98,13 +102,16 @@ fun AddImageButton(currentPark: Park?, context: Context) {
     if (showConfirmationDialog) {
       ConfirmImageDialog(
           imageUri = it,
-          // TODO: delete image after use
           onConfirm = {
-            // onImageUploaded(capturedImageUri!!)
+            // TODO: call the viewmodel to upload the file
             showConfirmationDialog = false
+            tempFile.delete() // IMPORTANT: only delete the file when the viewmodel is done with it,
+            // will cause race conditions otherwise
           },
-          onCancel = { showConfirmationDialog = false },
-          context)
+          onCancel = {
+            showConfirmationDialog = false
+            tempFile.delete()
+          })
     }
   }
 }
