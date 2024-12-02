@@ -153,6 +153,7 @@ fun DisplayScore(user: User?) {
  * This function displays the friends list.
  *
  * @param friends - The list of friends to display.
+ * @param userViewModel - The view model for the user.
  */
 @Composable
 fun DisplayFriendList(friends: List<User?>, userViewModel: UserViewModel) {
@@ -176,9 +177,11 @@ fun DisplayFriendList(friends: List<User?>, userViewModel: UserViewModel) {
 }
 
 /**
- * This function displays a friend (for the friend list).
+ * This function displays a friend (for the friend list). Also displays actions to perform on them
+ * through a dropdown menu.
  *
  * @param friend - The friend to display.
+ * @param userViewModel - The view model for the user / the friend.
  */
 @Composable
 fun DisplayFriendItem(friend: User, userViewModel: UserViewModel) {
@@ -210,7 +213,7 @@ fun DisplayFriendItem(friend: User, userViewModel: UserViewModel) {
               color = Color.Gray,
               modifier = Modifier.testTag("friendStatus"))
         }
-        // Box for positioning
+
         Box(modifier = Modifier.wrapContentSize(Alignment.TopEnd)) {
           // Three-dot menu icon (Overflow menu)
           IconButton(
@@ -218,10 +221,11 @@ fun DisplayFriendItem(friend: User, userViewModel: UserViewModel) {
               onClick = { showMenu.value = true }) {
                 Icon(
                     painter = painterResource(id = R.drawable.more_vertical),
-                    contentDescription = "More options")
+                    contentDescription = "More options",
+                    modifier = Modifier.size(24.dp))
               }
 
-          // DropDownMenu & Logic
+          // DropDownMenu
           FriendMenu(showMenu, friend, userViewModel, context)
         }
       }
@@ -271,6 +275,14 @@ fun DisplayUserPicture(user: User?, size: Dp, testTag: String) {
   }
 }
 
+/**
+ * This function displays the friend menu, which contains actions to perform on a friend.
+ *
+ * @param showMenu - The state of the menu (expanded or not).
+ * @param friend - The friend to perform actions on.
+ * @param userViewModel - The view model for the user / the friend.
+ * @param context - The context of the application.
+ */
 @Composable
 fun FriendMenu(
     showMenu: MutableState<Boolean>,
