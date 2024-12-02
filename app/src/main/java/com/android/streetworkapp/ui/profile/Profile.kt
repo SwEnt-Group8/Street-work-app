@@ -50,6 +50,8 @@ import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.theme.ColorPalette
+import com.android.streetworkapp.ui.utils.CustomDialog
+import com.android.streetworkapp.ui.utils.DialogType
 
 @Composable
 fun ProfileScreen(
@@ -278,6 +280,19 @@ fun FriendMenu(
 ) {
   DropdownMenu(expanded = showMenu.value, onDismissRequest = { showMenu.value = false }) {
     // Add more items here
+    val showConfirmDialog = remember { mutableStateOf(false) }
+    var onConfirm = {}
+
+    // Question : Should I put the Content Text in String.xml using two parts (before/after
+    // username), or is it too convoluted ?
+    CustomDialog(
+        showDialog = showConfirmDialog,
+        dialogType = DialogType.CONFIRM,
+        tag = "RemoveFriend",
+        title = "Are you sure ?",
+        verbose = false,
+        onSubmit = { onConfirm() },
+        Content = ({ Text("Do you really want to remove ${friend.username} from your friends ?") }))
 
     DropdownMenuItem(
         onClick = {
@@ -287,10 +302,14 @@ fun FriendMenu(
           val currentUID = userViewModel.currentUser.value?.uid
 
           if (currentUID != null) {
-            // TODO : Call a dialog for confirmation
-            userViewModel.removeFriend(currentUID, friendUID)
-            showMenu.value = false
-            Toast.makeText(context, "Removed $friendName from friends", Toast.LENGTH_SHORT).show()
+            // Set up the confirm function for the dialog
+            onConfirm = {
+              userViewModel.removeFriend(currentUID, friendUID)
+              Toast.makeText(context, "Removed $friendName from friends", Toast.LENGTH_SHORT).show()
+              showMenu.value = false
+            }
+
+            showConfirmDialog.value = true
           } else {
             Log.d("Profile", "Cannot remove friend - Current user is null")
             Toast.makeText(context, "Error - could not remove friend", Toast.LENGTH_SHORT).show()
