@@ -1,5 +1,6 @@
 package com.android.streetworkapp.ui.profile
 
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.border
@@ -12,16 +13,22 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -91,7 +98,7 @@ fun ProfileScreen(
                   Text(text = "Add friend", color = Color.White)
                 }
           }
-          DisplayFriendList(friendList)
+          DisplayFriendList(friendList, userViewModel)
           Log.d("SignInScreen", "friendList : ${friendList}")
         }
   }
@@ -146,14 +153,14 @@ fun DisplayScore(user: User?) {
  * @param friends - The list of friends to display.
  */
 @Composable
-fun DisplayFriendList(friends: List<User?>) {
+fun DisplayFriendList(friends: List<User?>, userViewModel: UserViewModel) {
   val NO_FRIENDS_MESSAGE = "You have no friends yet :("
 
   return if (friends.isNotEmpty()) {
     LazyColumn(modifier = Modifier.fillMaxSize().testTag("friendList")) {
       items(friends) { friend ->
         if (friend != null) {
-          DisplayFriendItem(friend)
+          DisplayFriendItem(friend, userViewModel)
           HorizontalDivider(thickness = 1.dp, color = Color.Gray)
         }
       }
@@ -172,9 +179,9 @@ fun DisplayFriendList(friends: List<User?>) {
  * @param friend - The friend to display.
  */
 @Composable
-fun DisplayFriendItem(friend: User) {
+fun DisplayFriendItem(friend: User, userViewModel: UserViewModel) {
   val context = LocalContext.current
-
+  val showMenu = remember { mutableStateOf(false) }
   val DEFAULT_USER_STATUS = "Definitely not a bot"
 
   Row(
@@ -201,17 +208,20 @@ fun DisplayFriendItem(friend: User) {
               color = Color.Gray,
               modifier = Modifier.testTag("friendStatus"))
         }
+        // Box for positioning
+        Box(modifier = Modifier.wrapContentSize(Alignment.TopEnd)) {
+          // Three-dot menu icon (Overflow menu)
+          IconButton(
+              modifier = Modifier.testTag("friendSettingButton"),
+              onClick = { showMenu.value = true }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.more_vertical),
+                    contentDescription = "More options")
+              }
 
-        // Three-dot menu icon (Overflow menu)
-        IconButton(
-            modifier = Modifier.testTag("friendSettingButton"),
-            onClick = {
-              Toast.makeText(context, "Not implemented yet", Toast.LENGTH_SHORT).show()
-            }) {
-              Icon(
-                  painter = painterResource(id = R.drawable.more_vertical),
-                  contentDescription = "More options")
-            }
+          // DropDownMenu & Logic
+          FriendMenu(showMenu, friend, userViewModel, context)
+        }
       }
 }
 
@@ -256,5 +266,45 @@ fun DisplayUserPicture(user: User?, size: Dp, testTag: String) {
                 .clip(CircleShape)
                 .border(2.dp, Color.LightGray, CircleShape)
                 .testTag(testTag))
+  }
+}
+
+@Composable
+fun FriendMenu(
+    showMenu: MutableState<Boolean>,
+    friend: User,
+    userViewModel: UserViewModel,
+    context: Context
+) {
+  DropdownMenu(expanded = showMenu.value, onDismissRequest = { showMenu.value = false }) {
+    // Add more items here
+
+    DropdownMenuItem(
+        onClick = {
+          val friendUID = friend.uid
+          val friendName = friend.username
+
+          val currentUID = userViewModel.currentUser.value?.uid
+
+          if (currentUID != null) {
+            // TODO : Call a dialog for confirmation
+            userViewModel.removeFriend(currentUID, friendUID)
+            showMenu.value = false
+            Toast.makeText(context, "Removed $friendName from friends", Toast.LENGTH_SHORT).show()
+          } else {
+            Log.d("Profile", "Cannot remove friend - Current user is null")
+            Toast.makeText(context, "Error - could not remove friend", Toast.LENGTH_SHORT).show()
+          }
+        },
+        text = {
+          // Display content here
+          Row() {
+            Icon(
+                painter = painterResource(id = R.drawable.person_remove),
+                contentDescription = "Remove friend",
+                modifier = Modifier.size(24.dp))
+            Text("Remove friend", modifier = Modifier.padding(start = 4.dp))
+          }
+        })
   }
 }
