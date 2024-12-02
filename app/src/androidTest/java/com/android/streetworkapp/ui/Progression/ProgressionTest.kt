@@ -84,7 +84,7 @@ class ProgressionTest {
     composeTestRule.onNodeWithTag("percentageInsideCircularProgressBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("scoreTextUnderCircularProgressBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("metricCardScoreValue").assertIsDisplayed()
-    //composeTestRule.onNodeWithTag("metricCardParksVisitedValue").assertIsDisplayed()
+    // composeTestRule.onNodeWithTag("metricCardParksVisitedValue").assertIsDisplayed()
     composeTestRule.onNodeWithTag("metricCardFriendsAddedValue").assertIsDisplayed()
   }
 
