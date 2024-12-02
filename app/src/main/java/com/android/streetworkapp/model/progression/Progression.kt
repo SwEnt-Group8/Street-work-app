@@ -87,6 +87,22 @@ enum class ExerciseAchievement(val achievement: Achievement) {
   FRONT_LEVER(Achievement(R.drawable.front_lever, "Front Lever", emptyList(), ""))
 }
 
+/** Represents a type of achievement linked to the social interactions of the user */
+enum class SocialAchievement(val achievement: Achievement) {
+  SOCIAL1(
+      Achievement(
+          R.drawable.bronze_achievement_icon,
+          "First Friend",
+          listOf("Social"),
+          "You added your first friend!")),
+  SOCIAL3(
+      Achievement(
+          R.drawable.bronze_achievement_icon,
+          "Workout Group",
+          listOf("Social"),
+          "You added 3 friends!"))
+}
+
 /** Represents the number of points obtained for different actions in the app */
 enum class ScoreIncrease(val points: Int) {
   ADD_EVENT(30),
