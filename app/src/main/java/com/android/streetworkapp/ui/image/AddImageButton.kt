@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -31,6 +32,10 @@ import com.android.sample.R
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.ui.theme.ColorPalette
 import java.io.File
+
+object AddImageButtonParams {
+  const val DEBUG_PREFIX = "AddImageButton:"
+}
 
 /**
  * IconButton that on onclick will request permission (if not already done) and open the camera to
@@ -111,7 +116,8 @@ fun AddImageButton(currentPark: Park?, context: Context) {
           },
           onCancel = {
             showConfirmationDialog = false
-            tempFile.delete()
+            if (!tempFile.delete())
+                Log.d(AddImageButtonParams.DEBUG_PREFIX, "Failed to delete cached photo file.")
           })
     }
   }
