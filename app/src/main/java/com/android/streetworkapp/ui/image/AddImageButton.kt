@@ -32,90 +32,79 @@ import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.ui.theme.ColorPalette
 import java.io.File
 
-//TODO: setup description for this composable
+// TODO: setup description for this composable
 @Composable
-fun AddImageButton(currentPark : Park?, context: Context) {
+fun AddImageButton(currentPark: Park?, context: Context) {
 
-    var hasCameraPermission by remember {
-        mutableStateOf(
-            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
-        )
-    }
+  var hasCameraPermission by remember {
+    mutableStateOf(
+        ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+            PackageManager.PERMISSION_GRANTED)
+  }
 
-    var showConfirmationDialog by remember { mutableStateOf(false) }
-    var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
+  var showConfirmationDialog by remember { mutableStateOf(false) }
+  var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
 
-    // Temporary file for storing the captured image
-    //TODO: check to add delete on exit
-    val tempFile = File(context.cacheDir, "temp_image_for_park_upload.jpg")
+  // Temporary file for storing the captured image
+  // TODO: check to add delete on exit
+  val tempFile = File(context.cacheDir, "temp_image_for_park_upload.jpg")
 
-    capturedImageUri = FileProvider.getUriForFile(
-        context,
-        "${context.packageName}.provider",
-        tempFile
-    )
+  capturedImageUri =
+      FileProvider.getUriForFile(context, "${context.packageName}.provider", tempFile)
 
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture(),
-        onResult = { success ->
+  val cameraLauncher =
+      rememberLauncherForActivityResult(
+          contract = ActivityResultContracts.TakePicture(),
+          onResult = { success ->
             if (success) {
-                showConfirmationDialog = true
-                //onImageCaptured(tempUri) // Pass the URI to the parent composable for further processing
+              showConfirmationDialog = true
+              // onImageCaptured(tempUri) // Pass the URI to the parent composable for further
+              // processing
             }
-        }
-    )
+          })
 
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { isGranted ->
+  val permissionLauncher =
+      rememberLauncherForActivityResult(
+          contract = ActivityResultContracts.RequestPermission(),
+          onResult = { isGranted ->
             hasCameraPermission = isGranted
             if (isGranted) {
-                cameraLauncher.launch(capturedImageUri)
+              cameraLauncher.launch(capturedImageUri)
             }
-        }
-    )
+          })
 
-    IconButton(
-        onClick = {
-            if (hasCameraPermission)
-                cameraLauncher.launch(capturedImageUri)
-            else
-                permissionLauncher.launch(Manifest.permission.CAMERA)
-        },
-        modifier = Modifier.testTag("addImageIconButton")
-    ) {
+  IconButton(
+      onClick = {
+        if (hasCameraPermission) cameraLauncher.launch(capturedImageUri)
+        else permissionLauncher.launch(Manifest.permission.CAMERA)
+      },
+      modifier = Modifier.testTag("addImageIconButton")) {
         Box(
-            modifier = Modifier
-                .size(36.dp)
-                .background(
-                    color = ColorPalette.INTERACTION_COLOR_DARK,
-                    shape = CircleShape
-                )
-                .padding(4.dp)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.add_a_photo_24px), // Replace with your "add image" icon
-                contentDescription = "Add Image",
-                tint = Color.White,
-                modifier = Modifier.align(Alignment.Center).fillMaxSize(0.75f)
-            )
-        }
-    }
+            modifier =
+                Modifier.size(36.dp)
+                    .background(color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape)
+                    .padding(4.dp)) {
+              Icon(
+                  painter =
+                      painterResource(
+                          id = R.drawable.add_a_photo_24px), // Replace with your "add image" icon
+                  contentDescription = "Add Image",
+                  tint = Color.White,
+                  modifier = Modifier.align(Alignment.Center).fillMaxSize(0.75f))
+            }
+      }
 
-    capturedImageUri?.let {
-        if (showConfirmationDialog) {
-            ConfirmImageDialog(
-                imageUri = it,
-                //TODO: delete image after use
-                onConfirm = {
-                    //onImageUploaded(capturedImageUri!!)
-                    showConfirmationDialog = false
-                },
-                onCancel = {
-                    showConfirmationDialog = false
-                },
-                context
-            )
-        }
+  capturedImageUri?.let {
+    if (showConfirmationDialog) {
+      ConfirmImageDialog(
+          imageUri = it,
+          // TODO: delete image after use
+          onConfirm = {
+            // onImageUploaded(capturedImageUri!!)
+            showConfirmationDialog = false
+          },
+          onCancel = { showConfirmationDialog = false },
+          context)
     }
+  }
 }
