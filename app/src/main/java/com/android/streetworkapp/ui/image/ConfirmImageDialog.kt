@@ -81,7 +81,9 @@ fun ConfirmImageDialog(
                             modifier = Modifier.testTag("pictureShown"),
                             contentScale = ContentScale.Fit,
                             onSuccess = { isImageLoading = false },
-                            onError = { isImageLoading = false } // TODO: add text error
+                            onError = {
+                              isImageLoading = false
+                            } // Note: should prob setup and error message but whatever
                             )
                         if (isImageLoading) {
                           Text(
