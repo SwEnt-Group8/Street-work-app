@@ -6,9 +6,8 @@
 
 
     // Friend removal dialog
-
     <string name="RemoveFriendTitle">Are you sure ?</string>
-    <string name="RemoveFriendContent">Are you sure you want to remove %1$ from your friends ?</string>
+    <string name="RemoveFriendContent">Do you really want to remove %1$s from your friends ?</string>
 
     // Helping dialogs(INFO)
 

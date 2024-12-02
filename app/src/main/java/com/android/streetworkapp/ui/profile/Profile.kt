@@ -302,13 +302,11 @@ fun FriendMenu(
             showDialog = showConfirmDialog,
             dialogType = DialogType.CONFIRM,
             tag = "RemoveFriend",
-            title = "Are you sure ?",
+            title = context.getString(R.string.RemoveFriendTitle),
             verbose = false,
             onSubmit = { onConfirm() },
             onDismiss = { onDismiss() },
-            Content = ({
-                  Text("Do you really want to remove ${friend.username} from your friends ?")
-                }))
+            Content = ({ Text(context.getString(R.string.RemoveFriendContent, friend.username)) }))
 
         DropdownMenuItem(
             modifier = Modifier.testTag("RemoveFriendMenuItem"),
