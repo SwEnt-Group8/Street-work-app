@@ -49,6 +49,7 @@ import com.android.streetworkapp.model.progression.Achievement
 import com.android.streetworkapp.model.progression.ExerciseAchievement
 import com.android.streetworkapp.model.progression.MedalsAchievement
 import com.android.streetworkapp.model.progression.ProgressionViewModel
+import com.android.streetworkapp.model.progression.SocialAchievement
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.theme.ColorPalette
@@ -79,6 +80,7 @@ fun ProgressScreen(
 
   currentUser?.uid?.let { progressionViewModel.getOrAddProgression(it) }
   currentUser?.let { progressionViewModel.checkScore(it.score) }
+  currentUser?.let { progressionViewModel.checkFriends(it.friends.size) }
 
   val progressionPercentage = // in case of error set it to 0, otherwise score/currentGoal
       (if (currentUser == null || currentProgression.currentGoal == 0) 0f
@@ -161,10 +163,19 @@ fun ProgressScreen(
 
                   Column {
                     currentProgression.achievements.forEach { achievementName ->
-                      val achievementEnum = enumValueOf<MedalsAchievement>(achievementName)
-                      Box(modifier = Modifier.testTag("achievementItem")) {
-                        AchievementItem(achievementEnum.achievement, false)
-                        HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
+                      if (achievementName.contains("SOCIAL")) {
+                        val achievementEnum = enumValueOf<SocialAchievement>(achievementName)
+                        Box(modifier = Modifier.testTag("achievementItem")) {
+                          AchievementItem(achievementEnum.achievement, false)
+                          HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
+                        }
+                      } else {
+
+                        val achievementEnum = enumValueOf<MedalsAchievement>(achievementName)
+                        Box(modifier = Modifier.testTag("achievementItem")) {
+                          AchievementItem(achievementEnum.achievement, false)
+                          HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
+                        }
                       }
                     }
                   }
