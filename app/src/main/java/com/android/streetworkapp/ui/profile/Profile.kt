@@ -290,57 +290,62 @@ fun FriendMenu(
     userViewModel: UserViewModel,
     context: Context
 ) {
-  DropdownMenu(expanded = showMenu.value, onDismissRequest = { showMenu.value = false }) {
-    // Add more items here
-    val showConfirmDialog = remember { mutableStateOf(false) }
-    var onConfirm = {}
-    var onDismiss = {}
+  DropdownMenu(
+      expanded = showMenu.value,
+      onDismissRequest = { showMenu.value = false },
+      modifier = Modifier.testTag("friendMenu")) {
+        val showConfirmDialog = remember { mutableStateOf(false) }
+        var onConfirm = {}
+        var onDismiss = {}
 
-    // Question : Should I put the Content Text in String.xml using two parts (before/after
-    // username), or is it too convoluted ?
-    CustomDialog(
-        showDialog = showConfirmDialog,
-        dialogType = DialogType.CONFIRM,
-        tag = "RemoveFriend",
-        title = "Are you sure ?",
-        verbose = false,
-        onSubmit = { onConfirm() },
-        onDismiss = { onDismiss() },
-        Content = ({ Text("Do you really want to remove ${friend.username} from your friends ?") }))
+        CustomDialog(
+            showDialog = showConfirmDialog,
+            dialogType = DialogType.CONFIRM,
+            tag = "RemoveFriend",
+            title = "Are you sure ?",
+            verbose = false,
+            onSubmit = { onConfirm() },
+            onDismiss = { onDismiss() },
+            Content = ({
+                  Text("Do you really want to remove ${friend.username} from your friends ?")
+                }))
 
-    DropdownMenuItem(
-        onClick = {
-          val friendUID = friend.uid
-          val friendName = friend.username
+        DropdownMenuItem(
+            modifier = Modifier.testTag("RemoveFriendMenuItem"),
+            onClick = {
+              val friendUID = friend.uid
+              val friendName = friend.username
 
-          val currentUID = userViewModel.currentUser.value?.uid
+              val currentUID = userViewModel.currentUser.value?.uid
 
-          if (currentUID != null) {
-            // Set up the confirm function for the dialog
-            onConfirm = {
-              userViewModel.removeFriend(currentUID, friendUID)
-              Toast.makeText(context, "Removed $friendName from friends", Toast.LENGTH_SHORT).show()
-              showMenu.value = false
-            }
+              if (currentUID != null) {
+                // Set up the confirm function for the dialog
+                onConfirm = {
+                  userViewModel.removeFriend(currentUID, friendUID)
+                  Toast.makeText(context, "Removed $friendName from friends", Toast.LENGTH_SHORT)
+                      .show()
+                  showMenu.value = false
+                }
 
-            onDismiss = { showMenu.value = false }
+                onDismiss = { showMenu.value = false }
 
-            showConfirmDialog.value = true
-          } else {
-            Log.d("Profile", "Cannot remove friend - Current user is null")
-            Toast.makeText(context, "Error - could not remove friend", Toast.LENGTH_SHORT).show()
-          }
-        },
-        text = {
-          // Display content here
-          Row() {
-            Icon(
-                painter = painterResource(id = R.drawable.person_remove),
-                contentDescription = "Remove friend",
-                modifier = Modifier.size(24.dp),
-                tint = Color.Red)
-            Text("Remove friend", modifier = Modifier.padding(start = 4.dp), color = Color.Red)
-          }
-        })
-  }
+                showConfirmDialog.value = true
+              } else {
+                Log.d("Profile", "Cannot remove friend - Current user is null")
+                Toast.makeText(context, "Error - could not remove friend", Toast.LENGTH_SHORT)
+                    .show()
+              }
+            },
+            text = {
+              // Display content here
+              Row() {
+                Icon(
+                    painter = painterResource(id = R.drawable.person_remove),
+                    contentDescription = "Remove friend",
+                    modifier = Modifier.size(24.dp),
+                    tint = Color.Red)
+                Text("Remove friend", modifier = Modifier.padding(start = 4.dp), color = Color.Red)
+              }
+            })
+      }
 }
