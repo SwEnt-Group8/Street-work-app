@@ -26,6 +26,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import com.android.streetworkapp.device.network.isInternetAvailable
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
 import com.android.streetworkapp.model.event.EventViewModel
@@ -77,15 +78,19 @@ import okhttp3.OkHttpClient
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    val internetAvailable = isInternetAvailable(this)
     Log.d("MainActivity", "Setup content")
-    setContent(parent = null) { StreetWorkAppMain() }
+    setContent(parent = null) { StreetWorkAppMain(internetAvailable = internetAvailable) }
   }
 }
 
 // the testInvokation is super ugly but I have NOT found any other way to test the navigation from a
 // ui perspective since we don't use fragments
 @Composable
-fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
+fun StreetWorkAppMain(
+    testInvokation: NavigationActions.() -> Unit = {},
+    internetAvailable: Boolean = false
+) {
 
   // repositories
   val overpassParkLocationRepo = OverpassParkLocationRepository(OkHttpClient())
