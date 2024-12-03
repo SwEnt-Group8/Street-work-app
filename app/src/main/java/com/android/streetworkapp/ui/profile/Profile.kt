@@ -318,7 +318,9 @@ fun FriendMenu(
 
               if (currentUID != null) {
                 // Set up the confirm function for the dialog
+                Log.d("Profile", "Setting up callback (confirm) for removing friend")
                 onConfirm = {
+                  Log.d("Profile", "Removined friend $friendName")
                   userViewModel.removeFriend(currentUID, friendUID)
                   Toast.makeText(context, "Removed $friendName from friends", Toast.LENGTH_SHORT)
                       .show()
