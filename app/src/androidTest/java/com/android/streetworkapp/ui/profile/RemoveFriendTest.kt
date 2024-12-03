@@ -10,11 +10,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -39,8 +36,6 @@ class RemoveFriendTest {
   fun isFriendDeletionDisplayingCorrectly() = runTest {
     val currentUser = User("uid-alice", "Alice", "alice@gmail.com", 42, listOf("uid-bob"), "")
     val friend = User("uid-bob", "Bob", "bob@gmail.com", 64, listOf("uid-alice"), "")
-
-    val DEFAULT_USER_STATUS = "Definitely not a bot"
 
     userViewModel.setCurrentUser(currentUser) // called in friendMenu, inside FriendItem
 
