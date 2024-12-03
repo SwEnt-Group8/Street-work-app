@@ -1,5 +1,6 @@
 package com.android.streetworkapp.model.workout
 
+import java.util.TimeZone
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -10,6 +11,8 @@ class WorkoutSessionTest {
 
   @Before
   fun setup() {
+    TimeZone.setDefault(
+        TimeZone.getTimeZone("UTC")) // The timezone is assumed to be in UTC in those tests
     // Initialize a WorkoutSession object with epoch timestamps
     workoutSession =
         WorkoutSession(
