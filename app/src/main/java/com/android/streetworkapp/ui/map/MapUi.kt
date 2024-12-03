@@ -185,7 +185,7 @@ fun MapSearchBar(query: MutableState<String>, onCancel: () -> Unit) {
         onActiveChange = {},
         onSearch = {},
         leadingIcon = {
-          IconButton(onClick = onCancel) {
+          IconButton(onClick = onCancel, modifier = Modifier.testTag("cancelSearchButton")) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Search",

@@ -61,4 +61,21 @@ class MapUiTest {
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("googleMap").assertIsDisplayed()
   }
+
+  @Test
+  fun mapSearchBarDisplaysCOmponents() {
+    `when`(navigationActions.currentRoute()).thenReturn(Screen.MAP)
+
+    val logicValue = mutableStateOf(false)
+
+    composeTestRule.setContent {
+      MapSearchBar(mutableStateOf("")){ logicValue.value = true }
+    }
+
+    composeTestRule.waitForIdle()
+
+    composeTestRule.onNodeWithTag("searchBar").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("cancelSearchButton").assertIsDisplayed().performClick()
+    assert(logicValue.value)
+  }
 }
