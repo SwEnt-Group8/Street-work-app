@@ -7,6 +7,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
+import com.android.streetworkapp.StreetWorkAppMain
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.park.ParkViewModel
@@ -15,6 +16,7 @@ import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.model.parklocation.ParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.ui.navigation.Screen
 import okhttp3.OkHttpClient
 import org.junit.Before
@@ -103,5 +105,16 @@ class MapUiTest {
     composeTestRule.onNodeWithTag("cancelSearchButton").assertIsDisplayed().performClick()
 
     assert(logicValue.value)
+  }
+
+  @Test
+  fun mapSearchBarHasCorrectBehavior() {
+    composeTestRule.setContent { StreetWorkAppMain { navigateTo(Route.MAP) } }
+
+    composeTestRule.waitForIdle()
+
+    composeTestRule.onNodeWithTag("search_button").assertIsDisplayed().performClick()
+
+    composeTestRule.onNodeWithTag("searchBar").assertIsDisplayed()
   }
 }
