@@ -152,36 +152,7 @@ fun ProgressScreen(
             when (uiState.collectAsState().value) {
               DashboardStateProgression.Achievement -> {
 
-                if (currentProgression.achievements.isEmpty()) {
-
-                  Text(
-                      text = "You don't have any achievements yet!",
-                      fontSize = 15.sp,
-                      fontWeight = FontWeight.Normal,
-                      color = ColorPalette.SECONDARY_TEXT_COLOR,
-                      modifier = Modifier.padding(top = 10.dp).testTag("emptyAchievementsText"))
-                } else {
-
-                  Column {
-                    currentProgression.achievements.forEach { achievementName ->
-                      if (achievementName.contains(
-                          ProgressionScreenSettings.ACHIEVEMEMENT_TYPE_SOCIAL)) {
-                        val achievementEnum = enumValueOf<SocialAchievement>(achievementName)
-                        Box(modifier = Modifier.testTag("achievementItem")) {
-                          AchievementItem(achievementEnum.achievement, false)
-                          HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
-                        }
-                      } else {
-
-                        val achievementEnum = enumValueOf<MedalsAchievement>(achievementName)
-                        Box(modifier = Modifier.testTag("achievementItem")) {
-                          AchievementItem(achievementEnum.achievement, false)
-                          HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
-                        }
-                      }
-                    }
-                  }
-                }
+                AchievementColumn(currentProgression.achievements)
               }
               DashboardStateProgression.Training -> {
 
@@ -197,6 +168,40 @@ fun ProgressScreen(
             }
           }
         }
+  }
+}
+
+@Composable
+fun AchievementColumn(achievements: List<String>) {
+
+  if (achievements.isEmpty()) {
+
+    Text(
+        text = "You don't have any achievements yet!",
+        fontSize = 15.sp,
+        fontWeight = FontWeight.Normal,
+        color = ColorPalette.SECONDARY_TEXT_COLOR,
+        modifier = Modifier.padding(top = 10.dp).testTag("emptyAchievementsText"))
+  } else {
+
+    Column {
+      achievements.forEach { achievementName ->
+        if (achievementName.contains(ProgressionScreenSettings.ACHIEVEMEMENT_TYPE_SOCIAL)) {
+          val achievementEnum = enumValueOf<SocialAchievement>(achievementName)
+          Box(modifier = Modifier.testTag("achievementItem")) {
+            AchievementItem(achievementEnum.achievement, false)
+            HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
+          }
+        } else {
+
+          val achievementEnum = enumValueOf<MedalsAchievement>(achievementName)
+          Box(modifier = Modifier.testTag("achievementItem")) {
+            AchievementItem(achievementEnum.achievement, false)
+            HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
+          }
+        }
+      }
+    }
   }
 }
 
