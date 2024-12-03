@@ -29,6 +29,7 @@ class PreferencesRepositoryDataStore(context: Context) : PreferencesRepository {
     val SAVED_SCORE = intPreferencesKey("saved_score")
 
     private const val IO_ERR = "An IO exception occurred, emitting empty preferences."
+    private const val ERR_TAG = "PreferencesRepositoryDataStore"
   }
 
   /** A flow that emits the login state of the user. */
@@ -38,9 +39,9 @@ class PreferencesRepositoryDataStore(context: Context) : PreferencesRepository {
             // Handle exceptions
             if (exception is IOException) {
               emit(emptyPreferences())
-              Log.d("DataStoreManager", IO_ERR)
+              Log.d(ERR_TAG, IO_ERR)
             } else {
-              Log.d("DataStoreManager", exception.message.toString())
+              Log.d(ERR_TAG, exception.message.toString())
             }
           }
           .map { preferences -> preferences[IS_LOGGED_IN] ?: false }
@@ -52,9 +53,9 @@ class PreferencesRepositoryDataStore(context: Context) : PreferencesRepository {
             // Handle exceptions
             if (exception is IOException) {
               emit(emptyPreferences())
-              Log.d("DataStoreManager", IO_ERR)
+              Log.d(ERR_TAG, IO_ERR)
             } else {
-              Log.d("DataStoreManager", exception.message.toString())
+              Log.d(ERR_TAG, exception.message.toString())
             }
           }
           .map { preferences -> preferences[SAVED_UID] ?: "" }
@@ -66,9 +67,9 @@ class PreferencesRepositoryDataStore(context: Context) : PreferencesRepository {
             // Handle exceptions
             if (exception is IOException) {
               emit(emptyPreferences())
-              Log.d("DataStoreManager", IO_ERR)
+              Log.d(ERR_TAG, IO_ERR)
             } else {
-              Log.d("DataStoreManager", exception.message.toString())
+              Log.d(ERR_TAG, exception.message.toString())
             }
           }
           .map { preferences -> preferences[SAVED_NAME] ?: "" }
@@ -80,9 +81,9 @@ class PreferencesRepositoryDataStore(context: Context) : PreferencesRepository {
             // Handle exceptions
             if (exception is IOException) {
               emit(emptyPreferences())
-              Log.d("DataStoreManager", "An IO exception occurred, emitting empty preferences.")
+              Log.d(ERR_TAG, "An IO exception occurred, emitting empty preferences.")
             } else {
-              Log.d("DataStoreManager", exception.message.toString())
+              Log.d(ERR_TAG, exception.message.toString())
             }
           }
           .map { preferences -> preferences[SAVED_SCORE] ?: 0 }
