@@ -174,7 +174,8 @@ fun StreetWorkApp(
     textModerationViewModel: TextModerationViewModel,
     preferencesViewModel: PreferencesViewModel,
     navTestInvokationOnEachRecompose: Boolean = false,
-    e2eEventTesting: Boolean = false
+    e2eEventTesting: Boolean = false,
+    startDestination: String = Route.AUTH
 ) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
@@ -259,7 +260,8 @@ fun StreetWorkApp(
       }) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Route.AUTH) { // TODO: handle start destination based on signIn logic
+            startDestination =
+                startDestination) { // TODO: handle start destination based on signIn logic
               navigation(
                   startDestination = Screen.AUTH,
                   route = Route.AUTH,
