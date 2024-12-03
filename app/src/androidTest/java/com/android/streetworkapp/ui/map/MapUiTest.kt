@@ -4,9 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.printToLog
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.android.streetworkapp.model.park.ParkRepository
@@ -68,9 +66,7 @@ class MapUiTest {
 
     val logicValue = mutableStateOf(false)
 
-    composeTestRule.setContent {
-      MapSearchBar(mutableStateOf("")){ logicValue.value = true }
-    }
+    composeTestRule.setContent { MapSearchBar(mutableStateOf("")) { logicValue.value = true } }
 
     composeTestRule.waitForIdle()
 

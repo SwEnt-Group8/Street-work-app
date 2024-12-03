@@ -157,14 +157,23 @@ fun MapScreen(
                           modifier =
                               Modifier.background(Color.White, shape = RoundedCornerShape(10.dp))
                                   .padding(10.dp)) {
-                            Text(text = park.name, color = Color.Black, fontSize = 16.sp, modifier = Modifier.padding(5.dp))
+                            Text(
+                                text = park.name,
+                                color = Color.Black,
+                                fontSize = 16.sp,
+                                modifier = Modifier.padding(5.dp))
 
                             RatingComponent(park.rating.toInt(), park.nbrRating)
 
-                            Row(modifier = Modifier.padding(5.dp), verticalAlignment = Alignment.CenterVertically) {
-                              Icon(Icons.Filled.Event, contentDescription = "eventIcon", modifier = Modifier.padding(horizontal = 5.dp))
-                              Text(text = "${park.events.size} event(s) planned")
-                            }
+                            Row(
+                                modifier = Modifier.padding(5.dp),
+                                verticalAlignment = Alignment.CenterVertically) {
+                                  Icon(
+                                      Icons.Filled.Event,
+                                      contentDescription = "eventIcon",
+                                      modifier = Modifier.padding(horizontal = 5.dp))
+                                  Text(text = "${park.events.size} event(s) planned")
+                                }
                           }
                     }
               }

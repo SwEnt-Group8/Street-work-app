@@ -155,7 +155,7 @@ class TopAppBarActionTest {
   }
 
   @Test
-  fun isSearchActionWorking(){
+  fun isSearchActionWorking() {
     val searchAction = TopAppBarManager.TopAppBarAction.SEARCH
 
     val topAppBarManager = TopAppBarManager("any title", actions = listOf(searchAction))
