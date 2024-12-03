@@ -81,7 +81,7 @@ class PreferencesRepositoryDataStore(context: Context) : PreferencesRepository {
             // Handle exceptions
             if (exception is IOException) {
               emit(emptyPreferences())
-              Log.d(ERR_TAG, "An IO exception occurred, emitting empty preferences.")
+              Log.d(ERR_TAG, IO_ERR)
             } else {
               Log.d(ERR_TAG, exception.message.toString())
             }
