@@ -19,18 +19,18 @@ class PreferencesViewModel(private val preferencesRepository: PreferencesReposit
     get() = _loginState
 
   /** A StateFlow of the user's uid. */
-  private val _uid = MutableStateFlow<String>("")
-  val uid: StateFlow<String>
+  private val _uid = MutableStateFlow<String?>(null)
+  val uid: StateFlow<String?>
     get() = _uid
 
   /** A StateFlow of the user's name. */
-  private val _name = MutableStateFlow<String>("")
-  val name: StateFlow<String>
+  private val _name = MutableStateFlow<String?>(null)
+  val name: StateFlow<String?>
     get() = _name
 
   /** A StateFlow of the user's score. */
-  private val _score = MutableStateFlow<Int>(0)
-  val score: StateFlow<Int>
+  private val _score = MutableStateFlow<Int?>(null)
+  val score: StateFlow<Int?>
     get() = _score
 
   /** Get the login state of the user. */
