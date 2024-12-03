@@ -138,7 +138,8 @@ fun StreetWorkAppMain(
       eventViewModel,
       progressionViewModel,
       workoutViewModel,
-      textModerationViewModel)
+      textModerationViewModel,
+      preferencesViewModel)
 }
 
 fun NavGraphBuilder.trainComposable(
@@ -171,6 +172,7 @@ fun StreetWorkApp(
     progressionViewModel: ProgressionViewModel,
     workoutViewModel: WorkoutViewModel,
     textModerationViewModel: TextModerationViewModel,
+    preferencesViewModel: PreferencesViewModel,
     navTestInvokationOnEachRecompose: Boolean = false,
     e2eEventTesting: Boolean = false
 ) {
