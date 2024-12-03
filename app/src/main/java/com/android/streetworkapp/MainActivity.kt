@@ -37,6 +37,8 @@ import com.android.streetworkapp.model.park.ParkRepositoryFirestore
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
+import com.android.streetworkapp.model.preferences.PreferencesRepositoryDataStore
+import com.android.streetworkapp.model.preferences.PreferencesViewModel
 import com.android.streetworkapp.model.progression.ProgressionRepositoryFirestore
 import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.user.UserRepositoryFirestore
@@ -122,6 +124,10 @@ fun StreetWorkAppMain(
   // Instantiate Text Moderation
   val textModerationRepository = PerspectiveAPIRepository(OkHttpClient())
   val textModerationViewModel = TextModerationViewModel(textModerationRepository)
+
+  // Instantiate Preferences repository
+  val preferencesRepository = PreferencesRepositoryDataStore(LocalContext.current)
+  val preferencesViewModel = PreferencesViewModel(preferencesRepository)
 
   StreetWorkApp(
       parkLocationViewModel,
