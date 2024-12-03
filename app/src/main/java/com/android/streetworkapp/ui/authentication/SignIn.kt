@@ -88,6 +88,10 @@ fun SignInScreen(
   LaunchedEffect(user) {
     user?.let {
       userViewModel.setCurrentUser(it)
+      preferencesViewModel.setLoginState(true)
+      preferencesViewModel.setUid(it.uid)
+      preferencesViewModel.setName(it.username)
+      preferencesViewModel.setScore(it.score)
       Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
       navigationActions.navigateTo(Screen.MAP)
     }
