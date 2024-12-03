@@ -251,6 +251,10 @@ dependencies {
     androidTestImplementation(libs.mockito.kotlin)
     androidTestImplementation (libs.mockito.android)
 
+    // Preferences DataStore
+    implementation(libs.datastore.preferences)
+    implementation(libs.datastore.core)
+
 }
 
 configurations.configureEach {

@@ -24,6 +24,7 @@ import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_DARK
 import kotlin.math.abs
 
 data class GraphData(val x: Float, val y: Float)
+
 /**
  * Data class for configuring the properties of a graph.
  *
@@ -45,6 +46,7 @@ class GraphConfiguration(
     var strokeWidth: Float = 4f,
     var showDashedLines: Boolean = true
 )
+
 /**
  * A composable function that renders an interactive graph based on the provided configuration.
  *
