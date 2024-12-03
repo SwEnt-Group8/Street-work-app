@@ -94,7 +94,7 @@ class MapUiTest {
 
     val logicValue = mutableStateOf(false)
 
-    composeTestRule.setContent { MapSearchBar(mutableStateOf("")){ logicValue.value = true} }
+    composeTestRule.setContent { MapSearchBar(mutableStateOf("")) { logicValue.value = true } }
 
     composeTestRule.waitForIdle()
 
