@@ -116,5 +116,9 @@ class MapUiTest {
     composeTestRule.onNodeWithTag("search_button").assertIsDisplayed().performClick()
 
     composeTestRule.onNodeWithTag("searchBar").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("cancelSearchButton").assertIsDisplayed().performClick()
+
+    composeTestRule.onNodeWithTag("topAppBar").assertIsDisplayed()
   }
 }
