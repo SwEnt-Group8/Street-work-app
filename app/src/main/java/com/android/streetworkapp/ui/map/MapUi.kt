@@ -136,11 +136,10 @@ fun MapScreen(
                     rememberMarkerState(position = LatLng(park.location.lat, park.location.lon))
 
                 MarkerInfoWindow(
+                    tag = "Marker$markerIndex",
                     state = markerState,
                     icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE),
                     onClick = {
-                      Log.d("Markerinfowindow", "clicked on ${park.name}")
-                      Log.d("Markerinfowindow", "SelectedPark: ${selectedPark.name}")
                       markerState.showInfoWindow()
                       if (selectedPark == park) {
                         selectedPark = Park()
@@ -152,29 +151,7 @@ fun MapScreen(
                       selectedPark = park
                       true
                     }) {
-                      Column(
-                          horizontalAlignment = Alignment.CenterHorizontally,
-                          modifier =
-                              Modifier.background(Color.White, shape = RoundedCornerShape(10.dp))
-                                  .padding(10.dp)) {
-                            Text(
-                                text = park.name,
-                                color = Color.Black,
-                                fontSize = 16.sp,
-                                modifier = Modifier.padding(5.dp))
-
-                            RatingComponent(park.rating.toInt(), park.nbrRating)
-
-                            Row(
-                                modifier = Modifier.padding(5.dp),
-                                verticalAlignment = Alignment.CenterVertically) {
-                                  Icon(
-                                      Icons.Filled.Event,
-                                      contentDescription = "eventIcon",
-                                      modifier = Modifier.padding(horizontal = 5.dp))
-                                  Text(text = "${park.events.size} event(s) planned")
-                                }
-                          }
+                      MarkerInfoWindowContent(park)
                     }
               }
         }
@@ -203,4 +180,32 @@ fun MapSearchBar(query: MutableState<String>, onCancel: () -> Unit) {
         },
     ) {}
   }
+}
+
+@Composable
+fun MarkerInfoWindowContent(park: Park) {
+  Column(
+      horizontalAlignment = Alignment.CenterHorizontally,
+      modifier =
+          Modifier.background(Color.White, shape = RoundedCornerShape(10.dp))
+              .padding(10.dp)
+              .testTag("markerInfoWindow")) {
+        Text(
+            text = park.name,
+            color = Color.Black,
+            fontSize = 16.sp,
+            modifier = Modifier.padding(5.dp).testTag("parkName"))
+
+        RatingComponent(park.rating.toInt(), park.nbrRating)
+
+        Row(modifier = Modifier.padding(5.dp), verticalAlignment = Alignment.CenterVertically) {
+          Icon(
+              Icons.Filled.Event,
+              contentDescription = "eventIcon",
+              modifier = Modifier.padding(horizontal = 5.dp).testTag("eventIcon"))
+          Text(
+              text = "${park.events.size} event(s) planned",
+              modifier = Modifier.testTag("eventsPlanned"))
+        }
+      }
 }

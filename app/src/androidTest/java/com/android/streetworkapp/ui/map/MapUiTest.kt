@@ -4,12 +4,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
+import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
+import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.model.parklocation.ParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
@@ -29,6 +30,14 @@ class MapUiTest {
   private lateinit var parkRepository: ParkRepository
   private lateinit var parkViewModel: ParkViewModel
   private lateinit var navigationActions: NavigationActions
+
+  private var testPark =
+      Park(
+          name = "Test Park",
+          location = ParkLocation(),
+          rating = 4F,
+          occupancy = 3,
+          events = emptyList())
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -61,17 +70,21 @@ class MapUiTest {
   }
 
   @Test
-  fun mapSearchBarDisplaysCOmponents() {
+  fun infoWindowContentsAreDisplayed() {
     `when`(navigationActions.currentRoute()).thenReturn(Screen.MAP)
 
-    val logicValue = mutableStateOf(false)
-
-    composeTestRule.setContent { MapSearchBar(mutableStateOf("")) { logicValue.value = true } }
+    composeTestRule.setContent { MarkerInfoWindowContent(testPark) }
 
     composeTestRule.waitForIdle()
 
-    composeTestRule.onNodeWithTag("searchBar").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("cancelSearchButton").assertIsDisplayed().performClick()
-    assert(logicValue.value)
+    composeTestRule.onNodeWithTag("markerInfoWindow").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("parkName").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("ratingComponent").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("eventIcon").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("eventsPlanned").assertIsDisplayed()
   }
 }
