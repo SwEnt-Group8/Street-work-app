@@ -12,9 +12,12 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.streetworkapp.model.user.User
+import com.android.streetworkapp.model.user.UserRepository
+import com.android.streetworkapp.model.user.UserViewModel
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 
 @RunWith(AndroidJUnit4::class)
 class ProfileComponentsTest {
@@ -63,7 +66,10 @@ class ProfileComponentsTest {
     val friend = User("uid-alice", "Alice", "alice@gmail.com", 42, emptyList(), "")
     val DEFAULT_USER_STATUS = "Definitely not a bot"
 
-    composeTestRule.setContent { DisplayFriendItem(friend) }
+    val repository: UserRepository = mock()
+    val userViewModel = UserViewModel(repository)
+
+    composeTestRule.setContent { DisplayFriendItem(friend, userViewModel) }
 
     composeTestRule.onNodeWithTag("friendProfilePicture").assertExists().assertIsDisplayed()
 
@@ -94,7 +100,10 @@ class ProfileComponentsTest {
     val bob = User("uid-bob", "Bob", "bob@gmail.com", 64, emptyList(), "")
     val friends = listOf(alice, bob)
 
-    composeTestRule.setContent { DisplayFriendList(friends) }
+    val repository: UserRepository = mock()
+    val userViewModel = UserViewModel(repository)
+
+    composeTestRule.setContent { DisplayFriendList(friends, userViewModel) }
 
     // Verify that the emptyList text is not displayed :
     composeTestRule.onNodeWithTag("emptyFriendListText").assertIsNotDisplayed()
@@ -114,7 +123,10 @@ class ProfileComponentsTest {
     val friends = emptyList<User>()
     val NO_FRIENDS_MESSAGE = "You have no friends yet :("
 
-    composeTestRule.setContent { DisplayFriendList(friends) }
+    val repository: UserRepository = mock()
+    val userViewModel = UserViewModel(repository)
+
+    composeTestRule.setContent { DisplayFriendList(friends, userViewModel) }
 
     composeTestRule
         .onNodeWithTag("emptyFriendListText")
