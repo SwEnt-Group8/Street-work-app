@@ -1,6 +1,7 @@
 package com.android.streetworkapp.ui.profile
 
 import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
@@ -9,6 +10,7 @@ import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.streetworkapp.model.user.User
@@ -91,7 +93,20 @@ class ProfileComponentsTest {
         .assertIsDisplayed()
         .assertTextEquals(DEFAULT_USER_STATUS)
 
-    composeTestRule.onNodeWithTag("friendSettingButton").assertExists().assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("friendSettingButton")
+        .assertExists()
+        .assertIsDisplayed()
+        .assertHasClickAction()
+
+    // Menu testing :
+    composeTestRule.onNodeWithTag("friendMenu").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("friendSettingButton").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("friendMenu").assertIsDisplayed()
+
+    // Menu Actions testing :
+    composeTestRule.onNodeWithTag("RemoveFriendMenuItem").assertIsDisplayed().assertHasClickAction()
   }
 
   @Test
