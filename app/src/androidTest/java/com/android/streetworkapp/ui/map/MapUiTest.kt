@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.android.streetworkapp.model.park.Park
@@ -86,5 +87,21 @@ class MapUiTest {
     composeTestRule.onNodeWithTag("eventIcon").assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("eventsPlanned").assertIsDisplayed()
+  }
+
+  @Test
+  fun mapSearchBarComponentIsDisplayed() {
+
+    val logicValue = mutableStateOf(false)
+
+    composeTestRule.setContent { MapSearchBar(mutableStateOf("")){ logicValue.value = true} }
+
+    composeTestRule.waitForIdle()
+
+    composeTestRule.onNodeWithTag("searchBar").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("cancelSearchButton").assertIsDisplayed().performClick()
+
+    assert(logicValue.value)
   }
 }
