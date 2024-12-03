@@ -14,8 +14,8 @@ import kotlinx.coroutines.launch
 class PreferencesViewModel(private val preferencesRepository: PreferencesRepository) : ViewModel() {
 
   /** A StateFlow of the login state of the user. */
-  private val _loginState = MutableStateFlow<Boolean>(false)
-  val loginState: StateFlow<Boolean>
+  private val _loginState = MutableStateFlow<Boolean?>(null)
+  val loginState: StateFlow<Boolean?>
     get() = _loginState
 
   /** A StateFlow of the user's uid. */
