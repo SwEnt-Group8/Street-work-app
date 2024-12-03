@@ -91,14 +91,14 @@ enum class ExerciseAchievement(val achievement: Achievement) {
 enum class SocialAchievement(val achievement: Achievement, val numberOfFriends: Int) {
   SOCIAL1(
       Achievement(
-          R.drawable.bronze_achievement_icon,
+          R.drawable.first_friend_achievement,
           "First Friend",
           listOf("Social"),
           "You added your first friend!"),
       1),
   SOCIAL3(
       Achievement(
-          R.drawable.bronze_achievement_icon,
+          R.drawable.group_friend_achievement,
           "Workout Group",
           listOf("Social"),
           "You added 3 friends!"),
