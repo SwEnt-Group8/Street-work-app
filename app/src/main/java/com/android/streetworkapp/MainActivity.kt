@@ -16,6 +16,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -137,17 +138,48 @@ fun StreetWorkAppMain(
   val textModerationRepository = PerspectiveAPIRepository(OkHttpClient())
   val textModerationViewModel = TextModerationViewModel(textModerationRepository)
 
-  StreetWorkApp(
-      parkLocationViewModel,
-      testInvokation,
-      {},
-      userViewModel,
-      parkViewModel,
-      eventViewModel,
-      progressionViewModel,
-      workoutViewModel,
-      textModerationViewModel,
-      preferencesViewModel)
+  // Get the preferences cached parameters
+  val loginState by preferencesViewModel.loginState.collectAsState()
+  val uid by preferencesViewModel.uid.collectAsState()
+  val name by preferencesViewModel.name.collectAsState()
+  val score by preferencesViewModel.score.collectAsState()
+
+  LaunchedEffect(Unit) {
+    preferencesViewModel.getLoginState()
+    preferencesViewModel.getUid()
+    preferencesViewModel.getName()
+    preferencesViewModel.getScore()
+  }
+
+  // Ensure login state is initialized before deciding the start destination
+  var resolvedStartDestination by remember { mutableStateOf<String?>(null) }
+
+  LaunchedEffect(loginState) {
+    resolvedStartDestination =
+        when (loginState) {
+          true -> Route.MAP
+          false -> Route.AUTH
+          else -> null
+        }
+  }
+
+  // Display the splash screen while determining the start destination
+  if (resolvedStartDestination == null) {
+    SplashScreen()
+  } else {
+    StreetWorkApp(
+        parkLocationViewModel,
+        testInvokation,
+        {},
+        userViewModel,
+        parkViewModel,
+        eventViewModel,
+        progressionViewModel,
+        workoutViewModel,
+        textModerationViewModel,
+        preferencesViewModel,
+        startDestination = resolvedStartDestination!!)
+  }
 }
 
 fun NavGraphBuilder.trainComposable(
