@@ -36,8 +36,7 @@ object Screen {
       "TrainCoach/{activity}/{isTimeDependent}?time={time}&sets={sets}&reps={reps}"
   const val TRAIN_CHALLENGE =
       "TrainChallenge/{activity}/{isTimeDependent}?time={time}&sets={sets}&reps={reps}"
-  const val TRAIN_TIME_DEP_PARAMS = "TrainTimeDependentParamsScreen"
-  const val TRAIN_TIME_INDEP_PARAMS = "TrainTimeIndependentParamsScreen"
+  const val TRAIN_PARAM = "TrainParam/{activity}/{isTimeDependent}/{type}"
   const val UNK = "TBD Screen" // TODO: not yet defined
 }
 
@@ -157,6 +156,13 @@ data class ScreenParams(
             bottomBarType = BottomNavigationMenuType.DEFAULT,
             isTopBarVisible = true,
             TopAppBarManager("Challenge with your friend", hasNavigationIcon = true))
+    val TRAIN_PARAM =
+        ScreenParams(
+            screenName = Screen.TRAIN_PARAM,
+            isBottomBarVisible = true,
+            bottomBarType = BottomNavigationMenuType.DEFAULT,
+            isTopBarVisible = true,
+            TopAppBarManager("Train with parameters", hasNavigationIcon = true))
   }
 }
 
@@ -173,7 +179,8 @@ val LIST_OF_SCREENS =
         ScreenParams.TRAIN_HUB,
         ScreenParams.TRAIN_SOLO,
         ScreenParams.TRAIN_COACH,
-        ScreenParams.TRAIN_CHALLENGE)
+        ScreenParams.TRAIN_CHALLENGE,
+        ScreenParams.TRAIN_PARAM)
 
 /**
  * Represents a top-level destination in the app's navigation.
@@ -356,5 +363,17 @@ open class NavigationActions(
         (time?.let { "?time=$it" } ?: "") +
         (sets?.let { "&sets=$it" } ?: "") +
         (reps?.let { "&reps=$it" } ?: "")
+  }
+
+  /**
+   * Navigate to the TrainParam screen.
+   *
+   * @param activity The activity to train.
+   * @param isTimeDependent Whether the activity is time dependent.
+   * @param type The type of training.
+   */
+  fun navigateToTrainParam(activity: String, isTimeDependent: Boolean, type: String) {
+    val route = "TrainParam/$activity/$isTimeDependent/$type"
+    navController.navigate(route)
   }
 }

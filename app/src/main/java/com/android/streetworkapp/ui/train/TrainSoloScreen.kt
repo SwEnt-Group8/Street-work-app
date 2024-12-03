@@ -32,7 +32,6 @@ fun TrainSoloScreen(
     reps: Int?,
     workoutViewModel: WorkoutViewModel,
     paddingValues: PaddingValues = PaddingValues(0.dp)
-
 ) {
   var isStopped by remember { mutableStateOf(false) }
 
