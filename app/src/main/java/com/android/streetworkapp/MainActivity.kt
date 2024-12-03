@@ -69,6 +69,7 @@ import com.android.streetworkapp.ui.train.TrainSoloScreen
 import com.android.streetworkapp.ui.utils.CustomDialog
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.serialization.json.JsonNull.content
 import java.util.Date
 import okhttp3.OkHttpClient
 
@@ -85,7 +86,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
 
-  // repositories
+  // repositoriesNavGraphBuilder
   val overpassParkLocationRepo = OverpassParkLocationRepository(OkHttpClient())
   val parkNameRepository = NominatimParkNameRepository(OkHttpClient())
   // viewmodels
@@ -132,18 +133,26 @@ fun NavGraphBuilder.trainComposable(
     route: String,
     workoutViewModel: WorkoutViewModel,
     innerPadding: PaddingValues,
-    content: @Composable (activity: String, isTimeDependent: Boolean) -> Unit
+    content: @Composable (activity: String, isTimeDependent: Boolean, time: Int?, sets: Int?, reps: Int?) -> Unit
 ) {
-  composable(
-      route = route,
-      arguments =
-          listOf(
-              navArgument("activity") { type = NavType.StringType },
-              navArgument("isTimeDependent") { type = NavType.BoolType })) { backStackEntry ->
+    composable(
+        route = route,
+        arguments = listOf(
+            navArgument("activity") { type = NavType.StringType },
+            navArgument("isTimeDependent") { type = NavType.BoolType },
+            navArgument("time") { type = NavType.IntType; defaultValue = 0 },
+            navArgument("sets") { type = NavType.IntType; defaultValue = 0 },
+            navArgument("reps") { type = NavType.IntType; defaultValue = 0 }
+        )
+    ) { backStackEntry ->
         val activity = backStackEntry.arguments?.getString("activity") ?: "Unknown"
         val isTimeDependent = backStackEntry.arguments?.getBoolean("isTimeDependent") ?: false
-        content(activity, isTimeDependent)
-      }
+        val time = backStackEntry.arguments?.getInt("time")
+        val sets = backStackEntry.arguments?.getInt("sets")
+        val reps = backStackEntry.arguments?.getInt("reps")
+
+        content(activity, isTimeDependent, time, sets, reps)
+    }
 }
 
 @SuppressLint("UnrememberedMutableState")
@@ -332,29 +341,35 @@ fun StreetWorkApp(
                 composable(Screen.TRAIN_HUB) {
                   TrainHubScreen(navigationActions, workoutViewModel, userViewModel, innerPadding)
                 }
-                trainComposable(
-                    route = Screen.TRAIN_SOLO,
-                    workoutViewModel = workoutViewModel,
-                    innerPadding = innerPadding) { activity, isTimeDependent ->
-                      TrainSoloScreen(activity, isTimeDependent, workoutViewModel, innerPadding)
-                    }
+                  trainComposable(
+                      route = Screen.TRAIN_SOLO,
+                      workoutViewModel = workoutViewModel,
+                      innerPadding = innerPadding,
+                      content = { activity, isTimeDependent, time, sets, reps ->
+                          TrainSoloScreen(activity, isTimeDependent, time, sets, reps, workoutViewModel, innerPadding)
+                      }
+                  )
 
-                trainComposable(
-                    route = Screen.TRAIN_COACH,
-                    workoutViewModel = workoutViewModel,
-                    innerPadding = innerPadding) { activity, isTimeDependent ->
-                      TrainCoachScreen(activity, isTimeDependent, workoutViewModel, innerPadding)
-                    }
+                  trainComposable(
+                      route = Screen.TRAIN_COACH,
+                      workoutViewModel = workoutViewModel,
+                      innerPadding = innerPadding,
+                      content = { activity, isTimeDependent, time, sets, reps ->
+                          TrainCoachScreen(activity, isTimeDependent, time, sets, reps, workoutViewModel, innerPadding)
+                      }
+                  )
 
-                trainComposable(
-                    route = Screen.TRAIN_CHALLENGE,
-                    workoutViewModel = workoutViewModel,
-                    innerPadding = innerPadding) { activity, isTimeDependent ->
-                      TrainChallengeScreen(
-                          activity, isTimeDependent, workoutViewModel, innerPadding)
-                    }
+                  trainComposable(
+                      route = Screen.TRAIN_CHALLENGE,
+                      workoutViewModel = workoutViewModel,
+                      innerPadding = innerPadding,
+                      content = { activity, isTimeDependent, time, sets, reps ->
+                          TrainChallengeScreen(activity, isTimeDependent, time, sets, reps, workoutViewModel, innerPadding)
+                      }
+                  )
+
               }
-            }
+        }
 
         if (e2eEventTesting) {
           LaunchedEffect(navTestInvokation) { navigationActions.apply(navTestInvokation) }

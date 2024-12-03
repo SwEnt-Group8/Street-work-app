@@ -27,8 +27,12 @@ import com.android.streetworkapp.ui.theme.ColorPalette.PRINCIPLE_BACKGROUND_COLO
 fun TrainSoloScreen(
     activity: String,
     isTimeDependent: Boolean,
+    time: Int?,
+    sets: Int?,
+    reps: Int?,
     workoutViewModel: WorkoutViewModel,
     paddingValues: PaddingValues = PaddingValues(0.dp)
+
 ) {
   var isStopped by remember { mutableStateOf(false) }
 
