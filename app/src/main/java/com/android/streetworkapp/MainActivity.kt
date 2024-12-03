@@ -25,7 +25,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
-import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.moderation.PerspectiveAPIRepository
@@ -45,6 +44,7 @@ import com.android.streetworkapp.ui.authentication.SignInScreen
 import com.android.streetworkapp.ui.event.AddEventScreen
 import com.android.streetworkapp.ui.event.EventOverviewScreen
 import com.android.streetworkapp.ui.map.MapScreen
+import com.android.streetworkapp.ui.map.MapSearchBar
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenu
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenuType
 import com.android.streetworkapp.ui.navigation.EventBottomBar
@@ -68,9 +68,7 @@ import com.android.streetworkapp.ui.train.TrainHubScreen
 import com.android.streetworkapp.ui.train.TrainSoloScreen
 import com.android.streetworkapp.ui.tutorial.TutorialEvent
 import com.android.streetworkapp.ui.utils.CustomDialog
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
-import java.util.Date
 import okhttp3.OkHttpClient
 
 class MainActivity : ComponentActivity() {
@@ -177,44 +175,40 @@ fun StreetWorkApp(
   var firstTimeLoaded by remember { mutableStateOf<Boolean>(true) }
 
   navigationActions.registerStringListenerOnDestinationChange(currentScreenName)
+
   screenParams = LIST_OF_SCREENS.find { currentScreenName.value == it.screenName }
 
   // Instantiate info manager and its components :
   val showInfoDialog = remember { mutableStateOf(false) }
+  val showSearchBar = remember { mutableStateOf(false) }
+
+  // query for the search bar
+  val searchQuery = remember { mutableStateOf("") }
+
   Log.d("InfoDialog", "Main - Instantiating the InfoDialogManager")
   val infoManager =
       InfoDialogManager(
           showInfoDialog, currentScreenName, topAppBarManager = screenParams?.topAppBarManager)
 
-  // Park with no events
-  val sampleEvent =
-      Event(
-          eid = "event123",
-          title = "Community Park Cleanup",
-          // description = "Join us for a day of community service to clean up the local park!",
-          description =
-              "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eget leo vitae enim facilisis fringilla. Morbi feugiat scelerisque nisl, vel vehicula sem malesuada et. Proin id arcu eget nisi congue facilisis. Integer feugiat, ex eu vestibulum sagittis, erat felis scelerisque dui, id varius turpis magna in nisi. Suspendisse potenti. Pellentesque quis posuere elit. Vivamus tincidunt dui vel risus dignissim, sit amet dignissim velit cursus. Nam sodales nulla non semper pharetra. Aliquam erat volutpat. Morbi pharetra odio id facilisis pulvinar. Mauris aliquet ipsum eu dolor ultrices, id sodales sapien dictum. Nam facilisis vestibulum viverra.\n" +
-                  "\n" +
-                  "Sed elementum risus in tempor accumsan. Integer egestas, eros at venenatis ultricies, quam nunc dictum urna, a aliquam odio erat at lacus. In lacinia mauris sit amet orci accumsan, in bibendum arcu condimentum. In ut lacus et ipsum tincidunt condimentum. Fusce non magna ut urna vestibulum gravida at ut felis. Nullam auctor dapibus sem, ut rhoncus turpis gravida non. Pellentesque elementum erat a libero luctus feugiat. Aenean tincidunt fermentum nisl, in rhoncus ex iaculis nec. Vestibulum gravida, est vel scelerisque varius, magna erat pharetra risus, a sollicitudin libero orci nec lectus. Fusce lobortis magna in arcu vehicula, sit amet fermentum leo interdum",
-          participants = 15,
-          maxParticipants = 50,
-          date = Timestamp(Date()), // Current date and time
-          owner = "ownerUserId",
-          listParticipants = listOf("user1", "user2", "user3"),
-          parkId = "park567")
-
   Scaffold(
       containerColor = ColorPalette.PRINCIPLE_BACKGROUND_COLOR,
       topBar = {
-        screenParams
-            ?.isTopBarVisible
-            ?.takeIf { it }
-            ?.let {
-              TopAppBarWrapper(navigationActions, screenParams?.topAppBarManager)
-              // setup the InfoDialogManager in topBar, because it relies on the topAppBarManager.
-              Log.d("InfoDialog", "Main - Setting up the InfoDialogManager")
-              infoManager.setUp()
-            }
+        if (showSearchBar.value && screenParams?.hasSearchBar == true) {
+          MapSearchBar(searchQuery) {
+            searchQuery.value = ""
+            showSearchBar.value = false
+          }
+        } else {
+          screenParams
+              ?.isTopBarVisible
+              ?.takeIf { it }
+              ?.let {
+                TopAppBarWrapper(navigationActions, screenParams?.topAppBarManager)
+                // setup the InfoDialogManager in topBar, because it relies on the topAppBarManager.
+                Log.d("InfoDialog", "Main - Setting up the InfoDialogManager")
+                infoManager.setUp()
+              }
+        }
       },
       snackbarHost = {
         SnackbarHost(
@@ -269,8 +263,13 @@ fun StreetWorkApp(
                       parkLocationViewModel,
                       parkViewModel,
                       navigationActions,
+                      searchQuery,
                       mapCallbackOnMapLoaded,
                       innerPadding)
+                  screenParams?.topAppBarManager?.setActionCallback(
+                      TopAppBarManager.TopAppBarAction.SEARCH) {
+                        showSearchBar.value = true
+                      }
                 }
                 composable(Screen.PARK_OVERVIEW) {
                   infoManager.Display()
