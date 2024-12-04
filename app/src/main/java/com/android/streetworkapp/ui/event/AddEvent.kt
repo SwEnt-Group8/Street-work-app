@@ -18,7 +18,6 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -46,7 +45,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -64,14 +62,14 @@ import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.progress.updateAndDisplayPoints
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.google.firebase.Timestamp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 
 object AddEventParams {
   const val TEXT_EVALUATION_DISPLAY_TIME = 5000L // in ns
@@ -105,12 +103,10 @@ fun AddEventScreen(
     paddingValues: PaddingValues = PaddingValues(0.dp),
 ) {
 
-  val context = LocalContext.current
-
   val eid = eventViewModel.getNewEid()
 
   val event by remember {
-    mutableStateOf<Event>(
+    mutableStateOf(
         Event(
             eid,
             "",
@@ -143,10 +139,10 @@ fun AddEventScreen(
   // passing it as param)
   val isTextEvaluationOverThresholdsError = remember { mutableStateOf(false) } // same here
   val isDateBackInTimeError = remember { mutableStateOf(false) } // same here
-  var isTextEvaluationError = remember {
+  val isTextEvaluationError = remember {
     mutableStateOf(false)
   } // for api error, deserialization error or network issues
-  var formErrorMessage = remember {
+  val formErrorMessage = remember {
     mutableStateOf("")
   } // message to be displayed at bottom of form in case of form error
 
@@ -160,10 +156,7 @@ fun AddEventScreen(
           isDateBackInTimeError.value,
           isTextEvaluationError.value)
 
-  Box(
-      modifier = Modifier.padding(paddingValues).background(MaterialTheme.colorScheme.background),
-  ) {
-    Box(modifier = Modifier.fillMaxSize().testTag("addEventScreen").padding(vertical = 15.dp)) {
+    Box(modifier = Modifier.fillMaxSize().testTag("addEventScreen").padding(paddingValues).background(MaterialTheme.colorScheme.background)) {
       Column(
           modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
           verticalArrangement = Arrangement.spacedBy(18.dp),
@@ -201,10 +194,7 @@ fun AddEventScreen(
             }
 
             Button(
-                colors =
-                    ButtonDefaults.buttonColors(
-                        containerColor = ColorPalette.INTERACTION_COLOR_DARK,
-                        contentColor = ColorPalette.PRIMARY_TEXT_COLOR),
+                colors = ColorPalette.BUTTON_COLOR,
                 modifier = Modifier.testTag("addEventButton"),
                 onClick = {
                   onAddEventClickHandler(
@@ -227,7 +217,7 @@ fun AddEventScreen(
           }
     }
   }
-}
+
 
 /**
  * Used to change the title of the event
