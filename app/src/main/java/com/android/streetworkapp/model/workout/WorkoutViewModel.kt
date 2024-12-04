@@ -106,9 +106,7 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
   ) {
     viewModelScope.launch {
       try {
-        Log.d("WorkoutViewModel", "Fetching or adding workout data for UID: $uid")
         val currentWorkoutData = repository.getOrAddWorkoutData(uid)
-        Log.d("WorkoutViewModel", "Current workout data: $currentWorkoutData")
 
         val updatedWorkoutSessions = currentWorkoutData.workoutSessions.toMutableList()
 
@@ -136,8 +134,6 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
                   endTime = System.currentTimeMillis())
           updatedWorkoutSessions.add(newSession)
         }
-
-        Log.d("WorkoutViewModel", "Updated workout sessions: $updatedWorkoutSessions")
 
         // Update repository with the new/updated session
         repository.addOrUpdateWorkoutSession(uid, updatedWorkoutSessions.last())
