@@ -29,7 +29,7 @@ data class WorkoutSession(
 
 /** An enum class representing the type of workout session. */
 enum class SessionType {
-  ALONE, // Solo session
-  REFEREE, // Referee-observed session
+  SOLO, // Solo session
+  COACH, // Referee-observed session
   CHALLENGE // Competitive session
 }
