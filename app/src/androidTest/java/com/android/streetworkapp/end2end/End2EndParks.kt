@@ -30,12 +30,14 @@ import androidx.test.espresso.idling.CountingIdlingResource
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.streetworkapp.StreetWorkApp
 import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.moderation.TextModerationViewModel
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
 import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.user.UserViewModel
+import com.android.streetworkapp.model.workout.WorkoutViewModel
 import com.android.streetworkapp.ui.navigation.Route
 import io.mockk.every
 import io.mockk.mockk
@@ -108,7 +110,9 @@ class End2EndParks {
           UserViewModel(mockk()),
           ParkViewModel(mockk()),
           EventViewModel(mockk()),
-          ProgressionViewModel(mockk()))
+          ProgressionViewModel(mockk()),
+          WorkoutViewModel(mockk()),
+          TextModerationViewModel(mockk()))
       // setup so as we're already on the MAP route
     }
 

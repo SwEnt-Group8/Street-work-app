@@ -55,6 +55,27 @@ class UserViewModelTest {
   }
 
   @Test
+  fun getUserByUidAndSetAsCurrentUserCallsRepositoryWithCorrectUid() = runTest {
+    val uid = "user123"
+    val user = User(uid, "John Doe", "john@example.com", 100, emptyList(), picture = "")
+    whenever(repository.getUserByUid(uid)).thenReturn(user)
+    userViewModel.getUserByUidAndSetAsCurrentUser(uid)
+    testDispatcher.scheduler.advanceUntilIdle()
+    verify(repository).getUserByUid(uid)
+  }
+
+  @Test
+  fun getUserByUidAndSetAsCurrentUserUpdatesCurrentUser() = runTest {
+    val uid = "user123"
+    val user = User(uid, "John Doe", "john@example.com", 100, emptyList(), picture = "")
+    whenever(repository.getUserByUid(uid)).thenReturn(user)
+    userViewModel.getUserByUidAndSetAsCurrentUser(uid)
+    testDispatcher.scheduler.advanceUntilIdle()
+    val observedUser = userViewModel.currentUser.first()
+    assertEquals(user, observedUser)
+  }
+
+  @Test
   fun getUserByEmailCallsRepositoryWithCorrectEmail() = runTest {
     val email = "john@example.com"
     val user = User("user123", "John Doe", email, 100, emptyList(), picture = "")
@@ -196,5 +217,13 @@ class UserViewModelTest {
     testDispatcher.scheduler.advanceUntilIdle()
     val observedUser = userViewModel.user.first()
     assertEquals(user, observedUser)
+  }
+
+  @Test
+  fun getUsersByUidsCallsRepository() = runTest {
+    val uids = listOf("user123", "user456")
+    userViewModel.getUsersByUids(uids)
+    testDispatcher.scheduler.advanceUntilIdle()
+    verify(repository).getUsersByUids(any())
   }
 }

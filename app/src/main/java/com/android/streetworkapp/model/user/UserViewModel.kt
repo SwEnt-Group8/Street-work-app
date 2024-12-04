@@ -23,6 +23,10 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
   val friends: StateFlow<List<User?>>
     get() = _friends
 
+  private val _userList = MutableStateFlow<List<User?>>(emptyList())
+  val userList: StateFlow<List<User?>>
+    get() = _userList
+
   private val _parks = MutableStateFlow<List<String>>(emptyList())
   val parks: StateFlow<List<String>>
     get() = _parks
@@ -86,6 +90,21 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
   }
 
   /**
+   * Retrieves a user from Firestore based on the provided uid and set it as the current user.
+   *
+   * @param uid The unique ID of the user to retrieve.
+   * @return The User object if found, or null if the user doesn't exist or an error occurs.
+   */
+  fun getUserByUidAndSetAsCurrentUser(uid: String) {
+    viewModelScope.launch {
+      val user = repository.getUserByUid(uid)
+      if (user != null) {
+        _currentUser.value = user
+      }
+    }
+  }
+
+  /**
    * Retrieves a user from Firestore based on the provided email.
    *
    * @param email The email of the user to retrieve.
@@ -102,7 +121,7 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * Retrieves a user from Firestore based on the provided username.
    *
    * @param userName The username of the user to retrieve.
-   * @return The User object if found, or null if the user doesn't exist or an error occurs.
+   * @return A list of users if found, or null if the user doesn't exist or an error occurs.
    */
   fun getUserByUserName(userName: String) {
     viewModelScope.launch {
@@ -119,9 +138,24 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    */
   fun getFriendsByUid(uid: String) {
     viewModelScope.launch {
-      val fetchedFriends = repository.getFriendsByUid(uid)
-      if (fetchedFriends != null) {
-        _friends.value = fetchedFriends
+      val fetchedUsers = repository.getFriendsByUid(uid)
+      if (fetchedUsers != null) {
+        _friends.value = fetchedUsers
+      }
+    }
+  }
+
+  /**
+   * Retrieves a list of users from Firestore based on the provided list of IDs.
+   *
+   * @param uids The list of unique IDs to retrieve users for.
+   * @return A list of User objects representing the users.
+   */
+  fun getUsersByUids(uids: List<String>) {
+    viewModelScope.launch {
+      val fetchedUsers = repository.getUsersByUids(uids)
+      if (fetchedUsers != null) {
+        _userList.value = fetchedUsers
       }
     }
   }
@@ -177,7 +211,14 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @param points The number of points to add to the user's score.
    */
   fun increaseUserScore(uid: String, points: Int) =
-      viewModelScope.launch { repository.increaseUserScore(uid, points) }
+      viewModelScope.launch {
+        repository.increaseUserScore(uid, points)
+
+        _currentUser.value?.let {
+          val updatedUser = it.copy(score = it.score + points)
+          _currentUser.value = updatedUser
+        }
+      }
 
   /**
    * Adds a friend to both the user's and friend's friend lists in Firestore.

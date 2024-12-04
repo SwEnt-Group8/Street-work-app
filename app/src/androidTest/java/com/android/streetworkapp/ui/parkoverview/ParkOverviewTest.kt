@@ -1,5 +1,6 @@
 package com.android.streetworkapp.ui.parkoverview
 
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.isDisplayed
@@ -20,6 +21,8 @@ import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.park.ParkOverviewScreen
 import com.android.streetworkapp.ui.park.RatingComponent
+import com.android.streetworkapp.utils.dateDifference
+import com.android.streetworkapp.utils.toFormattedString
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -53,6 +56,7 @@ class ParkOverviewTest {
                       description = "A fun group workout session to train new skills",
                       participants = 3,
                       maxParticipants = 5,
+                      listParticipants = listOf("user1", "user2", "user3"),
                       date = Timestamp(0, 0), // 01/01/1970 00:00
                       owner = "user123")))
 
@@ -134,6 +138,8 @@ class ParkOverviewTest {
           parkViewModel, eventViewModel = eventViewModel, navigationActions = navigationActions)
     }
     composeTestRule.waitForIdle()
+
+    composeTestRule.onNodeWithTag("addImageIconButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("createEventButton").assertTextEquals("Create an event")
     composeTestRule.onNodeWithTag("eventItem").assertTextContains("Group workout")
     composeTestRule
@@ -141,7 +147,7 @@ class ParkOverviewTest {
         .assertTextContains("Participants 3/5")
     composeTestRule
         .onNodeWithTag("dateText", useUnmergedTree = true)
-        .assertTextContains("01/01/1970 00:00")
+        .assertTextContains(dateDifference(eventList.events.first().date.toFormattedString()))
     composeTestRule
         .onNodeWithTag("eventButtonText", useUnmergedTree = true)
         .assertTextContains("About")
@@ -163,16 +169,6 @@ class ParkOverviewTest {
     composeTestRule.onNodeWithTag("noEventText").isDisplayed()
     composeTestRule.onNodeWithTag("noEventText").assertTextEquals("No event is planned yet")
   }
-
-  /*
-    // TODO: Adapt this test to the new event data class
-  @Test
-  fun parkOverviewScreenButtonsAreClickable() {
-    composeTestRule.setContent { ParkOverviewScreen(park) }
-    composeTestRule.onNodeWithTag("eventButton").performClick()
-    composeTestRule.onNodeWithTag("createEventButton").performClick()
-  }
-  */
 
   @Test
   fun parkOverviewScreenInvalidRatingTriggersException() {

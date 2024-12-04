@@ -42,6 +42,17 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
   }
 
   /**
+   * Retrieves a list of users from Firestore based on the provided list of UIDs.
+   *
+   * @param uids The list of unique IDs of the users to retrieve.
+   * @return A list of User objects if found, or null if the users don't exist or an error occurs.
+   */
+  override suspend fun getUsersByUids(uids: List<String>): List<User> {
+    require(uids.isNotEmpty()) { "UIDs must not be empty" }
+    return uids.mapNotNull { getUserByUid(it) }
+  }
+
+  /**
    * Retrieves a user from Firestore based on the provided email.
    *
    * @param email The email of the user to retrieve.

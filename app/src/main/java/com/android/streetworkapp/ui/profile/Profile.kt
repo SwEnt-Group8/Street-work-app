@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -42,16 +43,13 @@ import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.theme.ColorPalette
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 
 @Composable
 fun ProfileScreen(
     navigationActions: NavigationActions,
     userViewModel: UserViewModel = viewModel(factory = UserViewModel.Factory),
-    innerPaddingValues: PaddingValues = PaddingValues(0.dp)
+    innerPaddingValues: PaddingValues = PaddingValues(0.dp),
 ) {
-
   // Handling the MVVM calls for user :
   val currentUser = userViewModel.currentUser.collectAsState().value
 
@@ -61,28 +59,14 @@ fun ProfileScreen(
     userViewModel.getFriendsByUid(currentUser.uid)
   }
 
-  // fetch profile picture from firebase
-  val photo = Firebase.auth.currentUser?.photoUrl
-
   Box(modifier = Modifier.fillMaxWidth().padding(innerPaddingValues).testTag("ProfileScreen")) {
     // Center Column for Profile Picture, Score, and Add Friend button
     Column(
         modifier = Modifier.fillMaxWidth().padding(top = 50.dp).testTag("profileColumn"),
         horizontalAlignment = Alignment.CenterHorizontally) {
+
           // display the profile picture
-          AsyncImage(
-              model =
-                  ImageRequest.Builder(LocalContext.current)
-                      .data(photo ?: R.drawable.profile)
-                      .placeholder(R.drawable.profile)
-                      .build(),
-              contentDescription = "user_profile_picture",
-              contentScale = ContentScale.Crop,
-              modifier =
-                  Modifier.size(180.dp)
-                      .clip(CircleShape)
-                      .border(5.dp, Color.LightGray, CircleShape)
-                      .testTag("profilePicture"))
+          DisplayUserPicture(currentUser, 180.dp, "profilePicture")
 
           // username text
           DisplayUsername(currentUser)
@@ -90,13 +74,21 @@ fun ProfileScreen(
           // score text
           DisplayScore(currentUser)
 
-          Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+          Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+            // Train Button
+            Button(
+                onClick = { navigationActions.navigateTo(Screen.TRAIN_HUB) },
+                modifier = Modifier.padding(horizontal = 4.dp).testTag("profileTrainButton"),
+                colors = ColorPalette.BUTTON_COLOR) {
+                  Text(text = "Train", color = Color.White)
+                }
+
             // Add Friend Button
             Button(
                 onClick = { navigationActions.navigateTo(Screen.ADD_FRIEND) },
                 modifier = Modifier.padding(horizontal = 4.dp).testTag("profileAddButton"),
                 colors = ColorPalette.BUTTON_COLOR) {
-                  Text(text = "Add friend")
+                  Text(text = "Add friend", color = Color.White)
                 }
           }
           DisplayFriendList(friendList)
@@ -186,10 +178,10 @@ fun DisplayFriendItem(friend: User) {
   val DEFAULT_USER_STATUS = "Definitely not a bot"
 
   Row(
-      modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("friendItem"),
+      modifier = Modifier.fillMaxWidth().padding(8.dp).testTag("friendItem"),
       verticalAlignment = Alignment.CenterVertically) {
         // Friend's avatar
-        DisplayFriendPicture(friend)
+        DisplayUserPicture(friend, 80.dp, "friendProfilePicture")
 
         // Friend's info (name, score, status)
         Column(modifier = Modifier.weight(1f)) {
@@ -224,15 +216,16 @@ fun DisplayFriendItem(friend: User) {
 }
 
 /**
- * This function displays the friend profile picture.
+ * This function displays the user profile picture.
  *
- * @param friend - The friend to display.
+ * @param user - The user to display.
  */
 @Composable
-fun DisplayFriendPicture(friend: User?) {
+fun DisplayUserPicture(user: User?, size: Dp, testTag: String) {
   val DEFAULT_PROFILE_PICTURE = R.drawable.profile
-  if (friend != null) {
-    val photo = friend.picture
+  if (user != null) {
+    val photo = user.picture
+    Log.d("ProfilePicture", photo)
 
     AsyncImage(
         model =
@@ -240,13 +233,14 @@ fun DisplayFriendPicture(friend: User?) {
                 .data(photo)
                 .placeholder(DEFAULT_PROFILE_PICTURE)
                 .build(),
-        contentDescription = "${friend.username}'s avatar",
+        contentDescription = "profile_picture",
+        contentScale = ContentScale.Crop,
         modifier =
-            Modifier.size(80.dp)
+            Modifier.size(size)
+                .padding(8.dp)
                 .clip(CircleShape)
                 .border(2.dp, Color.LightGray, CircleShape)
-                .testTag("friendProfilePicture"),
-        contentScale = ContentScale.Crop)
+                .testTag(testTag))
   } else {
     // display the profile picture
     AsyncImage(
@@ -255,12 +249,12 @@ fun DisplayFriendPicture(friend: User?) {
                 .data(DEFAULT_PROFILE_PICTURE)
                 .placeholder(DEFAULT_PROFILE_PICTURE)
                 .build(),
-        contentDescription = "fake avatar",
+        contentDescription = "profile_picture",
+        contentScale = ContentScale.Crop,
         modifier =
-            Modifier.size(80.dp)
+            Modifier.size(size)
                 .clip(CircleShape)
                 .border(2.dp, Color.LightGray, CircleShape)
-                .testTag("friendProfilePicture"),
-        contentScale = ContentScale.Crop)
+                .testTag(testTag))
   }
 }

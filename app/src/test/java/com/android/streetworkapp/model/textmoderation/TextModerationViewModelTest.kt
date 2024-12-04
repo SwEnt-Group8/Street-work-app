@@ -6,6 +6,7 @@ import com.android.streetworkapp.model.moderation.TextModerationViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
@@ -37,7 +38,7 @@ class TextModerationViewModelTest {
   }
 
   @Test
-  fun underThresholdsIsCalledIfTextIsUnderThresholds() {
+  fun underThresholdsIsCalledIfTextIsUnderThresholds() = runTest {
     whenever(textModerationRepository.evaluateText(any(), any()))
         .thenReturn(TextEvaluation.Result(true))
 
@@ -47,7 +48,7 @@ class TextModerationViewModelTest {
   }
 
   @Test
-  fun overThresholdsIsCalledIfTextIsOverThresholds() {
+  fun overThresholdsIsCalledIfTextIsOverThresholds() = runTest {
     whenever(textModerationRepository.evaluateText(any(), any()))
         .thenReturn(TextEvaluation.Result(false))
 
