@@ -213,16 +213,20 @@ object TopLevelDestinations {
           icon = null,
           imagePainter = R.drawable.trophy_24px,
           textId = "Progression")
-    val TRAIN_HUB =
-        TopLevelDestination(
-            route = Route.TRAIN_HUB,
-            icon = null,
-            imagePainter = R.drawable.training,
-            textId = "Train Hub")
+  val TRAIN_HUB =
+      TopLevelDestination(
+          route = Route.TRAIN_HUB,
+          icon = null,
+          imagePainter = R.drawable.training,
+          textId = "Train Hub")
 }
 
 val LIST_TOP_LEVEL_DESTINATION =
-    listOf(TopLevelDestinations.PROGRESSION, TopLevelDestinations.MAP, TopLevelDestinations.PROFILE, TopLevelDestinations.TRAIN_HUB)
+    listOf(
+        TopLevelDestinations.PROGRESSION,
+        TopLevelDestinations.MAP,
+        TopLevelDestinations.PROFILE,
+        TopLevelDestinations.TRAIN_HUB)
 
 fun getScreens(): Screen {
   return Screen

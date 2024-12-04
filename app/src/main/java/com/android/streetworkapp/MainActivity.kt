@@ -87,7 +87,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
 
-  // repositoriesNavGraphBuilder
+  // repositories
   val overpassParkLocationRepo = OverpassParkLocationRepository(OkHttpClient())
   val parkNameRepository = NominatimParkNameRepository(OkHttpClient())
   // viewmodels
@@ -364,6 +364,7 @@ fun StreetWorkApp(
                           sets,
                           reps,
                           workoutViewModel,
+                          userViewModel,
                           innerPadding)
                     })
 
