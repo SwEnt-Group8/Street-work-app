@@ -1,5 +1,6 @@
 package com.android.streetworkapp.ui.navigation
 
+import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Place
@@ -320,6 +321,7 @@ open class NavigationActions(
       reps: Int? = null
   ) {
     val route = buildRoute("TrainSolo", activity, isTimeDependent, time, sets, reps)
+      Log.d("Navigation", "Generated route: $route")
     navController.navigate(route)
   }
 
@@ -351,7 +353,7 @@ open class NavigationActions(
   fun navigateToChallengeScreen(
       activity: String,
       isTimeDependent: Boolean,
-      time: Int? = null,
+      time: Int? = 0,
       sets: Int? = null,
       reps: Int? = null
   ) {
@@ -378,10 +380,18 @@ open class NavigationActions(
       sets: Int?,
       reps: Int?
   ): String {
-    return "$baseRoute/$activity/$isTimeDependent" +
-        (time?.let { "?time=$it" } ?: "") +
-        (sets?.let { "&sets=$it" } ?: "") +
-        (reps?.let { "&reps=$it" } ?: "")
+      val queryParams = mutableListOf<String>()
+
+      // Add query parameters only if they exist
+      time?.let { queryParams.add("time=$it") }
+      sets?.let { queryParams.add("sets=$it") }
+      reps?.let { queryParams.add("reps=$it") }
+
+      // Construct the query string
+      val queryString = if (queryParams.isNotEmpty()) "?${queryParams.joinToString("&")}" else ""
+
+      // Build the final route
+      return "$baseRoute/$activity/$isTimeDependent$queryString"
   }
 
   /**
