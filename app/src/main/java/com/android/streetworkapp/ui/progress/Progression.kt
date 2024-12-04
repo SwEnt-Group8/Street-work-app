@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -45,6 +46,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.sample.R
 import com.android.streetworkapp.model.progression.Achievement
 import com.android.streetworkapp.model.progression.ExerciseAchievement
 import com.android.streetworkapp.model.progression.MedalsAchievement
@@ -177,7 +179,7 @@ fun AchievementColumn(achievements: List<String>) {
   if (achievements.isEmpty()) {
 
     Text(
-        text = "You don't have any achievements yet!",
+        text = LocalContext.current.getString(R.string.ProgressionEmptyAchievements),
         fontSize = 15.sp,
         fontWeight = FontWeight.Normal,
         color = ColorPalette.SECONDARY_TEXT_COLOR,
