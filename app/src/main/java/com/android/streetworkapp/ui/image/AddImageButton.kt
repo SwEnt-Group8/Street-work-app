@@ -102,9 +102,7 @@ fun AddImageButton(currentPark: Park?) {
                     .background(color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape)
                     .padding(4.dp)) {
               Icon(
-                  painter =
-                      painterResource(
-                          id = R.drawable.add_a_photo_24px), // Replace with your "add image" icon
+                  painter = painterResource(id = R.drawable.add_a_photo_24px),
                   contentDescription = "Add Image",
                   tint = Color.White,
                   modifier = Modifier.align(Alignment.Center).fillMaxSize(0.75f))
