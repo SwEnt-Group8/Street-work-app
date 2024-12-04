@@ -43,10 +43,11 @@ object Screen {
 
 data class ScreenParams(
     val screenName: String,
-    val isBottomBarVisible: Boolean,
-    val bottomBarType: BottomNavigationMenuType,
-    val isTopBarVisible: Boolean,
-    val topAppBarManager: TopAppBarManager?
+    val isBottomBarVisible: Boolean = true,
+    val bottomBarType: BottomNavigationMenuType = BottomNavigationMenuType.DEFAULT,
+    val isTopBarVisible: Boolean = true,
+    val topAppBarManager: TopAppBarManager?,
+    val hasSearchBar: Boolean = false
 ) {
   companion object {
     val AUTH =
@@ -59,97 +60,82 @@ data class ScreenParams(
     val MAP =
         ScreenParams(
             Screen.MAP,
-            isBottomBarVisible = true,
-            BottomNavigationMenuType.DEFAULT,
-            isTopBarVisible = true,
-            TopAppBarManager("Map", actions = listOf(TopAppBarManager.TopAppBarAction.INFO)))
+            topAppBarManager =
+                TopAppBarManager(
+                    "Map",
+                    actions =
+                        listOf(
+                            TopAppBarManager.TopAppBarAction.SEARCH,
+                            TopAppBarManager.TopAppBarAction.INFO)),
+            hasSearchBar = true)
     val PROFILE =
         ScreenParams(
             Screen.PROFILE,
-            isBottomBarVisible = true,
-            BottomNavigationMenuType.DEFAULT,
-            isTopBarVisible = true,
-            TopAppBarManager(
-                "My Profile",
-                actions =
-                    listOf(
-                        TopAppBarManager.TopAppBarAction.SETTINGS,
-                        TopAppBarManager.TopAppBarAction.INFO)))
+            topAppBarManager =
+                TopAppBarManager(
+                    "My Profile",
+                    actions =
+                        listOf(
+                            TopAppBarManager.TopAppBarAction.SETTINGS,
+                            TopAppBarManager.TopAppBarAction.INFO)))
     val ADD_FRIEND =
         ScreenParams(
             Screen.ADD_FRIEND,
-            isBottomBarVisible = true,
-            BottomNavigationMenuType.DEFAULT,
-            isTopBarVisible = true,
-            TopAppBarManager(
-                "Add a new Friend",
-                hasNavigationIcon = true,
-                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON,
-                actions = listOf(TopAppBarManager.TopAppBarAction.INFO)))
+            topAppBarManager =
+                TopAppBarManager(
+                    "Add a new Friend",
+                    hasNavigationIcon = true,
+                    navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON,
+                    actions = listOf(TopAppBarManager.TopAppBarAction.INFO)))
     val PARK_OVERVIEW =
         ScreenParams(
             Screen.PARK_OVERVIEW,
-            isBottomBarVisible = true,
-            BottomNavigationMenuType.DEFAULT,
-            isTopBarVisible = true,
-            TopAppBarManager(
-                "Park Overview",
-                hasNavigationIcon = true,
-                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON,
-                actions = listOf(TopAppBarManager.TopAppBarAction.INFO)))
+            topAppBarManager =
+                TopAppBarManager(
+                    "Park Overview",
+                    hasNavigationIcon = true,
+                    navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON,
+                    actions = listOf(TopAppBarManager.TopAppBarAction.INFO)))
     val ADD_EVENT =
         ScreenParams(
             Screen.ADD_EVENT,
-            isBottomBarVisible = true,
-            BottomNavigationMenuType.DEFAULT,
-            isTopBarVisible = true,
-            TopAppBarManager(
-                "Event Creation",
-                hasNavigationIcon = true,
-                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON,
-                actions = listOf(TopAppBarManager.TopAppBarAction.INFO)))
+            topAppBarManager =
+                TopAppBarManager(
+                    "Event Creation",
+                    hasNavigationIcon = true,
+                    navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON,
+                    actions = listOf(TopAppBarManager.TopAppBarAction.INFO)))
     val EVENT_OVERVIEW =
         ScreenParams(
             Screen.EVENT_OVERVIEW,
-            isBottomBarVisible = true,
-            BottomNavigationMenuType.EVENT_OVERVIEW,
-            isTopBarVisible = true,
-            TopAppBarManager(
-                "Event Overview",
-                hasNavigationIcon = true,
-                navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON,
-                actions = listOf(TopAppBarManager.TopAppBarAction.INFO)))
+            bottomBarType = BottomNavigationMenuType.EVENT_OVERVIEW,
+            topAppBarManager =
+                TopAppBarManager(
+                    "Event Overview",
+                    hasNavigationIcon = true,
+                    navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON,
+                    actions = listOf(TopAppBarManager.TopAppBarAction.INFO)))
     val PROGRESSION =
         ScreenParams(
             Screen.PROGRESSION,
-            isBottomBarVisible = true,
-            BottomNavigationMenuType.DEFAULT,
-            isTopBarVisible = true,
-            TopAppBarManager(
-                "My Progress",
-                hasNavigationIcon = false,
-                actions = listOf(TopAppBarManager.TopAppBarAction.INFO)))
+            topAppBarManager =
+                TopAppBarManager(
+                    "My Progress",
+                    hasNavigationIcon = false,
+                    actions = listOf(TopAppBarManager.TopAppBarAction.INFO)))
     val TRAIN_HUB =
         ScreenParams(
             screenName = Screen.TRAIN_HUB,
-            isBottomBarVisible = true,
-            bottomBarType = BottomNavigationMenuType.DEFAULT,
-            isTopBarVisible = true,
-            TopAppBarManager("Training hub", hasNavigationIcon = true))
+            topAppBarManager = TopAppBarManager("Training hub", hasNavigationIcon = true))
     val TRAIN_SOLO =
         ScreenParams(
             screenName = Screen.TRAIN_SOLO,
-            isBottomBarVisible = true,
-            bottomBarType = BottomNavigationMenuType.DEFAULT,
-            isTopBarVisible = true,
-            TopAppBarManager("Train Solo", hasNavigationIcon = true))
+            topAppBarManager = TopAppBarManager("Train Solo", hasNavigationIcon = true))
     val TRAIN_COACH =
         ScreenParams(
             screenName = Screen.TRAIN_COACH,
-            isBottomBarVisible = true,
-            bottomBarType = BottomNavigationMenuType.DEFAULT,
-            isTopBarVisible = true,
-            TopAppBarManager("Train with a friends as coach", hasNavigationIcon = true))
+            topAppBarManager =
+                TopAppBarManager("Train with a friends as coach", hasNavigationIcon = true))
     val TRAIN_CHALLENGE =
         ScreenParams(
             screenName = Screen.TRAIN_CHALLENGE,

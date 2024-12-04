@@ -1,5 +1,6 @@
 package com.android.streetworkapp.ui.parkoverview
 
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.isDisplayed
@@ -137,6 +138,8 @@ class ParkOverviewTest {
           parkViewModel, eventViewModel = eventViewModel, navigationActions = navigationActions)
     }
     composeTestRule.waitForIdle()
+
+    composeTestRule.onNodeWithTag("addImageIconButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("createEventButton").assertTextEquals("Create an event")
     composeTestRule.onNodeWithTag("eventItem").assertTextContains("Group workout")
     composeTestRule
