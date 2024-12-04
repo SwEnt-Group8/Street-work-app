@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_DARK
+import com.android.streetworkapp.ui.theme.ColorPalette.PRIMARY_TEXT_COLOR
 import com.android.streetworkapp.ui.theme.ColorPalette.PRINCIPLE_BACKGROUND_COLOR
 
 @SuppressLint("DefaultLocale")
@@ -115,7 +116,7 @@ fun TrainParamScreen(
                     navigationActions.navigateToSoloScreen(
                         activity = activity,
                         isTimeDependent = isTimeDependent,
-                        time = time,
+                        time = if (isTimeDependent) time else null,
                         sets = if (!isTimeDependent) sets else null,
                         reps = if (!isTimeDependent) reps else null)
                 "Coach" ->
@@ -268,7 +269,7 @@ fun SelectionButtonWithChar(
                   text = char,
                   fontSize = buttonSize.width.value * 0.3.sp, // Dynamically adjust font size
                   fontWeight = FontWeight.Bold,
-                  color = if (isSelected) INTERACTION_COLOR_DARK else Color.Gray)
+                  color = PRIMARY_TEXT_COLOR)
             }
       }
 }
