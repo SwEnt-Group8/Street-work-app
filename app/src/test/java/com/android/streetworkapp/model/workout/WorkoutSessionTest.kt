@@ -19,7 +19,7 @@ class WorkoutSessionTest {
             sessionId = "123",
             startTime = 1732430400000L,
             endTime = 1732434000000L,
-            sessionType = SessionType.ALONE)
+            sessionType = SessionType.SOLO)
   }
 
   @Test

@@ -78,7 +78,7 @@ class WorkoutRepositoryFirestoreTest {
   @Test
   fun addOrUpdateWorkoutSessionUpdatesWorkoutData() = runTest {
     val uid = "testUid"
-    val workoutSession = WorkoutSession("sessionId", 123L, 0L, SessionType.ALONE)
+    val workoutSession = WorkoutSession("sessionId", 123L, 0L, SessionType.SOLO)
 
     val existingWorkoutData = WorkoutData(uid, listOf(workoutSession))
     `when`(document.exists()).thenReturn(true)
@@ -93,8 +93,8 @@ class WorkoutRepositoryFirestoreTest {
   @Test
   fun deleteWorkoutSessionRemovesSession() = runTest {
     val uid = "testUid"
-    val sessionToDelete = WorkoutSession("sessionId", 123L, 0L, SessionType.ALONE)
-    val remainingSession = WorkoutSession("remainingSessionId", 456L, 0L, SessionType.ALONE)
+    val sessionToDelete = WorkoutSession("sessionId", 123L, 0L, SessionType.SOLO)
+    val remainingSession = WorkoutSession("remainingSessionId", 456L, 0L, SessionType.SOLO)
 
     val existingWorkoutData = WorkoutData(uid, listOf(sessionToDelete, remainingSession))
 
