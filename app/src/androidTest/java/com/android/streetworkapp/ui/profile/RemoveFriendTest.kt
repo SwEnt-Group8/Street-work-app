@@ -54,6 +54,7 @@ class RemoveFriendTest {
     composeTestRule.onNodeWithTag("RemoveFriendDialogConfirmButton").performClick()
 
     Mockito.verify(repository, Mockito.times(1)).removeFriend(currentUser.uid, friend.uid)
+    Mockito.verify(repository, Mockito.times(1)).getFriendsByUid(currentUser.uid)
 
     // Menu is being hidden afterwards, which confirms that callback function is called.
     composeTestRule.waitForIdle()
