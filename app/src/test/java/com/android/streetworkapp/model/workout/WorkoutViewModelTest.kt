@@ -40,7 +40,7 @@ class WorkoutViewModelTest {
             sessionId = "testSessionId",
             startTime = 0L,
             endTime = 0L,
-            sessionType = SessionType.ALONE)
+            sessionType = SessionType.SOLO)
 
     workoutViewModel.addOrUpdateWorkoutSession(uid, workoutSession)
     testDispatcher.scheduler.advanceUntilIdle()
