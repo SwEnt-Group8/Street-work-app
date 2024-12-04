@@ -2,23 +2,32 @@ package com.android.streetworkapp.ui.train
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.theme.ColorPalette.BORDER_COLOR
 import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_DARK
 import com.android.streetworkapp.ui.theme.ColorPalette.PRIMARY_TEXT_COLOR
 import com.android.streetworkapp.ui.theme.ColorPalette.PRINCIPLE_BACKGROUND_COLOR
@@ -52,10 +62,6 @@ fun TrainParamScreen(
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center // Center vertically
       ) {
-        // Prompt for the activity
-        Text(
-            text = "Set parameters for $activity training",
-            modifier = Modifier.testTag("ActivityPrompt"))
 
         // Timer or repetitions display
         Text(
@@ -74,38 +80,24 @@ fun TrainParamScreen(
               minutes = minutes,
               seconds = seconds,
               onUpdateMinutes = { minutes = it },
-              onUpdateSeconds = { seconds = it })
-        } else {
-          // Simple adjustment for sets and reps
-          Row(
-              horizontalArrangement = Arrangement.spacedBy(16.dp),
-              verticalAlignment = Alignment.CenterVertically) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                  Text("Sets")
-                  Button(
-                      onClick = { if (sets > 1) sets-- },
-                      modifier = Modifier.testTag("DecrementSets")) {
-                        Text("-")
-                      }
-                  Text("$sets")
-                  Button(onClick = { sets++ }, modifier = Modifier.testTag("IncrementSets")) {
-                    Text("+")
-                  }
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                  Text("Reps")
-                  Button(
-                      onClick = { if (reps > 1) reps-- },
-                      modifier = Modifier.testTag("DecrementReps")) {
-                        Text("-")
-                      }
-                  Text("$reps")
-                  Button(onClick = { reps++ }, modifier = Modifier.testTag("IncrementReps")) {
-                    Text("+")
-                  }
-                }
-              }
-        }
+              onUpdateSeconds = { seconds = it }
+          )
+      } else {
+          // NumberPickers for sets and reps
+          NumberPicker(
+              label = "Number of sets:",
+              value = sets,
+              range = 0..100,
+              onValueChange = { sets = it }
+          )
+          NumberPicker(
+              label = "Number of reps:",
+              value = reps,
+              range = 0..100,
+              onValueChange = { reps = it }
+          )
+      }
+
 
         // Confirm button
         Button(
@@ -272,4 +264,70 @@ fun SelectionButtonWithChar(
                   color = PRIMARY_TEXT_COLOR)
             }
       }
+}
+
+@Composable
+fun NumberPicker(
+    label: String,
+    value: Int,
+    range: IntRange,
+    onValueChange: (Int) -> Unit
+) {
+    val lazyListState = rememberLazyListState(initialFirstVisibleItemIndex = range.indexOf(value))
+
+    // Listen to scroll position changes and update the value accordingly
+    LaunchedEffect(lazyListState) {
+        snapshotFlow { lazyListState.firstVisibleItemIndex + 1 }
+            .collect { index ->
+                val newValue = range.elementAtOrNull(index)
+                newValue?.let { onValueChange(it) }
+            }
+    }
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(vertical = 16.dp)
+    ) {
+        // Label for the picker
+        Text(
+            text = label,
+            style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        Box(
+            modifier = Modifier
+                .size(60.dp, 120.dp)
+                .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
+        ) {
+            LazyColumn(
+                state = lazyListState,
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                items(range.toList()) { number ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(40.dp), // Adjust to fit the visibleItemCount size
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = number.toString(),
+                            style = androidx.compose.material3.MaterialTheme.typography.headlineMedium
+                        )
+                    }
+                }
+            }
+
+            // Highlight the middle item to indicate selection
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .border(2.dp, BORDER_COLOR, RoundedCornerShape(8.dp))
+                    .padding(vertical = 40.dp) // Adjust for centering
+            )
+        }
+    }
 }
