@@ -325,6 +325,7 @@ fun FriendMenu(
                   Toast.makeText(context, "Removed $friendName from friends", Toast.LENGTH_SHORT)
                       .show()
                   showMenu.value = false
+                  userViewModel.getFriendsByUid(currentUID) // Refresh friend list
                 }
 
                 onDismiss = { showMenu.value = false }
