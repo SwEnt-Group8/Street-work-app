@@ -15,12 +15,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarColors
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,6 +45,7 @@ import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.park.RatingComponent
+import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.utils.LocationService
 import com.android.streetworkapp.utils.PermissionManager
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -166,7 +168,7 @@ fun MapSearchBar(query: MutableState<String>, onCancel: () -> Unit) {
         query = query.value,
         onQueryChange = { query.value = it },
         placeholder = { "Search for parks" },
-        modifier = Modifier.testTag("searchBar"),
+        modifier = Modifier.testTag("searchBar").padding(bottom = 8.dp),
         active = false,
         onActiveChange = {},
         onSearch = {},
@@ -178,6 +180,7 @@ fun MapSearchBar(query: MutableState<String>, onCancel: () -> Unit) {
             )
           }
         },
+        colors = SearchBarDefaults.colors(containerColor = ColorPalette.INTERACTION_COLOR_LIGHT)
     ) {}
   }
 }

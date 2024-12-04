@@ -113,7 +113,7 @@ class MapUiTest {
 
     composeTestRule.waitForIdle()
 
-    composeTestRule.onNodeWithTag("search_button").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("searchButton").assertIsDisplayed().performClick()
 
     composeTestRule.onNodeWithTag("searchBar").assertIsDisplayed()
 
