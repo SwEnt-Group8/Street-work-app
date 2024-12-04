@@ -2,7 +2,6 @@ package com.android.streetworkapp.ui.train
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -62,42 +61,43 @@ fun TrainParamScreen(
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center // Center vertically
       ) {
-
-        // Timer or repetitions display
-        Text(
-            text =
-                if (isTimeDependent) {
-                  String.format("%02d min %02d s", minutes, seconds)
-                } else {
-                  "Sets: $sets, Reps: $reps"
-                },
-            modifier = Modifier.padding(vertical = 16.dp).testTag("ParamDisplay"),
-            style = androidx.compose.material3.MaterialTheme.typography.headlineMedium)
-
+        Box(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
+            contentAlignment = Alignment.Center) {
+              Text(
+                  text =
+                      if (isTimeDependent) {
+                        String.format(
+                            "I want to do %02d min and %02d seconds of %s",
+                            minutes,
+                            seconds,
+                            activity)
+                      } else {
+                        String.format("I want to do %2d sets of %2d %s", sets, reps, activity)
+                      },
+                  modifier = Modifier.padding(vertical = 16.dp).testTag("ParamDisplay"),
+                  style = androidx.compose.material3.MaterialTheme.typography.headlineSmall)
+            }
         // Input grid for timer (time-dependent activities)
         if (isTimeDependent) {
           TimerInputGrid(
               minutes = minutes,
               seconds = seconds,
               onUpdateMinutes = { minutes = it },
-              onUpdateSeconds = { seconds = it }
-          )
-      } else {
+              onUpdateSeconds = { seconds = it })
+        } else {
           // NumberPickers for sets and reps
           NumberPicker(
               label = "Number of sets:",
               value = sets,
               range = 0..100,
-              onValueChange = { sets = it }
-          )
+              onValueChange = { sets = it })
           NumberPicker(
               label = "Number of reps:",
               value = reps,
               range = 0..100,
-              onValueChange = { reps = it }
-          )
-      }
-
+              onValueChange = { reps = it })
+        }
 
         // Confirm button
         Button(
@@ -267,67 +267,57 @@ fun SelectionButtonWithChar(
 }
 
 @Composable
-fun NumberPicker(
-    label: String,
-    value: Int,
-    range: IntRange,
-    onValueChange: (Int) -> Unit
-) {
-    val lazyListState = rememberLazyListState(initialFirstVisibleItemIndex = range.indexOf(value))
+fun NumberPicker(label: String, value: Int, range: IntRange, onValueChange: (Int) -> Unit) {
+  val lazyListState = rememberLazyListState(initialFirstVisibleItemIndex = range.indexOf(value))
 
-    // Listen to scroll position changes and update the value accordingly
-    LaunchedEffect(lazyListState) {
-        snapshotFlow { lazyListState.firstVisibleItemIndex + 1 }
-            .collect { index ->
-                val newValue = range.elementAtOrNull(index)
-                newValue?.let { onValueChange(it) }
-            }
-    }
+  // Listen to scroll position changes and update the value accordingly
+  LaunchedEffect(lazyListState) {
+    snapshotFlow { lazyListState.firstVisibleItemIndex + 1 }
+        .collect { index ->
+          val newValue = range.elementAtOrNull(index)
+          newValue?.let { onValueChange(it) }
+        }
+  }
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(vertical = 16.dp)
-    ) {
+  Column(
+      horizontalAlignment = Alignment.CenterHorizontally,
+      modifier = Modifier.padding(vertical = 16.dp)) {
         // Label for the picker
         Text(
             text = label,
             style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
+            modifier = Modifier.padding(bottom = 8.dp))
 
         Box(
-            modifier = Modifier
-                .size(60.dp, 120.dp)
-                .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
-        ) {
-            LazyColumn(
-                state = lazyListState,
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                items(range.toList()) { number ->
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(40.dp), // Adjust to fit the visibleItemCount size
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = number.toString(),
-                            style = androidx.compose.material3.MaterialTheme.typography.headlineMedium
-                        )
+            modifier =
+                Modifier.size(60.dp, 120.dp).border(1.dp, Color.Gray, RoundedCornerShape(8.dp))) {
+              LazyColumn(
+                  state = lazyListState,
+                  modifier = Modifier.fillMaxSize(),
+                  horizontalAlignment = Alignment.CenterHorizontally,
+                  verticalArrangement = Arrangement.Center) {
+                    items(range.toList()) { number ->
+                      Box(
+                          modifier =
+                              Modifier.fillMaxWidth()
+                                  .height(40.dp), // Adjust to fit the visibleItemCount size
+                          contentAlignment = Alignment.Center) {
+                            Text(
+                                text = number.toString(),
+                                style =
+                                    androidx.compose.material3.MaterialTheme.typography
+                                        .headlineMedium)
+                          }
                     }
-                }
-            }
+                  }
 
-            // Highlight the middle item to indicate selection
-            Box(
-                modifier = Modifier
-                    .matchParentSize()
-                    .border(2.dp, BORDER_COLOR, RoundedCornerShape(8.dp))
-                    .padding(vertical = 40.dp) // Adjust for centering
-            )
-        }
-    }
+              // Highlight the middle item to indicate selection
+              Box(
+                  modifier =
+                      Modifier.matchParentSize()
+                          .border(2.dp, BORDER_COLOR, RoundedCornerShape(8.dp))
+                          .padding(vertical = 40.dp) // Adjust for centering
+                  )
+            }
+      }
 }
