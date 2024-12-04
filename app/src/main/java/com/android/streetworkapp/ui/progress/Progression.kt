@@ -188,7 +188,7 @@ fun AchievementColumn(achievements: List<String>) {
       achievements.forEach { achievementName ->
         if (achievementName.contains(ProgressionScreenSettings.ACHIEVEMEMENT_TYPE_SOCIAL)) {
           val achievementEnum = enumValueOf<SocialAchievement>(achievementName)
-          Box(modifier = Modifier.testTag("achievementItem")) {
+          Box(modifier = Modifier.testTag("achievementItem$achievementName")) {
             AchievementItem(achievementEnum.achievement, false)
             HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
           }
