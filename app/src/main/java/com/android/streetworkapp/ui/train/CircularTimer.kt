@@ -30,21 +30,29 @@ import kotlinx.coroutines.delay
  */
 @SuppressLint("DefaultLocale")
 @Composable
-fun CircularTimer(totalTime: Float = 30f, onTimeUp: () -> Unit = {}) {
+fun CircularTimer(
+    totalTime: Float = 30f,
+    onTimeUp: () -> Unit = {},
+    onTimeUpdate: (Float) -> Unit = {},
+    onStop: (Float) -> Unit = {}
+) {
   val startTime = remember { System.currentTimeMillis() }
   var timeRemaining by remember { mutableFloatStateOf(totalTime) }
   val progress = remember { Animatable(1f) }
   var isTimeUp by remember { mutableStateOf(false) }
+  var isStopped by remember { mutableStateOf(false) }
 
+  // Launch a timer effect
   LaunchedEffect(Unit) {
-    while (timeRemaining > 0 && !isTimeUp) {
+    while (timeRemaining > 0 && !isTimeUp && !isStopped) {
       val elapsedTime = (System.currentTimeMillis() - startTime) / 1000f
       timeRemaining = (totalTime - elapsedTime).coerceAtLeast(0f)
       progress.snapTo(timeRemaining / totalTime)
+      onTimeUpdate(totalTime - timeRemaining) // Report elapsed time
       delay(16L)
     }
 
-    if (!isTimeUp) {
+    if (!isTimeUp && !isStopped) {
       isTimeUp = true
       onTimeUp()
     }
@@ -76,5 +84,10 @@ fun CircularTimer(totalTime: Float = 30f, onTimeUp: () -> Unit = {}) {
         modifier = Modifier.testTag("TimeRemainingText"),
         color = PRIMARY_TEXT_COLOR,
         fontSize = 24.sp)
+  }
+
+  // Stop the timer when the user manually stops it
+  if (isStopped) {
+    onStop(totalTime - timeRemaining) // Pass the elapsed time when stopped
   }
 }
