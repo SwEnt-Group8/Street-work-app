@@ -72,7 +72,6 @@ import com.android.streetworkapp.ui.train.TrainSoloScreen
 import com.android.streetworkapp.ui.tutorial.TutorialEvent
 import com.android.streetworkapp.ui.utils.CustomDialog
 import com.google.firebase.firestore.FirebaseFirestore
-import java.util.Date
 import kotlinx.serialization.json.JsonNull.content
 import okhttp3.OkHttpClient
 
