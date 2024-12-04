@@ -12,6 +12,7 @@ import com.android.streetworkapp.model.progression.Progression
 import com.android.streetworkapp.model.progression.ProgressionRepositoryFirestore
 import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.progression.Ranks
+import com.android.streetworkapp.model.progression.SocialAchievement
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
@@ -84,7 +85,6 @@ class ProgressionTest {
     composeTestRule.onNodeWithTag("percentageInsideCircularProgressBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("scoreTextUnderCircularProgressBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("metricCardScoreValue").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("metricCardParksVisitedValue").assertIsDisplayed()
     composeTestRule.onNodeWithTag("metricCardFriendsAddedValue").assertIsDisplayed()
   }
 
@@ -185,6 +185,40 @@ class ProgressionTest {
 
     enumValues<ExerciseAchievement>().forEach { exercise ->
       composeTestRule.onNodeWithTag("exerciseItem" + exercise.name).assertExists()
+    }
+  }
+
+  @Test
+  fun screenDisplaysCorrectSocialElements() {
+
+    val mockedProgression =
+        Progression(
+            progressionId = "prog123456",
+            uid = mockedUser.uid,
+            currentGoal = Ranks.SILVER.score,
+            eventsCreated = 9,
+            eventsJoined = 14,
+            achievements = listOf(SocialAchievement.SOCIAL1.name, SocialAchievement.SOCIAL3.name))
+
+    coEvery { progressionRepository.getOrAddProgression(eq(mockedUser.uid)) } answers
+        {
+          mockedProgression
+        }
+
+    composeTestRule.setContent {
+      ProgressScreen(navigationActions, userViewModel, progressionViewModel)
+    }
+
+    composeTestRule.onNodeWithTag("AchievementTab").performClick()
+
+    composeTestRule
+        .onNodeWithTag("metricCardFriendsAddedValue")
+        .assertTextEquals("${mockedUser.friends.size}")
+
+    composeTestRule.onNodeWithTag("emptyAchievementsText").assertIsNotDisplayed()
+
+    mockedProgression.achievements.forEach { name ->
+      composeTestRule.onNodeWithTag("achievementItem$name").assertIsDisplayed()
     }
   }
 }
