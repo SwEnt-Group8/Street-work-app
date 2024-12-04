@@ -157,13 +157,13 @@ data class ScreenParams(
             bottomBarType = BottomNavigationMenuType.DEFAULT,
             isTopBarVisible = true,
             TopAppBarManager("Challenge with your friend", hasNavigationIcon = true))
-      val TRAIN_PARAM =
-          ScreenParams(
-              screenName = Screen.TRAIN_PARAM,
-              isBottomBarVisible = true,
-              bottomBarType = BottomNavigationMenuType.DEFAULT,
-              isTopBarVisible = true,
-              TopAppBarManager("Train with parameters", hasNavigationIcon = true))
+    val TRAIN_PARAM =
+        ScreenParams(
+            screenName = Screen.TRAIN_PARAM,
+            isBottomBarVisible = true,
+            bottomBarType = BottomNavigationMenuType.DEFAULT,
+            isTopBarVisible = true,
+            TopAppBarManager("Train with parameters", hasNavigationIcon = true))
     val TUTO_EVENT =
         ScreenParams(
             Screen.TUTO_EVENT,
