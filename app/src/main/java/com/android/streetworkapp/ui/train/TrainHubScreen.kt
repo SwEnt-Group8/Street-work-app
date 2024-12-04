@@ -63,7 +63,7 @@ fun TrainHubScreen(
                     "Solo" -> R.drawable.training_solo
                     "Coach" -> R.drawable.training_coach
                     "Challenge" -> R.drawable.training_challenge
-                    else -> R.drawable.pushup
+                    else -> R.drawable.pushup_orig
                   }
                 },
                 isSelected = { it == selectedType },
@@ -105,7 +105,24 @@ fun TrainHubScreen(
                               "Muscle-up" to false)
                           .first { it.first == activity }
                 },
-                getItemImageRes = { R.drawable.pushup },
+                getItemImageRes = { role ->
+                  when (role) {
+                    // source of icone :
+                    // https://www.shutterstock.com/image-vector/bundle-set-sport-pictogram-gym-fitness-2519719005
+                    // https://www.amazon.in/T%C3%BCnde-K%C3%A1tai-Burpee-Challenge/dp/B07HRTGM1K
+                    // edited in GIMP
+                    "Push-ups" -> R.drawable.train_pushup
+                    "Dips" -> R.drawable.train_dips
+                    "Burpee" -> R.drawable.train_burpee
+                    "Lunge" -> R.drawable.train_lunge
+                    "Planks" -> R.drawable.train_planks
+                    "Handstand" -> R.drawable.train_hand_stand
+                    "Front lever" -> R.drawable.train_front_lever
+                    "Flag" -> R.drawable.train_flag
+                    "Muscle-up" -> R.drawable.train_muscle_up
+                    else -> R.drawable.handstand_org
+                  }
+                },
                 isSelected = { selectedActivity?.first == it },
                 testTagPrefix = "Activity_")
           }
@@ -179,7 +196,7 @@ fun SelectionButton(
               Image(
                   painter = painterResource(id = imageResId),
                   contentDescription = text,
-                  modifier = Modifier.size(buttonSize.width * 0.4f))
+                  modifier = Modifier.fillMaxSize())
             }
         Spacer(modifier = Modifier.height(8.dp))
         Text(text = text, fontSize = 14.sp, fontWeight = FontWeight.Medium)

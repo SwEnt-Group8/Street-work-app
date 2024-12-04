@@ -83,8 +83,8 @@ enum class MedalsAchievement(val achievement: Achievement) {
 
 /** Represents a type of achievement linked to the performance of the user on different exercises */
 enum class ExerciseAchievement(val achievement: Achievement) {
-  HANDSTAND(Achievement(R.drawable.handstand, "Handstand", emptyList(), "")),
-  FRONT_LEVER(Achievement(R.drawable.front_lever, "Front Lever", emptyList(), ""))
+  HANDSTAND(Achievement(R.drawable.train_hand_stand, "Handstand", emptyList(), "")),
+  FRONT_LEVER(Achievement(R.drawable.train_front_lever, "Front Lever", emptyList(), ""))
 }
 
 /** Represents the number of points obtained for different actions in the app */
