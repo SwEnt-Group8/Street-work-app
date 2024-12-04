@@ -62,14 +62,14 @@ import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.progress.updateAndDisplayPoints
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.google.firebase.Timestamp
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 
 object AddEventParams {
   const val TEXT_EVALUATION_DISPLAY_TIME = 5000L // in ns
@@ -156,68 +156,73 @@ fun AddEventScreen(
           isDateBackInTimeError.value,
           isTextEvaluationError.value)
 
-    Box(modifier = Modifier.fillMaxSize().testTag("addEventScreen").padding(paddingValues).background(MaterialTheme.colorScheme.background)) {
-      Column(
-          modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
-          verticalArrangement = Arrangement.spacedBy(18.dp),
-          horizontalAlignment = Alignment.CenterHorizontally) {
-            EventTitleSelection(event, isTitleEmptyError, isTextEvaluationOverThresholdsError)
-            EventDescriptionSelection(event, isTextEvaluationOverThresholdsError)
-            TimeSelection(event, isDateBackInTimeError)
+  Box(
+      modifier =
+          Modifier.fillMaxSize()
+              .testTag("addEventScreen")
+              .padding(paddingValues)
+              .background(MaterialTheme.colorScheme.background)) {
+        Column(
+            modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(18.dp),
+            horizontalAlignment = Alignment.CenterHorizontally) {
+              EventTitleSelection(event, isTitleEmptyError, isTextEvaluationOverThresholdsError)
+              EventDescriptionSelection(event, isTextEvaluationOverThresholdsError)
+              TimeSelection(event, isDateBackInTimeError)
 
-            Text(
-                text = "* Required fields",
-                color = ColorPalette.SECONDARY_TEXT_COLOR,
-                fontWeight = FontWeight.Normal,
-                fontSize = 12.sp,
-                textAlign = TextAlign.Left,
-                modifier = Modifier.fillMaxWidth(0.9f))
-            Text(
-                text = "How many participants do you want?",
-                fontSize = 18.sp,
-            )
-            ParticipantNumberSelection(event)
-
-            if (errorStates.any { it }) {
               Text(
-                  modifier =
-                      Modifier.padding(vertical = 0.dp, horizontal = 25.dp).testTag("errorMessage"),
-                  textAlign = TextAlign.Center,
-                  color = MaterialTheme.colorScheme.error,
-                  text = formErrorMessage.value)
-            }
-            // for non users-related-input errors, we only show the message for a brief amount of
-            // time
-            LaunchedEffect(isTextEvaluationError.value) {
-              delay(AddEventParams.TEXT_EVALUATION_DISPLAY_TIME)
-              isTextEvaluationError.value = false
-            }
+                  text = "* Required fields",
+                  color = ColorPalette.SECONDARY_TEXT_COLOR,
+                  fontWeight = FontWeight.Normal,
+                  fontSize = 12.sp,
+                  textAlign = TextAlign.Left,
+                  modifier = Modifier.fillMaxWidth(0.9f))
+              Text(
+                  text = "How many participants do you want?",
+                  fontSize = 18.sp,
+              )
+              ParticipantNumberSelection(event)
 
-            Button(
-                colors = ColorPalette.BUTTON_COLOR,
-                modifier = Modifier.testTag("addEventButton"),
-                onClick = {
-                  onAddEventClickHandler(
-                      event,
-                      navigationActions,
-                      eventViewModel,
-                      userViewModel,
-                      parkViewModel,
-                      textModerationViewModel,
-                      snackBarHostState,
-                      coroutineScope,
-                      isDateBackInTimeError,
-                      isTitleEmptyError,
-                      isTextEvaluationOverThresholdsError,
-                      isTextEvaluationError,
-                      formErrorMessage)
-                }) {
-                  Text("Add new event")
-                }
-          }
-    }
-  }
+              if (errorStates.any { it }) {
+                Text(
+                    modifier =
+                        Modifier.padding(vertical = 0.dp, horizontal = 25.dp)
+                            .testTag("errorMessage"),
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.error,
+                    text = formErrorMessage.value)
+              }
+              // for non users-related-input errors, we only show the message for a brief amount of
+              // time
+              LaunchedEffect(isTextEvaluationError.value) {
+                delay(AddEventParams.TEXT_EVALUATION_DISPLAY_TIME)
+                isTextEvaluationError.value = false
+              }
 
+              Button(
+                  colors = ColorPalette.BUTTON_COLOR,
+                  modifier = Modifier.testTag("addEventButton"),
+                  onClick = {
+                    onAddEventClickHandler(
+                        event,
+                        navigationActions,
+                        eventViewModel,
+                        userViewModel,
+                        parkViewModel,
+                        textModerationViewModel,
+                        snackBarHostState,
+                        coroutineScope,
+                        isDateBackInTimeError,
+                        isTitleEmptyError,
+                        isTextEvaluationOverThresholdsError,
+                        isTextEvaluationError,
+                        formErrorMessage)
+                  }) {
+                    Text("Add new event")
+                  }
+            }
+      }
+}
 
 /**
  * Used to change the title of the event
