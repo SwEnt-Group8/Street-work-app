@@ -182,33 +182,63 @@ fun TimerInputGrid(
       }
 }
 
-private fun handleDeleteInput(
+/**
+ * Delete the last input character from the timer
+ *
+ * @param minutes The current minutes value
+ * @param seconds The current seconds value
+ * @param onUpdateMinutes The callback to update the minutes value
+ * @param onUpdateSeconds The callback to update the seconds value
+ */
+@SuppressLint("DefaultLocale")
+internal fun handleDeleteInput(
     minutes: Int,
     seconds: Int,
     onUpdateMinutes: (Int) -> Unit,
     onUpdateSeconds: (Int) -> Unit
 ) {
-  if (seconds > 0) {
-    onUpdateSeconds(seconds / 10)
-  } else if (minutes > 0) {
-    onUpdateSeconds(minutes % 10)
-    onUpdateMinutes(minutes / 10)
-  }
+  val currentTime = String.format("%02d%02d", minutes, seconds)
+
+  val updatedTime = "0" + currentTime.dropLast(1)
+
+  val updatedMinutes = updatedTime.substring(0, 2).toIntOrNull() ?: 0
+  val updatedSeconds = updatedTime.substring(2).toIntOrNull() ?: 0
+
+  onUpdateMinutes(updatedMinutes)
+  onUpdateSeconds(updatedSeconds)
 }
 
-private fun handleInput(
+/**
+ * Handle the input of a character into the timer
+ *
+ * @param input The input character
+ * @param minutes The current minutes value
+ * @param seconds The current seconds value
+ * @param onUpdateMinutes The callback to update the minutes value
+ * @param onUpdateSeconds The callback to update the seconds value
+ */
+@SuppressLint("DefaultLocale")
+internal fun handleInput(
     input: String,
     minutes: Int,
     seconds: Int,
     onUpdateMinutes: (Int) -> Unit,
     onUpdateSeconds: (Int) -> Unit
 ) {
-  val num = input.toIntOrNull() ?: return
-  if (seconds < 60) {
-    onUpdateSeconds((seconds * 10 + num) % 60)
-  } else if (minutes < 100) {
-    onUpdateMinutes((minutes * 10 + num) % 100)
-  }
+  val currentTime = String.format("%02d%02d", minutes, seconds)
+
+  val updatedTime =
+      if (input == "00") {
+        currentTime.drop(2) + "00"
+      } else {
+        currentTime.drop(1) + input
+      }
+
+  val updatedMinutes = updatedTime.substring(0, 2).toIntOrNull() ?: 0
+  val updatedSeconds = updatedTime.substring(2).toIntOrNull() ?: 0
+
+  onUpdateMinutes(updatedMinutes)
+  onUpdateSeconds(updatedSeconds)
 }
 
 @Composable
