@@ -20,7 +20,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SearchBarColors
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -168,7 +167,7 @@ fun MapSearchBar(query: MutableState<String>, onCancel: () -> Unit) {
         query = query.value,
         onQueryChange = { query.value = it },
         placeholder = { "Search for parks" },
-        modifier = Modifier.testTag("searchBar").padding(bottom = 8.dp),
+        modifier = Modifier.testTag("searchBar").padding(bottom = 8.dp).padding(horizontal = 4.dp),
         active = false,
         onActiveChange = {},
         onSearch = {},
@@ -180,8 +179,7 @@ fun MapSearchBar(query: MutableState<String>, onCancel: () -> Unit) {
             )
           }
         },
-        colors = SearchBarDefaults.colors(containerColor = ColorPalette.INTERACTION_COLOR_LIGHT)
-    ) {}
+        colors = SearchBarDefaults.colors(containerColor = ColorPalette.INTERACTION_COLOR_LIGHT)) {}
   }
 }
 
