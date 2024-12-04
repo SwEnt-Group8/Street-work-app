@@ -198,12 +198,8 @@ fun ConfirmButtonSection(
         onClick = {
           selectedType?.let { type ->
             selectedActivity?.let { (activity, isTimeDependent) ->
-              when (type) {
-                "Solo" -> navigationActions.navigateToSoloScreen(activity, isTimeDependent)
-                "Coach" -> navigationActions.navigateToCoachScreen(activity, isTimeDependent)
-                "Challenge" ->
-                    navigationActions.navigateToChallengeScreen(activity, isTimeDependent)
-              }
+              // Navigate to TrainParamScreen with the selected parameters
+              navigationActions.navigateToTrainParam(activity, isTimeDependent, type)
             }
           }
         })
