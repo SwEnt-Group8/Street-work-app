@@ -132,8 +132,8 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
                   sessionId = sessionId,
                   sessionType = sessionType, // Pass the session type here
                   exercises = listOf(exercise),
-                  startTime = System.currentTimeMillis(),
-                  endTime = 0L)
+                  startTime = System.currentTimeMillis() - (exercise.duration ?: 0),
+                  endTime = System.currentTimeMillis())
           updatedWorkoutSessions.add(newSession)
         }
 
