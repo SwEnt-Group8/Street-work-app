@@ -43,7 +43,6 @@ object AddImageButtonParams {
  * to cancel or upload the file
  *
  * @param currentPark The info of the park the image will be linked to
- * @param context The current context
  */
 @Composable
 fun AddImageButton(currentPark: Park?) {
@@ -63,9 +62,8 @@ fun AddImageButton(currentPark: Park?) {
   val tempFile by remember {
     mutableStateOf(
         File(context.cacheDir, "temp_image_for_park_upload.jpg").apply {
-          if (exists()) {
-            if (!delete())
-                Log.d(AddImageButtonParams.DEBUG_PREFIX, "Failed to delete cached photo file.")
+          if (exists() && !delete()) {
+            Log.d(AddImageButtonParams.DEBUG_PREFIX, "Failed to delete cached photo file.")
           }
         })
   }

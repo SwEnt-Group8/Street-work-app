@@ -44,6 +44,13 @@ import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.android.streetworkapp.ui.theme.ColorPalette
 
+/**
+ * Displays a photo and allows the user to confirm or cancel the operation
+ *
+ * @param imageUri The [Uri] of the image to be shown
+ * @param onConfirm Function to be called if the user clicks on confirmation button
+ * @param onCancel Function to be called if user clicks on the cancel button or dismisses the dialog
+ */
 @Composable
 fun ConfirmImageDialog(
     imageUri: Uri,
