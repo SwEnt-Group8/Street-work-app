@@ -148,6 +148,21 @@ class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRep
   }
 
   /**
+   * Saves or overwrites the entire WorkoutData for a user in Firestore.
+   *
+   * @param uid The UID of the user.
+   * @param workoutData The WorkoutData to save.
+   */
+  override suspend fun saveWorkoutData(uid: String, workoutData: WorkoutData) {
+    require(uid.isNotEmpty()) { "The user UID must not be empty." }
+    try {
+      db.collection(COLLECTION_PATH).document(uid).set(workoutData).await()
+    } catch (e: Exception) {
+      Log.e(ERROR_TAG, "Error saving WorkoutData for UID=$uid: ${e.message}")
+    }
+  }
+
+  /**
    * Converts a Firestore document to a WorkoutData object.
    *
    * @param document The document to convert.
