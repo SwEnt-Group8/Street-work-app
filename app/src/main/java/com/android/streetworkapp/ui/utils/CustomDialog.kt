@@ -110,7 +110,7 @@ enum class ButtonType {
 /**
  * This function displays the button for the dialog. Will hide the dialog once interacted with.
  *
- * @param ButtonType - Type of button (SUBMIT, CANCEL, CONFIRM)
+ * @param buttonType - Type of button (SUBMIT, CANCEL, CONFIRM)
  * @param tag - Describe the instance of the dialog ("Settings", "Rating", etc.)
  * @param onSubmit - Submission callback
  * @param showDialog - MutableState to show the dialog
@@ -118,7 +118,7 @@ enum class ButtonType {
  */
 @Composable
 fun DialogButton(
-    ButtonType: ButtonType,
+    buttonType: ButtonType,
     tag: String,
     onSubmit: () -> Unit,
     showDialog: MutableState<Boolean>,
@@ -129,11 +129,11 @@ fun DialogButton(
       onClick = {
         onSubmit()
         if (verbose)
-            Toast.makeText(context, ButtonType.response(context), Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, buttonType.response(context), Toast.LENGTH_SHORT).show()
         showDialog.value = false
       },
-      modifier = Modifier.testTag("${tag}Dialog${ButtonType.tag(context)}Button")) {
-        Text(ButtonType.tag(context), color = ButtonType.color())
+      modifier = Modifier.testTag("${tag}Dialog${buttonType.tag(context)}Button")) {
+        Text(buttonType.tag(context), color = buttonType.color())
       }
 }
 
