@@ -12,9 +12,9 @@ import androidx.compose.ui.platform.testTag
 @Composable
 fun SplashScreen() {
   Box(
-      modifier = Modifier.fillMaxSize().testTag("SplashScreen"),
+      modifier = Modifier.fillMaxSize().testTag("splashScreen"),
       contentAlignment = Alignment.Center) {
         CircularProgressIndicator(
-            modifier = Modifier.testTag("SplashScreenCircularProgressIndicator"))
+            modifier = Modifier.testTag("splashScreenCircularProgressIndicator"))
       }
 }

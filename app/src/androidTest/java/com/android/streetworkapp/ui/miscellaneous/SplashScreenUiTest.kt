@@ -16,7 +16,7 @@ class SplashScreenUiTest {
   @Test
   fun splashScreen_isDisplayed() {
     composeTestRule.setContent { SplashScreen() }
-    composeTestRule.onNodeWithTag("SplashScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("SplashScreenCircularProgressIndicator").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("splashScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("splashScreenCircularProgressIndicator").assertIsDisplayed()
   }
 }
