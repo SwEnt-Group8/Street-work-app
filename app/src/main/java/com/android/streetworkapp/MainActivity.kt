@@ -28,7 +28,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.android.streetworkapp.device.network.isInternetAvailable
-import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.moderation.PerspectiveAPIRepository
@@ -75,9 +74,7 @@ import com.android.streetworkapp.ui.train.TrainHubScreen
 import com.android.streetworkapp.ui.train.TrainSoloScreen
 import com.android.streetworkapp.ui.tutorial.TutorialEvent
 import com.android.streetworkapp.ui.utils.CustomDialog
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
-import java.util.Date
 import okhttp3.OkHttpClient
 
 class MainActivity : ComponentActivity() {
@@ -107,6 +104,7 @@ fun StreetWorkAppMain(
   // repositories
   val overpassParkLocationRepo = OverpassParkLocationRepository(OkHttpClient())
   val parkNameRepository = NominatimParkNameRepository(OkHttpClient())
+
   // viewmodels
   val parkLocationViewModel = ParkLocationViewModel(overpassParkLocationRepo)
 
