@@ -46,7 +46,8 @@ val TEST_SCREEN_EXCLUSION_LIST =
         Screen.EVENT_OVERVIEW,
         Screen.TRAIN_SOLO,
         Screen.TRAIN_COACH,
-        Screen.TRAIN_CHALLENGE)
+        Screen.TRAIN_CHALLENGE,
+        Screen.TRAIN_PARAM)
 
 @RunWith(AndroidJUnit4::class)
 class BottomNavigationTest {
