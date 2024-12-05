@@ -53,6 +53,8 @@ import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.ui.utils.CustomDialog
 import com.android.streetworkapp.ui.utils.DialogType
 
+const val PROFILE_LOG_TAG = "Profile"
+
 @Composable
 fun ProfileScreen(
     navigationActions: NavigationActions,
@@ -318,9 +320,9 @@ fun FriendMenu(
 
               if (currentUID != null) {
                 // Set up the confirm function for the dialog
-                Log.d("Profile", "Setting up callback (confirm) for removing friend")
+                Log.d(PROFILE_LOG_TAG, "Setting up callback (confirm) for removing friend")
                 onConfirm = {
-                  Log.d("Profile", "Removined friend $friendName")
+                  Log.d(PROFILE_LOG_TAG, "Removed friend $friendName")
                   userViewModel.removeFriend(currentUID, friendUID)
                   Toast.makeText(context, "Removed $friendName from friends", Toast.LENGTH_SHORT)
                       .show()
@@ -332,7 +334,7 @@ fun FriendMenu(
 
                 showConfirmDialog.value = true
               } else {
-                Log.d("Profile", "Cannot remove friend - Current user is null")
+                Log.d(PROFILE_LOG_TAG, "Cannot remove friend - Current user is null")
                 Toast.makeText(context, "Error - could not remove friend", Toast.LENGTH_SHORT)
                     .show()
               }
