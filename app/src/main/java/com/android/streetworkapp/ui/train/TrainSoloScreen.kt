@@ -160,7 +160,16 @@ fun TrainSoloScreen(
         }
       }
 }
-
+/**
+ * Adds an exercise to the workout.
+ *
+ * @param userId The user ID.
+ * @param workoutViewModel The [WorkoutViewModel] instance.
+ * @param activity The activity name.
+ * @param duration The duration of the exercise.
+ * @param reps The number of reps.
+ * @param sets The number of sets.
+ */
 fun addExerciseToWorkout(
     userId: String?,
     workoutViewModel: WorkoutViewModel,
