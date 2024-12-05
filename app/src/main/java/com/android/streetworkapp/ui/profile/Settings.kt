@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.android.sample.R
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.theme.ColorPalette
@@ -28,11 +29,10 @@ fun SettingsContent(
     showParentDialog: MutableState<Boolean>
 ) {
   Column() {
-    // Selector  for settings :
-
     val currentUser = remember { userViewModel.currentUser.value }
     val showConfirmUserDelete = remember { mutableStateOf(false) }
     val context = LocalContext.current
+
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -40,10 +40,10 @@ fun SettingsContent(
 
           // Settings content
           if (currentUser == null) {
-            Text("You are not logged-in, please log-in to access connection settings")
+            Text(context.getString(R.string.SettingsNullUserContent))
           } else {
             Text(
-                "You are logged-in as ${currentUser.username}",
+                context.getString(R.string.SettingsConnectionContent),
                 modifier = Modifier.padding(bottom = 16.dp))
 
             Button(
@@ -67,11 +67,8 @@ fun SettingsContent(
         showConfirmUserDelete,
         DialogType.CONFIRM,
         tag = "deleteAccount",
-        title = "Are you sure ?",
-        Content = {
-          Text(
-              "Are you sure you want to delete your account ?\n\n You will loose all of your progression \n\nThis action is irreversible.")
-        },
+        title = context.getString(R.string.DeleteAccountConfirmationTitle),
+        Content = { Text(context.getString(R.string.DeleteAccountConfirmationContent)) },
         onSubmit = {
           // Friends - remove user from friends list of all friends.
           // Parks - remove user ratings for parks.
