@@ -265,10 +265,13 @@ fun StreetWorkApp(
                   MapScreen(
                       parkLocationViewModel,
                       parkViewModel,
+                      userViewModel,
                       navigationActions,
                       searchQuery,
                       mapCallbackOnMapLoaded,
-                      innerPadding)
+                      innerPadding,
+                      scope,
+                      host)
                   screenParams?.topAppBarManager?.setActionCallback(
                       TopAppBarManager.TopAppBarAction.SEARCH) {
                         showSearchBar.value = true
@@ -277,7 +280,8 @@ fun StreetWorkApp(
                 composable(Screen.PARK_OVERVIEW) {
                   infoManager.Display(LocalContext.current)
                   ParkOverviewScreen(
-                      parkViewModel, innerPadding, navigationActions, eventViewModel, userViewModel)
+                      parkViewModel, innerPadding, navigationActions, eventViewModel, userViewModel,scope,
+                      host)
                 }
                 composable(Screen.ADD_EVENT) {
                   infoManager.Display(LocalContext.current)
