@@ -324,7 +324,10 @@ fun FriendMenu(
                 onConfirm = {
                   Log.d(PROFILE_LOG_TAG, "Removed friend $friendName")
                   userViewModel.removeFriend(currentUID, friendUID)
-                  Toast.makeText(context, "Removed $friendName from friends", Toast.LENGTH_SHORT)
+                  Toast.makeText(
+                          context,
+                          context.getString(R.string.RemoveFriendSuccess, friendName),
+                          Toast.LENGTH_SHORT)
                       .show()
                   showMenu.value = false
                   userViewModel.getFriendsByUid(currentUID) // Refresh friend list
@@ -335,7 +338,10 @@ fun FriendMenu(
                 showConfirmDialog.value = true
               } else {
                 Log.d(PROFILE_LOG_TAG, "Cannot remove friend - Current user is null")
-                Toast.makeText(context, "Error - could not remove friend", Toast.LENGTH_SHORT)
+                Toast.makeText(
+                        context,
+                        context.getString(R.string.RemoveFriendFailure),
+                        Toast.LENGTH_SHORT)
                     .show()
               }
             },
@@ -347,7 +353,10 @@ fun FriendMenu(
                     contentDescription = "Remove friend",
                     modifier = Modifier.size(24.dp),
                     tint = Color.Red)
-                Text("Remove friend", modifier = Modifier.padding(start = 4.dp), color = Color.Red)
+                Text(
+                    context.getString(R.string.RemoveFriendAction),
+                    modifier = Modifier.padding(start = 4.dp),
+                    color = Color.Red)
               }
             })
       }

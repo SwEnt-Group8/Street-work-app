@@ -4,6 +4,10 @@
     <string name="title_activity_second">SecondActivity</string>
     <string name="default_web_client_id">949532445294-2cvshtbsgubvrn54cg9301rrs2pe8dth.apps.googleusercontent.com</string>
 
+    // Friend removal :
+    <string name="RemoveFriendAction">Remove friend</string>
+    <string name="RemoveFriendSuccess">Removed %1$s from your friends</string>
+    <string name="RemoveFriendFailure">Error - could not remove friend</string>
 
     // Friend removal dialog
     <string name="RemoveFriendTitle">Are you sure ?</string>
