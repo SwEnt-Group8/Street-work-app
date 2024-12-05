@@ -1,18 +1,22 @@
 package com.android.streetworkapp.ui.map
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onRoot
-import androidx.compose.ui.test.printToLog
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
+import com.android.streetworkapp.StreetWorkAppMain
+import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
+import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.model.parklocation.ParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.ui.navigation.Screen
 import okhttp3.OkHttpClient
 import org.junit.Before
@@ -29,6 +33,14 @@ class MapUiTest {
   private lateinit var parkRepository: ParkRepository
   private lateinit var parkViewModel: ParkViewModel
   private lateinit var navigationActions: NavigationActions
+
+  private var testPark =
+      Park(
+          name = "Test Park",
+          location = ParkLocation(),
+          rating = 4F,
+          occupancy = 3,
+          events = emptyList())
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -47,27 +59,66 @@ class MapUiTest {
   }
 
   @Test
-  fun printComposeHierarchy() {
-    composeTestRule.setContent {
-      MapScreen(parkLocationViewModel, parkViewModel, navigationActions)
-    }
-
-    composeTestRule.waitForIdle()
-
-    composeTestRule.onRoot().printToLog("MapScreen")
-  }
-
-  @Test
   fun displayAllComponents() {
     `when`(navigationActions.currentRoute()).thenReturn(Screen.MAP)
 
     composeTestRule.setContent {
-      MapScreen(parkLocationViewModel, parkViewModel, navigationActions)
+      MapScreen(parkLocationViewModel, parkViewModel, navigationActions, mutableStateOf(""))
     }
 
     composeTestRule.waitForIdle()
 
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("googleMap").assertIsDisplayed()
+  }
+
+  @Test
+  fun infoWindowContentsAreDisplayed() {
+    `when`(navigationActions.currentRoute()).thenReturn(Screen.MAP)
+
+    composeTestRule.setContent { MarkerInfoWindowContent(testPark) }
+
+    composeTestRule.waitForIdle()
+
+    composeTestRule.onNodeWithTag("markerInfoWindow").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("parkName").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("ratingComponent").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("eventIcon").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("eventsPlanned").assertIsDisplayed()
+  }
+
+  @Test
+  fun mapSearchBarComponentIsDisplayed() {
+
+    val logicValue = mutableStateOf(false)
+
+    composeTestRule.setContent { MapSearchBar(mutableStateOf("")) { logicValue.value = true } }
+
+    composeTestRule.waitForIdle()
+
+    composeTestRule.onNodeWithTag("searchBar").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("cancelSearchButton").assertIsDisplayed().performClick()
+
+    assert(logicValue.value)
+  }
+
+  @Test
+  fun mapSearchBarHasCorrectBehavior() {
+    composeTestRule.setContent { StreetWorkAppMain { navigateTo(Route.MAP) } }
+
+    composeTestRule.waitForIdle()
+
+    composeTestRule.onNodeWithTag("searchButton").assertIsDisplayed().performClick()
+
+    composeTestRule.onNodeWithTag("searchBar").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("cancelSearchButton").assertIsDisplayed().performClick()
+
+    composeTestRule.onNodeWithTag("topAppBar").assertIsDisplayed()
   }
 }

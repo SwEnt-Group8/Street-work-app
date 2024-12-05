@@ -62,6 +62,10 @@ mockitoKotlin = "5.4.0"
 mockitoAndroid = "5.13.0"
 runtimeLivedata = "1.7.5"
 
+# Preferences DataStore
+datastorePreferences = "1.0.0"
+datastoreCore = "1.0.0"
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "coreTesting" }
@@ -127,6 +131,9 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 androidx-navigation-testing = { group = "androidx.navigation", name = "navigation-testing", version.ref = "navigationTesting" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 
+# Preferences DataStore
+datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
+datastore-core = { module = "androidx.datastore:datastore-core", version.ref = "datastoreCore" }
 
 
 [plugins]

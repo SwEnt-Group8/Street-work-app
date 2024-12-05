@@ -85,23 +85,25 @@ fun ProfileScreen(
           // score text
           DisplayScore(currentUser)
 
-          Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-            // Train Button
-            Button(
-                onClick = { navigationActions.navigateTo(Screen.TRAIN_HUB) },
-                modifier = Modifier.padding(horizontal = 4.dp).testTag("profileTrainButton"),
-                colors = ColorPalette.BUTTON_COLOR) {
-                  Text(text = "Train", color = Color.White)
-                }
+          Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.SpaceBetween) {
+                // Train Button
+                Button(
+                    onClick = { navigationActions.navigateTo(Screen.TRAIN_HUB) },
+                    modifier = Modifier.padding(horizontal = 8.dp).testTag("profileTrainButton"),
+                    colors = ColorPalette.BUTTON_COLOR) {
+                      Text(text = "Train", color = Color.White)
+                    }
 
-            // Add Friend Button
-            Button(
-                onClick = { navigationActions.navigateTo(Screen.ADD_FRIEND) },
-                modifier = Modifier.padding(horizontal = 4.dp).testTag("profileAddButton"),
-                colors = ColorPalette.BUTTON_COLOR) {
-                  Text(text = "Add friend", color = Color.White)
-                }
-          }
+                // Add Friend Button
+                Button(
+                    onClick = { navigationActions.navigateTo(Screen.ADD_FRIEND) },
+                    modifier = Modifier.padding(horizontal = 4.dp).testTag("profileAddButton"),
+                    colors = ColorPalette.BUTTON_COLOR) {
+                      Text(text = "Add friend", color = Color.White)
+                    }
+              }
           DisplayFriendList(friendList, userViewModel)
           Log.d("SignInScreen", "friendList : ${friendList}")
         }

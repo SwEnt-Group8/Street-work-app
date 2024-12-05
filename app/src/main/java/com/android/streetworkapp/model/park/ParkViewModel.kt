@@ -27,6 +27,10 @@ open class ParkViewModel(
   val parkLocation: StateFlow<ParkLocation>
     get() = _parkLocation
 
+  private val _parkList = MutableStateFlow<List<Park?>>(emptyList())
+  val parkList: StateFlow<List<Park?>>
+    get() = _parkList
+
   /**
    * Set the current park.
    *
@@ -102,6 +106,12 @@ open class ParkViewModel(
     }
   }
 
+  fun getOrCreateAllParksByLocation(locations: List<ParkLocation>) {
+    viewModelScope.launch {
+      val parks = locations.map { repository.getOrCreateParkByLocation(it) }
+      _parkList.value = parks
+    }
+  }
   /**
    * Update the name of a park.
    *

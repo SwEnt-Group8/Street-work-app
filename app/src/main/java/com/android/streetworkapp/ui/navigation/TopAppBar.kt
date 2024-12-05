@@ -1,6 +1,9 @@
 package com.android.streetworkapp.ui.navigation
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -25,17 +28,21 @@ fun TopAppBarWrapper(navigationActions: NavigationActions, topAppBarManager: Top
           Text(modifier = Modifier.testTag("topAppBarTitle"), text = it.getTopAppBarTitle())
         },
         actions = {
-          topAppBarManager.getTopAppBarActions().forEach { action ->
-            IconButton(
-                onClick = { topAppBarManager.onActionClick(action) },
-                modifier = Modifier.testTag(action.testTag).size(32.dp)) {
-                  Icon(
-                      painterResource(action.icon),
-                      contentDescription = action.contentDescription,
-                      modifier = Modifier.size(32.dp).fillMaxSize(),
-                  )
+          Row(
+              horizontalArrangement = Arrangement.spacedBy(8.dp),
+              modifier = Modifier.padding(8.dp)) {
+                topAppBarManager.getTopAppBarActions().forEach { action ->
+                  IconButton(
+                      onClick = { topAppBarManager.onActionClick(action) },
+                      modifier = Modifier.testTag(action.testTag).size(32.dp)) {
+                        Icon(
+                            painterResource(action.icon),
+                            contentDescription = action.contentDescription,
+                            modifier = Modifier.size(32.dp).fillMaxSize(),
+                        )
+                      }
                 }
-          }
+              }
         },
         colors =
             TopAppBarDefaults.topAppBarColors(
