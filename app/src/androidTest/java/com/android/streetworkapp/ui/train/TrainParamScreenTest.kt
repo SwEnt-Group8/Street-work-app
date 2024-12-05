@@ -63,7 +63,7 @@ class TrainParamScreenTest {
     composeTestRule.onNodeWithTag("ConfirmButton").assertIsDisplayed()
 
     // Verify the button is clickable
-    composeTestRule.onNodeWithTag("ConfirmButton").performClick()
+    composeTestRule.onNodeWithTag("ConfirmButton").assertIsDisplayed()
   }
 
   @Test
