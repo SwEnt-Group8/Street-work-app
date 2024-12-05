@@ -11,7 +11,7 @@
     <string name="SettingsConnectionContent">You are logged-in as %1$s</string>
 
     <string name="DeleteAccountConfirmationTitle">Are you sure ?</string>
-    <string name="DeleteAccountConfirmationContent">Do you really want to delete your account ? \n\nYou will loose all of your progression \n\nThis action is irreversible.</string>
+    <string name="DeleteAccountConfirmationContent">Do you really want to delete your account ? \n\nYou will loose all of your progression. \nThis action is irreversible.</string>
 
 
     // Friend removal :
