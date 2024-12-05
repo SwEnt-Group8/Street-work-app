@@ -42,6 +42,7 @@ import com.android.streetworkapp.model.preferences.PreferencesRepositoryDataStor
 import com.android.streetworkapp.model.preferences.PreferencesViewModel
 import com.android.streetworkapp.model.progression.ProgressionRepositoryFirestore
 import com.android.streetworkapp.model.progression.ProgressionViewModel
+import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.model.workout.WorkoutRepositoryFirestore
@@ -139,30 +140,46 @@ fun StreetWorkAppMain(
   val uid by preferencesViewModel.uid.collectAsState()
   val name by preferencesViewModel.name.collectAsState()
   val score by preferencesViewModel.score.collectAsState()
+  preferencesViewModel.getLoginState()
+  preferencesViewModel.getUid()
+  preferencesViewModel.getName()
+  preferencesViewModel.getScore()
 
-  LaunchedEffect(Unit) {
-    preferencesViewModel.getLoginState()
-    preferencesViewModel.getUid()
-    preferencesViewModel.getName()
-    preferencesViewModel.getScore()
-  }
-
-  // Ensure login state is initialized before deciding the start destination
+  // Ensure start destination and preferences parameters are resolved before displaying the app
   var resolvedStartDestination by remember { mutableStateOf<String?>(null) }
+  var resolvedPreferencesParameters by remember { mutableStateOf<Boolean>(false) }
 
-  LaunchedEffect(loginState) {
-    resolvedStartDestination =
-        when (loginState) {
-          true -> Route.MAP
-          false -> Route.AUTH
-          else -> null
-        }
+  // Determine start destination and be sure preferences parameters are correctly loaded
+  if (loginState == false) {
+    resolvedPreferencesParameters = true
+    resolvedStartDestination = Route.AUTH
+  } else {
+    if (internetAvailable && !uid.isNullOrEmpty()) {
+      // User is logged in and has internet connection
+      resolvedPreferencesParameters = true
+      resolvedStartDestination = Route.MAP
+    } else if (!internetAvailable && !uid.isNullOrEmpty() && name != null && score != null) {
+      // User is logged in but has no internet connection
+      resolvedPreferencesParameters = true
+      resolvedStartDestination = Route.MAP
+    }
   }
 
-  // Display the splash screen while determining the start destination
-  if (resolvedStartDestination == null) {
+  // Display splash screen while determining start destination and preferences
+  if (resolvedStartDestination == null || !resolvedPreferencesParameters) {
     SplashScreen()
   } else {
+    if (loginState == true) {
+      if (internetAvailable) {
+        Log.d("MainActivity", "Internet available, fetching user $uid from database")
+        userViewModel.getUserByUidAndSetAsCurrentUser(uid!!)
+      } else {
+        Log.d("MainActivity", "Internet not available, loading user $uid from cache")
+        val offlineUser = User(uid!!, name!!, "", score!!, emptyList(), "")
+        userViewModel.setCurrentUser(offlineUser)
+      }
+    }
+
     StreetWorkApp(
         parkLocationViewModel,
         testInvokation,
