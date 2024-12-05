@@ -1,6 +1,7 @@
 package com.android.streetworkapp
 
 import android.annotation.SuppressLint
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -80,6 +81,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import okhttp3.OkHttpClient
 
 class MainActivity : ComponentActivity() {
+  @SuppressLint("SourceLockedOrientationActivity")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     val internetAvailable = isInternetAvailable(this)
@@ -87,6 +89,7 @@ class MainActivity : ComponentActivity() {
     val preferencesRepository = PreferencesRepositoryDataStore(this)
     val preferencesViewModel = PreferencesViewModel(preferencesRepository)
     Log.d("MainActivity", "Setup content")
+    this.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
     setContent(parent = null) {
       StreetWorkAppMain(
           internetAvailable = internetAvailable, preferencesViewModel = preferencesViewModel)

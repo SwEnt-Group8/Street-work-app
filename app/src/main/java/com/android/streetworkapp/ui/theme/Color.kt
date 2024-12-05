@@ -41,19 +41,20 @@ object ColorPalette {
   val BUTTON_COLOR =
       ButtonColors(
           containerColor = INTERACTION_COLOR_DARK,
-          contentColor = PRIMARY_TEXT_COLOR,
-          disabledContentColor = SECONDARY_TEXT_COLOR,
+          contentColor = Color.White,
+          disabledContentColor = Color.White,
           disabledContainerColor = INTERACTION_COLOR_LIGHT)
   val NAVIGATION_BAR_ITEM_COLORS =
       NavigationBarItemColors(
-          selectedIconColor = PRIMARY_TEXT_COLOR,
-          selectedTextColor = PRIMARY_TEXT_COLOR,
+          selectedIconColor = Color.White,
+          selectedTextColor = Color.White,
           selectedIndicatorColor = INTERACTION_COLOR_DARK,
-          disabledIconColor = Color.Transparent,
-          disabledTextColor = PRIMARY_TEXT_COLOR,
-          unselectedIconColor = PRIMARY_TEXT_COLOR,
-          unselectedTextColor = PRIMARY_TEXT_COLOR)
+          disabledIconColor = Color.LightGray,
+          disabledTextColor = Color.LightGray,
+          unselectedIconColor = Color.Black,
+          unselectedTextColor = Color.LightGray,
+      )
 
-  val TUTORIAL_INTERACTION_1 = Color(0xFFFF0000) // red
-  val TUTORIAL_INTERACTION_2 = Color(0xFF00FF00) // green
+  val TUTORIAL_INTERACTION_1 = Color.Red
+  val TUTORIAL_INTERACTION_2 = Color.Green
 }

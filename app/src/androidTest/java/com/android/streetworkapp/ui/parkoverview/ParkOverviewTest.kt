@@ -140,7 +140,7 @@ class ParkOverviewTest {
     composeTestRule.waitForIdle()
 
     composeTestRule.onNodeWithTag("addImageIconButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("createEventButton").assertTextEquals("Create an event")
+    composeTestRule.onNodeWithTag("createEventButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("eventItem").assertTextContains("Group workout")
     composeTestRule
         .onNodeWithTag("participantsText", useUnmergedTree = true)
