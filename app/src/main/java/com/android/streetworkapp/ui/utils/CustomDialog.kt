@@ -34,9 +34,8 @@ fun CustomDialog(
     Content: @Composable () -> Unit = {},
     onSubmit: () -> Unit = {},
     onDismiss: () -> Unit = {},
-    verbose: Boolean = true
+    verbose: Boolean = false
 ) {
-  val context = LocalContext.current
 
   if (showDialog.value) {
     AlertDialog(
@@ -45,42 +44,8 @@ fun CustomDialog(
           onDismiss()
           showDialog.value = false
         },
-        confirmButton = {
-          if (dialogType.shouldShowButton(ButtonType.SUBMIT)) {
-            TextButton(
-                onClick = {
-                  onSubmit()
-                  if (verbose) Toast.makeText(context, "Submitted", Toast.LENGTH_SHORT).show()
-                  showDialog.value = false
-                },
-                modifier = Modifier.testTag("${tag}DialogSubmitButton")) {
-                  Text("Submit", color = ColorPalette.SECONDARY_TEXT_COLOR)
-                }
-          } else if (dialogType.shouldShowButton(ButtonType.CONFIRM)) {
-            TextButton(
-                onClick = {
-                  onSubmit()
-                  if (verbose) Toast.makeText(context, "Confirmed", Toast.LENGTH_SHORT).show()
-                  showDialog.value = false
-                },
-                modifier = Modifier.testTag("${tag}DialogConfirmButton")) {
-                  Text("Confirm", color = Color.Red)
-                }
-          }
-        },
-        dismissButton = {
-          if (dialogType.shouldShowButton(ButtonType.CANCEL)) {
-            TextButton(
-                onClick = {
-                  onDismiss()
-                  if (verbose) Toast.makeText(context, "Dismissed", Toast.LENGTH_SHORT).show()
-                  showDialog.value = false
-                },
-                modifier = Modifier.testTag("${tag}DialogCancelButton")) {
-                  Text("Cancel", color = Color.Red)
-                }
-          }
-        },
+        confirmButton = { HandleConfirmButton(dialogType, tag, showDialog, onSubmit, verbose) },
+        dismissButton = { HandleDismissButton(dialogType, tag, showDialog, onDismiss, verbose) },
         title = {
           Text(
               title,
@@ -109,8 +74,92 @@ enum class DialogType {
   }
 }
 
+/** Enum class for the button types. Each type has a response, tag, and color. */
 enum class ButtonType {
   SUBMIT,
   CANCEL,
-  CONFIRM
+  CONFIRM;
+
+  fun response(): String {
+    return when (this) {
+      SUBMIT -> "Submitted"
+      CANCEL -> "Dismissed"
+      CONFIRM -> "Confirmed"
+    }
+  }
+
+  fun tag(): String {
+    return when (this) {
+      SUBMIT -> "Submit"
+      CANCEL -> "Cancel"
+      CONFIRM -> "Confirm"
+    }
+  }
+
+  fun color(): Color {
+    return when (this) {
+      CONFIRM -> Color.Red
+      CANCEL -> Color.Red
+      else -> ColorPalette.SECONDARY_TEXT_COLOR
+    }
+  }
+}
+
+/**
+ * This function displays the button for the dialog. Will hide the dialog once interacted with.
+ *
+ * @param ButtonType - Type of button (SUBMIT, CANCEL, CONFIRM)
+ * @param tag - Describe the instance of the dialog ("Settings", "Rating", etc.)
+ * @param onSubmit - Submission callback
+ * @param showDialog - MutableState to show the dialog
+ * @param verbose - Whether to display a Toast message on interaction
+ */
+@Composable
+fun DialogButton(
+    ButtonType: ButtonType,
+    tag: String,
+    onSubmit: () -> Unit,
+    showDialog: MutableState<Boolean>,
+    verbose: Boolean
+) {
+  val context = LocalContext.current
+  TextButton(
+      onClick = {
+        onSubmit()
+        if (verbose) Toast.makeText(context, ButtonType.response(), Toast.LENGTH_SHORT).show()
+        showDialog.value = false
+      },
+      modifier = Modifier.testTag("${tag}Dialog${ButtonType.tag()}Button")) {
+        Text(ButtonType.tag(), color = ButtonType.color())
+      }
+}
+
+/** Handles whether to display the confirm button or the submit button (or none). */
+@Composable
+fun HandleConfirmButton(
+    dialogType: DialogType,
+    dialogTag: String,
+    showDialog: MutableState<Boolean>,
+    onClick: () -> Unit,
+    verbose: Boolean = false
+) {
+  if (dialogType.shouldShowButton(ButtonType.CONFIRM)) {
+    DialogButton(ButtonType.CONFIRM, dialogTag, onClick, showDialog, true)
+  } else if (dialogType.shouldShowButton(ButtonType.SUBMIT)) {
+    DialogButton(ButtonType.SUBMIT, dialogTag, onClick, showDialog, verbose)
+  }
+}
+
+/** Handles whether to display the cancel button (or none). */
+@Composable
+fun HandleDismissButton(
+    dialogType: DialogType,
+    dialogTag: String,
+    showDialog: MutableState<Boolean>,
+    onClick: () -> Unit,
+    verbose: Boolean = false
+) {
+  if (dialogType.shouldShowButton(ButtonType.CANCEL)) {
+    DialogButton(ButtonType.CANCEL, dialogTag, onClick, showDialog, verbose)
+  }
 }
