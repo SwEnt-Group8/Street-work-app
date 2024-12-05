@@ -6,9 +6,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.*
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class WorkoutViewModelTest {
@@ -117,5 +120,44 @@ class WorkoutViewModelTest {
     testDispatcher.scheduler.advanceUntilIdle()
 
     verify(repository, times(2)).getOrAddWorkoutData(uid)
+  }
+
+  @Test
+  fun `getOrAddExerciseToWorkout adds a new session if none exists`() = runTest {
+    // Arrange
+    val uid = "user123"
+    val sessionId = "solo_session_1"
+    val exercise = Exercise("Push-ups", 10, 3, 30f, 0)
+    val sessionType = SessionType.SOLO
+
+    // Mock the repository to return empty workout data
+    whenever(repository.getOrAddWorkoutData(uid)).thenReturn(
+      WorkoutData(userUid = uid, workoutSessions = emptyList())
+    )
+
+    // Act
+    workoutViewModel.getOrAddExerciseToWorkout(uid, sessionId, exercise, sessionType)
+    testDispatcher.scheduler.advanceUntilIdle() // Ensure coroutines complete
+
+    // Assert
+    val uidCaptor = argumentCaptor<String>()
+    val sessionCaptor = argumentCaptor<WorkoutSession>()
+
+    // Verify the repository method was called
+    verify(repository).addOrUpdateWorkoutSession(uidCaptor.capture(), sessionCaptor.capture())
+
+    // Debug captor values
+    println("Captured UID: ${uidCaptor.allValues}")
+    println("Captured Sessions: ${sessionCaptor.allValues}")
+
+    // Verify that the UID is correct
+    assertEquals(uid, uidCaptor.firstValue)
+
+    // Verify the captured session
+    val capturedSession = sessionCaptor.firstValue
+    assertEquals(sessionId, capturedSession.sessionId)
+    assertEquals(sessionType, capturedSession.sessionType)
+    assertEquals(1, capturedSession.exercises.size)
+    assertEquals(exercise, capturedSession.exercises.first())
   }
 }
