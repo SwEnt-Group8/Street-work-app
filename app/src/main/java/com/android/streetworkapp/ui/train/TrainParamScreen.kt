@@ -36,7 +36,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import com.android.streetworkapp.ui.navigation.NavigationActions
-import com.android.streetworkapp.ui.theme.ColorPalette.BORDER_COLOR
 import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_DARK
 import com.android.streetworkapp.ui.theme.ColorPalette.PRIMARY_TEXT_COLOR
 import com.android.streetworkapp.ui.theme.ColorPalette.PRINCIPLE_BACKGROUND_COLOR
@@ -59,26 +58,15 @@ fun TrainParamScreen(
       modifier =
           Modifier.fillMaxSize().padding(paddingValues).padding(16.dp).testTag("TrainParamScreen"),
       horizontalAlignment = Alignment.CenterHorizontally,
-      verticalArrangement = Arrangement.Center // Center vertically
-      ) {
-        Box(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
-            contentAlignment = Alignment.Center) {
-              Text(
-                  text =
-                      if (isTimeDependent) {
-                        String.format(
-                            "I want to do %02d min and %02d seconds of %s",
-                            minutes,
-                            seconds,
-                            activity)
-                      } else {
-                        String.format("I want to do %2d sets of %2d %s", sets, reps, activity)
-                      },
-                  modifier = Modifier.padding(vertical = 16.dp).testTag("ParamDisplay"),
-                  style = androidx.compose.material3.MaterialTheme.typography.headlineSmall)
-            }
-        // Input grid for timer (time-dependent activities)
+      verticalArrangement = Arrangement.Center) {
+        TrainParamHeader(
+            isTimeDependent = isTimeDependent,
+            minutes = minutes,
+            seconds = seconds,
+            sets = sets,
+            reps = reps,
+            activity = activity)
+
         if (isTimeDependent) {
           TimerInputGrid(
               minutes = minutes,
@@ -86,50 +74,174 @@ fun TrainParamScreen(
               onUpdateMinutes = { minutes = it },
               onUpdateSeconds = { seconds = it })
         } else {
-          // NumberPickers for sets and reps
-          NumberPicker(
-              label = "Number of sets:",
-              value = sets,
-              range = 0..100,
-              onValueChange = { sets = it })
-          NumberPicker(
-              label = "Number of reps:",
-              value = reps,
-              range = 0..100,
-              onValueChange = { reps = it })
+          SetsAndRepsSection(
+              sets = sets, reps = reps, onUpdateSets = { sets = it }, onUpdateReps = { reps = it })
         }
 
-        // Confirm button
-        Button(
-            onClick = {
-              val time = if (isTimeDependent) (minutes * 60 + seconds) else null
-              when (type) {
-                "Solo" ->
-                    navigationActions.navigateToSoloScreen(
-                        activity = activity,
-                        isTimeDependent = isTimeDependent,
-                        time = if (isTimeDependent) time else null,
-                        sets = if (!isTimeDependent) sets else null,
-                        reps = if (!isTimeDependent) reps else null)
-                "Coach" ->
-                    navigationActions.navigateToCoachScreen(
-                        activity = activity,
-                        isTimeDependent = isTimeDependent,
-                        time = time,
-                        sets = if (!isTimeDependent) sets else null,
-                        reps = if (!isTimeDependent) reps else null)
-                "Challenge" ->
-                    navigationActions.navigateToChallengeScreen(
-                        activity = activity,
-                        isTimeDependent = isTimeDependent,
-                        time = time,
-                        sets = if (!isTimeDependent) sets else null,
-                        reps = if (!isTimeDependent) reps else null)
-              }
-            },
-            colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
-            modifier = Modifier.padding(top = 24.dp).testTag("ConfirmButton")) {
-              Text("Confirm", color = PRINCIPLE_BACKGROUND_COLOR)
+        ConfirmActionButton(
+            navigationActions = navigationActions,
+            activity = activity,
+            isTimeDependent = isTimeDependent,
+            type = type,
+            minutes = minutes,
+            seconds = seconds,
+            sets = sets,
+            reps = reps)
+      }
+}
+
+@SuppressLint("DefaultLocale")
+@Composable
+fun TrainParamHeader(
+    isTimeDependent: Boolean,
+    minutes: Int,
+    seconds: Int,
+    sets: Int,
+    reps: Int,
+    activity: String
+) {
+  Box(
+      modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp).testTag("ParamDisplay"),
+      contentAlignment = Alignment.Center) {
+        Text(
+            text =
+                if (isTimeDependent) {
+                  String.format(
+                      "I want to do %02d min and %02d seconds of %s", minutes, seconds, activity)
+                } else {
+                  String.format("I want to do %2d sets of %2d %s", sets, reps, activity)
+                },
+            style = androidx.compose.material3.MaterialTheme.typography.headlineSmall)
+      }
+}
+
+@Composable
+fun TimerInputSection(
+    minutes: Int,
+    seconds: Int,
+    onUpdateMinutes: (Int) -> Unit,
+    onUpdateSeconds: (Int) -> Unit
+) {
+  TimerInputGrid(
+      minutes = minutes,
+      seconds = seconds,
+      onUpdateMinutes = onUpdateMinutes,
+      onUpdateSeconds = onUpdateSeconds)
+}
+
+@Composable
+fun SetsAndRepsSection(
+    sets: Int,
+    reps: Int,
+    onUpdateSets: (Int) -> Unit,
+    onUpdateReps: (Int) -> Unit
+) {
+  NumberPicker(
+      label = "Number of sets:",
+      value = sets,
+      range = 0..100,
+      onValueChange = onUpdateSets,
+      modifier = Modifier.testTag("SetsPicker"))
+  NumberPicker(
+      label = "Number of reps:",
+      value = reps,
+      range = 0..100,
+      onValueChange = onUpdateReps,
+      modifier = Modifier.testTag("RepsPicker"))
+}
+
+@Composable
+fun ConfirmActionButton(
+    navigationActions: NavigationActions,
+    activity: String,
+    isTimeDependent: Boolean,
+    type: String,
+    minutes: Int,
+    seconds: Int,
+    sets: Int,
+    reps: Int
+) {
+  Button(
+      onClick = {
+        val time = if (isTimeDependent) (minutes * 60 + seconds) else null
+        when (type) {
+          "Solo" ->
+              navigationActions.navigateToSoloScreen(
+                  activity = activity,
+                  isTimeDependent = isTimeDependent,
+                  time = time,
+                  sets = if (!isTimeDependent) sets else null,
+                  reps = if (!isTimeDependent) reps else null)
+          "Coach" ->
+              navigationActions.navigateToCoachScreen(
+                  activity = activity,
+                  isTimeDependent = isTimeDependent,
+                  time = time,
+                  sets = if (!isTimeDependent) sets else null,
+                  reps = if (!isTimeDependent) reps else null)
+          "Challenge" ->
+              navigationActions.navigateToChallengeScreen(
+                  activity = activity,
+                  isTimeDependent = isTimeDependent,
+                  time = time,
+                  sets = if (!isTimeDependent) sets else null,
+                  reps = if (!isTimeDependent) reps else null)
+        }
+      },
+      colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
+      modifier = Modifier.padding(top = 24.dp).testTag("ConfirmButton")) {
+        Text("Confirm", color = PRINCIPLE_BACKGROUND_COLOR)
+      }
+}
+
+@Composable
+fun NumberPicker(
+    label: String,
+    value: Int,
+    range: IntRange,
+    onValueChange: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+  val lazyListState = rememberLazyListState(initialFirstVisibleItemIndex = range.indexOf(value))
+
+  // Listen to scroll position changes and update the value accordingly
+  LaunchedEffect(lazyListState) {
+    snapshotFlow { lazyListState.firstVisibleItemIndex }
+        .collect { index ->
+          val newValue = range.elementAtOrNull(index)
+          newValue?.let { onValueChange(it) }
+        }
+  }
+
+  Column(
+      horizontalAlignment = Alignment.CenterHorizontally,
+      modifier = modifier.padding(vertical = 16.dp)) {
+        // Label for the picker
+        Text(
+            text = label,
+            style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(bottom = 8.dp))
+
+        Box(
+            modifier =
+                Modifier.size(60.dp, 120.dp).border(1.dp, Color.Gray, RoundedCornerShape(8.dp))) {
+              LazyColumn(
+                  state = lazyListState,
+                  modifier = Modifier.fillMaxSize(),
+                  horizontalAlignment = Alignment.CenterHorizontally,
+                  verticalArrangement = Arrangement.Center) {
+                    items(range.toList()) { number ->
+                      Box(
+                          modifier = Modifier.fillMaxWidth().height(40.dp),
+                          contentAlignment = Alignment.Center) {
+                            Text(
+                                text = number.toString(),
+                                style =
+                                    androidx.compose.material3.MaterialTheme.typography
+                                        .headlineMedium)
+                          }
+                    }
+                  }
             }
       }
 }
@@ -150,11 +262,13 @@ fun TimerInputGrid(
 
   Column(
       horizontalAlignment = Alignment.CenterHorizontally,
-      verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        buttonTexts.forEach { row ->
+      verticalArrangement = Arrangement.spacedBy(8.dp),
+      modifier = Modifier.testTag("TimerInputGrid")) {
+        buttonTexts.forEachIndexed { rowIndex, row ->
           Row(
               horizontalArrangement = Arrangement.spacedBy(8.dp),
-              verticalAlignment = Alignment.CenterVertically) {
+              verticalAlignment = Alignment.CenterVertically,
+              modifier = Modifier.testTag("Row$rowIndex")) {
                 row.forEach { char ->
                   SelectionButtonWithChar(
                       char = char,
@@ -262,62 +376,6 @@ fun SelectionButtonWithChar(
                   fontSize = buttonSize.width.value * 0.3.sp, // Dynamically adjust font size
                   fontWeight = FontWeight.Bold,
                   color = PRIMARY_TEXT_COLOR)
-            }
-      }
-}
-
-@Composable
-fun NumberPicker(label: String, value: Int, range: IntRange, onValueChange: (Int) -> Unit) {
-  val lazyListState = rememberLazyListState(initialFirstVisibleItemIndex = range.indexOf(value))
-
-  // Listen to scroll position changes and update the value accordingly
-  LaunchedEffect(lazyListState) {
-    snapshotFlow { lazyListState.firstVisibleItemIndex + 1 }
-        .collect { index ->
-          val newValue = range.elementAtOrNull(index)
-          newValue?.let { onValueChange(it) }
-        }
-  }
-
-  Column(
-      horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = Modifier.padding(vertical = 16.dp)) {
-        // Label for the picker
-        Text(
-            text = label,
-            style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(bottom = 8.dp))
-
-        Box(
-            modifier =
-                Modifier.size(60.dp, 120.dp).border(1.dp, Color.Gray, RoundedCornerShape(8.dp))) {
-              LazyColumn(
-                  state = lazyListState,
-                  modifier = Modifier.fillMaxSize(),
-                  horizontalAlignment = Alignment.CenterHorizontally,
-                  verticalArrangement = Arrangement.Center) {
-                    items(range.toList()) { number ->
-                      Box(
-                          modifier =
-                              Modifier.fillMaxWidth()
-                                  .height(40.dp), // Adjust to fit the visibleItemCount size
-                          contentAlignment = Alignment.Center) {
-                            Text(
-                                text = number.toString(),
-                                style =
-                                    androidx.compose.material3.MaterialTheme.typography
-                                        .headlineMedium)
-                          }
-                    }
-                  }
-
-              // Highlight the middle item to indicate selection
-              Box(
-                  modifier =
-                      Modifier.matchParentSize()
-                          .border(2.dp, BORDER_COLOR, RoundedCornerShape(8.dp))
-                          .padding(vertical = 40.dp) // Adjust for centering
-                  )
             }
       }
 }
