@@ -149,7 +149,7 @@ data class ScreenParams(
             isBottomBarVisible = true,
             bottomBarType = BottomNavigationMenuType.DEFAULT,
             isTopBarVisible = true,
-            TopAppBarManager("Train with parameters", hasNavigationIcon = true))
+            TopAppBarManager("Parameters", hasNavigationIcon = true))
     val TUTO_EVENT =
         ScreenParams(
             Screen.TUTO_EVENT,

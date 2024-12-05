@@ -111,7 +111,7 @@ fun TrainParamHeader(
                 } else {
                   String.format("I want to do %2d sets of %2d %s", sets, reps, activity)
                 },
-            style = androidx.compose.material3.MaterialTheme.typography.headlineSmall)
+            style = androidx.compose.material3.MaterialTheme.typography.bodyLarge)
       }
 }
 
