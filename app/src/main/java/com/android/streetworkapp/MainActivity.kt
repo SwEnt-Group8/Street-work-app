@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
@@ -51,6 +52,7 @@ import com.android.streetworkapp.ui.event.AddEventScreen
 import com.android.streetworkapp.ui.event.EventOverviewScreen
 import com.android.streetworkapp.ui.map.MapScreen
 import com.android.streetworkapp.ui.miscellaneous.SplashScreen
+import com.android.streetworkapp.ui.map.MapSearchBar
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenu
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenuType
 import com.android.streetworkapp.ui.navigation.EventBottomBar
@@ -211,6 +213,7 @@ fun NavGraphBuilder.trainComposable(
       }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun StreetWorkApp(
@@ -243,10 +246,16 @@ fun StreetWorkApp(
   var firstTimeLoaded by remember { mutableStateOf<Boolean>(true) }
 
   navigationActions.registerStringListenerOnDestinationChange(currentScreenName)
+
   screenParams = LIST_OF_SCREENS.find { currentScreenName.value == it.screenName }
 
   // Instantiate info manager and its components :
   val showInfoDialog = remember { mutableStateOf(false) }
+  val showSearchBar = remember { mutableStateOf(false) }
+
+  // query for the search bar
+  val searchQuery = remember { mutableStateOf("") }
+
   Log.d("InfoDialog", "Main - Instantiating the InfoDialogManager")
   val infoManager =
       InfoDialogManager(
@@ -255,15 +264,22 @@ fun StreetWorkApp(
   Scaffold(
       containerColor = ColorPalette.PRINCIPLE_BACKGROUND_COLOR,
       topBar = {
-        screenParams
-            ?.isTopBarVisible
-            ?.takeIf { it }
-            ?.let {
-              TopAppBarWrapper(navigationActions, screenParams?.topAppBarManager)
-              // setup the InfoDialogManager in topBar, because it relies on the topAppBarManager.
-              Log.d("InfoDialog", "Main - Setting up the InfoDialogManager")
-              infoManager.setUp()
-            }
+        if (showSearchBar.value && screenParams?.hasSearchBar == true) {
+          MapSearchBar(searchQuery) {
+            searchQuery.value = ""
+            showSearchBar.value = false
+          }
+        } else {
+          screenParams
+              ?.isTopBarVisible
+              ?.takeIf { it }
+              ?.let {
+                TopAppBarWrapper(navigationActions, screenParams?.topAppBarManager)
+                // setup the InfoDialogManager in topBar, because it relies on the topAppBarManager.
+                Log.d("InfoDialog", "Main - Setting up the InfoDialogManager")
+                infoManager.setUp()
+              }
+        }
       },
       snackbarHost = {
         SnackbarHost(
@@ -292,118 +308,125 @@ fun StreetWorkApp(
               }
             }
       }) { innerPadding ->
-        NavHost(navController = navController, startDestination = startDestination) {
-          navigation(
-              startDestination = Screen.AUTH,
-              route = Route.AUTH,
-          ) {
-            composable(Screen.AUTH) {
-              SignInScreen(navigationActions, userViewModel, preferencesViewModel)
-            }
-          }
-          navigation(startDestination = Screen.PROGRESSION, route = Route.PROGRESSION) {
-            composable(Screen.PROGRESSION) {
-              infoManager.Display(LocalContext.current)
-              ProgressScreen(navigationActions, userViewModel, progressionViewModel, innerPadding)
-            }
-          }
-          navigation(
-              startDestination = Screen.MAP,
-              route = Route.MAP,
-          ) {
-            composable(Screen.MAP) {
-              infoManager.Display(LocalContext.current)
-              MapScreen(
-                  parkLocationViewModel,
-                  parkViewModel,
-                  navigationActions,
-                  mapCallbackOnMapLoaded,
-                  innerPadding)
-            }
-            composable(Screen.PARK_OVERVIEW) {
-              infoManager.Display(LocalContext.current)
-              ParkOverviewScreen(
-                  parkViewModel, innerPadding, navigationActions, eventViewModel, userViewModel)
-            }
-            composable(Screen.ADD_EVENT) {
-              infoManager.Display(LocalContext.current)
-              AddEventScreen(
-                  navigationActions,
-                  parkViewModel,
-                  eventViewModel,
-                  userViewModel,
-                  textModerationViewModel,
-                  scope,
-                  host,
-                  innerPadding)
-            }
-            composable(Screen.EVENT_OVERVIEW) {
-              infoManager.Display(LocalContext.current)
-              EventOverviewScreen(
-                  eventViewModel, parkViewModel, userViewModel, navigationActions, innerPadding)
-            }
-            composable(Screen.TUTO_EVENT) { TutorialEvent(navigationActions) }
-          }
-
-          navigation(
-              startDestination = Screen.PROFILE,
-              route = Route.PROFILE,
-          ) {
-            // profile screen + list of friend
-            composable(Screen.PROFILE) {
-              infoManager.Display(LocalContext.current)
-              ProfileScreen(navigationActions, userViewModel, innerPadding)
-              val showSettingsDialog = remember { mutableStateOf(false) }
-
-              screenParams?.topAppBarManager?.setActionCallback(
-                  TopAppBarManager.TopAppBarAction.SETTINGS) {
-                    showSettingsDialog.value = true
-                  }
-
-              // The settings "in" the profile screen
-              // TODO : Implement the dialog Content composable
-              CustomDialog(
-                  showSettingsDialog,
-                  tag = "Settings",
-                  Content = { Text("Settings to be implemented") },
-              )
-            }
-            // screen for adding friend
-            composable(Screen.ADD_FRIEND) {
-              infoManager.Display(LocalContext.current)
-              AddFriendScreen(userViewModel, navigationActions, scope, host, innerPadding)
-            }
-          }
-
-          navigation(
-              startDestination = Screen.TRAIN_HUB,
-              route = Route.TRAIN_HUB,
-          ) {
-            composable(Screen.TRAIN_HUB) {
-              TrainHubScreen(navigationActions, workoutViewModel, userViewModel, innerPadding)
-            }
-            trainComposable(
-                route = Screen.TRAIN_SOLO,
-                workoutViewModel = workoutViewModel,
-                innerPadding = innerPadding) { activity, isTimeDependent ->
-                  TrainSoloScreen(activity, isTimeDependent, workoutViewModel, innerPadding)
+        NavHost(
+            navController = navController,
+            startDestination = startDestination) {
+              navigation(
+                  startDestination = Screen.AUTH,
+                  route = Route.AUTH,
+              ) {
+                composable(Screen.AUTH) { SignInScreen(navigationActions, userViewModel) }
+              }
+              navigation(startDestination = Screen.PROGRESSION, route = Route.PROGRESSION) {
+                composable(Screen.PROGRESSION) {
+                  infoManager.Display(LocalContext.current)
+                  ProgressScreen(
+                      navigationActions, userViewModel, progressionViewModel, innerPadding)
                 }
-
-            trainComposable(
-                route = Screen.TRAIN_COACH,
-                workoutViewModel = workoutViewModel,
-                innerPadding = innerPadding) { activity, isTimeDependent ->
-                  TrainCoachScreen(activity, isTimeDependent, workoutViewModel, innerPadding)
+              }
+              navigation(
+                  startDestination = Screen.MAP,
+                  route = Route.MAP,
+              ) {
+                composable(Screen.MAP) {
+                  infoManager.Display(LocalContext.current)
+                  MapScreen(
+                      parkLocationViewModel,
+                      parkViewModel,
+                      navigationActions,
+                      searchQuery,
+                      mapCallbackOnMapLoaded,
+                      innerPadding)
+                  screenParams?.topAppBarManager?.setActionCallback(
+                      TopAppBarManager.TopAppBarAction.SEARCH) {
+                        showSearchBar.value = true
+                      }
                 }
-
-            trainComposable(
-                route = Screen.TRAIN_CHALLENGE,
-                workoutViewModel = workoutViewModel,
-                innerPadding = innerPadding) { activity, isTimeDependent ->
-                  TrainChallengeScreen(activity, isTimeDependent, workoutViewModel, innerPadding)
+                composable(Screen.PARK_OVERVIEW) {
+                  infoManager.Display(LocalContext.current)
+                  ParkOverviewScreen(
+                      parkViewModel, innerPadding, navigationActions, eventViewModel, userViewModel)
                 }
-          }
-        }
+                composable(Screen.ADD_EVENT) {
+                  infoManager.Display(LocalContext.current)
+                  AddEventScreen(
+                      navigationActions,
+                      parkViewModel,
+                      eventViewModel,
+                      userViewModel,
+                      textModerationViewModel,
+                      scope,
+                      host,
+                      innerPadding)
+                }
+                composable(Screen.EVENT_OVERVIEW) {
+                  infoManager.Display(LocalContext.current)
+                  EventOverviewScreen(
+                      eventViewModel, parkViewModel, userViewModel, navigationActions, innerPadding)
+                }
+                composable(Screen.TUTO_EVENT) { TutorialEvent(navigationActions) }
+              }
+
+              navigation(
+                  startDestination = Screen.PROFILE,
+                  route = Route.PROFILE,
+              ) {
+                // profile screen + list of friend
+                composable(Screen.PROFILE) {
+                  infoManager.Display(LocalContext.current)
+                  ProfileScreen(navigationActions, userViewModel, innerPadding)
+                  val showSettingsDialog = remember { mutableStateOf(false) }
+
+                  screenParams?.topAppBarManager?.setActionCallback(
+                      TopAppBarManager.TopAppBarAction.SETTINGS) {
+                        showSettingsDialog.value = true
+                      }
+
+                  // The settings "in" the profile screen
+                  // TODO : Implement the dialog Content composable
+                  CustomDialog(
+                      showSettingsDialog,
+                      tag = "Settings",
+                      Content = { Text("Settings to be implemented") },
+                  )
+                }
+                // screen for adding friend
+                composable(Screen.ADD_FRIEND) {
+                  infoManager.Display(LocalContext.current)
+                  AddFriendScreen(userViewModel, navigationActions, scope, host, innerPadding)
+                }
+              }
+
+              navigation(
+                  startDestination = Screen.TRAIN_HUB,
+                  route = Route.TRAIN_HUB,
+              ) {
+                composable(Screen.TRAIN_HUB) {
+                  TrainHubScreen(navigationActions, workoutViewModel, userViewModel, innerPadding)
+                }
+                trainComposable(
+                    route = Screen.TRAIN_SOLO,
+                    workoutViewModel = workoutViewModel,
+                    innerPadding = innerPadding) { activity, isTimeDependent ->
+                      TrainSoloScreen(activity, isTimeDependent, workoutViewModel, innerPadding)
+                    }
+
+                trainComposable(
+                    route = Screen.TRAIN_COACH,
+                    workoutViewModel = workoutViewModel,
+                    innerPadding = innerPadding) { activity, isTimeDependent ->
+                      TrainCoachScreen(activity, isTimeDependent, workoutViewModel, innerPadding)
+                    }
+
+                trainComposable(
+                    route = Screen.TRAIN_CHALLENGE,
+                    workoutViewModel = workoutViewModel,
+                    innerPadding = innerPadding) { activity, isTimeDependent ->
+                      TrainChallengeScreen(
+                          activity, isTimeDependent, workoutViewModel, innerPadding)
+                    }
+              }
+            }
 
         if (e2eEventTesting) {
           LaunchedEffect(navTestInvokation) { navigationActions.apply(navTestInvokation) }

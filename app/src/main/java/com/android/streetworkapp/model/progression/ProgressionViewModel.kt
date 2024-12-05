@@ -60,6 +60,27 @@ open class ProgressionViewModel(private val repository: ProgressionRepository) :
               }
         }
       }
+
+  /**
+   * Check the number of friends of the user. Gives an achievement when the user as enough friends
+   *
+   * @param numberOfFriends: The current numberOfFriends of the user
+   */
+  fun checkFriends(numberOfFriends: Int) =
+      viewModelScope.launch {
+        val newAchievements = _currentProgression.value.achievements.toMutableList()
+
+        enumValues<SocialAchievement>().forEach {
+          if (it.numberOfFriends <= numberOfFriends && !newAchievements.contains(it.name)) {
+            newAchievements += it.name
+          }
+        }
+
+        repository.updateProgressionWithAchievementAndGoal(
+            _currentProgression.value.progressionId,
+            newAchievements,
+            _currentProgression.value.currentGoal)
+      }
 }
 
 /**
