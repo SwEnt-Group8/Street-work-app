@@ -80,7 +80,8 @@ class EventOverviewTest {
             occupancy = 5,
             events = emptyList())
 
-    participant = User("123", "test", "test", 0, listOf(), "test")
+    participant = User("123", "test", "test", 0, listOf(), "test",
+      parks = listOf(""))
     joiner = participant.copy(uid = "joiner")
     owner = participant.copy(uid = "124", username = "owner")
 

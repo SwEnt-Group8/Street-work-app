@@ -31,7 +31,8 @@ class ProfileComponentsTest {
 
   @Test
   fun isScoreCorrectlyDisplayed() {
-    val user = User("uid-alice", "Alice", "alice@gmail.com", 42, emptyList(), "")
+    val user = User("uid-alice", "Alice", "alice@gmail.com", 42, emptyList(), "",
+        parks = listOf(""))
     composeTestRule.setContent { DisplayScore(user) }
     composeTestRule.onNodeWithTag("profileScore").assertTextEquals("Score: ${user.score}")
   }
@@ -46,7 +47,8 @@ class ProfileComponentsTest {
 
   @Test
   fun isUsernameCorrectlyDisplayed() {
-    val user = User("uid-alice", "Alice", "alice@gmail.com", 42, emptyList(), "")
+    val user = User("uid-alice", "Alice", "alice@gmail.com", 42, emptyList(), "",
+        parks = listOf(""))
     composeTestRule.setContent { DisplayUsername(user) }
     composeTestRule.onNodeWithTag("profileUsername").assertTextEquals(user.username)
   }
@@ -60,7 +62,8 @@ class ProfileComponentsTest {
 
   @Test
   fun isFriendElementCorrectlyDisplayed() {
-    val friend = User("uid-alice", "Alice", "alice@gmail.com", 42, emptyList(), "")
+    val friend = User("uid-alice", "Alice", "alice@gmail.com", 42, emptyList(), "",
+        parks = listOf(""))
     val DEFAULT_USER_STATUS = "Definitely not a bot"
 
     composeTestRule.setContent { DisplayFriendItem(friend) }
@@ -90,8 +93,10 @@ class ProfileComponentsTest {
 
   @Test
   fun isFriendListCorrectlyDisplayed() {
-    val alice = User("uid-alice", "Alice", "alice@gmail.com", 42, emptyList(), "")
-    val bob = User("uid-bob", "Bob", "bob@gmail.com", 64, emptyList(), "")
+    val alice = User("uid-alice", "Alice", "alice@gmail.com", 42, emptyList(), "",
+        parks = listOf(""))
+    val bob = User("uid-bob", "Bob", "bob@gmail.com", 64, emptyList(), "",
+        parks = listOf(""))
     val friends = listOf(alice, bob)
 
     composeTestRule.setContent { DisplayFriendList(friends) }

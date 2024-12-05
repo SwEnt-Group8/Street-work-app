@@ -61,14 +61,17 @@ class End2EndGeneral {
               email = "david.miller@example.com",
               score = Ranks.BRONZE.score + (Ranks.SILVER.score - Ranks.BRONZE.score) / 2,
               friends = listOf(mockedUserUid),
-              picture = ""),
+              picture = "",
+              parks = listOf("")),
           User(
               uid = "987356",
               username = "Jane Smith",
               email = "jane.smith@example.com",
               score = Ranks.GOLD.score + (Ranks.PLATINUM.score - Ranks.GOLD.score) / 3,
               friends = listOf(mockedUserUid),
-              picture = "")))
+              picture = "",
+              parks = listOf(""))
+      ))
 
   private val mockedUser =
       User(
@@ -77,7 +80,8 @@ class End2EndGeneral {
           email = "john.doe@example.com",
           score = Ranks.SILVER.score + (Ranks.GOLD.score - Ranks.SILVER.score) / 2,
           friends = listOf(mockedFriendsForMockedUser[0].uid, mockedFriendsForMockedUser[1].uid),
-          picture = "")
+          picture = "",
+          parks = listOf(""))
 
   // for the input text field in add friend testing
   private val dummyFriendId = "friendId123"
