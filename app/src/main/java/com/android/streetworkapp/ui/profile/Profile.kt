@@ -177,8 +177,8 @@ fun DisplayFriendList(friends: List<User?>, userViewModel: UserViewModel) {
 }
 
 /**
- * This function displays a friend (for the friend list). Also displays actions to perform on them
- * through a dropdown menu.
+ * This function displays a friend (of the friend list) and actions about them through a dropdown
+ * menu.
  *
  * @param friend - The friend to display.
  * @param userViewModel - The view model for the user / the friend.
