@@ -6,7 +6,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.*
@@ -131,9 +130,8 @@ class WorkoutViewModelTest {
     val sessionType = SessionType.SOLO
 
     // Mock the repository to return empty workout data
-    whenever(repository.getOrAddWorkoutData(uid)).thenReturn(
-      WorkoutData(userUid = uid, workoutSessions = emptyList())
-    )
+    whenever(repository.getOrAddWorkoutData(uid))
+        .thenReturn(WorkoutData(userUid = uid, workoutSessions = emptyList()))
 
     // Act
     workoutViewModel.getOrAddExerciseToWorkout(uid, sessionId, exercise, sessionType)
