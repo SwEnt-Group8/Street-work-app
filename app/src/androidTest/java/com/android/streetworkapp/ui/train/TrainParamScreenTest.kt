@@ -4,15 +4,67 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.navigation.NavHostController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.streetworkapp.ui.navigation.NavigationActions
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.mock
 
 @RunWith(AndroidJUnit4::class)
 class TrainParamScreenTest {
 
   @get:Rule val composeTestRule = createComposeRule()
+
+  @Test
+  fun basic_trainParamScreen() {
+    val mockNavController = mock<NavHostController>()
+    val navigationActions = NavigationActions(mockNavController)
+
+    composeTestRule.setContent {
+      TrainParamScreen(
+          navigationActions = navigationActions,
+          activity = "Push-ups",
+          isTimeDependent = true,
+          type = "Solo")
+    }
+
+    composeTestRule.onNodeWithTag("TrainParamScreen").assertIsDisplayed()
+  }
+
+  @Test
+  fun confirmActionButton_isDisplayedAndClickable() {
+    // Arrange
+    val mockNavigationActions = mock<NavigationActions>()
+    val activity = "Push-ups"
+    val isTimeDependent = true
+    val type = "Solo"
+    val minutes = 5
+    val seconds = 30
+    val sets = 3
+    val reps = 15
+
+    composeTestRule.setContent {
+      ConfirmActionButton(
+          navigationActions = mockNavigationActions,
+          activity = activity,
+          isTimeDependent = isTimeDependent,
+          type = type,
+          minutes = minutes,
+          seconds = seconds,
+          sets = sets,
+          reps = reps)
+    }
+
+    // Act & Assert
+    // Verify the button is displayed
+    composeTestRule.onNodeWithTag("ConfirmButton").assertIsDisplayed()
+
+    // Verify the button is clickable
+    composeTestRule.onNodeWithTag("ConfirmButton").performClick()
+  }
 
   @Test
   fun timerInputGrid_DisplaysCorrectButtons() {
