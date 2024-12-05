@@ -27,7 +27,6 @@ class TrainSoloScreenTest {
     workoutViewModel = WorkoutViewModel(workoutRepository)
     userRepository = mock()
     userViewModel = UserViewModel(userRepository)
-
   }
 
   @Test
@@ -35,12 +34,12 @@ class TrainSoloScreenTest {
     composeTestRule.setContent {
       TrainSoloScreen(
           activity = "Push-ups",
-        isTimeDependent = true,
-        time = 60,
-        sets = 5,
-        reps = 10,
-        userViewModel = userViewModel,
-        workoutViewModel = workoutViewModel)
+          isTimeDependent = true,
+          time = 60,
+          sets = 5,
+          reps = 10,
+          userViewModel = userViewModel,
+          workoutViewModel = workoutViewModel)
     }
 
     // Verify core components
@@ -58,13 +57,12 @@ class TrainSoloScreenTest {
     composeTestRule.setContent {
       TrainSoloScreen(
           activity = "Push-ups",
-        isTimeDependent = false,
-        workoutViewModel = workoutViewModel,
-        time = 60,
-        sets = 5,
-        reps = 10,
-        userViewModel = userViewModel
-      )
+          isTimeDependent = false,
+          workoutViewModel = workoutViewModel,
+          time = 60,
+          sets = 5,
+          reps = 10,
+          userViewModel = userViewModel)
     }
 
     // Verify core components
@@ -83,7 +81,13 @@ class TrainSoloScreenTest {
   fun trainSoloScreen_stopButtonUpdatesState() {
     composeTestRule.setContent {
       TrainSoloScreen(
-          activity = "Push-ups", isTimeDependent = true, userViewModel = userViewModel, time = 1, sets = 1, reps = 1, workoutViewModel = workoutViewModel)
+          activity = "Push-ups",
+          isTimeDependent = true,
+          userViewModel = userViewModel,
+          time = 1,
+          sets = 1,
+          reps = 1,
+          workoutViewModel = workoutViewModel)
     }
 
     // Click "I stopped" button
@@ -97,7 +101,13 @@ class TrainSoloScreenTest {
   fun trainSoloScreen_counterUpdatesState() {
     composeTestRule.setContent {
       TrainSoloScreen(
-          activity = "Push-ups", isTimeDependent = false, userViewModel = userViewModel, time = 1, sets = 1, reps = 1, workoutViewModel = workoutViewModel)
+          activity = "Push-ups",
+          isTimeDependent = false,
+          userViewModel = userViewModel,
+          time = 1,
+          sets = 1,
+          reps = 1,
+          workoutViewModel = workoutViewModel)
     }
 
     // Verify initial state
