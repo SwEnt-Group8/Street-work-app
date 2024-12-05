@@ -7,7 +7,7 @@ import androidx.test.rule.GrantPermissionRule
 import com.android.streetworkapp.StreetWorkAppMain
 import com.android.streetworkapp.model.preferences.PreferencesRepository
 import com.android.streetworkapp.model.preferences.PreferencesViewModel
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
@@ -22,7 +22,7 @@ class StreetWorkAppMainTest {
       GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
   @Test
-  fun userNotLoggedInLoadAuthScreen() = runBlockingTest {
+  fun userNotLoggedInLoadAuthScreen() = runTest {
     val preferencesRepository = mock(PreferencesRepository::class.java)
     val preferencesViewModel = PreferencesViewModel(preferencesRepository)
 
@@ -40,7 +40,7 @@ class StreetWorkAppMainTest {
   }
 
   @Test
-  fun userLoggedInLoadMapScreen() = runBlockingTest {
+  fun userLoggedInLoadMapScreenNoInternet() = runTest {
     val preferencesRepository = mock(PreferencesRepository::class.java)
     val preferencesViewModel = PreferencesViewModel(preferencesRepository)
 
@@ -52,6 +52,22 @@ class StreetWorkAppMainTest {
     composeTestRule.setContent {
       StreetWorkAppMain(preferencesViewModel, internetAvailable = false)
     }
+
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
+  }
+
+  @Test
+  fun userLoggedInLoadMapScreenWithInternet() = runTest {
+    val preferencesRepository = mock(PreferencesRepository::class.java)
+    val preferencesViewModel = PreferencesViewModel(preferencesRepository)
+
+    `when`(preferencesRepository.getLoginState()).thenReturn(true)
+    `when`(preferencesRepository.getUid()).thenReturn("123")
+    `when`(preferencesRepository.getName()).thenReturn("John")
+    `when`(preferencesRepository.getScore()).thenReturn(120)
+
+    composeTestRule.setContent { StreetWorkAppMain(preferencesViewModel, internetAvailable = true) }
 
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
