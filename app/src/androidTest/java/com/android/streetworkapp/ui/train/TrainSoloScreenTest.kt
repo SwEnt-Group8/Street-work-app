@@ -3,6 +3,8 @@ package com.android.streetworkapp.ui.train
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import com.android.streetworkapp.model.user.UserRepository
+import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.model.workout.WorkoutRepository
 import com.android.streetworkapp.model.workout.WorkoutViewModel
 import org.junit.Before
@@ -14,6 +16,8 @@ class TrainSoloScreenTest {
 
   private lateinit var workoutRepository: WorkoutRepository
   private lateinit var workoutViewModel: WorkoutViewModel
+  private lateinit var userRepository: UserRepository
+  private lateinit var userViewModel: UserViewModel
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -21,13 +25,22 @@ class TrainSoloScreenTest {
   fun setUp() {
     workoutRepository = mock()
     workoutViewModel = WorkoutViewModel(workoutRepository)
+    userRepository = mock()
+    userViewModel = UserViewModel(userRepository)
+
   }
 
   @Test
   fun trainSoloScreen_componentsAreDisplayed_forTimeDependent() {
     composeTestRule.setContent {
       TrainSoloScreen(
-          activity = "Push-ups", isTimeDependent = true, workoutViewModel = workoutViewModel)
+          activity = "Push-ups",
+        isTimeDependent = true,
+        time = 60,
+        sets = 5,
+        reps = 10,
+        userViewModel = userViewModel,
+        workoutViewModel = workoutViewModel)
     }
 
     // Verify core components
@@ -44,7 +57,14 @@ class TrainSoloScreenTest {
   fun trainSoloScreen_componentsAreDisplayed_forNonTimeDependent() {
     composeTestRule.setContent {
       TrainSoloScreen(
-          activity = "Push-ups", isTimeDependent = false, workoutViewModel = workoutViewModel)
+          activity = "Push-ups",
+        isTimeDependent = false,
+        workoutViewModel = workoutViewModel,
+        time = 60,
+        sets = 5,
+        reps = 10,
+        userViewModel = userViewModel
+      )
     }
 
     // Verify core components
@@ -63,7 +83,7 @@ class TrainSoloScreenTest {
   fun trainSoloScreen_stopButtonUpdatesState() {
     composeTestRule.setContent {
       TrainSoloScreen(
-          activity = "Push-ups", isTimeDependent = true, workoutViewModel = workoutViewModel)
+          activity = "Push-ups", isTimeDependent = true, userViewModel = userViewModel, time = 1, sets = 1, reps = 1, workoutViewModel = workoutViewModel)
     }
 
     // Click "I stopped" button
@@ -77,7 +97,7 @@ class TrainSoloScreenTest {
   fun trainSoloScreen_counterUpdatesState() {
     composeTestRule.setContent {
       TrainSoloScreen(
-          activity = "Push-ups", isTimeDependent = false, workoutViewModel = workoutViewModel)
+          activity = "Push-ups", isTimeDependent = false, userViewModel = userViewModel, time = 1, sets = 1, reps = 1, workoutViewModel = workoutViewModel)
     }
 
     // Verify initial state
