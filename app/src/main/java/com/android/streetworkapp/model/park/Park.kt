@@ -14,6 +14,7 @@ import com.android.streetworkapp.model.parklocation.ParkLocation
  * @param occupancy The park occupancy.
  * @param events The list of events in the park.
  * @param votersUIDs The list of UIDs of users who have voted.
+ * @param imagesCollectionId The id of the image collection linked to the park.
  */
 data class Park(
     val pid: String = "",
@@ -25,5 +26,6 @@ data class Park(
     var capacity: Int = 0,
     var occupancy: Int = 0,
     var events: List<String> = emptyList(),
-    var votersUIDs: List<String> = emptyList()
+    var votersUIDs: List<String> = emptyList(),
+    var imagesCollectionId: String = ""
 )

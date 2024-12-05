@@ -17,6 +17,7 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore, testing: Boolea
     private const val INVALID_RATING_MESSAGE = "Rating must be between 1 and 5."
     private const val PID_EMPTY = "Park ID cannot be empty."
     private const val LID_EMPTY = "Location ID cannot be empty."
+
   }
 
   /**
@@ -312,6 +313,24 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore, testing: Boolea
   }
 
   /**
+   * Retrieves or sets up the imageCollection for a park
+   * @param pid The parkId to add the collection to.
+   * @param collectionId The id of the collection the park will be linked to.
+   */
+  suspend fun addImageCollection(pid: String, collectionId: String) {
+    require(pid.isNotEmpty()) { PID_EMPTY }
+    require(collectionId.isNotEmpty()) { "collectionId can't be null" }
+    try {
+      db.collection(COLLECTION_PATH)
+        .document(pid)
+        .update("imagesCollectionId", collectionId)
+        .await()
+    } catch (e: Exception) {
+      Log.e("FirestoreError", "Error adding collectionId to park: ${e.message}")
+    }
+  }
+
+  /**
    * Convert a Firestore document to a park object.
    *
    * @param document The Firestore document.
@@ -365,4 +384,5 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore, testing: Boolea
       null
     }
   }
+
 }

@@ -33,5 +33,7 @@ interface ParkRepository {
 
   suspend fun addRating(pid: String, uid: String, rating: Float)
 
+  suspend fun addImageCollection(pid: String, collectionId: String)
+
   suspend fun deleteParkByPid(pid: String)
 }
