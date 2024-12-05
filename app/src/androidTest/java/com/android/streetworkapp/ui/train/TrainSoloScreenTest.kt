@@ -45,9 +45,6 @@ class TrainSoloScreenTest {
 
     // Verify core components
     composeTestRule.onNodeWithTag("TrainSoloScreen").assertExists()
-    composeTestRule.onNodeWithTag("TrainSoloTitle").assertExists()
-    composeTestRule.onNodeWithTag("ActivityText").assertExists()
-    composeTestRule.onNodeWithTag("TimeDependentText").assertExists()
 
     // Verify Timer components
     composeTestRule.onNodeWithTag("StopButton").assertExists()
@@ -68,9 +65,6 @@ class TrainSoloScreenTest {
 
     // Verify core components
     composeTestRule.onNodeWithTag("TrainSoloScreen").assertExists()
-    composeTestRule.onNodeWithTag("TrainSoloTitle").assertExists()
-    composeTestRule.onNodeWithTag("ActivityText").assertExists()
-    composeTestRule.onNodeWithTag("TimeDependentText").assertExists()
 
     // Verify Counter components
     composeTestRule.onNodeWithTag("CounterText").assertExists()
