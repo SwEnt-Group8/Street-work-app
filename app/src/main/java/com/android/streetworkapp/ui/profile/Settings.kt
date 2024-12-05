@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.sample.R
 import com.android.streetworkapp.model.user.UserViewModel
@@ -28,58 +29,61 @@ fun SettingsContent(
     userViewModel: UserViewModel,
     showParentDialog: MutableState<Boolean>
 ) {
-  Column() {
-    val currentUser = remember { userViewModel.currentUser.value }
-    val showConfirmUserDelete = remember { mutableStateOf(false) }
-    val context = LocalContext.current
 
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-        horizontalAlignment = Alignment.CenterHorizontally) {
+  val currentUser = remember { userViewModel.currentUser.value }
+  val showConfirmUserDelete = remember { mutableStateOf(false) }
+  val context = LocalContext.current
 
-          // Settings content
-          if (currentUser == null) {
-            Text(context.getString(R.string.SettingsNullUserContent))
-          } else {
-            Text(
-                context.getString(R.string.SettingsConnectionContent),
-                modifier = Modifier.padding(bottom = 16.dp))
+  Column(
+      modifier = Modifier.fillMaxWidth().testTag("SettingsContent"),
+      verticalArrangement = Arrangement.spacedBy(4.dp),
+      horizontalAlignment = Alignment.CenterHorizontally) {
 
-            Button(
-                onClick = {
-                  showParentDialog.value = false
-                  Toast.makeText(context, "Not yet implemented", Toast.LENGTH_SHORT).show()
-                },
-                colors = ColorPalette.BUTTON_COLOR) {
-                  Text("Log-out")
-                }
+        // Settings content
+        if (currentUser == null) {
+          Text(
+              text = context.getString(R.string.SettingsNullUserContent),
+              modifier = Modifier.testTag("NullUserSettingsContent"))
+        } else {
+          Text(
+              context.getString(R.string.SettingsConnectionContent, currentUser.username),
+              modifier = Modifier.padding(bottom = 16.dp).testTag("ConnectionSettingsContent"))
 
-            Button(
-                onClick = { showConfirmUserDelete.value = true },
-                colors = ColorPalette.BUTTON_COLOR) {
-                  Text("Delete account")
-                }
-          }
+          Button(
+              onClick = {
+                showParentDialog.value = false
+                Toast.makeText(context, "Not yet implemented", Toast.LENGTH_SHORT).show()
+              },
+              colors = ColorPalette.BUTTON_COLOR,
+              modifier = Modifier.testTag("LogOutButton")) {
+                Text("Log-out")
+              }
+
+          Button(
+              onClick = { showConfirmUserDelete.value = true },
+              colors = ColorPalette.BUTTON_COLOR,
+              modifier = Modifier.testTag("DeleteAccountButton")) {
+                Text("Delete account")
+              }
         }
+      }
 
-    CustomDialog(
-        showConfirmUserDelete,
-        DialogType.CONFIRM,
-        tag = "deleteAccount",
-        title = context.getString(R.string.DeleteAccountConfirmationTitle),
-        Content = { Text(context.getString(R.string.DeleteAccountConfirmationContent)) },
-        onSubmit = {
-          // Friends - remove user from friends list of all friends.
-          // Parks - remove user ratings for parks.
-          // Parks - remove user in participants of each event.
-          // Progression - delete user progression
-          // userViewModel.deleteUser(currentUser)
+  CustomDialog(
+      showConfirmUserDelete,
+      DialogType.CONFIRM,
+      tag = "deleteAccount",
+      title = context.getString(R.string.DeleteAccountConfirmationTitle),
+      Content = { Text(context.getString(R.string.DeleteAccountConfirmationContent)) },
+      onSubmit = {
+        // Friends - remove user from friends list of all friends.
+        // Parks - remove user ratings for parks.
+        // Parks - remove user in participants of each event.
+        // Progression - delete user progression
+        // userViewModel.deleteUser(currentUser)
 
-          Toast.makeText(context, "Not yet implemented", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "Not yet implemented", Toast.LENGTH_SHORT).show()
 
-          showParentDialog.value = false
-          // navigationActions.navigateTo(Screen.AUTH)
-        })
-  }
+        showParentDialog.value = false
+        // navigationActions.navigateTo(Screen.AUTH)
+      })
 }
