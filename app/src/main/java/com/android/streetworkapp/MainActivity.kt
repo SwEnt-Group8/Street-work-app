@@ -150,19 +150,15 @@ fun StreetWorkAppMain(
   var resolvedPreferencesParameters by remember { mutableStateOf<Boolean>(false) }
 
   // Determine start destination and be sure preferences parameters are correctly loaded
-  if (loginState == false) {
-    resolvedPreferencesParameters = true
-    resolvedStartDestination = Route.AUTH
-  } else {
-    if (internetAvailable && !uid.isNullOrEmpty()) {
-      // User is logged in and has internet connection
-      resolvedPreferencesParameters = true
-      resolvedStartDestination = Route.MAP
-    } else if (!internetAvailable && !uid.isNullOrEmpty() && name != null && score != null) {
-      // User is logged in but has no internet connection
+  if (loginState == true) {
+    if ((internetAvailable && !uid.isNullOrEmpty()) ||
+        (!internetAvailable && !uid.isNullOrEmpty() && name != null && score != null)) {
       resolvedPreferencesParameters = true
       resolvedStartDestination = Route.MAP
     }
+  } else if (loginState == false) {
+    resolvedPreferencesParameters = true
+    resolvedStartDestination = Route.AUTH
   }
 
   // Display splash screen while determining start destination and preferences
