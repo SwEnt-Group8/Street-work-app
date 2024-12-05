@@ -1,10 +1,10 @@
 package com.android.streetworkapp.ui.train
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,6 +30,7 @@ import com.android.streetworkapp.model.workout.SessionType
 import com.android.streetworkapp.model.workout.WorkoutViewModel
 import com.android.streetworkapp.ui.theme.ColorPalette.BORDER_COLOR
 import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_DARK
+import com.android.streetworkapp.ui.theme.ColorPalette.PRIMARY_TEXT_COLOR
 import com.android.streetworkapp.ui.theme.ColorPalette.PRINCIPLE_BACKGROUND_COLOR
 import com.android.streetworkapp.utils.Graph
 import com.android.streetworkapp.utils.GraphConfiguration
@@ -54,16 +55,38 @@ fun TrainSoloScreen(
   var isResetEnabled by remember { mutableStateOf(false) }
 
   val graphData =
-      workoutData?.workoutSessions?.mapIndexed { index, session ->
-        val duration = session.exercises.find { it.name == activity }?.duration?.toFloat() ?: 0f
-        GraphData(x = index.toFloat(), y = duration)
-      } ?: emptyList()
+      workoutData
+          ?.workoutSessions
+          ?.filter { session -> session.exercises.any { it.name == activity } }
+          ?.mapIndexed { index, session ->
+            val sessionReps =
+                if (!isTimeDependent) {
+                  session.exercises.find { it.name == activity }?.sets?.times(reps ?: 0) ?: 0
+                } else {
+                  session.exercises.find { it.name == activity }?.duration?.toFloat() ?: 0f
+                }
+            Log.d("DEBUGSWENT", "Session $index: Reps=$sessionReps")
+            GraphData(x = index.toFloat(), y = sessionReps.toFloat())
+          } ?: emptyList()
 
   Column(
       modifier =
           Modifier.fillMaxSize().padding(paddingValues).padding(16.dp).testTag("TrainSoloScreen"),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.SpaceBetween) {
+        Text(
+            text = "Train Solo",
+            modifier = Modifier.testTag("TrainSoloTitle"),
+            style = androidx.compose.material3.MaterialTheme.typography.headlineMedium)
+        Text(
+            text = "Activity: $activity",
+            modifier = Modifier.testTag("ActivityText"),
+            style = androidx.compose.material3.MaterialTheme.typography.bodyMedium)
+        Text(
+            text = "Time Dependent: $isTimeDependent",
+            modifier = Modifier.testTag("TimeDependentText"),
+            style = androidx.compose.material3.MaterialTheme.typography.bodyMedium)
+
         if (isTimeDependent) {
           if (!isStopped) {
             CircularTimer(
@@ -76,14 +99,14 @@ fun TrainSoloScreen(
                 },
                 onTimeUpdate = { elapsedTime -> durationAchieved = elapsedTime.toInt() })
           } else {
-            Text("Nice Work!", modifier = Modifier.testTag("TimeUp"))
+            Text("Nice Work!", modifier = Modifier.testTag("TimeUpText"))
           }
 
           if (!isResetEnabled) {
             Button(
                 onClick = {
                   isStopped = true
-                  isResetEnabled = true // Switch to "Reset" button
+                  isResetEnabled = true
                   addExerciseToWorkout(
                       currentUser?.uid, workoutViewModel, activity, durationAchieved, count, count)
                 },
@@ -94,9 +117,8 @@ fun TrainSoloScreen(
           } else {
             Button(
                 onClick = {
-                  // Reset timer and state
                   isStopped = false
-                  isResetEnabled = false // Switch back to "Stop" button
+                  isResetEnabled = false
                   durationAchieved = 0
                   count = 0
                 },
@@ -106,52 +128,32 @@ fun TrainSoloScreen(
                 }
           }
         } else {
-          // Counter logic
+          Text(
+              text =
+                  "The counter represents the number of sets completed. Each time you finish your target reps, increment the counter until you've completed your objective.",
+              style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
+              modifier =
+                  Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                      .testTag("CounterExplanation"),
+              color = PRIMARY_TEXT_COLOR)
           AnimatedCounter(
               count = count,
               style = androidx.compose.material3.MaterialTheme.typography.displayLarge,
               modifier = Modifier.testTag("CounterText"))
-
-          Row(
-              horizontalArrangement = Arrangement.spacedBy(16.dp),
-              verticalAlignment = Alignment.CenterVertically) {
-                Button(
-                    onClick = { if (count > 0) count-- },
-                    colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
-                    modifier = Modifier.testTag("DecrementButton")) {
-                      Text("-1", color = PRINCIPLE_BACKGROUND_COLOR)
-                    }
-
-                Button(
-                    onClick = { count++ },
-                    colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
-                    modifier = Modifier.testTag("IncrementButton")) {
-                      Text("+1", color = PRINCIPLE_BACKGROUND_COLOR)
-                    }
-              }
-
-          Button(
-              onClick = {
-                addExerciseToWorkout(
-                    currentUser?.uid, workoutViewModel, activity, durationAchieved, count, count)
-              },
-              colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
-              modifier = Modifier.testTag("AddExerciseButton")) {
-                Text("Add Exercise", color = PRINCIPLE_BACKGROUND_COLOR)
-              }
         }
+
         HorizontalDivider(
             modifier = Modifier.padding(vertical = 16.dp).testTag("Divider"),
             thickness = 1.dp,
             color = BORDER_COLOR)
-        // Performance History Graph
+
         if (graphData.isNotEmpty()) {
           Text("Performance History")
           Box(modifier = Modifier.fillMaxWidth().height(200.dp)) {
             Graph(
                 graphConfiguration =
                     GraphConfiguration(
-                        xUnitLabel = "Session", yUnitLabel = "Duration", dataPoints = graphData))
+                        xUnitLabel = "Session", yUnitLabel = "Total reps", dataPoints = graphData))
           }
         } else {
           Text("No performance history available.")

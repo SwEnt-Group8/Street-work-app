@@ -1,5 +1,6 @@
 package com.android.streetworkapp.ui.train
 
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -77,52 +78,23 @@ class TrainSoloScreenTest {
     composeTestRule.onNodeWithTag("IncrementButton").assertExists()
   }
 
-  @Test
-  fun trainSoloScreen_stopButtonUpdatesState() {
-    composeTestRule.setContent {
-      TrainSoloScreen(
-          activity = "Push-ups",
-          isTimeDependent = true,
-          userViewModel = userViewModel,
-          time = 1,
-          sets = 1,
-          reps = 1,
-          workoutViewModel = workoutViewModel)
+    @Test
+    fun trainSoloScreen_stopButtonUpdatesState() {
+        composeTestRule.setContent {
+            TrainSoloScreen(
+                activity = "Push-ups",
+                isTimeDependent = true,
+                userViewModel = userViewModel,
+                time = 1,
+                sets = 1,
+                reps = 1,
+                workoutViewModel = workoutViewModel
+            )
+        }
+
+        composeTestRule.onNodeWithTag("StopButton").assertExists().performClick()
+
+        composeTestRule.onNodeWithTag("TimeUpText").assertExists().assertIsDisplayed()
     }
-
-    // Click "I stopped" button
-    composeTestRule.onNodeWithTag("StopButton").performClick()
-
-    // Verify updated state
-    composeTestRule.onNodeWithTag("TimeUpText").assertExists()
-  }
-
-  @Test
-  fun trainSoloScreen_counterUpdatesState() {
-    composeTestRule.setContent {
-      TrainSoloScreen(
-          activity = "Push-ups",
-          isTimeDependent = false,
-          userViewModel = userViewModel,
-          time = 1,
-          sets = 1,
-          reps = 1,
-          workoutViewModel = workoutViewModel)
-    }
-
-    // Verify initial state
-    composeTestRule.onNodeWithTag("CounterText").assertExists()
-
-    // Increment counter
-    composeTestRule.onNodeWithTag("IncrementButton").performClick()
-
-    // Verify counter updated
-    composeTestRule.onNodeWithTag("CounterText").assertExists()
-
-    // Decrement counter
-    composeTestRule.onNodeWithTag("DecrementButton").performClick()
-
-    // Verify counter updated
-    composeTestRule.onNodeWithTag("CounterText").assertExists()
-  }
 }
+
