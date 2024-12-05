@@ -1,6 +1,5 @@
 package com.android.streetworkapp.ui.train
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -74,7 +73,6 @@ fun TrainSoloScreen(
           Modifier.fillMaxSize().padding(paddingValues).padding(16.dp).testTag("TrainSoloScreen"),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.SpaceBetween) {
-
         if (isTimeDependent) {
           if (!isStopped) {
             CircularTimer(
@@ -116,20 +114,18 @@ fun TrainSoloScreen(
                 }
           }
         } else {
-            Text(
-                text =
-                "The counter represents the number of sets completed. Each time you finish your target reps, increment the counter until you've completed your objective.",
-                style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
-                modifier =
-                Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                    .testTag("CounterExplanation"),
-                color = PRIMARY_TEXT_COLOR
-            )
-            AnimatedCounter(
-                count = count,
-                style = androidx.compose.material3.MaterialTheme.typography.displayLarge,
-                modifier = Modifier.testTag("CounterText")
-            )
+          Text(
+              text =
+                  "The counter represents the number of sets completed. Each time you finish your target reps, increment the counter until you've completed your objective.",
+              style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
+              modifier =
+                  Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                      .testTag("CounterExplanation"),
+              color = PRIMARY_TEXT_COLOR)
+          AnimatedCounter(
+              count = count,
+              style = androidx.compose.material3.MaterialTheme.typography.displayLarge,
+              modifier = Modifier.testTag("CounterText"))
 
           Row(
               horizontalArrangement = Arrangement.spacedBy(16.dp),

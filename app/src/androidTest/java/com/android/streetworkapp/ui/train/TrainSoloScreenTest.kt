@@ -93,4 +93,24 @@ class TrainSoloScreenTest {
 
     composeTestRule.onNodeWithTag("TimeUpText").assertExists().assertIsDisplayed()
   }
+
+  @Test
+  fun testIsDisplayedButtonsAndAnimatedCounter() {
+    // Initialize Compose test rule and set content
+    composeTestRule.setContent {
+      TrainSoloScreen(
+          activity = "Push-ups",
+          isTimeDependent = false,
+          time = null,
+          sets = 5,
+          reps = 10,
+          workoutViewModel = workoutViewModel,
+          userViewModel = userViewModel)
+    }
+
+    // Verify initial state of the counter
+    composeTestRule.onNodeWithTag("CounterText").assertExists()
+    composeTestRule.onNodeWithTag("IncrementButton").assertExists()
+    composeTestRule.onNodeWithTag("DecrementButton").assertExists()
+  }
 }
