@@ -1,5 +1,6 @@
 package com.android.streetworkapp.ui.profile
 
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.border
@@ -12,16 +13,22 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,6 +50,10 @@ import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.theme.ColorPalette
+import com.android.streetworkapp.ui.utils.CustomDialog
+import com.android.streetworkapp.ui.utils.DialogType
+
+const val PROFILE_LOG_TAG = "Profile"
 
 @Composable
 fun ProfileScreen(
@@ -88,12 +99,12 @@ fun ProfileScreen(
                 // Add Friend Button
                 Button(
                     onClick = { navigationActions.navigateTo(Screen.ADD_FRIEND) },
-                    modifier = Modifier.padding(horizontal = 8.dp).testTag("profileAddButton"),
+                    modifier = Modifier.padding(horizontal = 4.dp).testTag("profileAddButton"),
                     colors = ColorPalette.BUTTON_COLOR) {
                       Text(text = "Add friend", color = Color.White)
                     }
               }
-          DisplayFriendList(friendList)
+          DisplayFriendList(friendList, userViewModel)
           Log.d("SignInScreen", "friendList : ${friendList}")
         }
   }
@@ -146,16 +157,17 @@ fun DisplayScore(user: User?) {
  * This function displays the friends list.
  *
  * @param friends - The list of friends to display.
+ * @param userViewModel - The view model for the user.
  */
 @Composable
-fun DisplayFriendList(friends: List<User?>) {
+fun DisplayFriendList(friends: List<User?>, userViewModel: UserViewModel) {
   val NO_FRIENDS_MESSAGE = "You have no friends yet :("
 
   return if (friends.isNotEmpty()) {
     LazyColumn(modifier = Modifier.fillMaxSize().testTag("friendList")) {
       items(friends) { friend ->
         if (friend != null) {
-          DisplayFriendItem(friend)
+          DisplayFriendItem(friend, userViewModel)
           HorizontalDivider(thickness = 1.dp, color = Color.Gray)
         }
       }
@@ -169,14 +181,16 @@ fun DisplayFriendList(friends: List<User?>) {
 }
 
 /**
- * This function displays a friend (for the friend list).
+ * This function displays a friend (of the friend list) and actions about them through a dropdown
+ * menu.
  *
  * @param friend - The friend to display.
+ * @param userViewModel - The view model for the user / the friend.
  */
 @Composable
-fun DisplayFriendItem(friend: User) {
+fun DisplayFriendItem(friend: User, userViewModel: UserViewModel) {
   val context = LocalContext.current
-
+  val showMenu = remember { mutableStateOf(false) }
   val DEFAULT_USER_STATUS = "Definitely not a bot"
 
   Row(
@@ -204,16 +218,20 @@ fun DisplayFriendItem(friend: User) {
               modifier = Modifier.testTag("friendStatus"))
         }
 
-        // Three-dot menu icon (Overflow menu)
-        IconButton(
-            modifier = Modifier.testTag("friendSettingButton"),
-            onClick = {
-              Toast.makeText(context, "Not implemented yet", Toast.LENGTH_SHORT).show()
-            }) {
-              Icon(
-                  painter = painterResource(id = R.drawable.more_vertical),
-                  contentDescription = "More options")
-            }
+        Box(modifier = Modifier.wrapContentSize(Alignment.TopEnd)) {
+          // Three-dot menu icon (Overflow menu)
+          IconButton(
+              modifier = Modifier.testTag("friendSettingButton"),
+              onClick = { showMenu.value = true }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.more_vertical),
+                    contentDescription = "More options",
+                    modifier = Modifier.size(24.dp))
+              }
+
+          // DropDownMenu
+          FriendMenu(showMenu, friend, userViewModel, context)
+        }
       }
 }
 
@@ -259,4 +277,89 @@ fun DisplayUserPicture(user: User?, size: Dp, testTag: String) {
                 .border(2.dp, Color.LightGray, CircleShape)
                 .testTag(testTag))
   }
+}
+
+/**
+ * This function displays the friend menu, which contains actions to perform on a friend.
+ *
+ * @param showMenu - The state of the menu (expanded or not).
+ * @param friend - The friend to perform actions on.
+ * @param userViewModel - The view model for the user / the friend.
+ * @param context - The context of the application.
+ */
+@Composable
+fun FriendMenu(
+    showMenu: MutableState<Boolean>,
+    friend: User,
+    userViewModel: UserViewModel,
+    context: Context
+) {
+  DropdownMenu(
+      expanded = showMenu.value,
+      onDismissRequest = { showMenu.value = false },
+      modifier = Modifier.testTag("friendMenu")) {
+        val showConfirmDialog = remember { mutableStateOf(false) }
+        var onConfirm = {}
+        var onDismiss = {}
+
+        CustomDialog(
+            showDialog = showConfirmDialog,
+            dialogType = DialogType.CONFIRM,
+            tag = "RemoveFriend",
+            title = context.getString(R.string.RemoveFriendTitle),
+            verbose = false,
+            onSubmit = { onConfirm() },
+            onDismiss = { onDismiss() },
+            Content = ({ Text(context.getString(R.string.RemoveFriendContent, friend.username)) }))
+
+        DropdownMenuItem(
+            modifier = Modifier.testTag("RemoveFriendMenuItem"),
+            onClick = {
+              val friendUID = friend.uid
+              val friendName = friend.username
+
+              val currentUID = userViewModel.currentUser.value?.uid
+
+              if (currentUID != null) {
+                // Set up the confirm function for the dialog
+                Log.d(PROFILE_LOG_TAG, "Setting up callback (confirm) for removing friend")
+                onConfirm = {
+                  Log.d(PROFILE_LOG_TAG, "Removed friend $friendName")
+                  userViewModel.removeFriend(currentUID, friendUID)
+                  Toast.makeText(
+                          context,
+                          context.getString(R.string.RemoveFriendSuccess, friendName),
+                          Toast.LENGTH_SHORT)
+                      .show()
+                  showMenu.value = false
+                  userViewModel.getFriendsByUid(currentUID) // Refresh friend list
+                }
+
+                onDismiss = { showMenu.value = false }
+
+                showConfirmDialog.value = true
+              } else {
+                Log.d(PROFILE_LOG_TAG, "Cannot remove friend - Current user is null")
+                Toast.makeText(
+                        context,
+                        context.getString(R.string.RemoveFriendFailure),
+                        Toast.LENGTH_SHORT)
+                    .show()
+              }
+            },
+            text = {
+              // Display content here
+              Row() {
+                Icon(
+                    painter = painterResource(id = R.drawable.person_remove),
+                    contentDescription = "Remove friend",
+                    modifier = Modifier.size(24.dp),
+                    tint = Color.Red)
+                Text(
+                    context.getString(R.string.RemoveFriendAction),
+                    modifier = Modifier.padding(start = 4.dp),
+                    color = Color.Red)
+              }
+            })
+      }
 }
