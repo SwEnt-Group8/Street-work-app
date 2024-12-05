@@ -53,7 +53,7 @@ class LocationService(private val context: Context, private val userViewModel: U
     fun rewardParkDiscovery(userLocation: LatLng, parksLocation: List<ParkLocation>) {
 
         val results = FloatArray(1)
-
+        Log.d("Localisation", "check all park distance")
         for (park in parksLocation) {
             // Calculate the distance between userLocation and park location
             Location.distanceBetween(
@@ -64,11 +64,13 @@ class LocationService(private val context: Context, private val userViewModel: U
 
             val distance = results[0]
             if (distance < insidePark) {
+                Log.d("Localisation", "found close park")
                 userViewModel.currentUser.value?.let {
                     //add new park in user list
                     userViewModel.getParksByUid(it.uid)
                     val currentParks = userViewModel.parks.value
                     if(!currentParks.contains(park.id)){
+                        Log.d("Localisation", "park is new")
                         userViewModel.addNewPark(
                             it.uid,
                             park.id
