@@ -150,13 +150,13 @@ fun StreetWorkAppMain(
   var resolvedPreferencesParameters by remember { mutableStateOf<Boolean>(false) }
 
   // Determine start destination and be sure preferences parameters are correctly loaded
-  if (loginState == true) {
-    if ((internetAvailable && !uid.isNullOrEmpty()) ||
-        (!internetAvailable && !uid.isNullOrEmpty() && name != null && score != null)) {
-      resolvedPreferencesParameters = true
-      resolvedStartDestination = Route.MAP
-    }
-  } else if (loginState == false) {
+  if (loginState == true &&
+      ((internetAvailable && !uid.isNullOrEmpty()) ||
+          (!internetAvailable && !uid.isNullOrEmpty() && name != null && score != null))) {
+    resolvedPreferencesParameters = true
+    resolvedStartDestination = Route.MAP
+  }
+  if (loginState == false) {
     resolvedPreferencesParameters = true
     resolvedStartDestination = Route.AUTH
   }
