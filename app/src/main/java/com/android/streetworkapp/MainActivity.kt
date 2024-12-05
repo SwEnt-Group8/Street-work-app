@@ -254,23 +254,6 @@ fun StreetWorkApp(
       InfoDialogManager(
           showInfoDialog, currentScreenName, topAppBarManager = screenParams?.topAppBarManager)
 
-  // Park with no events
-  val sampleEvent =
-      Event(
-          eid = "event123",
-          title = "Community Park Cleanup",
-          // description = "Join us for a day of community service to clean up the local park!",
-          description =
-              "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eget leo vitae enim facilisis fringilla. Morbi feugiat scelerisque nisl, vel vehicula sem malesuada et. Proin id arcu eget nisi congue facilisis. Integer feugiat, ex eu vestibulum sagittis, erat felis scelerisque dui, id varius turpis magna in nisi. Suspendisse potenti. Pellentesque quis posuere elit. Vivamus tincidunt dui vel risus dignissim, sit amet dignissim velit cursus. Nam sodales nulla non semper pharetra. Aliquam erat volutpat. Morbi pharetra odio id facilisis pulvinar. Mauris aliquet ipsum eu dolor ultrices, id sodales sapien dictum. Nam facilisis vestibulum viverra.\n" +
-                  "\n" +
-                  "Sed elementum risus in tempor accumsan. Integer egestas, eros at venenatis ultricies, quam nunc dictum urna, a aliquam odio erat at lacus. In lacinia mauris sit amet orci accumsan, in bibendum arcu condimentum. In ut lacus et ipsum tincidunt condimentum. Fusce non magna ut urna vestibulum gravida at ut felis. Nullam auctor dapibus sem, ut rhoncus turpis gravida non. Pellentesque elementum erat a libero luctus feugiat. Aenean tincidunt fermentum nisl, in rhoncus ex iaculis nec. Vestibulum gravida, est vel scelerisque varius, magna erat pharetra risus, a sollicitudin libero orci nec lectus. Fusce lobortis magna in arcu vehicula, sit amet fermentum leo interdum",
-          participants = 15,
-          maxParticipants = 50,
-          date = Timestamp(Date()), // Current date and time
-          owner = "ownerUserId",
-          listParticipants = listOf("user1", "user2", "user3"),
-          parkId = "park567")
-
   Scaffold(
       containerColor = ColorPalette.PRINCIPLE_BACKGROUND_COLOR,
       topBar = {
