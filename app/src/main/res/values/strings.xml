@@ -13,8 +13,19 @@
     <string name="RemoveFriendTitle">Are you sure ?</string>
     <string name="RemoveFriendContent">Do you really want to remove %1$s from your friends ?</string>
 
-    // Helping dialogs(INFO)
 
+
+    // Dialogs
+    <string name="DialogCancelButtonTitle">Cancel</string>
+    <string name="DialogCancelButtonResponse">Canceled</string>
+
+    <string name="DialogConfirmButtonTitle">Confirm</string>
+    <string name="DialogConfirmButtonResponse">Confirmed</string>
+
+    <string name="DialogSubmitButtonTitle">Submit</string>
+    <string name="DialogSubmitButtonResponse">Submit</string>
+
+    // Helping dialogs(INFO)
     // Default Info
     <string name="DefaultInfoTitle">Screen not supported yet</string>
     <string name="DefaultInfoContent">Information about this screen is not available. Please explore to learn more!</string>

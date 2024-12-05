@@ -1,5 +1,6 @@
 package com.android.streetworkapp.ui.utils
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
@@ -11,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.window.DialogProperties
+import com.android.sample.R
 import com.android.streetworkapp.ui.theme.ColorPalette
 
 /**
@@ -80,19 +82,19 @@ enum class ButtonType {
   CANCEL,
   CONFIRM;
 
-  fun response(): String {
+  fun response(context: Context): String {
     return when (this) {
-      SUBMIT -> "Submitted"
-      CANCEL -> "Dismissed"
-      CONFIRM -> "Confirmed"
+      SUBMIT -> context.getString(R.string.DialogSubmitButtonResponse)
+      CANCEL -> context.getString(R.string.DialogCancelButtonResponse)
+      CONFIRM -> context.getString(R.string.DialogConfirmButtonResponse)
     }
   }
 
-  fun tag(): String {
+  fun tag(context: Context): String {
     return when (this) {
-      SUBMIT -> "Submit"
-      CANCEL -> "Cancel"
-      CONFIRM -> "Confirm"
+      SUBMIT -> context.getString(R.string.DialogSubmitButtonTitle)
+      CANCEL -> context.getString(R.string.DialogCancelButtonTitle)
+      CONFIRM -> context.getString(R.string.DialogConfirmButtonTitle)
     }
   }
 
@@ -126,11 +128,12 @@ fun DialogButton(
   TextButton(
       onClick = {
         onSubmit()
-        if (verbose) Toast.makeText(context, ButtonType.response(), Toast.LENGTH_SHORT).show()
+        if (verbose)
+            Toast.makeText(context, ButtonType.response(context), Toast.LENGTH_SHORT).show()
         showDialog.value = false
       },
-      modifier = Modifier.testTag("${tag}Dialog${ButtonType.tag()}Button")) {
-        Text(ButtonType.tag(), color = ButtonType.color())
+      modifier = Modifier.testTag("${tag}Dialog${ButtonType.tag(context)}Button")) {
+        Text(ButtonType.tag(context), color = ButtonType.color())
       }
 }
 
