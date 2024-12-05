@@ -15,6 +15,8 @@ import com.android.streetworkapp.model.parklocation.OverpassParkLocationReposito
 import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.model.parklocation.ParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
+import com.android.streetworkapp.model.user.UserRepository
+import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.ui.navigation.Screen
@@ -32,6 +34,8 @@ class MapUiTest {
   private lateinit var parkLocationViewModel: ParkLocationViewModel
   private lateinit var parkRepository: ParkRepository
   private lateinit var parkViewModel: ParkViewModel
+  private lateinit var userRepository: UserRepository
+  private lateinit var userViewModel: UserViewModel
   private lateinit var navigationActions: NavigationActions
 
   private var testPark =
@@ -55,6 +59,8 @@ class MapUiTest {
     parkLocationViewModel = ParkLocationViewModel(parkLocationRepository)
     parkRepository = mock(ParkRepository::class.java)
     parkViewModel = ParkViewModel(parkRepository)
+    userRepository = mock(UserRepository::class.java)
+    userViewModel = UserViewModel(userRepository)
     navigationActions = mock(NavigationActions::class.java)
   }
 
@@ -63,7 +69,7 @@ class MapUiTest {
     `when`(navigationActions.currentRoute()).thenReturn(Screen.MAP)
 
     composeTestRule.setContent {
-      MapScreen(parkLocationViewModel, parkViewModel, navigationActions, mutableStateOf(""))
+      MapScreen(parkLocationViewModel, parkViewModel,userViewModel, navigationActions, mutableStateOf(""))
     }
 
     composeTestRule.waitForIdle()
