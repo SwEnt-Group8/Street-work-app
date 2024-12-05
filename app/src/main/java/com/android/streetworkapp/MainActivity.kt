@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
@@ -131,14 +130,11 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
       textModerationViewModel)
 }
 
-fun NavGraphBuilder.trainComposable(
-    route: String,
-    workoutViewModel: WorkoutViewModel,
-    innerPadding: PaddingValues,
-    content:
-        @Composable
-        (activity: String, isTimeDependent: Boolean, time: Int?, sets: Int?, reps: Int?) -> Unit
-) {
+typealias TrainComposableParams =
+    @Composable
+    (activity: String, isTimeDependent: Boolean, time: Int?, sets: Int?, reps: Int?) -> Unit
+
+fun NavGraphBuilder.trainComposable(route: String, content: TrainComposableParams) {
   composable(
       route = route,
       arguments =
@@ -358,48 +354,42 @@ fun StreetWorkApp(
                 }
                 trainComposable(
                     route = Screen.TRAIN_SOLO,
-                    workoutViewModel = workoutViewModel,
-                    innerPadding = innerPadding,
                     content = { activity, isTimeDependent, time, sets, reps ->
                       TrainSoloScreen(
-                          activity,
-                          isTimeDependent,
-                          time,
-                          sets,
-                          reps,
-                          workoutViewModel,
-                          userViewModel,
-                          innerPadding)
+                          activity = activity,
+                          isTimeDependent = isTimeDependent,
+                          time = time,
+                          sets = sets,
+                          reps = reps,
+                          workoutViewModel = workoutViewModel,
+                          userViewModel = userViewModel,
+                          paddingValues = innerPadding)
                     })
 
                 trainComposable(
                     route = Screen.TRAIN_COACH,
-                    workoutViewModel = workoutViewModel,
-                    innerPadding = innerPadding,
                     content = { activity, isTimeDependent, time, sets, reps ->
                       TrainCoachScreen(
-                          activity,
-                          isTimeDependent,
-                          time,
-                          sets,
-                          reps,
-                          workoutViewModel,
-                          innerPadding)
+                          activity = activity,
+                          isTimeDependent = isTimeDependent,
+                          time = time,
+                          sets = sets,
+                          reps = reps,
+                          workoutViewModel = workoutViewModel,
+                          paddingValues = innerPadding)
                     })
 
                 trainComposable(
                     route = Screen.TRAIN_CHALLENGE,
-                    workoutViewModel = workoutViewModel,
-                    innerPadding = innerPadding,
                     content = { activity, isTimeDependent, time, sets, reps ->
                       TrainChallengeScreen(
-                          activity,
-                          isTimeDependent,
-                          time,
-                          sets,
-                          reps,
-                          workoutViewModel,
-                          innerPadding)
+                          activity = activity,
+                          isTimeDependent = isTimeDependent,
+                          time = time,
+                          sets = sets,
+                          reps = reps,
+                          workoutViewModel = workoutViewModel,
+                          paddingValues = innerPadding)
                     })
                 composable(
                     route = "TrainParam/{activity}/{isTimeDependent}/{type}",
