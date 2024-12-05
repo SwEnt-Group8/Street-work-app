@@ -116,20 +116,6 @@ fun TrainParamHeader(
 }
 
 @Composable
-fun TimerInputSection(
-    minutes: Int,
-    seconds: Int,
-    onUpdateMinutes: (Int) -> Unit,
-    onUpdateSeconds: (Int) -> Unit
-) {
-  TimerInputGrid(
-      minutes = minutes,
-      seconds = seconds,
-      onUpdateMinutes = onUpdateMinutes,
-      onUpdateSeconds = onUpdateSeconds)
-}
-
-@Composable
 fun SetsAndRepsSection(
     sets: Int,
     reps: Int,
