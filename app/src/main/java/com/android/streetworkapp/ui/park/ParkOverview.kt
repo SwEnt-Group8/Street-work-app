@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Star
@@ -45,6 +44,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
@@ -107,7 +107,16 @@ fun ParkOverviewScreen(
       // TODO: Fetch image from Firestore storage
       Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         ParkDetails(park = currentPark.value, showRatingDialog, currentUser)
-        CreateEventButton(navigationActions)
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
+            horizontalArrangement = Arrangement.End) {
+              Button(
+                  onClick = { navigationActions.navigateTo(Screen.ADD_EVENT) },
+                  modifier = Modifier.testTag("createEventButton"),
+                  colors = ColorPalette.BUTTON_COLOR) {
+                    Text("Add an event", textAlign = TextAlign.Center)
+                  }
+            }
       }
 
       val starRating = remember { mutableIntStateOf(3) } // Stores the "live" rating value
@@ -400,27 +409,13 @@ fun EventItem(event: Event, eventViewModel: EventViewModel, navigationActions: N
   HorizontalDivider()
 }
 
-@Composable
-fun CreateEventButton(navigationActions: NavigationActions) {
-  Row(
-      modifier = Modifier.fillMaxWidth().padding(end = 32.dp),
-      horizontalArrangement = Arrangement.End) {
-        IconButton(
-            onClick = { navigationActions.navigateTo(Screen.ADD_EVENT) },
-            modifier = Modifier.testTag("createEventButton").size(50.dp)) {
-              Box(
-                  modifier =
-                      Modifier.fillMaxSize()
-                          .background(
-                              color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape)
-                          .padding(4.dp)) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.calendar_add_on),
-                        contentDescription = "Create Event",
-                        tint = Color.White,
-                        modifier =
-                            Modifier.align(Alignment.Center).size(30.dp).padding(start = 2.dp))
-                  }
-            }
-      }
-}
+/**
+ * @Composable fun CreateEventButton(navigationActions: NavigationActions) { Row( modifier =
+ *   Modifier.fillMaxWidth().padding(end = 32.dp), horizontalArrangement = Arrangement.End) {
+ *   IconButton( onClick = { navigationActions.navigateTo(Screen.ADD_EVENT) }, modifier =
+ *   Modifier.testTag("createEventButton").size(50.dp)) { Box( modifier = Modifier.fillMaxSize()
+ *   .background( color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape) .padding(4.dp))
+ *   { Icon( painter = painterResource(id = R.drawable.calendar_add_on), contentDescription =
+ *   "Create Event", tint = Color.White, modifier =
+ *   Modifier.align(Alignment.Center).size(30.dp).padding(start = 2.dp)) } } } }
+ */
