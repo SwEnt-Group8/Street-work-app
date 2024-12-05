@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -65,7 +66,6 @@ fun TrainSoloScreen(
                 } else {
                   session.exercises.find { it.name == activity }?.duration?.toFloat() ?: 0f
                 }
-            Log.d("DEBUGSWENT", "Session $index: Reps=$sessionReps")
             GraphData(x = index.toFloat(), y = sessionReps.toFloat())
           } ?: emptyList()
 
@@ -74,18 +74,6 @@ fun TrainSoloScreen(
           Modifier.fillMaxSize().padding(paddingValues).padding(16.dp).testTag("TrainSoloScreen"),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.SpaceBetween) {
-        Text(
-            text = "Train Solo",
-            modifier = Modifier.testTag("TrainSoloTitle"),
-            style = androidx.compose.material3.MaterialTheme.typography.headlineMedium)
-        Text(
-            text = "Activity: $activity",
-            modifier = Modifier.testTag("ActivityText"),
-            style = androidx.compose.material3.MaterialTheme.typography.bodyMedium)
-        Text(
-            text = "Time Dependent: $isTimeDependent",
-            modifier = Modifier.testTag("TimeDependentText"),
-            style = androidx.compose.material3.MaterialTheme.typography.bodyMedium)
 
         if (isTimeDependent) {
           if (!isStopped) {
@@ -128,20 +116,49 @@ fun TrainSoloScreen(
                 }
           }
         } else {
-          Text(
-              text =
-                  "The counter represents the number of sets completed. Each time you finish your target reps, increment the counter until you've completed your objective.",
-              style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
-              modifier =
-                  Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                      .testTag("CounterExplanation"),
-              color = PRIMARY_TEXT_COLOR)
-          AnimatedCounter(
-              count = count,
-              style = androidx.compose.material3.MaterialTheme.typography.displayLarge,
-              modifier = Modifier.testTag("CounterText"))
-        }
+            Text(
+                text =
+                "The counter represents the number of sets completed. Each time you finish your target reps, increment the counter until you've completed your objective.",
+                style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
+                modifier =
+                Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                    .testTag("CounterExplanation"),
+                color = PRIMARY_TEXT_COLOR
+            )
+            AnimatedCounter(
+                count = count,
+                style = androidx.compose.material3.MaterialTheme.typography.displayLarge,
+                modifier = Modifier.testTag("CounterText")
+            )
 
+          Row(
+              horizontalArrangement = Arrangement.spacedBy(16.dp),
+              verticalAlignment = Alignment.CenterVertically) {
+                Button(
+                    onClick = { if (count > 0) count-- },
+                    colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
+                    modifier = Modifier.testTag("DecrementButton")) {
+                      Text("-1", color = PRINCIPLE_BACKGROUND_COLOR)
+                    }
+
+                Button(
+                    onClick = { count++ },
+                    colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
+                    modifier = Modifier.testTag("IncrementButton")) {
+                      Text("+1", color = PRINCIPLE_BACKGROUND_COLOR)
+                    }
+              }
+
+          Button(
+              onClick = {
+                addExerciseToWorkout(
+                    currentUser?.uid, workoutViewModel, activity, durationAchieved, count, count)
+              },
+              colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
+              modifier = Modifier.testTag("AddExerciseButton")) {
+                Text("End Exercise", color = PRINCIPLE_BACKGROUND_COLOR)
+              }
+        }
         HorizontalDivider(
             modifier = Modifier.padding(vertical = 16.dp).testTag("Divider"),
             thickness = 1.dp,
@@ -160,6 +177,7 @@ fun TrainSoloScreen(
         }
       }
 }
+
 /**
  * Adds an exercise to the workout.
  *
