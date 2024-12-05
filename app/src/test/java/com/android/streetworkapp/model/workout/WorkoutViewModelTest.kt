@@ -92,4 +92,30 @@ class WorkoutViewModelTest {
 
     assertEquals(workoutData, workoutViewModel.workoutData.value)
   }
+
+  @Test
+  fun getOrAddExerciseToWorkoutHandlesSessionCorrectly() = runTest {
+    val uid = "testUid"
+    val sessionId = "testSessionId"
+    val exercise = Exercise(name = "Push-up", duration = 30)
+    val sessionType = SessionType.SOLO
+
+    val existingSession =
+        WorkoutSession(
+            sessionId = sessionId,
+            startTime = 0L,
+            endTime = 0L,
+            sessionType = sessionType,
+            participants = listOf("testParticipant"),
+            exercises = listOf(),
+            winner = null)
+    val workoutData = WorkoutData(userUid = uid, workoutSessions = listOf(existingSession))
+
+    `when`(repository.getOrAddWorkoutData(uid)).thenReturn(workoutData)
+
+    workoutViewModel.getOrAddExerciseToWorkout(uid, sessionId, exercise, sessionType)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    verify(repository, times(2)).getOrAddWorkoutData(uid)
+  }
 }
