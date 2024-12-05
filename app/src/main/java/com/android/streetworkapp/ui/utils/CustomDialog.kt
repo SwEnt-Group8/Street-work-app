@@ -96,9 +96,9 @@ fun CustomDialog(
 }
 
 enum class DialogType {
-  QUERY, // Have submit / cancel buttons + use OnSubmit / onDismiss.
+  QUERY, // Have {submit, cancel} buttons + use {onSubmit, onDismiss}.
   INFO, // Only display the content + use onDismiss.
-  CONFIRM;
+  CONFIRM; // Display the content + {confirm} button + {onSubmit, onDismiss}.
 
   fun shouldShowButton(button: ButtonType): Boolean {
     return when (button) {
