@@ -130,7 +130,15 @@ fun ParkOverviewScreen(
           onSubmit = {
             Log.d("ParkOverview", "RatingDialog: Submitting rating")
             handleRating(
-                context, currentPark.value, currentUser, starRating.intValue, parkViewModel,userViewModel,navigationActions,scope,host)
+                context,
+                currentPark.value,
+                currentUser,
+                starRating.intValue,
+                parkViewModel,
+                userViewModel,
+                navigationActions,
+                scope,
+                host)
           },
           onDismiss = { starRating.intValue = 3 })
 
@@ -291,14 +299,14 @@ fun handleRating(
       Log.d("ParkOverview", "handleRating: Adding rating to park")
       if (context != null) Toast.makeText(context, "Rating submitted", Toast.LENGTH_SHORT).show()
       parkViewModel.addRating(park.pid, user.uid, starRating.toFloat())
-        if (snackbarHostState != null) {
-            updateAndDisplayPoints(
-                userViewModel,
-                navigationActions,
-                ScoreIncrease.ADD_RATING.points,
-                scope,
-                snackbarHostState)
-        }
+      if (snackbarHostState != null) {
+        updateAndDisplayPoints(
+            userViewModel,
+            navigationActions,
+            ScoreIncrease.ADD_RATING.points,
+            scope,
+            snackbarHostState)
+      }
     }
   }
 }

@@ -280,7 +280,12 @@ fun StreetWorkApp(
                 composable(Screen.PARK_OVERVIEW) {
                   infoManager.Display(LocalContext.current)
                   ParkOverviewScreen(
-                      parkViewModel, innerPadding, navigationActions, eventViewModel, userViewModel,scope,
+                      parkViewModel,
+                      innerPadding,
+                      navigationActions,
+                      eventViewModel,
+                      userViewModel,
+                      scope,
                       host)
                 }
                 composable(Screen.ADD_EVENT) {

@@ -92,6 +92,6 @@ enum class ScoreIncrease(val points: Int) {
   ADD_EVENT(30),
   JOIN_EVENT(60),
   ADD_FRIEND(90),
-    FIND_NEW_PARK(100),
-    ADD_RATING(20)
+  FIND_NEW_PARK(100),
+  ADD_RATING(20)
 }

@@ -20,14 +20,15 @@ import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CoroutineScope
 
-
-class LocationService(private val context: Context, private val userViewModel: UserViewModel,
-                      private val navigationActions: NavigationActions,
-                      private val scope: CoroutineScope,
-                      private val host: SnackbarHostState?
+class LocationService(
+    private val context: Context,
+    private val userViewModel: UserViewModel,
+    private val navigationActions: NavigationActions,
+    private val scope: CoroutineScope,
+    private val host: SnackbarHostState?
 ) {
-    // Define the distance for when is in a park
-    private val insidePark = 50
+  // Define the distance for when is in a park
+  private val insidePark = 30
 
   // Define the FusedLocationProviderClient to get location
   private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
@@ -41,7 +42,7 @@ class LocationService(private val context: Context, private val userViewModel: U
             .build()
     if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
         PackageManager.PERMISSION_GRANTED) {
-        Log.d("Localisation", "activated location update actual")
+      Log.d("Localisation", "activated location update actual")
       fusedLocationClient.requestLocationUpdates(locationRequest, callback, Looper.getMainLooper())
     }
   }
@@ -50,46 +51,34 @@ class LocationService(private val context: Context, private val userViewModel: U
     fusedLocationClient.removeLocationUpdates(callback)
   }
 
-    fun rewardParkDiscovery(userLocation: LatLng, parksLocation: List<ParkLocation>) {
+  fun rewardParkDiscovery(userLocation: LatLng, parksLocation: List<ParkLocation>) {
 
-        val results = FloatArray(1)
-        Log.d("Localisation", "check all park distance")
-        for (park in parksLocation) {
-            // Calculate the distance between userLocation and park location
-            Location.distanceBetween(
-                userLocation.latitude, userLocation.longitude,
-                park.lat, park.lon,
-                results
-            )
+    val results = FloatArray(1)
+    Log.d("Localisation", "check all park distance")
+    for (park in parksLocation) {
+      // Calculate the distance between userLocation and park location
+      Location.distanceBetween(
+          userLocation.latitude, userLocation.longitude, park.lat, park.lon, results)
 
-            val distance = results[0]
-            if (distance < insidePark) {
-                Log.d("Localisation", "found close park")
-                userViewModel.currentUser.value?.let {
-                    //add new park in user list
-                    userViewModel.getParksByUid(it.uid)
-                    val currentParks = userViewModel.parks.value
-                    if(!currentParks.contains(park.id)){
-                        Log.d("Localisation", "park is new")
-                        userViewModel.addNewPark(
-                            it.uid,
-                            park.id
-                        )
+      val distance = results[0]
+      if (distance < insidePark) {
+        Log.d("Localisation", "found close park")
+        userViewModel.currentUser.value?.let {
+          // add new park in user list
+          userViewModel.getParksByUid(it.uid)
+          val currentParks = userViewModel.parks.value
+          if (!currentParks.contains(park.id)) {
+            Log.d("Localisation", "park is new")
+            userViewModel.addNewPark(it.uid, park.id)
 
-                        //add point if first time
-                        if (host != null) {
-                            updateAndDisplayPoints(
-                                userViewModel,
-                                navigationActions,
-                                ScoreIncrease.FIND_NEW_PARK.points,
-                                scope,
-                                host
-                            )
-                        }
-                    }
-
-                }
+            // add point if first time
+            if (host != null) {
+              updateAndDisplayPoints(
+                  userViewModel, navigationActions, ScoreIncrease.FIND_NEW_PARK.points, scope, host)
             }
+          }
         }
+      }
     }
+  }
 }

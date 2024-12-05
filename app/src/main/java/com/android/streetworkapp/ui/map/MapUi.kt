@@ -84,7 +84,7 @@ fun MapScreen(
 
   val context = LocalContext.current
   // call utils for location management
-  val locationService = LocationService(context,userViewModel,navigationActions,scope,host)
+  val locationService = LocationService(context, userViewModel, navigationActions, scope, host)
   val permissionManager = PermissionManager(context)
   // Initiate initial fail-safe value
   var initialLatLng = remember { mutableStateOf(LatLng(46.518659400000004, 6.566561505148001)) }
@@ -100,8 +100,8 @@ fun MapScreen(
   LaunchedEffect(initialLatLng.value) {
     parkLocationViewModel.findNearbyParks(
         initialLatLng.value.latitude, initialLatLng.value.longitude)
-      Log.d("Localisation", "fetch new park")
-      locationService.rewardParkDiscovery(initialLatLng.value,parkLocationViewModel.parks.value)
+    Log.d("Localisation", "fetch new park")
+    locationService.rewardParkDiscovery(initialLatLng.value, parkLocationViewModel.parks.value)
   }
 
   val parks = parkLocationViewModel.parks.collectAsState().value

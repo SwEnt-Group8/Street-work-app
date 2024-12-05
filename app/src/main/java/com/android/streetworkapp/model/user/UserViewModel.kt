@@ -245,7 +245,7 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
    * @param parkId The ID of the park to add to the user's parks list.
    */
   fun addNewPark(uid: String, parkId: String) =
-    viewModelScope.launch { repository.addNewPark(uid, parkId) }
+      viewModelScope.launch { repository.addNewPark(uid, parkId) }
 
   /**
    * Deletes a user from Firestore based on the provided ID.

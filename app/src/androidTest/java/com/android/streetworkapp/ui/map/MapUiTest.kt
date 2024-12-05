@@ -69,7 +69,12 @@ class MapUiTest {
     `when`(navigationActions.currentRoute()).thenReturn(Screen.MAP)
 
     composeTestRule.setContent {
-      MapScreen(parkLocationViewModel, parkViewModel,userViewModel, navigationActions, mutableStateOf(""))
+      MapScreen(
+          parkLocationViewModel,
+          parkViewModel,
+          userViewModel,
+          navigationActions,
+          mutableStateOf(""))
     }
 
     composeTestRule.waitForIdle()

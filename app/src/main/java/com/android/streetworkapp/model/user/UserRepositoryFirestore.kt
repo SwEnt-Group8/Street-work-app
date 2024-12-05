@@ -138,8 +138,9 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     return try {
       // Get the user's document first to retrieve the list of friend UIDs
       val document = db.collection(COLLECTION_PATH).document(uid).get().await()
-      val parksIds = (document["parks"]as? List<*>)//safecast
-        ?.mapNotNull { it as? String }?: emptyList()
+      val parksIds =
+          (document["parks"] as? List<*>) // safecast
+              ?.mapNotNull { it as? String } ?: emptyList()
 
       parksIds
     } catch (e: Exception) {
@@ -336,12 +337,12 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
           }
       // Safely handle the 'parks' field
       val parks =
-        try {
-          document["parks"] as? List<*> ?: emptyList<String>()
-        } catch (e: Exception) {
-          Log.e("FirestoreError", "Error retrieving parks list", e)
-          emptyList<String>() // Return an empty list in case of an exception
-        }
+          try {
+            document["parks"] as? List<*> ?: emptyList<String>()
+          } catch (e: Exception) {
+            Log.e("FirestoreError", "Error retrieving parks list", e)
+            emptyList<String>() // Return an empty list in case of an exception
+          }
 
       val validFriends = friends.filterIsInstance<String>()
       val validParks = parks.filterIsInstance<String>()
@@ -352,8 +353,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
           score = score,
           friends = validFriends,
           picture = picture,
-          parks = validParks
-        )
+          parks = validParks)
     } catch (e: Exception) {
       Log.e("FirestoreError", "Error converting document to User", e)
       null
