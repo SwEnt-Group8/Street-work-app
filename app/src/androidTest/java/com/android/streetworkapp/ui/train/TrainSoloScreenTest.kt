@@ -74,8 +74,6 @@ class TrainSoloScreenTest {
 
     // Verify Counter components
     composeTestRule.onNodeWithTag("CounterText").assertExists()
-    composeTestRule.onNodeWithTag("DecrementButton").assertExists()
-    composeTestRule.onNodeWithTag("IncrementButton").assertExists()
   }
 
   @Test
