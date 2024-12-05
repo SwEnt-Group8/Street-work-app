@@ -78,23 +78,21 @@ class TrainSoloScreenTest {
     composeTestRule.onNodeWithTag("IncrementButton").assertExists()
   }
 
-    @Test
-    fun trainSoloScreen_stopButtonUpdatesState() {
-        composeTestRule.setContent {
-            TrainSoloScreen(
-                activity = "Push-ups",
-                isTimeDependent = true,
-                userViewModel = userViewModel,
-                time = 1,
-                sets = 1,
-                reps = 1,
-                workoutViewModel = workoutViewModel
-            )
-        }
-
-        composeTestRule.onNodeWithTag("StopButton").assertExists().performClick()
-
-        composeTestRule.onNodeWithTag("TimeUpText").assertExists().assertIsDisplayed()
+  @Test
+  fun trainSoloScreen_stopButtonUpdatesState() {
+    composeTestRule.setContent {
+      TrainSoloScreen(
+          activity = "Push-ups",
+          isTimeDependent = true,
+          userViewModel = userViewModel,
+          time = 1,
+          sets = 1,
+          reps = 1,
+          workoutViewModel = workoutViewModel)
     }
-}
 
+    composeTestRule.onNodeWithTag("StopButton").assertExists().performClick()
+
+    composeTestRule.onNodeWithTag("TimeUpText").assertExists().assertIsDisplayed()
+  }
+}
