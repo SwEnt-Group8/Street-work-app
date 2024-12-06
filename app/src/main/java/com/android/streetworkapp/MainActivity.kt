@@ -170,11 +170,9 @@ fun StreetWorkAppMain(
     SplashScreen()
   } else {
     if (loginState == true) {
-      if (internetAvailable) {
+      if (internetAvailable && !uid.isNullOrEmpty()) {
         Log.d("MainActivity", "Internet available, fetching user $uid from database")
-        if (!uid.isNullOrEmpty()) {
-          userViewModel.getUserByUidAndSetAsCurrentUser(uid!!)
-        }
+        userViewModel.getUserByUidAndSetAsCurrentUser(uid!!)
       } else {
         Log.d("MainActivity", "Internet not available, loading user $uid from cache")
         val offlineUser = User(uid.orEmpty(), name.orEmpty(), "", score ?: 0, emptyList(), "")
