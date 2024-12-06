@@ -63,5 +63,8 @@
     // Progression UI
     <string name="ProgressionEmptyAchievements">You do not have any achievements yet!</string>
 
+    <string name="WorkoutDurationMessage1">I want to do %02d min and %02d seconds of %s</string>
+    <string name="WorkoutDurationMessage2">I want to do %2d sets of %2d %s</string>
+
 
 </resources>

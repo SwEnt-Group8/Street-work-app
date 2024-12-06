@@ -30,11 +30,13 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
+import com.android.sample.R
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.TrainNavigationParams
 import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_DARK
@@ -73,7 +75,7 @@ fun TrainParamScreen(
       }
 }
 
-@SuppressLint("DefaultLocale")
+@SuppressLint("DefaultLocale", "StringFormatMatches")
 @Composable
 fun TrainParamHeader(
     isTimeDependent: Boolean,
@@ -89,10 +91,9 @@ fun TrainParamHeader(
         Text(
             text =
                 if (isTimeDependent) {
-                  String.format(
-                      "I want to do %02d min and %02d seconds of %s", minutes, seconds, activity)
+                      LocalContext.current.getString(R.string.WorkoutDurationMessage1, minutes, seconds, activity)
                 } else {
-                  String.format("I want to do %2d sets of %2d %s", sets, reps, activity)
+                    LocalContext.current.getString(R.string.WorkoutDurationMessage2, sets, reps, activity)
                 },
             style = androidx.compose.material3.MaterialTheme.typography.bodyLarge)
       }
