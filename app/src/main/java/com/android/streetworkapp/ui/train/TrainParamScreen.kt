@@ -42,6 +42,7 @@ import com.android.streetworkapp.ui.navigation.TrainNavigationParams
 import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_DARK
 import com.android.streetworkapp.ui.theme.ColorPalette.PRIMARY_TEXT_COLOR
 import com.android.streetworkapp.ui.theme.ColorPalette.PRINCIPLE_BACKGROUND_COLOR
+import com.android.streetworkapp.ui.theme.GoogleAuthButtonTextStyle
 
 @SuppressLint("DefaultLocale")
 @Composable
@@ -91,9 +92,11 @@ fun TrainParamHeader(
         Text(
             text =
                 if (isTimeDependent) {
-                      LocalContext.current.getString(R.string.WorkoutDurationMessage1, minutes, seconds, activity)
+                  LocalContext.current.getString(
+                      R.string.WorkoutDurationMessage1, minutes, seconds, activity)
                 } else {
-                    LocalContext.current.getString(R.string.WorkoutDurationMessage2, sets, reps, activity)
+                  LocalContext.current.getString(
+                      R.string.WorkoutDurationMessage2, sets, reps, activity)
                 },
             style = androidx.compose.material3.MaterialTheme.typography.bodyLarge)
       }
@@ -178,7 +181,7 @@ fun NumberPicker(
         // Label for the picker
         Text(
             text = label,
-            style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
+            style = GoogleAuthButtonTextStyle,
             modifier = Modifier.padding(bottom = 8.dp))
 
         Box(
