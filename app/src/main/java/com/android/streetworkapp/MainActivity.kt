@@ -12,7 +12,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -69,6 +68,7 @@ import com.android.streetworkapp.ui.navigation.TopAppBarWrapper
 import com.android.streetworkapp.ui.park.ParkOverviewScreen
 import com.android.streetworkapp.ui.profile.AddFriendScreen
 import com.android.streetworkapp.ui.profile.ProfileScreen
+import com.android.streetworkapp.ui.profile.SettingsContent
 import com.android.streetworkapp.ui.progress.ProgressScreen
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.ui.train.TrainChallengeScreen
@@ -77,6 +77,7 @@ import com.android.streetworkapp.ui.train.TrainHubScreen
 import com.android.streetworkapp.ui.train.TrainSoloScreen
 import com.android.streetworkapp.ui.tutorial.TutorialEvent
 import com.android.streetworkapp.ui.utils.CustomDialog
+import com.android.streetworkapp.ui.utils.DialogType
 import com.google.firebase.firestore.FirebaseFirestore
 import okhttp3.OkHttpClient
 
@@ -382,20 +383,23 @@ fun StreetWorkApp(
                     showSettingsDialog.value = true
                   }
 
-              // The settings "in" the profile screen
-              // TODO : Implement the dialog Content composable
-              CustomDialog(
-                  showSettingsDialog,
-                  tag = "Settings",
-                  Content = { Text("Settings to be implemented") },
-              )
-            }
-            // screen for adding friend
-            composable(Screen.ADD_FRIEND) {
-              infoManager.Display(LocalContext.current)
-              AddFriendScreen(userViewModel, navigationActions, scope, host, innerPadding)
-            }
-          }
+                  // The settings "in" the profile screen
+                  CustomDialog(
+                      showSettingsDialog,
+                      dialogType = DialogType.INFO,
+                      tag = "Settings",
+                      title = "Settings",
+                      Content = {
+                        SettingsContent(navigationActions, userViewModel, showSettingsDialog)
+                      },
+                  )
+                }
+                // screen for adding friend
+                composable(Screen.ADD_FRIEND) {
+                  infoManager.Display(LocalContext.current)
+                  AddFriendScreen(userViewModel, navigationActions, scope, host, innerPadding)
+                }
+              }
 
           navigation(
               startDestination = Screen.TRAIN_HUB,
