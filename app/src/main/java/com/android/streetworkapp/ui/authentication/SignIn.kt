@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
+import com.android.streetworkapp.model.preferences.PreferencesViewModel
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
@@ -49,7 +50,11 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
 @Composable
-fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewModel) {
+fun SignInScreen(
+    navigationActions: NavigationActions,
+    userViewModel: UserViewModel,
+    preferencesViewModel: PreferencesViewModel
+) {
 
   val user by userViewModel.user.collectAsState()
 
@@ -83,6 +88,10 @@ fun SignInScreen(navigationActions: NavigationActions, userViewModel: UserViewMo
   LaunchedEffect(user) {
     user?.let {
       userViewModel.setCurrentUser(it)
+      preferencesViewModel.setLoginState(true)
+      preferencesViewModel.setUid(it.uid)
+      preferencesViewModel.setName(it.username)
+      preferencesViewModel.setScore(it.score)
       Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
       navigationActions.navigateTo(Screen.MAP)
     }

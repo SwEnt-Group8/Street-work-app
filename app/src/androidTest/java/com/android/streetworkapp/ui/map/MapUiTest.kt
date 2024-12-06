@@ -15,9 +15,12 @@ import com.android.streetworkapp.model.parklocation.OverpassParkLocationReposito
 import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.model.parklocation.ParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
+import com.android.streetworkapp.model.preferences.PreferencesRepositoryDataStore
+import com.android.streetworkapp.model.preferences.PreferencesViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.ui.navigation.Screen
+import io.mockk.mockk
 import okhttp3.OkHttpClient
 import org.junit.Before
 import org.junit.Rule
@@ -109,7 +112,11 @@ class MapUiTest {
 
   @Test
   fun mapSearchBarHasCorrectBehavior() {
-    composeTestRule.setContent { StreetWorkAppMain { navigateTo(Route.MAP) } }
+    composeTestRule.setContent {
+      StreetWorkAppMain(
+          PreferencesViewModel(mockk<PreferencesRepositoryDataStore>(relaxed = true)),
+          { navigateTo(Route.MAP) })
+    }
 
     composeTestRule.waitForIdle()
 

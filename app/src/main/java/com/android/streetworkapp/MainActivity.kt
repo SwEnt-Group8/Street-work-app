@@ -13,6 +13,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,6 +26,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import com.android.streetworkapp.device.network.isInternetAvailable
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.moderation.PerspectiveAPIRepository
@@ -34,8 +36,11 @@ import com.android.streetworkapp.model.park.ParkRepositoryFirestore
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
+import com.android.streetworkapp.model.preferences.PreferencesRepositoryDataStore
+import com.android.streetworkapp.model.preferences.PreferencesViewModel
 import com.android.streetworkapp.model.progression.ProgressionRepositoryFirestore
 import com.android.streetworkapp.model.progression.ProgressionViewModel
+import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.model.workout.WorkoutRepositoryFirestore
@@ -45,6 +50,7 @@ import com.android.streetworkapp.ui.event.AddEventScreen
 import com.android.streetworkapp.ui.event.EventOverviewScreen
 import com.android.streetworkapp.ui.map.MapScreen
 import com.android.streetworkapp.ui.map.MapSearchBar
+import com.android.streetworkapp.ui.miscellaneous.SplashScreen
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenu
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenuType
 import com.android.streetworkapp.ui.navigation.EventBottomBar
@@ -80,20 +86,32 @@ class MainActivity : ComponentActivity() {
   @SuppressLint("SourceLockedOrientationActivity")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    val internetAvailable = isInternetAvailable(this)
+    // Instantiate preferences view model here to avoid unauthorized multiple instantiations
+    val preferencesRepository = PreferencesRepositoryDataStore(this)
+    val preferencesViewModel = PreferencesViewModel(preferencesRepository)
     Log.d("MainActivity", "Setup content")
     this.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-    setContent(parent = null) { StreetWorkAppMain() }
+    setContent(parent = null) {
+      StreetWorkAppMain(
+          internetAvailable = internetAvailable, preferencesViewModel = preferencesViewModel)
+    }
   }
 }
 
 // the testInvokation is super ugly but I have NOT found any other way to test the navigation from a
 // ui perspective since we don't use fragments
 @Composable
-fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
+fun StreetWorkAppMain(
+    preferencesViewModel: PreferencesViewModel,
+    testInvokation: NavigationActions.() -> Unit = {},
+    internetAvailable: Boolean = false
+) {
 
   // repositories
   val overpassParkLocationRepo = OverpassParkLocationRepository(OkHttpClient())
   val parkNameRepository = NominatimParkNameRepository(OkHttpClient())
+
   // viewmodels
   val parkLocationViewModel = ParkLocationViewModel(overpassParkLocationRepo)
 
@@ -122,16 +140,60 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
   val textModerationRepository = PerspectiveAPIRepository(OkHttpClient())
   val textModerationViewModel = TextModerationViewModel(textModerationRepository)
 
-  StreetWorkApp(
-      parkLocationViewModel,
-      testInvokation,
-      {},
-      userViewModel,
-      parkViewModel,
-      eventViewModel,
-      progressionViewModel,
-      workoutViewModel,
-      textModerationViewModel)
+  // Get the preferences cached parameters
+  val loginState by preferencesViewModel.loginState.collectAsState()
+  val uid by preferencesViewModel.uid.collectAsState()
+  val name by preferencesViewModel.name.collectAsState()
+  val score by preferencesViewModel.score.collectAsState()
+  preferencesViewModel.getLoginState()
+  preferencesViewModel.getUid()
+  preferencesViewModel.getName()
+  preferencesViewModel.getScore()
+
+  // Ensure start destination and preferences parameters are resolved before displaying the app
+  var resolvedStartDestination by remember { mutableStateOf<String?>(null) }
+  var resolvedPreferencesParameters by remember { mutableStateOf<Boolean>(false) }
+
+  // Determine start destination and be sure preferences parameters are correctly loaded
+  if (loginState == true &&
+      ((internetAvailable && !uid.isNullOrEmpty()) ||
+          (!internetAvailable && !uid.isNullOrEmpty() && name != null && score != null))) {
+    resolvedPreferencesParameters = true
+    resolvedStartDestination = Route.MAP
+  }
+  if (loginState == false) {
+    resolvedPreferencesParameters = true
+    resolvedStartDestination = Route.AUTH
+  }
+
+  // Display splash screen while determining start destination and preferences
+  if (resolvedStartDestination == null || !resolvedPreferencesParameters) {
+    SplashScreen()
+  } else {
+    if (loginState == true) {
+      if (internetAvailable && !uid.isNullOrEmpty()) {
+        Log.d("MainActivity", "Internet available, fetching user $uid from database")
+        userViewModel.getUserByUidAndSetAsCurrentUser(uid!!)
+      } else {
+        Log.d("MainActivity", "Internet not available, loading user $uid from cache")
+        val offlineUser = User(uid.orEmpty(), name.orEmpty(), "", score ?: 0, emptyList(), "")
+        userViewModel.setCurrentUser(offlineUser)
+      }
+    }
+
+    StreetWorkApp(
+        parkLocationViewModel,
+        testInvokation,
+        {},
+        userViewModel,
+        parkViewModel,
+        eventViewModel,
+        progressionViewModel,
+        workoutViewModel,
+        textModerationViewModel,
+        preferencesViewModel,
+        startDestination = resolvedStartDestination!!)
+  }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -147,8 +209,10 @@ fun StreetWorkApp(
     progressionViewModel: ProgressionViewModel,
     workoutViewModel: WorkoutViewModel,
     textModerationViewModel: TextModerationViewModel,
+    preferencesViewModel: PreferencesViewModel,
     navTestInvokationOnEachRecompose: Boolean = false,
-    e2eEventTesting: Boolean = false
+    e2eEventTesting: Boolean = false,
+    startDestination: String = Route.AUTH
 ) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
@@ -227,105 +291,125 @@ fun StreetWorkApp(
               }
             }
       }) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = Route.AUTH) { // TODO: handle start destination based on signIn logic
-              navigation(
-                  startDestination = Screen.AUTH,
-                  route = Route.AUTH,
-              ) {
-                composable(Screen.AUTH) { SignInScreen(navigationActions, userViewModel) }
-              }
-              navigation(startDestination = Screen.PROGRESSION, route = Route.PROGRESSION) {
-                composable(Screen.PROGRESSION) {
-                  infoManager.Display(LocalContext.current)
-                  ProgressScreen(
-                      navigationActions, userViewModel, progressionViewModel, innerPadding)
-                }
-              }
-              navigation(
-                  startDestination = Screen.MAP,
-                  route = Route.MAP,
-              ) {
-                composable(Screen.MAP) {
-                  infoManager.Display(LocalContext.current)
-                  MapScreen(
-                      parkLocationViewModel,
-                      parkViewModel,
-                      navigationActions,
-                      searchQuery,
-                      mapCallbackOnMapLoaded,
-                      innerPadding)
-                  screenParams?.topAppBarManager?.setActionCallback(
-                      TopAppBarManager.TopAppBarAction.SEARCH) {
-                        showSearchBar.value = true
-                      }
-                }
-                composable(Screen.PARK_OVERVIEW) {
-                  infoManager.Display(LocalContext.current)
-                  ParkOverviewScreen(
-                      parkViewModel, innerPadding, navigationActions, eventViewModel, userViewModel)
-                }
-                composable(Screen.ADD_EVENT) {
-                  infoManager.Display(LocalContext.current)
-                  AddEventScreen(
-                      navigationActions,
-                      parkViewModel,
-                      eventViewModel,
-                      userViewModel,
-                      textModerationViewModel,
-                      scope,
-                      host,
-                      innerPadding)
-                }
-                composable(Screen.EVENT_OVERVIEW) {
-                  infoManager.Display(LocalContext.current)
-                  EventOverviewScreen(
-                      eventViewModel, parkViewModel, userViewModel, navigationActions, innerPadding)
-                }
-                composable(Screen.TUTO_EVENT) { TutorialEvent(navigationActions) }
-              }
+        NavHost(navController = navController, startDestination = startDestination) {
+          navigation(
+              startDestination = Screen.AUTH,
+              route = Route.AUTH,
+          ) {
+            composable(Screen.AUTH) {
+              SignInScreen(navigationActions, userViewModel, preferencesViewModel)
+            }
+          }
+          navigation(startDestination = Screen.PROGRESSION, route = Route.PROGRESSION) {
+            composable(Screen.PROGRESSION) {
+              infoManager.Display(LocalContext.current)
+              ProgressScreen(navigationActions, userViewModel, progressionViewModel, innerPadding)
+            }
+          }
+          navigation(
+              startDestination = Screen.MAP,
+              route = Route.MAP,
+          ) {
+            composable(Screen.MAP) {
+              infoManager.Display(LocalContext.current)
+              MapScreen(
+                  parkLocationViewModel,
+                  parkViewModel,
+                  navigationActions,
+                  searchQuery,
+                  mapCallbackOnMapLoaded,
+                  innerPadding)
+              screenParams?.topAppBarManager?.setActionCallback(
+                  TopAppBarManager.TopAppBarAction.SEARCH) {
+                    showSearchBar.value = true
+                  }
+            }
+            composable(Screen.PARK_OVERVIEW) {
+              infoManager.Display(LocalContext.current)
+              ParkOverviewScreen(
+                  parkViewModel, innerPadding, navigationActions, eventViewModel, userViewModel)
+            }
+            composable(Screen.ADD_EVENT) {
+              infoManager.Display(LocalContext.current)
+              AddEventScreen(
+                  navigationActions,
+                  parkViewModel,
+                  eventViewModel,
+                  userViewModel,
+                  textModerationViewModel,
+                  scope,
+                  host,
+                  innerPadding)
+            }
+            composable(Screen.EVENT_OVERVIEW) {
+              infoManager.Display(LocalContext.current)
+              EventOverviewScreen(
+                  eventViewModel, parkViewModel, userViewModel, navigationActions, innerPadding)
+            }
+            composable(Screen.TUTO_EVENT) { TutorialEvent(navigationActions) }
+          }
 
-              navigation(
-                  startDestination = Screen.PROFILE,
-                  route = Route.PROFILE,
-              ) {
-                // profile screen + list of friend
-                composable(Screen.PROFILE) {
-                  infoManager.Display(LocalContext.current)
-                  ProfileScreen(navigationActions, userViewModel, innerPadding)
-                  val showSettingsDialog = remember { mutableStateOf(false) }
+          navigation(
+              startDestination = Screen.PROFILE,
+              route = Route.PROFILE,
+          ) {
+            // profile screen + list of friend
+            composable(Screen.PROFILE) {
+              infoManager.Display(LocalContext.current)
+              ProfileScreen(navigationActions, userViewModel, innerPadding)
+              val showSettingsDialog = remember { mutableStateOf(false) }
 
-                  screenParams?.topAppBarManager?.setActionCallback(
-                      TopAppBarManager.TopAppBarAction.SETTINGS) {
-                        showSettingsDialog.value = true
-                      }
+              screenParams?.topAppBarManager?.setActionCallback(
+                  TopAppBarManager.TopAppBarAction.SETTINGS) {
+                    showSettingsDialog.value = true
+                  }
 
-                  // The settings "in" the profile screen
-                  CustomDialog(
-                      showSettingsDialog,
-                      dialogType = DialogType.INFO,
-                      tag = "Settings",
-                      title = "Settings",
-                      Content = {
-                        SettingsContent(navigationActions, userViewModel, showSettingsDialog)
-                      },
-                  )
-                }
-                // screen for adding friend
-                composable(Screen.ADD_FRIEND) {
-                  infoManager.Display(LocalContext.current)
-                  AddFriendScreen(userViewModel, navigationActions, scope, host, innerPadding)
-                }
-              }
+              // The settings "in" the profile screen
+              CustomDialog(
+                  showSettingsDialog,
+                  dialogType = DialogType.INFO,
+                  tag = "Settings",
+                  title = "Settings",
+                  Content = {
+                    SettingsContent(navigationActions, userViewModel, showSettingsDialog)
+                  },
+              )
+            }
+            // screen for adding friend
+            composable(Screen.ADD_FRIEND) {
+              infoManager.Display(LocalContext.current)
+              AddFriendScreen(userViewModel, navigationActions, scope, host, innerPadding)
+            }
+          }
 
-              navigation(
-                  startDestination = Screen.TRAIN_HUB,
-                  route = Route.TRAIN_HUB,
-              ) {
-                composable(Screen.TRAIN_HUB) {
-                  TrainHubScreen(navigationActions, workoutViewModel, userViewModel, innerPadding)
+          navigation(
+              startDestination = Screen.TRAIN_HUB,
+              route = Route.TRAIN_HUB,
+          ) {
+            composable(Screen.TRAIN_HUB) {
+              TrainHubScreen(navigationActions, workoutViewModel, userViewModel, innerPadding)
+            }
+            trainComposable(
+                route = Screen.TRAIN_SOLO,
+                workoutViewModel = workoutViewModel,
+                innerPadding = innerPadding) { activity, isTimeDependent ->
+                  TrainSoloScreen(activity, isTimeDependent, workoutViewModel, innerPadding)
                 }
+
+            trainComposable(
+                route = Screen.TRAIN_COACH,
+                workoutViewModel = workoutViewModel,
+                innerPadding = innerPadding) { activity, isTimeDependent ->
+                  TrainCoachScreen(activity, isTimeDependent, workoutViewModel, innerPadding)
+                }
+
+            trainComposable(
+                route = Screen.TRAIN_CHALLENGE,
+                workoutViewModel = workoutViewModel,
+                innerPadding = innerPadding) { activity, isTimeDependent ->
+                  TrainChallengeScreen(activity, isTimeDependent, workoutViewModel, innerPadding)
+                }
+
                 trainComposable(
                     route = Screen.TRAIN_SOLO,
                     content = { activity, isTimeDependent, time, sets, reps ->
@@ -383,6 +467,7 @@ fun StreetWorkApp(
                     }
               }
             }
+
 
         if (e2eEventTesting) {
           LaunchedEffect(navTestInvokation) { navigationActions.apply(navTestInvokation) }
