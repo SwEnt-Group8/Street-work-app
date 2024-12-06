@@ -60,34 +60,16 @@ fun TrainParamScreen(
           Modifier.fillMaxSize().padding(paddingValues).padding(16.dp).testTag("TrainParamScreen"),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center) {
-        TrainParamHeader(
-            isTimeDependent = isTimeDependent,
-            minutes = minutes,
-            seconds = seconds,
-            sets = sets,
-            reps = reps,
-            activity = activity)
+        TrainParamHeader(isTimeDependent, minutes, seconds, sets, reps, activity)
 
         if (isTimeDependent) {
-          TimerInputGrid(
-              minutes = minutes,
-              seconds = seconds,
-              onUpdateMinutes = { minutes = it },
-              onUpdateSeconds = { seconds = it })
+          TimerInputGrid(minutes, seconds, { minutes = it }, { seconds = it })
         } else {
-          SetsAndRepsSection(
-              sets = sets, reps = reps, onUpdateSets = { sets = it }, onUpdateReps = { reps = it })
+          SetsAndRepsSection(sets, reps, { sets = it }, { reps = it })
         }
 
         ConfirmActionButton(
-            navigationActions = navigationActions,
-            activity = activity,
-            isTimeDependent = isTimeDependent,
-            type = type,
-            minutes = minutes,
-            seconds = seconds,
-            sets = sets,
-            reps = reps)
+            navigationActions, activity, isTimeDependent, type, minutes, seconds, sets, reps)
       }
 }
 
