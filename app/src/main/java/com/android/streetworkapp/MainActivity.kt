@@ -383,23 +383,23 @@ fun StreetWorkApp(
                     showSettingsDialog.value = true
                   }
 
-                  // The settings "in" the profile screen
-                  CustomDialog(
-                      showSettingsDialog,
-                      dialogType = DialogType.INFO,
-                      tag = "Settings",
-                      title = "Settings",
-                      Content = {
-                        SettingsContent(navigationActions, userViewModel, showSettingsDialog)
-                      },
-                  )
-                }
-                // screen for adding friend
-                composable(Screen.ADD_FRIEND) {
-                  infoManager.Display(LocalContext.current)
-                  AddFriendScreen(userViewModel, navigationActions, scope, host, innerPadding)
-                }
-              }
+              // The settings "in" the profile screen
+              CustomDialog(
+                  showSettingsDialog,
+                  dialogType = DialogType.INFO,
+                  tag = "Settings",
+                  title = "Settings",
+                  Content = {
+                    SettingsContent(navigationActions, userViewModel, showSettingsDialog)
+                  },
+              )
+            }
+            // screen for adding friend
+            composable(Screen.ADD_FRIEND) {
+              infoManager.Display(LocalContext.current)
+              AddFriendScreen(userViewModel, navigationActions, scope, host, innerPadding)
+            }
+          }
 
           navigation(
               startDestination = Screen.TRAIN_HUB,
