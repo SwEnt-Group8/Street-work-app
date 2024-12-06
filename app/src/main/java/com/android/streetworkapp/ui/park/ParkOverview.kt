@@ -44,6 +44,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
@@ -106,11 +107,15 @@ fun ParkOverviewScreen(
       // TODO: Fetch image from Firestore storage
       Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         ParkDetails(park = currentPark.value, showRatingDialog, currentUser)
-        Button(
-            onClick = { navigationActions.navigateTo(Screen.ADD_EVENT) },
-            modifier = Modifier.size(width = 150.dp, height = 40.dp).testTag("createEventButton"),
-            colors = ColorPalette.BUTTON_COLOR) {
-              Text("Create an event")
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
+            horizontalArrangement = Arrangement.End) {
+              Button(
+                  onClick = { navigationActions.navigateTo(Screen.ADD_EVENT) },
+                  modifier = Modifier.testTag("createEventButton"),
+                  colors = ColorPalette.BUTTON_COLOR) {
+                    Text("Add an event", textAlign = TextAlign.Center)
+                  }
             }
       }
 
@@ -403,3 +408,14 @@ fun EventItem(event: Event, eventViewModel: EventViewModel, navigationActions: N
       })
   HorizontalDivider()
 }
+
+/**
+ * @Composable fun CreateEventButton(navigationActions: NavigationActions) { Row( modifier =
+ *   Modifier.fillMaxWidth().padding(end = 32.dp), horizontalArrangement = Arrangement.End) {
+ *   IconButton( onClick = { navigationActions.navigateTo(Screen.ADD_EVENT) }, modifier =
+ *   Modifier.testTag("createEventButton").size(50.dp)) { Box( modifier = Modifier.fillMaxSize()
+ *   .background( color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape) .padding(4.dp))
+ *   { Icon( painter = painterResource(id = R.drawable.calendar_add_on), contentDescription =
+ *   "Create Event", tint = Color.White, modifier =
+ *   Modifier.align(Alignment.Center).size(30.dp).padding(start = 2.dp)) } } } }
+ */

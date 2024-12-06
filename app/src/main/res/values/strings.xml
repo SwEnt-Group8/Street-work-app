@@ -4,9 +4,28 @@
     <string name="title_activity_second">SecondActivity</string>
     <string name="default_web_client_id">949532445294-2cvshtbsgubvrn54cg9301rrs2pe8dth.apps.googleusercontent.com</string>
 
+    // Friend removal :
+    <string name="RemoveFriendAction">Remove friend</string>
+    <string name="RemoveFriendSuccess">Removed %1$s from your friends</string>
+    <string name="RemoveFriendFailure">Error - could not remove friend</string>
+
+    // Friend removal dialog
+    <string name="RemoveFriendTitle">Are you sure ?</string>
+    <string name="RemoveFriendContent">Do you really want to remove %1$s from your friends ?</string>
+
+
+
+    // Dialogs
+    <string name="DialogCancelButtonTitle">Cancel</string>
+    <string name="DialogCancelButtonResponse">Canceled</string>
+
+    <string name="DialogConfirmButtonTitle">Confirm</string>
+    <string name="DialogConfirmButtonResponse">Confirmed</string>
+
+    <string name="DialogSubmitButtonTitle">Submit</string>
+    <string name="DialogSubmitButtonResponse">Submit</string>
 
     // Helping dialogs(INFO)
-
     // Default Info
     <string name="DefaultInfoTitle">Screen not supported yet</string>
     <string name="DefaultInfoContent">Information about this screen is not available. Please explore to learn more!</string>
