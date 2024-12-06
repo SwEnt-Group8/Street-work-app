@@ -30,12 +30,15 @@ class ProfileScreenTest {
 
   private val mockCurrentUser =
       MutableStateFlow<User?>(
-          User("user123", "John Doe", "john@example.com", 42424, emptyList(), ""))
+          User("user123", "John Doe", "john@example.com", 42424, emptyList(), "",
+            parks = listOf("")))
   private val mockFriends =
       MutableStateFlow<List<User>>(
           listOf(
-              User("friend1", "Friend One", "friend1@example.com", 123, emptyList(), ""),
-              User("friend2", "Friend Two", "friend2@example.com", 456, emptyList(), "")))
+              User("friend1", "Friend One", "friend1@example.com", 123, emptyList(), "",
+                parks = listOf("")),
+              User("friend2", "Friend Two", "friend2@example.com", 456, emptyList(), "",
+                parks = listOf(""))))
 
   @get:Rule val composeTestRule = createComposeRule()
 

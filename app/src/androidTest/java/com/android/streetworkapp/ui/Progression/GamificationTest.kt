@@ -41,7 +41,8 @@ class GamificationTest {
     userViewModel = UserViewModel(repository)
     navigationActions = mock()
 
-    userViewModel.setCurrentUser(User("test", "test", "test", 0, emptyList(), ""))
+    userViewModel.setCurrentUser(User("test", "test", "test", 0, emptyList(), "",
+        parks = listOf("")))
   }
 
   @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
