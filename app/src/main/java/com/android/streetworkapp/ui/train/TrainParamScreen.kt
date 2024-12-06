@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.navigation.TrainNavigationParams
 import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_DARK
 import com.android.streetworkapp.ui.theme.ColorPalette.PRIMARY_TEXT_COLOR
 import com.android.streetworkapp.ui.theme.ColorPalette.PRINCIPLE_BACKGROUND_COLOR
@@ -149,29 +150,18 @@ fun ConfirmActionButton(
 ) {
   Button(
       onClick = {
-        val time = if (isTimeDependent) (minutes * 60 + seconds) else null
+        val params =
+            TrainNavigationParams(
+                activity = activity,
+                isTimeDependent = isTimeDependent,
+                time = if (isTimeDependent) (minutes * 60 + seconds) else null,
+                sets = if (!isTimeDependent) sets else null,
+                reps = if (!isTimeDependent) reps else null)
+
         when (type) {
-          "Solo" ->
-              navigationActions.navigateToSoloScreen(
-                  activity = activity,
-                  isTimeDependent = isTimeDependent,
-                  time = time,
-                  sets = if (!isTimeDependent) sets else null,
-                  reps = if (!isTimeDependent) reps else null)
-          "Coach" ->
-              navigationActions.navigateToCoachScreen(
-                  activity = activity,
-                  isTimeDependent = isTimeDependent,
-                  time = time,
-                  sets = if (!isTimeDependent) sets else null,
-                  reps = if (!isTimeDependent) reps else null)
-          "Challenge" ->
-              navigationActions.navigateToChallengeScreen(
-                  activity = activity,
-                  isTimeDependent = isTimeDependent,
-                  time = time,
-                  sets = if (!isTimeDependent) sets else null,
-                  reps = if (!isTimeDependent) reps else null)
+          "Solo" -> navigationActions.navigateToSoloScreen(params)
+          "Coach" -> navigationActions.navigateToCoachScreen(params)
+          "Challenge" -> navigationActions.navigateToChallengeScreen(params)
         }
       },
       colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),

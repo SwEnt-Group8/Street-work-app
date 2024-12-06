@@ -40,11 +40,10 @@ fun CircularTimer(
   var timeRemaining by remember { mutableFloatStateOf(totalTime) }
   val progress = remember { Animatable(1f) }
   var isTimeUp by remember { mutableStateOf(false) }
-  var isStopped by remember { mutableStateOf(false) }
 
   // Launch a timer effect
   LaunchedEffect(Unit) {
-    while (timeRemaining > 0 && !isTimeUp && !isStopped) {
+    while (timeRemaining > 0 && !isTimeUp) {
       val elapsedTime = (System.currentTimeMillis() - startTime) / 1000f
       timeRemaining = (totalTime - elapsedTime).coerceAtLeast(0f)
       progress.snapTo(timeRemaining / totalTime)
@@ -52,7 +51,7 @@ fun CircularTimer(
       delay(16L)
     }
 
-    if (!isTimeUp && !isStopped) {
+    if (!isTimeUp) {
       isTimeUp = true
       onTimeUp()
     }
@@ -84,10 +83,5 @@ fun CircularTimer(
         modifier = Modifier.testTag("TimeRemainingText"),
         color = PRIMARY_TEXT_COLOR,
         fontSize = 24.sp)
-  }
-
-  // Stop the timer when the user manually stops it
-  if (isStopped) {
-    onStop(totalTime - timeRemaining) // Pass the elapsed time when stopped
   }
 }

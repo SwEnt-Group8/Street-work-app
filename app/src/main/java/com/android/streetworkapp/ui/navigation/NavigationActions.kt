@@ -14,9 +14,7 @@ object Route {
   const val PROFILE = "Profile"
   const val PROGRESSION = "Progression"
   const val TRAIN_HUB = "TrainHub"
-  const val TRAIN_SOLO = "TrainSolo"
-  const val TRAIN_COACH = "TrainCoach"
-  const val TRAIN_CHALLENGE = "TrainChallenge}"
+  const val TRAIN_PARAM = "TrainParam/{activity}/{isTimeDependent}/{type}"
   const val UNK = "TBD" // TODO: not yet defined
 }
 
@@ -157,7 +155,7 @@ data class ScreenParams(
             BottomNavigationMenuType.NONE,
             isTopBarVisible = false,
             null)
-  }
+  } // TODO UPDATE AND REMOVE THE UNNECESSARY DEFAULT PARAMS
 }
 
 val LIST_OF_SCREENS =
@@ -227,6 +225,14 @@ fun getScreens(): Screen {
   return Screen
 }
 
+data class TrainNavigationParams(
+    val activity: String,
+    val isTimeDependent: Boolean,
+    val time: Int? = 0,
+    val sets: Int? = null,
+    val reps: Int? = null
+)
+
 open class NavigationActions(
     private val navController: NavHostController,
 ) {
@@ -294,55 +300,32 @@ open class NavigationActions(
   /**
    * Navigate to the TrainSolo screen.
    *
-   * @param activity The activity to train.
-   * @param isTimeDependent Whether the activity is time dependent.
-   * @param time The time to train.
+   * @param params The parameters for the navigation.
    */
-  fun navigateToSoloScreen(
-      activity: String,
-      isTimeDependent: Boolean,
-      time: Int? = null,
-      sets: Int? = null,
-      reps: Int? = null
-  ) {
-    val route = buildRoute("TrainSolo", activity, isTimeDependent, time, sets, reps)
-    navController.navigate(route)
+  fun navigateToSoloScreen(params: TrainNavigationParams) {
+    val (activity, isTimeDependent, time, sets, reps) = params
+    navController.navigate(buildRoute("TrainSolo", activity, isTimeDependent, time, sets, reps))
   }
 
   /**
    * Navigate to the TrainCoach screen.
    *
-   * @param activity The activity to train.
-   * @param isTimeDependent Whether the activity is time dependent.
-   * @param time The time to train.
+   * @param params The parameters for the navigation.
    */
-  fun navigateToCoachScreen(
-      activity: String,
-      isTimeDependent: Boolean,
-      time: Int? = null,
-      sets: Int? = null,
-      reps: Int? = null
-  ) {
-    val route = buildRoute("TrainCoach", activity, isTimeDependent, time, sets, reps)
-    navController.navigate(route)
+  fun navigateToCoachScreen(params: TrainNavigationParams) {
+    val (activity, isTimeDependent, time, sets, reps) = params
+    navController.navigate(buildRoute("TrainCoach", activity, isTimeDependent, time, sets, reps))
   }
 
   /**
    * Navigate to the TrainChallenge screen.
    *
-   * @param activity The activity to train.
-   * @param isTimeDependent Whether the activity is time dependent.
-   * @param time The time to train.
+   * @param params The parameters for the navigation.
    */
-  fun navigateToChallengeScreen(
-      activity: String,
-      isTimeDependent: Boolean,
-      time: Int? = 0,
-      sets: Int? = null,
-      reps: Int? = null
-  ) {
-    val route = buildRoute("TrainChallenge", activity, isTimeDependent, time, sets, reps)
-    navController.navigate(route)
+  fun navigateToChallengeScreen(params: TrainNavigationParams) {
+    val (activity, isTimeDependent, time, sets, reps) = params
+    navController.navigate(
+        buildRoute("TrainChallenge", activity, isTimeDependent, time, sets, reps))
   }
 
   /**

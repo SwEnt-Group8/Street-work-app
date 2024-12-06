@@ -19,7 +19,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -70,6 +69,7 @@ import com.android.streetworkapp.ui.train.TrainParamScreen
 import com.android.streetworkapp.ui.train.TrainSoloScreen
 import com.android.streetworkapp.ui.tutorial.TutorialEvent
 import com.android.streetworkapp.ui.utils.CustomDialog
+import com.android.streetworkapp.ui.utils.trainComposable
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.serialization.json.JsonNull.content
 import okhttp3.OkHttpClient
@@ -128,39 +128,6 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
       progressionViewModel,
       workoutViewModel,
       textModerationViewModel)
-}
-
-typealias TrainComposableParams =
-    @Composable
-    (activity: String, isTimeDependent: Boolean, time: Int?, sets: Int?, reps: Int?) -> Unit
-
-fun NavGraphBuilder.trainComposable(route: String, content: TrainComposableParams) {
-  composable(
-      route = route,
-      arguments =
-          listOf(
-              navArgument("activity") { type = NavType.StringType },
-              navArgument("isTimeDependent") { type = NavType.BoolType },
-              navArgument("time") {
-                type = NavType.IntType
-                defaultValue = 0
-              },
-              navArgument("sets") {
-                type = NavType.IntType
-                defaultValue = 0
-              },
-              navArgument("reps") {
-                type = NavType.IntType
-                defaultValue = 0
-              })) { backStackEntry ->
-        val activity = backStackEntry.arguments?.getString("activity") ?: "Unknown"
-        val isTimeDependent = backStackEntry.arguments?.getBoolean("isTimeDependent") ?: false
-        val time = backStackEntry.arguments?.getInt("time")
-        val sets = backStackEntry.arguments?.getInt("sets")
-        val reps = backStackEntry.arguments?.getInt("reps")
-
-        content(activity, isTimeDependent, time, sets, reps)
-      }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -392,7 +359,7 @@ fun StreetWorkApp(
                           paddingValues = innerPadding)
                     })
                 composable(
-                    route = "TrainParam/{activity}/{isTimeDependent}/{type}",
+                    route = Route.TRAIN_PARAM,
                     arguments =
                         listOf(
                             navArgument("activity") { type = NavType.StringType },
