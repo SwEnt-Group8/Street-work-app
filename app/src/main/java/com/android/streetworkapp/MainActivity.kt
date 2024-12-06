@@ -176,7 +176,7 @@ fun StreetWorkAppMain(
         }
       } else {
         Log.d("MainActivity", "Internet not available, loading user $uid from cache")
-        val offlineUser = User(uid!!, name!!, "", score!!, emptyList(), "")
+        val offlineUser = User(uid.orEmpty(), name.orEmpty(), "", score ?: 0, emptyList(), "")
         userViewModel.setCurrentUser(offlineUser)
       }
     }
