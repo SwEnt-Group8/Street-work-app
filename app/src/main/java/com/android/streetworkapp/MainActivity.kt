@@ -70,8 +70,8 @@ import com.android.streetworkapp.ui.train.TrainParamScreen
 import com.android.streetworkapp.ui.train.TrainSoloScreen
 import com.android.streetworkapp.ui.tutorial.TutorialEvent
 import com.android.streetworkapp.ui.utils.CustomDialog
-import com.android.streetworkapp.ui.utils.trainComposable
 import com.android.streetworkapp.ui.utils.DialogType
+import com.android.streetworkapp.ui.utils.trainComposable
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.serialization.json.JsonNull.content
 import okhttp3.OkHttpClient
