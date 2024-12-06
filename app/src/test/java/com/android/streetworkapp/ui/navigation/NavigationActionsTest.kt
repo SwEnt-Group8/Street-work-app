@@ -119,13 +119,9 @@ class NavigationActionsTest {
 
   @Test
   fun navigateToSoloScreen_WithAllParams_CorrectRoute() {
-      val params = TrainNavigationParams(
-          activity = "Running",
-          isTimeDependent = true,
-          time = 120,
-          sets = null,
-          reps = null
-      )
+    val params =
+        TrainNavigationParams(
+            activity = "Running", isTimeDependent = true, time = 120, sets = null, reps = null)
     navigationActions.navigateToSoloScreen(params)
 
     verify(navHostController).navigate("TrainSolo/Running/true?time=120")
@@ -133,13 +129,9 @@ class NavigationActionsTest {
 
   @Test
   fun navigateToCoachScreen_WithSetsAndReps_CorrectRoute() {
-      val params = TrainNavigationParams(
-          activity = "Swimming",
-          isTimeDependent = false,
-          time = null,
-          sets = 4,
-          reps = 10
-      )
+    val params =
+        TrainNavigationParams(
+            activity = "Swimming", isTimeDependent = false, time = null, sets = 4, reps = 10)
     navigationActions.navigateToCoachScreen(params)
 
     verify(navHostController).navigate("TrainCoach/Swimming/false?sets=4&reps=10")
@@ -147,13 +139,9 @@ class NavigationActionsTest {
 
   @Test
   fun navigateToChallengeScreen_WithTime_CorrectRoute() {
-      val params = TrainNavigationParams(
-          activity = "Cycling",
-          isTimeDependent = true,
-          time = 300,
-          sets = null,
-          reps = null
-      )
+    val params =
+        TrainNavigationParams(
+            activity = "Cycling", isTimeDependent = true, time = 300, sets = null, reps = null)
     navigationActions.navigateToChallengeScreen(params)
 
     verify(navHostController).navigate("TrainChallenge/Cycling/true?time=300")
