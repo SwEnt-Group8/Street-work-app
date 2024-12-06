@@ -11,7 +11,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -61,6 +60,7 @@ import com.android.streetworkapp.ui.navigation.TopAppBarWrapper
 import com.android.streetworkapp.ui.park.ParkOverviewScreen
 import com.android.streetworkapp.ui.profile.AddFriendScreen
 import com.android.streetworkapp.ui.profile.ProfileScreen
+import com.android.streetworkapp.ui.profile.SettingsContent
 import com.android.streetworkapp.ui.progress.ProgressScreen
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.ui.train.TrainChallengeScreen
@@ -71,6 +71,7 @@ import com.android.streetworkapp.ui.train.TrainSoloScreen
 import com.android.streetworkapp.ui.tutorial.TutorialEvent
 import com.android.streetworkapp.ui.utils.CustomDialog
 import com.android.streetworkapp.ui.utils.trainComposable
+import com.android.streetworkapp.ui.utils.DialogType
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.serialization.json.JsonNull.content
 import okhttp3.OkHttpClient
@@ -301,11 +302,14 @@ fun StreetWorkApp(
                       }
 
                   // The settings "in" the profile screen
-                  // TODO : Implement the dialog Content composable
                   CustomDialog(
                       showSettingsDialog,
+                      dialogType = DialogType.INFO,
                       tag = "Settings",
-                      Content = { Text("Settings to be implemented") },
+                      title = "Settings",
+                      Content = {
+                        SettingsContent(navigationActions, userViewModel, showSettingsDialog)
+                      },
                   )
                 }
                 // screen for adding friend
