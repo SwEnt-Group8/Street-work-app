@@ -106,43 +106,37 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
   ) {
     viewModelScope.launch {
       try {
-        val currentWorkoutData = _workoutData.value
+        val currentWorkoutData = repository.getOrAddWorkoutData(uid)
+        val updatedWorkoutSessions = currentWorkoutData.workoutSessions.toMutableList()
 
-        if (currentWorkoutData != null) {
-          val updatedWorkoutSessions = currentWorkoutData.workoutSessions.toMutableList()
-
-          // Find session or create a new one if it doesn't exist
-          val sessionIndex = updatedWorkoutSessions.indexOfFirst { it.sessionId == sessionId }
-          if (sessionIndex != -1) {
-            // Update existing session
-            val existingSession = updatedWorkoutSessions[sessionIndex]
-            val updatedExercises = existingSession.exercises.toMutableList()
-            val existingExercise = updatedExercises.find { it.name == exercise.name }
-            if (existingExercise != null) {
-              updatedExercises[updatedExercises.indexOf(existingExercise)] = exercise
-            } else {
-              updatedExercises.add(exercise)
-            }
-            updatedWorkoutSessions[sessionIndex] =
-                existingSession.copy(exercises = updatedExercises)
+        // Find session or create a new one if it doesn't exist
+        val sessionIndex = updatedWorkoutSessions.indexOfFirst { it.sessionId == sessionId }
+        if (sessionIndex != -1) {
+          // Update existing session
+          val existingSession = updatedWorkoutSessions[sessionIndex]
+          val updatedExercises = existingSession.exercises.toMutableList()
+          val existingExercise = updatedExercises.find { it.name == exercise.name }
+          if (existingExercise != null) {
+            updatedExercises[updatedExercises.indexOf(existingExercise)] = exercise
           } else {
-            // Create new session if none exists
-            val newSession =
-                WorkoutSession(
-                    sessionId = sessionId,
-                    sessionType = sessionType,
-                    exercises = listOf(exercise),
-                    startTime = System.currentTimeMillis() - (exercise.duration ?: 0),
-                    endTime = System.currentTimeMillis())
-            updatedWorkoutSessions.add(newSession)
+            updatedExercises.add(exercise)
           }
-
-          // Update repository with the new/updated session
-          repository.addOrUpdateWorkoutSession(uid, updatedWorkoutSessions.last())
-          refreshWorkoutData(uid) // Refresh only if needed
+          updatedWorkoutSessions[sessionIndex] = existingSession.copy(exercises = updatedExercises)
         } else {
-          Log.e("WorkoutViewModel", "No workout data available in ViewModel.")
+          // Create new session if none exists
+          val newSession =
+              WorkoutSession(
+                  sessionId = sessionId,
+                  sessionType = sessionType,
+                  exercises = listOf(exercise),
+                  startTime = System.currentTimeMillis() - (exercise.duration ?: 0),
+                  endTime = System.currentTimeMillis())
+          updatedWorkoutSessions.add(newSession)
         }
+
+        // Update repository with the new/updated session
+        repository.addOrUpdateWorkoutSession(uid, updatedWorkoutSessions.last())
+        refreshWorkoutData(uid) // Refresh only if needed
       } catch (e: Exception) {
         Log.e("WorkoutViewModel", "Error in getOrAddExerciseToWorkout: ${e.message}")
       }
