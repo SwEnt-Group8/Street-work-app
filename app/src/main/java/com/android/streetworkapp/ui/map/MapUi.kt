@@ -80,6 +80,7 @@ fun MapScreen(
   val permissionManager = PermissionManager(context)
   // Initiate initial fail-safe value
   var initialLatLng = remember { mutableStateOf(LatLng(46.518659400000004, 6.566561505148001)) }
+  parkLocationViewModel.findNearbyParks(initialLatLng.value.latitude, initialLatLng.value.longitude)
 
   // Check the localisation permission and Update the current location
   MapManager(
