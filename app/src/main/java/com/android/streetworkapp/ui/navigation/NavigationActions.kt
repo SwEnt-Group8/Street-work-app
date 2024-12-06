@@ -14,9 +14,7 @@ object Route {
   const val PROFILE = "Profile"
   const val PROGRESSION = "Progression"
   const val TRAIN_HUB = "TrainHub"
-  const val TRAIN_SOLO = "TrainSolo"
-  const val TRAIN_COACH = "TrainCoach"
-  const val TRAIN_CHALLENGE = "TrainChallenge}"
+  const val TRAIN_PARAM = "TrainParam/{activity}/{isTimeDependent}/{type}"
   const val UNK = "TBD" // TODO: not yet defined
 }
 
@@ -30,9 +28,13 @@ object Screen {
   const val EVENT_OVERVIEW = "Event Overview Screen"
   const val PROGRESSION = "Progression Screen"
   const val TRAIN_HUB = "Train Hub Screen"
-  const val TRAIN_SOLO = "TrainSolo/{activity}/{isTimeDependent}"
-  const val TRAIN_COACH = "TrainCoach/{activity}/{isTimeDependent}"
-  const val TRAIN_CHALLENGE = "TrainChallenge/{activity}/{isTimeDependent}"
+  const val TRAIN_SOLO =
+      "TrainSolo/{activity}/{isTimeDependent}?time={time}&sets={sets}&reps={reps}"
+  const val TRAIN_COACH =
+      "TrainCoach/{activity}/{isTimeDependent}?time={time}&sets={sets}&reps={reps}"
+  const val TRAIN_CHALLENGE =
+      "TrainChallenge/{activity}/{isTimeDependent}?time={time}&sets={sets}&reps={reps}"
+  const val TRAIN_PARAM = "TrainParam/{activity}/{isTimeDependent}/{type}"
   const val UNK = "TBD Screen" // TODO: not yet defined
   const val TUTO_EVENT = "Tutorial event Screen"
 }
@@ -122,7 +124,7 @@ data class ScreenParams(
     val TRAIN_HUB =
         ScreenParams(
             screenName = Screen.TRAIN_HUB,
-            topAppBarManager = TopAppBarManager("Training hub", hasNavigationIcon = true))
+            topAppBarManager = TopAppBarManager("Training hub", hasNavigationIcon = false))
     val TRAIN_SOLO =
         ScreenParams(
             screenName = Screen.TRAIN_SOLO,
@@ -137,6 +139,10 @@ data class ScreenParams(
             screenName = Screen.TRAIN_CHALLENGE,
             topAppBarManager =
                 TopAppBarManager("Challenge with your friend", hasNavigationIcon = true))
+    val TRAIN_PARAM =
+        ScreenParams(
+            screenName = Screen.TRAIN_PARAM,
+            topAppBarManager = TopAppBarManager("Parameters", hasNavigationIcon = true))
     val TUTO_EVENT =
         ScreenParams(
             Screen.TUTO_EVENT,
@@ -161,6 +167,7 @@ val LIST_OF_SCREENS =
         ScreenParams.TRAIN_SOLO,
         ScreenParams.TRAIN_COACH,
         ScreenParams.TRAIN_CHALLENGE,
+        ScreenParams.TRAIN_PARAM,
         ScreenParams.TUTO_EVENT)
 
 /**
@@ -194,14 +201,32 @@ object TopLevelDestinations {
           icon = null,
           imagePainter = R.drawable.trophy_24px,
           textId = "Progression")
+  val TRAIN_HUB =
+      TopLevelDestination(
+          route = Route.TRAIN_HUB,
+          icon = null,
+          imagePainter = R.drawable.training,
+          textId = "Train Hub")
 }
 
 val LIST_TOP_LEVEL_DESTINATION =
-    listOf(TopLevelDestinations.PROGRESSION, TopLevelDestinations.MAP, TopLevelDestinations.PROFILE)
+    listOf(
+        TopLevelDestinations.PROGRESSION,
+        TopLevelDestinations.MAP,
+        TopLevelDestinations.PROFILE,
+        TopLevelDestinations.TRAIN_HUB)
 
 fun getScreens(): Screen {
   return Screen
 }
+
+data class TrainNavigationParams(
+    val activity: String,
+    val isTimeDependent: Boolean,
+    val time: Int? = 0,
+    val sets: Int? = null,
+    val reps: Int? = null
+)
 
 open class NavigationActions(
     private val navController: NavHostController,
@@ -270,29 +295,76 @@ open class NavigationActions(
   /**
    * Navigate to the TrainSolo screen.
    *
-   * @param activity The activity to train.
-   * @param isTimeDependent Whether the activity is time dependent.
+   * @param params The parameters for the navigation.
    */
-  fun navigateToSoloScreen(activity: String, isTimeDependent: Boolean) {
-    navController.navigate("TrainSolo/$activity/$isTimeDependent")
+  fun navigateToSoloScreen(params: TrainNavigationParams) {
+    val (activity, isTimeDependent, time, sets, reps) = params
+    navController.navigate(buildRoute("TrainSolo", activity, isTimeDependent, time, sets, reps))
   }
 
   /**
    * Navigate to the TrainCoach screen.
    *
-   * @param activity The activity to train.
-   * @param isTimeDependent Whether the activity is time dependent.
+   * @param params The parameters for the navigation.
    */
-  fun navigateToCoachScreen(activity: String, isTimeDependent: Boolean) {
-    navController.navigate("TrainCoach/$activity/$isTimeDependent")
+  fun navigateToCoachScreen(params: TrainNavigationParams) {
+    val (activity, isTimeDependent, time, sets, reps) = params
+    navController.navigate(buildRoute("TrainCoach", activity, isTimeDependent, time, sets, reps))
   }
+
   /**
    * Navigate to the TrainChallenge screen.
    *
+   * @param params The parameters for the navigation.
+   */
+  fun navigateToChallengeScreen(params: TrainNavigationParams) {
+    val (activity, isTimeDependent, time, sets, reps) = params
+    navController.navigate(
+        buildRoute("TrainChallenge", activity, isTimeDependent, time, sets, reps))
+  }
+
+  /**
+   * Build a route for a training screen.
+   *
+   * @param baseRoute The base route for the training screen.
    * @param activity The activity to train.
    * @param isTimeDependent Whether the activity is time dependent.
+   * @param time The time to train.
+   * @param sets The number of sets to train.
+   * @param reps The number of reps to train.
+   * @return The built route.
    */
-  fun navigateToChallengeScreen(activity: String, isTimeDependent: Boolean) {
-    navController.navigate("TrainChallenge/$activity/$isTimeDependent")
+  internal fun buildRoute(
+      baseRoute: String,
+      activity: String,
+      isTimeDependent: Boolean,
+      time: Int?,
+      sets: Int?,
+      reps: Int?
+  ): String {
+    val queryParams = mutableListOf<String>()
+
+    // Add query parameters only if they exist
+    time?.let { queryParams.add("time=$it") }
+    sets?.let { queryParams.add("sets=$it") }
+    reps?.let { queryParams.add("reps=$it") }
+
+    // Construct the query string
+    val queryString = if (queryParams.isNotEmpty()) "?${queryParams.joinToString("&")}" else ""
+
+    // Build the final route
+    return "$baseRoute/$activity/$isTimeDependent$queryString"
+  }
+
+  /**
+   * Navigate to the TrainParam screen.
+   *
+   * @param activity The activity to train.
+   * @param isTimeDependent Whether the activity is time dependent.
+   * @param type The type of training.
+   */
+  fun navigateToTrainParam(activity: String, isTimeDependent: Boolean, type: String) {
+    val route = "TrainParam/$activity/$isTimeDependent/$type"
+    navController.navigate(route)
   }
 }

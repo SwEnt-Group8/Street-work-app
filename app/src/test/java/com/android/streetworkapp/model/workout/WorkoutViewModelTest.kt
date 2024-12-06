@@ -9,6 +9,8 @@ import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.*
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class WorkoutViewModelTest {
@@ -40,7 +42,7 @@ class WorkoutViewModelTest {
             sessionId = "testSessionId",
             startTime = 0L,
             endTime = 0L,
-            sessionType = SessionType.ALONE)
+            sessionType = SessionType.SOLO)
 
     workoutViewModel.addOrUpdateWorkoutSession(uid, workoutSession)
     testDispatcher.scheduler.advanceUntilIdle()
@@ -91,5 +93,69 @@ class WorkoutViewModelTest {
     testDispatcher.scheduler.advanceUntilIdle()
 
     assertEquals(workoutData, workoutViewModel.workoutData.value)
+  }
+
+  @Test
+  fun getOrAddExerciseToWorkoutHandlesSessionCorrectly() = runTest {
+    val uid = "testUid"
+    val sessionId = "testSessionId"
+    val exercise = Exercise(name = "Push-up", duration = 30)
+    val sessionType = SessionType.SOLO
+
+    val existingSession =
+        WorkoutSession(
+            sessionId = sessionId,
+            startTime = 0L,
+            endTime = 0L,
+            sessionType = sessionType,
+            participants = listOf("testParticipant"),
+            exercises = listOf(),
+            winner = null)
+    val workoutData = WorkoutData(userUid = uid, workoutSessions = listOf(existingSession))
+
+    `when`(repository.getOrAddWorkoutData(uid)).thenReturn(workoutData)
+
+    workoutViewModel.getOrAddExerciseToWorkout(uid, sessionId, exercise, sessionType)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    verify(repository, times(2)).getOrAddWorkoutData(uid)
+  }
+
+  @Test
+  fun `getOrAddExerciseToWorkout adds a new session if none exists`() = runTest {
+    // Arrange
+    val uid = "user123"
+    val sessionId = "solo_session_1"
+    val exercise = Exercise("Push-ups", 10, 3, 30f, 0)
+    val sessionType = SessionType.SOLO
+
+    // Mock the repository to return empty workout data
+    whenever(repository.getOrAddWorkoutData(uid))
+        .thenReturn(WorkoutData(userUid = uid, workoutSessions = emptyList()))
+
+    // Act
+    workoutViewModel.getOrAddExerciseToWorkout(uid, sessionId, exercise, sessionType)
+    testDispatcher.scheduler.advanceUntilIdle() // Ensure coroutines complete
+
+    // Assert
+    val uidCaptor = argumentCaptor<String>()
+    val sessionCaptor = argumentCaptor<WorkoutSession>()
+
+    // Verify the repository method was called
+    verify(repository).addOrUpdateWorkoutSession(uidCaptor.capture(), sessionCaptor.capture())
+
+    // Debug captor values
+    println("Captured UID: ${uidCaptor.allValues}")
+    println("Captured Sessions: ${sessionCaptor.allValues}")
+
+    // Verify that the UID is correct
+    assertEquals(uid, uidCaptor.firstValue)
+
+    // Verify the captured session
+    val capturedSession = sessionCaptor.firstValue
+    assertEquals(sessionId, capturedSession.sessionId)
+    assertEquals(sessionType, capturedSession.sessionType)
+    assertEquals(1, capturedSession.exercises.size)
+    assertEquals(exercise, capturedSession.exercises.first())
   }
 }

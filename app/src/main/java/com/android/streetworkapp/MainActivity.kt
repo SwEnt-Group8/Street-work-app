@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
@@ -21,12 +20,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.android.streetworkapp.device.network.isInternetAvailable
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
@@ -78,7 +74,9 @@ import com.android.streetworkapp.ui.train.TrainSoloScreen
 import com.android.streetworkapp.ui.tutorial.TutorialEvent
 import com.android.streetworkapp.ui.utils.CustomDialog
 import com.android.streetworkapp.ui.utils.DialogType
+import com.android.streetworkapp.ui.utils.trainComposable
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.serialization.json.JsonNull.content
 import okhttp3.OkHttpClient
 
 class MainActivity : ComponentActivity() {
@@ -193,24 +191,6 @@ fun StreetWorkAppMain(
         preferencesViewModel,
         startDestination = resolvedStartDestination!!)
   }
-}
-
-fun NavGraphBuilder.trainComposable(
-    route: String,
-    workoutViewModel: WorkoutViewModel,
-    innerPadding: PaddingValues,
-    content: @Composable (activity: String, isTimeDependent: Boolean) -> Unit
-) {
-  composable(
-      route = route,
-      arguments =
-          listOf(
-              navArgument("activity") { type = NavType.StringType },
-              navArgument("isTimeDependent") { type = NavType.BoolType })) { backStackEntry ->
-        val activity = backStackEntry.arguments?.getString("activity") ?: "Unknown"
-        val isTimeDependent = backStackEntry.arguments?.getBoolean("isTimeDependent") ?: false
-        content(activity, isTimeDependent)
-      }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -408,25 +388,32 @@ fun StreetWorkApp(
             }
             trainComposable(
                 route = Screen.TRAIN_SOLO,
-                workoutViewModel = workoutViewModel,
-                innerPadding = innerPadding) { activity, isTimeDependent ->
-                  TrainSoloScreen(activity, isTimeDependent, workoutViewModel, innerPadding)
-                }
+            ) { activity, isTimeDependent, time, sets, reps ->
+              TrainSoloScreen(
+                  activity,
+                  isTimeDependent,
+                  time,
+                  sets,
+                  reps,
+                  workoutViewModel,
+                  userViewModel,
+                  innerPadding)
+            }
 
             trainComposable(
                 route = Screen.TRAIN_COACH,
-                workoutViewModel = workoutViewModel,
-                innerPadding = innerPadding) { activity, isTimeDependent ->
-                  TrainCoachScreen(activity, isTimeDependent, workoutViewModel, innerPadding)
-                }
-
-            trainComposable(
-                route = Screen.TRAIN_CHALLENGE,
-                workoutViewModel = workoutViewModel,
-                innerPadding = innerPadding) { activity, isTimeDependent ->
-                  TrainChallengeScreen(activity, isTimeDependent, workoutViewModel, innerPadding)
-                }
+                content = { activity, isTimeDependent, time, sets, reps ->
+                  TrainCoachScreen(
+                      activity, isTimeDependent, time, sets, reps, workoutViewModel, innerPadding)
+                })
           }
+
+          trainComposable(
+              route = Screen.TRAIN_CHALLENGE,
+              content = { activity, isTimeDependent, time, sets, reps ->
+                TrainChallengeScreen(
+                    activity, isTimeDependent, time, sets, reps, workoutViewModel, innerPadding)
+              })
         }
 
         if (e2eEventTesting) {
