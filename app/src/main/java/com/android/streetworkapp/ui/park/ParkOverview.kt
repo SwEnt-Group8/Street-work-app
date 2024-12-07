@@ -58,6 +58,7 @@ import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.image.AddImageButton
+import com.android.streetworkapp.ui.image.ImagesCollectionButton
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.theme.ColorPalette
@@ -102,6 +103,7 @@ fun ParkOverviewScreen(
   val showRatingDialog = remember { mutableStateOf(false) }
 
   val context = LocalContext.current
+
 
   Box(modifier = Modifier.padding(innerPadding).fillMaxSize().testTag("parkOverviewScreen")) {
     Column {
@@ -167,9 +169,14 @@ fun ImageTitle(imageViewModel: ImageViewModel, image: Painter?, park: Park?, use
         color = Color.White,
         fontSize = 24.sp,
         modifier = Modifier.align(Alignment.BottomStart).padding(16.dp).testTag("title"))
-    Box(modifier = Modifier.align(Alignment.TopEnd).padding(2.dp)) {
+    Row(modifier = Modifier.align(Alignment.BottomEnd).padding(5.dp), horizontalArrangement = Arrangement.spacedBy(
+        (-5).dp
+    )) {
+      ImagesCollectionButton()
       AddImageButton(imageViewModel, park, user)
     }
+
+
   }
 }
 

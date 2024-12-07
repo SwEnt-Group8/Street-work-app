@@ -102,7 +102,7 @@ fun AddImageButton(imageViewModel: ImageViewModel, currentPark: Park?, currentUs
             modifier =
                 Modifier.size(36.dp)
                     .background(color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape)
-                    .padding(4.dp)) {
+                    .padding(2.dp)) {
               Icon(
                   painter = painterResource(id = R.drawable.add_a_photo_24px),
                   contentDescription = "Add Image",
