@@ -36,53 +36,6 @@ open class ProgressionViewModel(private val repository: ProgressionRepository) :
   }
 
   /**
-   * Check the score of the user. With enough points, the user wins medals. This function should be
-   * called EACH TIME points are added
-   *
-   * @param score: The current score of the user
-   */
-  fun checkScore(score: Int) =
-      viewModelScope.launch {
-        while (_currentProgression.value.currentGoal < score && score <= Ranks.CEILING.score) {
-          val unlockedAchievement = getMedalByScore(_currentProgression.value.currentGoal)
-          val nextMedalName =
-              enumValues<MedalsAchievement>().getOrNull(unlockedAchievement.ordinal + 1)?.name
-          nextMedalName
-              ?.let { // if this executes this means that the user is not at the highest rank
-                val newAchievements =
-                    _currentProgression.value.achievements + unlockedAchievement.name
-                _currentProgression.value.currentGoal = enumValueOf<Ranks>(it).score
-
-                repository.updateProgressionWithAchievementAndGoal(
-                    _currentProgression.value.progressionId,
-                    newAchievements,
-                    _currentProgression.value.currentGoal)
-              }
-        }
-      }
-
-  /**
-   * Check the number of friends of the user. Gives an achievement when the user as enough friends
-   *
-   * @param numberOfFriends: The current numberOfFriends of the user
-   */
-  fun checkFriends(numberOfFriends: Int) =
-      viewModelScope.launch {
-        val newAchievements = _currentProgression.value.achievements.toMutableList()
-
-        enumValues<SocialAchievement>().forEach {
-          if (it.numberOfFriends <= numberOfFriends && !newAchievements.contains(it.name)) {
-            newAchievements += it.name
-          }
-        }
-
-        repository.updateProgressionWithAchievementAndGoal(
-            _currentProgression.value.progressionId,
-            newAchievements,
-            _currentProgression.value.currentGoal)
-      }
-
-  /**
    * Checks if the user have won achievements
    *
    * @param numberOfFriends: The current numberOfFriends of the user
