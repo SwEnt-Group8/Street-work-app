@@ -5,8 +5,36 @@
     <string name="default_web_client_id">949532445294-2cvshtbsgubvrn54cg9301rrs2pe8dth.apps.googleusercontent.com</string>
 
 
-    // Helping dialogs(INFO)
+    // Settings
+    <string name="SettingsTitle">Settings</string>
+    <string name="SettingsNullUserContent">You are not logged-in, please log-in to access connection settings</string>
+    <string name="SettingsConnectionContent">You are logged-in as %1$s</string>
 
+    <string name="DeleteAccountConfirmationTitle">Are you sure ?</string>
+    <string name="DeleteAccountConfirmationContent">Do you really want to delete your account ? \n\nYou will loose all of your progression. \nThis action is irreversible.</string>
+
+
+    // Friend removal :
+    <string name="RemoveFriendAction">Remove friend</string>
+    <string name="RemoveFriendSuccess">Removed %1$s from your friends</string>
+    <string name="RemoveFriendFailure">Error - could not remove friend</string>
+
+    // Friend removal dialog
+    <string name="RemoveFriendTitle">Are you sure ?</string>
+    <string name="RemoveFriendContent">Do you really want to remove %1$s from your friends ?</string>
+
+
+    // Dialogs
+    <string name="DialogCancelButtonTitle">Cancel</string>
+    <string name="DialogCancelButtonResponse">Canceled</string>
+
+    <string name="DialogConfirmButtonTitle">Confirm</string>
+    <string name="DialogConfirmButtonResponse">Confirmed</string>
+
+    <string name="DialogSubmitButtonTitle">Submit</string>
+    <string name="DialogSubmitButtonResponse">Submit</string>
+
+    // Helping dialogs(INFO)
     // Default Info
     <string name="DefaultInfoTitle">Screen not supported yet</string>
     <string name="DefaultInfoContent">Information about this screen is not available. Please explore to learn more!</string>
@@ -35,8 +63,21 @@
     // Progression UI
     <string name="ProgressionEmptyAchievements">You do not have any achievements yet!</string>
 
+    // Workout UI
+    <string name="WorkoutDurationMessage1">I want to do %02d min and %02d seconds of %s</string>
+    <string name="WorkoutDurationMessage2">I want to do %2d sets of %2d %s</string>
 
-
-
-
+    <string name="counter_explanation">
+    The counter represents the number of sets completed. Each time you finish your target reps, increment the counter until you\'ve completed your objective.
+    </string>
+    <string name="time_up_message">Nice Work!</string>
+    <string name="stop_button_text">Stop</string>
+    <string name="reset_button_text">Reset</string>
+    <string name="increment_button_text">+1</string>
+    <string name="decrement_button_text">-1</string>
+    <string name="end_exercise">End Exercise</string>
+    <string name="performance_history">Performance History</string>
+    <string name="no_performance_history">No performance history available.</string>
+    <string name="x_axis_label_session">Session</string>
+    <string name="y_axis_label_total_reps">Total reps</string>
 </resources>

@@ -116,4 +116,70 @@ class NavigationActionsTest {
     assertThat(navOptions.restoreState, `is`(false))
     assertThat(navOptions.launchSingleTop, `is`(true))
   }
+
+  @Test
+  fun navigateToSoloScreen_WithAllParams_CorrectRoute() {
+    val params =
+        TrainNavigationParams(
+            activity = "Running", isTimeDependent = true, time = 120, sets = null, reps = null)
+    navigationActions.navigateToSoloScreen(params)
+
+    verify(navHostController).navigate("TrainSolo/Running/true?time=120")
+  }
+
+  @Test
+  fun navigateToCoachScreen_WithSetsAndReps_CorrectRoute() {
+    val params =
+        TrainNavigationParams(
+            activity = "Swimming", isTimeDependent = false, time = null, sets = 4, reps = 10)
+    navigationActions.navigateToCoachScreen(params)
+
+    verify(navHostController).navigate("TrainCoach/Swimming/false?sets=4&reps=10")
+  }
+
+  @Test
+  fun navigateToChallengeScreen_WithTime_CorrectRoute() {
+    val params =
+        TrainNavigationParams(
+            activity = "Cycling", isTimeDependent = true, time = 300, sets = null, reps = null)
+    navigationActions.navigateToChallengeScreen(params)
+
+    verify(navHostController).navigate("TrainChallenge/Cycling/true?time=300")
+  }
+
+  @Test
+  fun navigateToTrainParam_CorrectRoute() {
+    navigationActions.navigateToTrainParam(
+        activity = "Jumping", isTimeDependent = true, type = "Solo")
+
+    verify(navHostController).navigate("TrainParam/Jumping/true/Solo")
+  }
+
+  @Test
+  fun buildRoute_WithTime_CorrectString() {
+    val route =
+        navigationActions.buildRoute(
+            baseRoute = "TrainSolo",
+            activity = "Push-ups",
+            isTimeDependent = true,
+            time = 60,
+            sets = null,
+            reps = null)
+
+    assertThat(route, `is`("TrainSolo/Push-ups/true?time=60"))
+  }
+
+  @Test
+  fun buildRoute_WithSetsAndReps_CorrectString() {
+    val route =
+        navigationActions.buildRoute(
+            baseRoute = "TrainCoach",
+            activity = "Push-ups",
+            isTimeDependent = false,
+            time = null,
+            sets = 3,
+            reps = 15)
+
+    assertThat(route, `is`("TrainCoach/Push-ups/false?sets=3&reps=15"))
+  }
 }

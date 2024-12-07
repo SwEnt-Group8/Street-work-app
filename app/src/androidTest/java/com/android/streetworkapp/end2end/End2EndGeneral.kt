@@ -19,6 +19,8 @@ import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.ParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
+import com.android.streetworkapp.model.preferences.PreferencesRepository
+import com.android.streetworkapp.model.preferences.PreferencesViewModel
 import com.android.streetworkapp.model.progression.MedalsAchievement
 import com.android.streetworkapp.model.progression.Progression
 import com.android.streetworkapp.model.progression.ProgressionRepository
@@ -121,7 +123,8 @@ class End2EndGeneral {
           progressionViewModel,
           WorkoutViewModel(mock(WorkoutRepository::class.java)),
           TextModerationViewModel(mock(TextModerationRepository::class.java)),
-          ImageViewModel(mock(ImageRepository::class.java)))
+          ImageViewModel(mock(ImageRepository::class.java)),
+          PreferencesViewModel(mock(PreferencesRepository::class.java)))
     }
 
     composeTestRule.waitForIdle()

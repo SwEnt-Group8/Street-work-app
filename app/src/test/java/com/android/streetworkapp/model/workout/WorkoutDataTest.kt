@@ -21,8 +21,8 @@ class WorkoutDataTest {
     // Prepare custom values
     val workoutSessions =
         listOf(
-            WorkoutSession("session1", 0L, 0L, SessionType.ALONE),
-            WorkoutSession("session2", 0L, 0L, SessionType.ALONE))
+            WorkoutSession("session1", 0L, 0L, SessionType.SOLO),
+            WorkoutSession("session2", 0L, 0L, SessionType.SOLO))
     val userUid = "test_user"
 
     // Create an instance of WorkoutData with custom values

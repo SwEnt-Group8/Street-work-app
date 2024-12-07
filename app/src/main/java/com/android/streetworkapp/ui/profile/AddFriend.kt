@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,8 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,7 +46,7 @@ import com.android.streetworkapp.model.progression.ScoreIncrease
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.progress.updateAndDisplayPoints
-import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_DARK
+import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.ui.theme.ColorPalette.PRIMARY_TEXT_COLOR
 import com.android.streetworkapp.ui.theme.ColorPalette.PRINCIPLE_BACKGROUND_COLOR
 import com.android.streetworkapp.ui.theme.ColorPalette.SECONDARY_TEXT_COLOR
@@ -115,37 +116,14 @@ fun AddFriendScreen(
                 .padding(innerPaddingValues)
                 .padding(vertical = 24.dp)
                 .testTag("AddFriendColumn"),
-        horizontalAlignment = Alignment.CenterHorizontally) {
-          Column(
-              modifier =
-                  Modifier.align(Alignment.Start)
-                      .padding(horizontal = 16.dp, vertical = 8.dp)
-                      .testTag("InstructionsContainer")) {
-                // Title
-                Text(
-                    text = "Instructions",
-                    modifier =
-                        Modifier.align(Alignment.Start)
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
-                            .testTag("InstructionsTitle"),
-                    style =
-                        TextStyle(
-                            fontSize = 18.sp,
-                            lineHeight = 24.sp,
-                            fontWeight = FontWeight(500),
-                            color = PRIMARY_TEXT_COLOR))
-              }
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center) {
           Box(
               modifier =
                   Modifier.padding(horizontal = 8.dp, vertical = 16.dp)
-                      .border(
-                          width = 1.dp,
-                          color = Color.Gray,
-                          shape = androidx.compose.foundation.shape.RoundedCornerShape(6.dp))
+                      .border(width = 1.dp, color = Color.Gray, shape = RoundedCornerShape(6.dp))
                       .width(336.dp)
-                      .background(
-                          PRINCIPLE_BACKGROUND_COLOR,
-                          shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
+                      .background(PRINCIPLE_BACKGROUND_COLOR, shape = RoundedCornerShape(8.dp))
                       .padding(12.dp)
                       .testTag("InstructionsBox")) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -194,7 +172,7 @@ fun FriendRequestDialog(username: String, onAccept: () -> Unit, onRefuse: () -> 
       confirmButton = {
         Button(
             onClick = onAccept,
-            colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
+            colors = ColorPalette.BUTTON_COLOR,
             modifier = Modifier.testTag("acceptButton")) {
               Text("Accept", color = PRIMARY_TEXT_COLOR)
             }
@@ -202,7 +180,7 @@ fun FriendRequestDialog(username: String, onAccept: () -> Unit, onRefuse: () -> 
       dismissButton = {
         Button(
             onClick = onRefuse,
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+            colors = ColorPalette.BUTTON_COLOR,
             modifier = Modifier.testTag("refuseButton")) {
               Text("Refuse", color = PRIMARY_TEXT_COLOR)
             }

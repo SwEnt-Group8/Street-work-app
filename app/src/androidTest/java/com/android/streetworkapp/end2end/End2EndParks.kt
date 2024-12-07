@@ -36,6 +36,8 @@ import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
+import com.android.streetworkapp.model.preferences.PreferencesRepository
+import com.android.streetworkapp.model.preferences.PreferencesViewModel
 import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.model.workout.WorkoutViewModel
@@ -49,6 +51,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.mock
 
 @RunWith(AndroidJUnit4::class)
 class End2EndParks {
@@ -114,7 +117,8 @@ class End2EndParks {
           ProgressionViewModel(mockk()),
           WorkoutViewModel(mockk()),
           TextModerationViewModel(mockk()),
-          ImageViewModel(mockk()))
+          ImageViewModel(mockk()),
+          PreferencesViewModel(mock(PreferencesRepository::class.java)))
       // setup so as we're already on the MAP route
     }
 

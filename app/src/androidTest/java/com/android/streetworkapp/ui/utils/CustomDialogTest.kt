@@ -1,10 +1,12 @@
 package com.android.streetworkapp.ui.utils
 
+import android.content.Context
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
@@ -161,5 +163,179 @@ class CustomDialogTest {
 
     // Content is displayed
     composeTestRule.onNodeWithTag("content").assertIsDisplayed()
+  }
+
+  @Composable
+  fun SetUpConfirmButtonHandler(
+      dialogType: DialogType,
+      tag: String,
+      showDialog: MutableState<Boolean>,
+      context: MutableState<Context?>,
+      onClick: () -> Unit = {}
+  ) {
+    HandleConfirmButton(dialogType, tag, showDialog, onClick)
+    context.value = LocalContext.current
+  }
+
+  @Test
+  fun isHandleConfirmButtonWorkingCorrectlyForINFO() {
+    val tag = "MyTag"
+    val context: MutableState<Context?> = mutableStateOf(null)
+
+    composeTestRule.setContent {
+      SetUpConfirmButtonHandler(DialogType.INFO, tag, mutableStateOf(true), context)
+    }
+
+    val SUBMIT_BUTTON_TAG = "${tag}Dialog${ButtonType.SUBMIT.tag(context.value!!)}Button"
+    val CONFIRM_BUTTON_TAG = "${tag}Dialog${ButtonType.CONFIRM.tag(context.value!!)}Button"
+    val CANCEL_BUTTON_TAG = "${tag}Dialog${ButtonType.CANCEL.tag(context.value!!)}Button"
+
+    // No buttons should be displayed in INFO
+    composeTestRule.onNodeWithTag(SUBMIT_BUTTON_TAG).assertDoesNotExist()
+    composeTestRule.onNodeWithTag(CONFIRM_BUTTON_TAG).assertDoesNotExist()
+    composeTestRule.onNodeWithTag(CANCEL_BUTTON_TAG).assertDoesNotExist()
+  }
+
+  @Test
+  fun isHandleConfirmButtonWorkingCorrectlyForCONFIRM() {
+    val tag = "MyTag"
+    val showDialog = mutableStateOf(true)
+    val submitted = mutableStateOf(false)
+    val onSubmit = { submitted.value = true }
+    val context: MutableState<Context?> = mutableStateOf(null)
+
+    composeTestRule.setContent {
+      SetUpConfirmButtonHandler(DialogType.CONFIRM, tag, showDialog, context, onSubmit)
+    }
+
+    val SUBMIT_BUTTON_TAG = "${tag}Dialog${ButtonType.SUBMIT.tag(context.value!!)}Button"
+    val CONFIRM_BUTTON_TAG = "${tag}Dialog${ButtonType.CONFIRM.tag(context.value!!)}Button"
+    val CANCEL_BUTTON_TAG = "${tag}Dialog${ButtonType.CANCEL.tag(context.value!!)}Button"
+
+    // Confirm button should be displayed in CONFIRM
+    composeTestRule.onNodeWithTag(SUBMIT_BUTTON_TAG).assertDoesNotExist()
+    composeTestRule.onNodeWithTag(CANCEL_BUTTON_TAG).assertDoesNotExist()
+    composeTestRule
+        .onNodeWithTag(CONFIRM_BUTTON_TAG)
+        .assertIsDisplayed()
+        .assertHasClickAction()
+        .assertTextEquals(ButtonType.CONFIRM.tag(context.value!!))
+
+    composeTestRule.onNodeWithTag(CONFIRM_BUTTON_TAG).performClick()
+    composeTestRule.waitForIdle()
+    assert(submitted.value)
+    assert(!showDialog.value)
+  }
+
+  @Test
+  fun isHandleConfirmButtonWorkingCorrectlyForQUERY() {
+    val tag = "MyTag"
+    val showDialog = mutableStateOf(true)
+    val submitted = mutableStateOf(false)
+    val onSubmit = { submitted.value = true }
+    val context: MutableState<Context?> = mutableStateOf(null)
+
+    composeTestRule.setContent {
+      SetUpConfirmButtonHandler(DialogType.QUERY, tag, showDialog, context, onSubmit)
+    }
+
+    val SUBMIT_BUTTON_TAG = "${tag}Dialog${ButtonType.SUBMIT.tag(context.value!!)}Button"
+    val CONFIRM_BUTTON_TAG = "${tag}Dialog${ButtonType.CONFIRM.tag(context.value!!)}Button"
+    val CANCEL_BUTTON_TAG = "${tag}Dialog${ButtonType.CANCEL.tag(context.value!!)}Button"
+
+    // Only submit button should be displayed in QUERY
+    composeTestRule.onNodeWithTag(CONFIRM_BUTTON_TAG).assertDoesNotExist()
+    composeTestRule.onNodeWithTag(CANCEL_BUTTON_TAG).assertDoesNotExist()
+    composeTestRule
+        .onNodeWithTag(SUBMIT_BUTTON_TAG)
+        .assertIsDisplayed()
+        .assertHasClickAction()
+        .assertTextEquals(ButtonType.SUBMIT.tag(context.value!!))
+
+    composeTestRule.onNodeWithTag(SUBMIT_BUTTON_TAG).performClick()
+    composeTestRule.waitForIdle()
+    assert(submitted.value)
+    assert(!showDialog.value)
+  }
+
+  @Composable
+  fun SetUpDismissButtonHandler(
+      dialogType: DialogType,
+      tag: String,
+      showDialog: MutableState<Boolean>,
+      context: MutableState<Context?>,
+      onClick: () -> Unit = {}
+  ) {
+    HandleDismissButton(dialogType, tag, showDialog, onClick)
+    context.value = LocalContext.current
+  }
+
+  @Test
+  fun isHandleDismissButtonWorkingCorrectlyForINFO() {
+    val tag = "MyTag"
+    val context: MutableState<Context?> = mutableStateOf(null)
+
+    composeTestRule.setContent {
+      SetUpDismissButtonHandler(DialogType.INFO, tag, mutableStateOf(true), context)
+    }
+
+    val SUBMIT_BUTTON_TAG = "${tag}Dialog${ButtonType.SUBMIT.tag(context.value!!)}Button"
+    val CONFIRM_BUTTON_TAG = "${tag}Dialog${ButtonType.CONFIRM.tag(context.value!!)}Button"
+    val CANCEL_BUTTON_TAG = "${tag}Dialog${ButtonType.CANCEL.tag(context.value!!)}Button"
+
+    // No buttons should be displayed in INFO
+    composeTestRule.onNodeWithTag(SUBMIT_BUTTON_TAG).assertDoesNotExist()
+    composeTestRule.onNodeWithTag(CONFIRM_BUTTON_TAG).assertDoesNotExist()
+    composeTestRule.onNodeWithTag(CANCEL_BUTTON_TAG).assertDoesNotExist()
+  }
+
+  @Test
+  fun isHandleDismissButtonWorkingCorrectlyForCONFRIM() {
+    val tag = "MyTag"
+    val context: MutableState<Context?> = mutableStateOf(null)
+
+    composeTestRule.setContent {
+      SetUpDismissButtonHandler(DialogType.CONFIRM, tag, mutableStateOf(true), context)
+    }
+
+    val SUBMIT_BUTTON_TAG = "${tag}Dialog${ButtonType.SUBMIT.tag(context.value!!)}Button"
+    val CONFIRM_BUTTON_TAG = "${tag}Dialog${ButtonType.CONFIRM.tag(context.value!!)}Button"
+    val CANCEL_BUTTON_TAG = "${tag}Dialog${ButtonType.CANCEL.tag(context.value!!)}Button"
+
+    // No buttons should be displayed in CONFIRM
+    composeTestRule.onNodeWithTag(SUBMIT_BUTTON_TAG).assertDoesNotExist()
+    composeTestRule.onNodeWithTag(CONFIRM_BUTTON_TAG).assertDoesNotExist()
+    composeTestRule.onNodeWithTag(CANCEL_BUTTON_TAG).assertDoesNotExist()
+  }
+
+  @Test
+  fun isHandleDismissButtonWorkingCorrectlyForQUERRY() {
+    val tag = "MyTag"
+    val showDialog = mutableStateOf(true)
+    val dismissed = mutableStateOf(false)
+    val onDismiss = { dismissed.value = true }
+    val context: MutableState<Context?> = mutableStateOf(null)
+
+    composeTestRule.setContent {
+      SetUpDismissButtonHandler(DialogType.QUERY, tag, showDialog, context, onDismiss)
+    }
+
+    val SUBMIT_BUTTON_TAG = "${tag}Dialog${ButtonType.SUBMIT.tag(context.value!!)}Button"
+    val CONFIRM_BUTTON_TAG = "${tag}Dialog${ButtonType.CONFIRM.tag(context.value!!)}Button"
+    val CANCEL_BUTTON_TAG = "${tag}Dialog${ButtonType.CANCEL.tag(context.value!!)}Button"
+
+    // Only cancel button should be displayed in QUERY
+    composeTestRule.onNodeWithTag(SUBMIT_BUTTON_TAG).assertDoesNotExist()
+    composeTestRule.onNodeWithTag(CONFIRM_BUTTON_TAG).assertDoesNotExist()
+    composeTestRule
+        .onNodeWithTag(CANCEL_BUTTON_TAG)
+        .assertIsDisplayed()
+        .assertHasClickAction()
+        .assertTextEquals(ButtonType.CANCEL.tag(context.value!!))
+
+    composeTestRule.onNodeWithTag(CANCEL_BUTTON_TAG).performClick()
+    composeTestRule.waitForIdle()
+    assert(dismissed.value)
+    assert(!showDialog.value)
   }
 }

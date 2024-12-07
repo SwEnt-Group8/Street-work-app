@@ -16,6 +16,9 @@ import com.android.streetworkapp.model.workout.WorkoutViewModel
 fun TrainChallengeScreen(
     activity: String,
     isTimeDependent: Boolean,
+    time: Int?,
+    sets: Int?,
+    reps: Int?,
     workoutViewModel: WorkoutViewModel,
     paddingValues: PaddingValues = PaddingValues(0.dp)
 ) {

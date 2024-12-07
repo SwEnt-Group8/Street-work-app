@@ -18,7 +18,6 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -46,7 +45,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -105,12 +103,10 @@ fun AddEventScreen(
     paddingValues: PaddingValues = PaddingValues(0.dp),
 ) {
 
-  val context = LocalContext.current
-
   val eid = eventViewModel.getNewEid()
 
   val event by remember {
-    mutableStateOf<Event>(
+    mutableStateOf(
         Event(
             eid,
             "",
@@ -143,10 +139,10 @@ fun AddEventScreen(
   // passing it as param)
   val isTextEvaluationOverThresholdsError = remember { mutableStateOf(false) } // same here
   val isDateBackInTimeError = remember { mutableStateOf(false) } // same here
-  var isTextEvaluationError = remember {
+  val isTextEvaluationError = remember {
     mutableStateOf(false)
   } // for api error, deserialization error or network issues
-  var formErrorMessage = remember {
+  val formErrorMessage = remember {
     mutableStateOf("")
   } // message to be displayed at bottom of form in case of form error
 
@@ -161,72 +157,71 @@ fun AddEventScreen(
           isTextEvaluationError.value)
 
   Box(
-      modifier = Modifier.padding(paddingValues).background(MaterialTheme.colorScheme.background),
-  ) {
-    Box(modifier = Modifier.fillMaxSize().testTag("addEventScreen").padding(vertical = 15.dp)) {
-      Column(
-          modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
-          verticalArrangement = Arrangement.spacedBy(18.dp),
-          horizontalAlignment = Alignment.CenterHorizontally) {
-            EventTitleSelection(event, isTitleEmptyError, isTextEvaluationOverThresholdsError)
-            EventDescriptionSelection(event, isTextEvaluationOverThresholdsError)
-            TimeSelection(event, isDateBackInTimeError)
+      modifier =
+          Modifier.fillMaxSize()
+              .testTag("addEventScreen")
+              .padding(paddingValues)
+              .background(MaterialTheme.colorScheme.background)) {
+        Column(
+            modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(18.dp),
+            horizontalAlignment = Alignment.CenterHorizontally) {
+              EventTitleSelection(event, isTitleEmptyError, isTextEvaluationOverThresholdsError)
+              EventDescriptionSelection(event, isTextEvaluationOverThresholdsError)
+              TimeSelection(event, isDateBackInTimeError)
 
-            Text(
-                text = "* Required fields",
-                color = ColorPalette.SECONDARY_TEXT_COLOR,
-                fontWeight = FontWeight.Normal,
-                fontSize = 12.sp,
-                textAlign = TextAlign.Left,
-                modifier = Modifier.fillMaxWidth(0.9f))
-            Text(
-                text = "How many participants do you want?",
-                fontSize = 18.sp,
-            )
-            ParticipantNumberSelection(event)
-
-            if (errorStates.any { it }) {
               Text(
-                  modifier =
-                      Modifier.padding(vertical = 0.dp, horizontal = 25.dp).testTag("errorMessage"),
-                  textAlign = TextAlign.Center,
-                  color = MaterialTheme.colorScheme.error,
-                  text = formErrorMessage.value)
-            }
-            // for non users-related-input errors, we only show the message for a brief amount of
-            // time
-            LaunchedEffect(isTextEvaluationError.value) {
-              delay(AddEventParams.TEXT_EVALUATION_DISPLAY_TIME)
-              isTextEvaluationError.value = false
-            }
+                  text = "* Required fields",
+                  color = ColorPalette.SECONDARY_TEXT_COLOR,
+                  fontWeight = FontWeight.Normal,
+                  fontSize = 12.sp,
+                  textAlign = TextAlign.Left,
+                  modifier = Modifier.fillMaxWidth(0.9f))
+              Text(
+                  text = "How many participants do you want?",
+                  fontSize = 18.sp,
+              )
+              ParticipantNumberSelection(event)
 
-            Button(
-                colors =
-                    ButtonDefaults.buttonColors(
-                        containerColor = ColorPalette.INTERACTION_COLOR_DARK,
-                        contentColor = ColorPalette.PRIMARY_TEXT_COLOR),
-                modifier = Modifier.testTag("addEventButton"),
-                onClick = {
-                  onAddEventClickHandler(
-                      event,
-                      navigationActions,
-                      eventViewModel,
-                      userViewModel,
-                      parkViewModel,
-                      textModerationViewModel,
-                      snackBarHostState,
-                      coroutineScope,
-                      isDateBackInTimeError,
-                      isTitleEmptyError,
-                      isTextEvaluationOverThresholdsError,
-                      isTextEvaluationError,
-                      formErrorMessage)
-                }) {
-                  Text("Add new event")
-                }
-          }
-    }
-  }
+              if (errorStates.any { it }) {
+                Text(
+                    modifier =
+                        Modifier.padding(vertical = 0.dp, horizontal = 25.dp)
+                            .testTag("errorMessage"),
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.error,
+                    text = formErrorMessage.value)
+              }
+              // for non users-related-input errors, we only show the message for a brief amount of
+              // time
+              LaunchedEffect(isTextEvaluationError.value) {
+                delay(AddEventParams.TEXT_EVALUATION_DISPLAY_TIME)
+                isTextEvaluationError.value = false
+              }
+
+              Button(
+                  colors = ColorPalette.BUTTON_COLOR,
+                  modifier = Modifier.testTag("addEventButton"),
+                  onClick = {
+                    onAddEventClickHandler(
+                        event,
+                        navigationActions,
+                        eventViewModel,
+                        userViewModel,
+                        parkViewModel,
+                        textModerationViewModel,
+                        snackBarHostState,
+                        coroutineScope,
+                        isDateBackInTimeError,
+                        isTitleEmptyError,
+                        isTextEvaluationOverThresholdsError,
+                        isTextEvaluationError,
+                        formErrorMessage)
+                  }) {
+                    Text("Add new event")
+                  }
+            }
+      }
 }
 
 /**

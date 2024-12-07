@@ -20,11 +20,17 @@ class TrainChallengeScreenTest {
   fun trainChallengeScreen_displaysCorrectInformation() {
     val testActivity = "Handstand"
     val testIsTimeDependent = false
+    val testTime: Int? = 60
+    val testSets: Int? = 5
+    val testReps: Int? = 10
 
     composeTestRule.setContent {
       TrainChallengeScreen(
           activity = testActivity,
           isTimeDependent = testIsTimeDependent,
+          time = testTime,
+          sets = testSets,
+          reps = testReps,
           workoutViewModel = workoutViewModel)
     }
 
