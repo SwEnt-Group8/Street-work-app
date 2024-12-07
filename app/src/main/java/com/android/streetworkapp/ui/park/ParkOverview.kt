@@ -89,7 +89,7 @@ fun ParkOverviewScreen(
   // MVVM calls for park state :
   val currentPark = parkViewModel.currentPark.collectAsState()
 
-    parkViewModel.park.collectAsState().value?.pid?.let { parkViewModel.loadCurrentPark(it) }
+  parkViewModel.park.collectAsState().value?.pid?.let { parkViewModel.loadCurrentPark(it) }
 
   // MVVM calls for event state of the park :
   currentPark.value?.let { eventViewModel.getEvents(it) }
@@ -167,7 +167,9 @@ fun ImageTitle(imageViewModel: ImageViewModel, image: Painter?, park: Park?, use
         color = Color.White,
         fontSize = 24.sp,
         modifier = Modifier.align(Alignment.BottomStart).padding(16.dp).testTag("title"))
-    Box(modifier = Modifier.align(Alignment.TopEnd).padding(2.dp)) { AddImageButton(imageViewModel, park, user) }
+    Box(modifier = Modifier.align(Alignment.TopEnd).padding(2.dp)) {
+      AddImageButton(imageViewModel, park, user)
+    }
   }
 }
 

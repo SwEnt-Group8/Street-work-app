@@ -133,8 +133,7 @@ fun StreetWorkAppMain(testInvokation: NavigationActions.() -> Unit = {}) {
       progressionViewModel,
       workoutViewModel,
       textModerationViewModel,
-      imageViewModel
-      )
+      imageViewModel)
 }
 
 fun NavGraphBuilder.trainComposable(
@@ -286,7 +285,12 @@ fun StreetWorkApp(
                 composable(Screen.PARK_OVERVIEW) {
                   infoManager.Display(LocalContext.current)
                   ParkOverviewScreen(
-                      parkViewModel, innerPadding, navigationActions, eventViewModel, userViewModel, imageViewModel)
+                      parkViewModel,
+                      innerPadding,
+                      navigationActions,
+                      eventViewModel,
+                      userViewModel,
+                      imageViewModel)
                 }
                 composable(Screen.ADD_EVENT) {
                   infoManager.Display(LocalContext.current)
