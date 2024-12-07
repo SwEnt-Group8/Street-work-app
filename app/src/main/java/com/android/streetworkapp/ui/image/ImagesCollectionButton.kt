@@ -1,6 +1,5 @@
 package com.android.streetworkapp.ui.image
 
-import android.Manifest
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,7 +9,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,44 +22,48 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.android.sample.R
 import com.android.streetworkapp.model.image.ImageViewModel
-import com.android.streetworkapp.model.image.ParkImageCollection
 import com.android.streetworkapp.model.image.ParkImageLocal
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.theme.ColorPalette
 
 @Composable
-fun ImagesCollectionButton(imageViewModel: ImageViewModel, userViewModel: UserViewModel, park: Park?) {
+fun ImagesCollectionButton(
+    imageViewModel: ImageViewModel,
+    userViewModel: UserViewModel,
+    park: Park?
+) {
 
-    val context = LocalContext.current
+  val context = LocalContext.current
 
-    var showImagesCollection by remember { mutableStateOf(false) }
-    var parkImages by remember { mutableStateOf(emptyList<ParkImageLocal>()) } //this will store the park images
+  var showImagesCollection by remember { mutableStateOf(false) }
+  var parkImages by remember {
+    mutableStateOf(emptyList<ParkImageLocal>())
+  } // this will store the park images
 
-    if (showImagesCollection)
-        FullScreenImagePopup(parkImages) { showImagesCollection = false }
+  if (showImagesCollection) FullScreenImagePopup(parkImages) { showImagesCollection = false }
 
-    IconButton(
-        onClick = {
-            park?.let {
-                //fetch the images
-                imageViewModel.retrieveImages(context, park) {
-                    parkImages = it
-                    showImagesCollection = true
-                }
-            }
-        },
-        modifier = Modifier.testTag("ImagesCollectionButton")) {
+  IconButton(
+      onClick = {
+        park?.let {
+          // fetch the images
+          imageViewModel.retrieveImages(context, park) {
+            parkImages = it
+            showImagesCollection = true
+          }
+        }
+      },
+      modifier = Modifier.testTag("ImagesCollectionButton")) {
         Box(
             modifier =
-            Modifier.size(36.dp)
-                .background(color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape)
-                .padding(2.dp)) {
-            Icon(
-                painter = painterResource(id = R.drawable.photo_library_24px),
-                contentDescription = "Add Image",
-                tint = Color.White,
-                modifier = Modifier.align(Alignment.Center).fillMaxSize(0.75f))
-        }
-    }
+                Modifier.size(36.dp)
+                    .background(color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape)
+                    .padding(2.dp)) {
+              Icon(
+                  painter = painterResource(id = R.drawable.photo_library_24px),
+                  contentDescription = "Add Image",
+                  tint = Color.White,
+                  modifier = Modifier.align(Alignment.Center).fillMaxSize(0.75f))
+            }
+      }
 }

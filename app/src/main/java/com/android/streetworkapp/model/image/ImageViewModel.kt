@@ -68,22 +68,21 @@ open class ImageViewModel(private val imageRepository: ImageRepository) : ViewMo
       val localParkImages = mutableListOf<ParkImageLocal>()
 
       val parkFolder = File(cacheDir, park.pid)
-        if (!parkFolder.exists()) {
-            parkFolder.mkdirs()
-        }
+      if (!parkFolder.exists()) {
+        parkFolder.mkdirs()
+      }
 
-
-        for (parkImage in retrievedImages) {
+      for (parkImage in retrievedImages) {
         val imageHash = sha256(parkImage.imageB64)
 
         val decodedBytes = Base64.decode(parkImage.imageB64, Base64.DEFAULT)
         val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
 
         val imageFile = File(parkFolder, "${imageHash}.jpg")
-        if (!imageFile.exists()) { //image doesn't exist, we decode it
-            FileOutputStream(imageFile).use { out ->
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
-            }
+        if (!imageFile.exists()) { // image doesn't exist, we decode it
+          FileOutputStream(imageFile).use { out ->
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+          }
         }
 
         val imageUri = Uri.fromFile(imageFile)
