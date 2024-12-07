@@ -121,8 +121,7 @@ class End2EndGeneral {
           progressionViewModel,
           WorkoutViewModel(mock(WorkoutRepository::class.java)),
           TextModerationViewModel(mock(TextModerationRepository::class.java)),
-          ImageViewModel(mock(ImageRepository::class.java))
-          )
+          ImageViewModel(mock(ImageRepository::class.java)))
     }
 
     composeTestRule.waitForIdle()

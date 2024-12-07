@@ -1,6 +1,5 @@
 package com.android.streetworkapp.ui.parkoverview
 
-import android.widget.ImageView
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
@@ -114,7 +113,11 @@ class ParkOverviewTest {
     parkViewModel.setCurrentPark(park)
     composeTestRule.setContent {
       ParkOverviewScreen(
-          parkViewModel, eventViewModel = eventViewModel, navigationActions = navigationActions, userViewModel = userViewModel, imageViewModel = imageViewModel)
+          parkViewModel,
+          eventViewModel = eventViewModel,
+          navigationActions = navigationActions,
+          userViewModel = userViewModel,
+          imageViewModel = imageViewModel)
     }
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("parkOverviewScreen").isDisplayed()
@@ -144,7 +147,11 @@ class ParkOverviewTest {
 
     composeTestRule.setContent {
       ParkOverviewScreen(
-          parkViewModel, eventViewModel = eventViewModel, navigationActions = navigationActions, userViewModel = userViewModel, imageViewModel = imageViewModel)
+          parkViewModel,
+          eventViewModel = eventViewModel,
+          navigationActions = navigationActions,
+          userViewModel = userViewModel,
+          imageViewModel = imageViewModel)
     }
     composeTestRule.waitForIdle()
 
@@ -172,7 +179,11 @@ class ParkOverviewTest {
     parkViewModel.setCurrentPark(noEventPark)
     composeTestRule.setContent {
       ParkOverviewScreen(
-          parkViewModel, eventViewModel = eventViewModel, navigationActions = navigationActions, userViewModel = userViewModel, imageViewModel = imageViewModel)
+          parkViewModel,
+          eventViewModel = eventViewModel,
+          navigationActions = navigationActions,
+          userViewModel = userViewModel,
+          imageViewModel = imageViewModel)
     }
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("noEventText").isDisplayed()
@@ -185,7 +196,11 @@ class ParkOverviewTest {
     assertThrows(IllegalArgumentException::class.java) {
       composeTestRule.setContent {
         ParkOverviewScreen(
-            parkViewModel, eventViewModel = eventViewModel, navigationActions = navigationActions, userViewModel = userViewModel, imageViewModel = imageViewModel)
+            parkViewModel,
+            eventViewModel = eventViewModel,
+            navigationActions = navigationActions,
+            userViewModel = userViewModel,
+            imageViewModel = imageViewModel)
       }
     }
   }

@@ -1,6 +1,5 @@
 package com.android.streetworkapp.ui.navigation
 
-import android.widget.ImageView
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed

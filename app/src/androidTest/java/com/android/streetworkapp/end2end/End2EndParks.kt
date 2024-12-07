@@ -114,8 +114,7 @@ class End2EndParks {
           ProgressionViewModel(mockk()),
           WorkoutViewModel(mockk()),
           TextModerationViewModel(mockk()),
-          ImageViewModel(mockk())
-          )
+          ImageViewModel(mockk()))
       // setup so as we're already on the MAP route
     }
 
