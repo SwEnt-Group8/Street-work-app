@@ -73,10 +73,10 @@ open class ImageViewModel(private val imageRepository: ImageRepository) : ViewMo
         val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
 
         val imageFile = File(cacheDir, "$imageHash.jpg")
-        if (imageFile.exists()) continue // Image already saved in cache, no need to decode it
-
-        FileOutputStream(imageFile).use { out ->
-          bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+        if (!imageFile.exists()) { //image doesn't exist, we decode it
+            FileOutputStream(imageFile).use { out ->
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+            }
         }
 
         val imageUri = Uri.fromFile(imageFile)
