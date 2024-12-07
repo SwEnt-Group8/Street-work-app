@@ -115,7 +115,6 @@ class ImageRepositoryFirestoreTest {
         assertTrue("Expected an empty list when imagesCollectionId is empty", result.isEmpty())
     }
 
-
     @Test
     fun `retrieveImages returns empty list when images collection does not exist`() = runBlocking {
         val park = Park(pid = "validParkId", imagesCollectionId = "missingCollectionId")
