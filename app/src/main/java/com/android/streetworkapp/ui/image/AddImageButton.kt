@@ -29,7 +29,10 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.android.sample.R
+import com.android.streetworkapp.model.image.ImageRepository
+import com.android.streetworkapp.model.image.ImageViewModel
 import com.android.streetworkapp.model.park.Park
+import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.ui.theme.ColorPalette
 import java.io.File
 
@@ -45,7 +48,7 @@ object AddImageButtonParams {
  * @param currentPark The info of the park the image will be linked to
  */
 @Composable
-fun AddImageButton(currentPark: Park?) {
+fun AddImageButton(imageViewModel: ImageViewModel, currentPark: Park?, currentUser: User?) {
 
   val context = LocalContext.current
 
@@ -109,22 +112,43 @@ fun AddImageButton(currentPark: Park?) {
             }
       }
 
-  capturedImageUri?.let {
-    if (showConfirmationDialog) {
-      ConfirmImageDialog(
-          imageUri = it,
-          onConfirm = {
-            // TODO: call the viewmodel to upload the file
-            showConfirmationDialog = false
-            // tempFile.delete() // IMPORTANT: only delete the file when the viewmodel is done with
-            // it,
-            // will cause race conditions otherwise
-          },
-          onCancel = {
-            showConfirmationDialog = false
-            if (!tempFile.delete())
-                Log.d(AddImageButtonParams.DEBUG_PREFIX, "Failed to delete cached photo file.")
-          })
-    }
+  capturedImageUri?.let { uri ->
+      currentPark?.let { park ->
+          currentUser?.let { user ->
+              if (showConfirmationDialog) {
+                  ConfirmImageDialog(
+                      imageUri = uri,
+                      onConfirm = {
+                          imageViewModel.uploadImage(context, uri, park.pid, user.uid, { onImageUploadSuccess(tempFile) }, { onImageUploadFailure() })
+                          showConfirmationDialog = false
+                          // tempFile.delete() // IMPORTANT: only delete the file when the viewmodel is done with
+                          // it,
+                          // will cause race conditions otherwise
+                      },
+                      onCancel = {
+                          showConfirmationDialog = false
+                          if (!tempFile.delete())
+                              Log.d(
+                                  AddImageButtonParams.DEBUG_PREFIX,
+                                  "Failed to delete cached photo file."
+                              )
+                      })
+              }
+          }
+      }
   }
 }
+
+//TODO: make UI responsive depending on success/failure
+private fun onImageUploadSuccess(file: File) {
+    if (!file.delete())
+        Log.d(
+            AddImageButtonParams.DEBUG_PREFIX,
+            "Failed to delete cached photo file."
+        )
+}
+
+private fun onImageUploadFailure() {
+
+}
+
