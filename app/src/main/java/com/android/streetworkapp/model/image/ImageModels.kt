@@ -13,7 +13,7 @@ data class ParkImageCollection(
     val id: String,
     val images: List<ParkImageDatabase>
 ) // note: if images field were to be changed, make sure to match the field name change in
-  // ImageRepositoryFirestore::uploadImage
+// ImageRepositoryFirestore::uploadImage
 
 /**
  * A data class that represents an image related to a park in the database, uploaded by a user, and

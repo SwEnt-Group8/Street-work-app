@@ -134,51 +134,49 @@ class ImageRepositoryFirestoreTest {
     assertTrue("Expected an empty list when the images collection does not exist", result.isEmpty())
   }
 
-    @Test
-    fun `retrieveImages returns list of ParkImageDatabase when valid data exists`() = runBlocking {
-        val mockImagesReply = listOf(
+  @Test
+  fun `retrieveImages returns list of ParkImageDatabase when valid data exists`() = runBlocking {
+    val mockImagesReply =
+        listOf(
             mapOf(
                 "imageB64" to "imageData1",
                 "userId" to "user1",
                 "rating" to mapOf("first" to 5, "second" to 10),
-                "uploadDate" to Timestamp.now()
-            ),
+                "uploadDate" to Timestamp.now()),
             mapOf(
                 "imageB64" to "imageData2",
                 "userId" to "user2",
                 "rating" to mapOf("first" to 8, "second" to 12),
-                "uploadDate" to Timestamp.now()
-            )
-        )
+                "uploadDate" to Timestamp.now()))
 
-        val park = Park(pid = "validParkId", imagesCollectionId = "validNonEmptyCollectionId")
+    val park = Park(pid = "validParkId", imagesCollectionId = "validNonEmptyCollectionId")
 
-        val mockCollection = mock(CollectionReference::class.java)
-        val mockDocument = mock(DocumentReference::class.java)
-        val mockTask = mock(Task::class.java) as Task<DocumentSnapshot>
-        val mockDocumentSnapshot = mock(DocumentSnapshot::class.java)
+    val mockCollection = mock(CollectionReference::class.java)
+    val mockDocument = mock(DocumentReference::class.java)
+    val mockTask = mock(Task::class.java) as Task<DocumentSnapshot>
+    val mockDocumentSnapshot = mock(DocumentSnapshot::class.java)
 
-        whenever(parkRepository.getParkByPid(park.pid)).thenReturn(park)
-        whenever(mockTask.isComplete).thenReturn(true)
-        whenever(mockTask.result).thenReturn(mockDocumentSnapshot)
-        whenever(fireStoreDB.collection(ImageRepositoryFirestore.COLLECTION_PATH))
-            .thenReturn(mockCollection)
-        whenever(mockCollection.document(park.imagesCollectionId)).thenReturn(mockDocument)
-        whenever(mockDocument.get()).thenReturn(mockTask)
-        whenever(mockDocumentSnapshot.exists()).thenReturn(true)
-        whenever(mockDocumentSnapshot.get("images")).thenReturn(mockImagesReply)
+    whenever(parkRepository.getParkByPid(park.pid)).thenReturn(park)
+    whenever(mockTask.isComplete).thenReturn(true)
+    whenever(mockTask.result).thenReturn(mockDocumentSnapshot)
+    whenever(fireStoreDB.collection(ImageRepositoryFirestore.COLLECTION_PATH))
+        .thenReturn(mockCollection)
+    whenever(mockCollection.document(park.imagesCollectionId)).thenReturn(mockDocument)
+    whenever(mockDocument.get()).thenReturn(mockTask)
+    whenever(mockDocumentSnapshot.exists()).thenReturn(true)
+    whenever(mockDocumentSnapshot.get("images")).thenReturn(mockImagesReply)
 
-        val result = imageRepositoryFirestore.retrieveImages(park)
+    val result = imageRepositoryFirestore.retrieveImages(park)
 
-        assertEquals(mockImagesReply.size, result.size)
+    assertEquals(mockImagesReply.size, result.size)
 
-        for ((index, image) in mockImagesReply.withIndex()) {
-            val first =  (image["rating"] as? Map<*, *>)?.get("first") as? Int
-            val second = (image["rating"] as? Map<*, *>)?.get("second") as? Int
+    for ((index, image) in mockImagesReply.withIndex()) {
+      val first = (image["rating"] as? Map<*, *>)?.get("first") as? Int
+      val second = (image["rating"] as? Map<*, *>)?.get("second") as? Int
 
-            assertEquals(image["imageB64"], result[index].imageB64)
-            assertEquals(image["userId"], result[index].userId)
-            assertEquals(Pair(first, second), result[index].rating)
-        }
+      assertEquals(image["imageB64"], result[index].imageB64)
+      assertEquals(image["userId"], result[index].userId)
+      assertEquals(Pair(first, second), result[index].rating)
     }
+  }
 }

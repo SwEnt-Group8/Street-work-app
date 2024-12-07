@@ -108,7 +108,7 @@ class ImageRepositoryFirestore(
       Log.d(
           DEBUG_PREFIX,
           e.message
-              ?: "An exception occurred but the message associated with couldn't be retrieved.")
+              ?: "An exception occurred but the message associated with it couldn't be retrieved.")
       return emptyList() // return emptyList in case of error, this way it doesn't propagate
     }
   }
