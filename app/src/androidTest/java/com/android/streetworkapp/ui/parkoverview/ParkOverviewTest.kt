@@ -156,6 +156,7 @@ class ParkOverviewTest {
     composeTestRule.waitForIdle()
 
     composeTestRule.onNodeWithTag("addImageIconButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("ImagesCollectionButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("createEventButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("eventItem").assertTextContains("Group workout")
     composeTestRule

@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -29,8 +30,8 @@ import com.android.streetworkapp.model.image.ParkImageLocal
 
 @Composable
 fun FullScreenImagePopup(images: List<ParkImageLocal>, onDismiss: () -> Unit) {
-  // State for the pager to keep track of the current image
   val imageUris by remember { mutableStateOf(images.map { it.image }) }
+  // State for the pager to keep track of the current image
   val pagerState = rememberPagerState(pageCount = { imageUris.size })
 
   Dialog(
@@ -39,26 +40,37 @@ fun FullScreenImagePopup(images: List<ParkImageLocal>, onDismiss: () -> Unit) {
           DialogProperties(
               usePlatformDefaultWidth = false // Allow the dialog to take full screen width
               )) {
-        Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.80f))) {
-          // HorizontalPager to swipe between images
-          HorizontalPager(
-              state = pagerState,
-              modifier = Modifier.fillMaxWidth().fillMaxHeight(0.7f).align(Alignment.Center)) { page
-                ->
-                ImageItem(imageUri = imageUris[page])
-              }
+        Box(
+            modifier =
+                Modifier.fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.80f))
+                    .testTag("fullscreenImagePopUp")) {
+              // HorizontalPager to swipe between images
+              HorizontalPager(
+                  state = pagerState,
+                  modifier = Modifier.fillMaxWidth().fillMaxHeight(0.7f).align(Alignment.Center)) {
+                      page ->
+                    ImageItem(imageUri = imageUris[page])
+                  }
 
-          IconButton(onClick = onDismiss, modifier = Modifier.align(Alignment.TopEnd).size(60.dp)) {
-            Icon(
-                imageVector = Icons.Default.Close, contentDescription = "Close", tint = Color.White)
-          }
-        }
+              IconButton(
+                  onClick = onDismiss,
+                  modifier =
+                      Modifier.align(Alignment.TopEnd)
+                          .size(60.dp)
+                          .testTag("fullscreenImagePopUpCloseButton")) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Close",
+                        tint = Color.White)
+                  }
+            }
       }
 }
 
 @Composable
 fun ImageItem(imageUri: Uri) {
-  Box(modifier = Modifier.fillMaxSize()) {
+  Box(modifier = Modifier.fillMaxSize().testTag("fullScreenImagePopUpImageBox")) {
     AsyncImage(
         modifier = Modifier.align(Alignment.Center),
         model = imageUri,
