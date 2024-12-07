@@ -1,5 +1,6 @@
 package com.android.streetworkapp.ui.navigation
 
+import android.widget.ImageView
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
@@ -9,6 +10,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import com.android.streetworkapp.StreetWorkApp
 import com.android.streetworkapp.model.event.EventRepository
 import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.image.ImageRepository
+import com.android.streetworkapp.model.image.ImageViewModel
 import com.android.streetworkapp.model.moderation.TextModerationRepository
 import com.android.streetworkapp.model.moderation.TextModerationViewModel
 import com.android.streetworkapp.model.park.ParkRepository
@@ -59,6 +62,7 @@ class TopAppBarTest {
           ProgressionViewModel(mock(ProgressionRepository::class.java, RETURNS_DEFAULTS)),
           WorkoutViewModel(mock(WorkoutRepository::class.java, RETURNS_DEFAULTS)),
           TextModerationViewModel(mock(TextModerationRepository::class.java)),
+          ImageViewModel(mock(ImageRepository::class.java)),
           true)
     }
 

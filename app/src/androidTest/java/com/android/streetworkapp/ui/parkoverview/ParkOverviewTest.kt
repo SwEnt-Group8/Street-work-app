@@ -1,5 +1,6 @@
 package com.android.streetworkapp.ui.parkoverview
 
+import android.widget.ImageView
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
@@ -12,10 +13,14 @@ import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventList
 import com.android.streetworkapp.model.event.EventRepository
 import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.image.ImageRepository
+import com.android.streetworkapp.model.image.ImageViewModel
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.ParkLocation
+import com.android.streetworkapp.model.user.UserRepository
+import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.ui.navigation.Screen
@@ -45,6 +50,8 @@ class ParkOverviewTest {
   private lateinit var invalidOccupancyPark: Park
   private lateinit var eventViewModel: EventViewModel
   private lateinit var parkViewModel: ParkViewModel
+  private lateinit var imageViewModel: ImageViewModel
+  private lateinit var userViewModel: UserViewModel
 
   private val eventList =
       EventList(
@@ -73,6 +80,8 @@ class ParkOverviewTest {
     eventViewModel = EventViewModel(eventRepository)
     parkRepository = mock(ParkRepository::class.java)
     parkViewModel = ParkViewModel(parkRepository)
+    imageViewModel = ImageViewModel(mock(ImageRepository::class.java))
+    userViewModel = UserViewModel(mock(UserRepository::class.java))
 
     `when`(navigationActions.currentRoute()).thenReturn(Route.MAP)
 
@@ -105,7 +114,7 @@ class ParkOverviewTest {
     parkViewModel.setCurrentPark(park)
     composeTestRule.setContent {
       ParkOverviewScreen(
-          parkViewModel, eventViewModel = eventViewModel, navigationActions = navigationActions)
+          parkViewModel, eventViewModel = eventViewModel, navigationActions = navigationActions, userViewModel = userViewModel, imageViewModel = imageViewModel)
     }
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("parkOverviewScreen").isDisplayed()
@@ -135,7 +144,7 @@ class ParkOverviewTest {
 
     composeTestRule.setContent {
       ParkOverviewScreen(
-          parkViewModel, eventViewModel = eventViewModel, navigationActions = navigationActions)
+          parkViewModel, eventViewModel = eventViewModel, navigationActions = navigationActions, userViewModel = userViewModel, imageViewModel = imageViewModel)
     }
     composeTestRule.waitForIdle()
 
@@ -163,7 +172,7 @@ class ParkOverviewTest {
     parkViewModel.setCurrentPark(noEventPark)
     composeTestRule.setContent {
       ParkOverviewScreen(
-          parkViewModel, eventViewModel = eventViewModel, navigationActions = navigationActions)
+          parkViewModel, eventViewModel = eventViewModel, navigationActions = navigationActions, userViewModel = userViewModel, imageViewModel = imageViewModel)
     }
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("noEventText").isDisplayed()
@@ -176,7 +185,7 @@ class ParkOverviewTest {
     assertThrows(IllegalArgumentException::class.java) {
       composeTestRule.setContent {
         ParkOverviewScreen(
-            parkViewModel, eventViewModel = eventViewModel, navigationActions = navigationActions)
+            parkViewModel, eventViewModel = eventViewModel, navigationActions = navigationActions, userViewModel = userViewModel, imageViewModel = imageViewModel)
       }
     }
   }
