@@ -81,6 +81,39 @@ open class ProgressionViewModel(private val repository: ProgressionRepository) :
             newAchievements,
             _currentProgression.value.currentGoal)
       }
+
+  /**
+   * Checks if the user have won achievements
+   *
+   * @param numberOfFriends: The current numberOfFriends of the user
+   * @param score: The current score of the user
+   */
+  fun checkAchievements(numberOfFriends: Int, score: Int) =
+      viewModelScope.launch {
+        val newAchievements = _currentProgression.value.achievements.toMutableList()
+
+        enumValues<SocialAchievement>().forEach {
+          if (it.numberOfFriends <= numberOfFriends && !newAchievements.contains(it.name)) {
+            newAchievements += it.name
+          }
+        }
+
+        enumValues<MedalsAchievement>().forEach {
+          if (it.rank.score <= score && !newAchievements.contains(it.name)) {
+            newAchievements += it.name
+            val nextMedal = enumValues<MedalsAchievement>().getOrNull(it.ordinal + 1)
+
+            if (nextMedal != null) {
+              _currentProgression.value.currentGoal = nextMedal.rank.score
+            }
+          }
+        }
+
+        repository.updateProgressionWithAchievementAndGoal(
+            _currentProgression.value.progressionId,
+            newAchievements,
+            _currentProgression.value.currentGoal)
+      }
 }
 
 /**

@@ -82,8 +82,9 @@ fun ProgressScreen(
   val currentProgression by progressionViewModel.currentProgression.collectAsState()
 
   currentUser?.uid?.let { progressionViewModel.getOrAddProgression(it) }
-  currentUser?.let { progressionViewModel.checkScore(it.score) }
-  currentUser?.let { progressionViewModel.checkFriends(it.friends.size) }
+  // currentUser?.let { progressionViewModel.checkScore(it.score) }
+  // currentUser?.let { progressionViewModel.checkFriends(it.friends.size) }
+  currentUser?.let { progressionViewModel.checkAchievements(it.friends.size, it.score) }
 
   val progressionPercentage = // in case of error set it to 0, otherwise score/currentGoal
       (if (currentUser == null || currentProgression.currentGoal == 0) 0f
