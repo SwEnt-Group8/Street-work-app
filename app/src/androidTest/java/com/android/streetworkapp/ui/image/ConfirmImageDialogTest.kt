@@ -6,6 +6,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.core.net.toUri
+import com.android.streetworkapp.model.image.ImageViewModel
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.user.User
 import java.io.File
@@ -14,12 +15,19 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
+import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doNothing
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class ConfirmImageDialogTest {
   private lateinit var testImageFile: File
+
+  @Mock private lateinit var imageViewModel: ImageViewModel
 
   @get:Rule val temporaryFolder = TemporaryFolder()
 
@@ -83,5 +91,23 @@ class ConfirmImageDialogTest {
 
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("ConfirmImageDialog").assertIsDisplayed()
+  }
+
+  @Test
+  fun `ConfirmImageDialogWrapper calls uploadImage on confirmation`() {
+    val showDialogState = mutableStateOf(true)
+    val park = Park(pid = "parkId")
+    val user = User("userId", "", "", 0, emptyList(), "")
+    doNothing().whenever(imageViewModel).uploadImage(any(), any(), any(), any(), any(), any())
+
+    composeTestRule.setContent {
+      ConfirmImageDialogWrapper(
+          mock(), showDialogState, imageViewModel, mock(), testImageFile.toUri(), park, user)
+    }
+
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("uploadButton").performClick()
+    verify(imageViewModel)
+        .uploadImage(any(), eq(testImageFile.toUri()), eq(park.pid), eq(user.uid), any(), any())
   }
 }
