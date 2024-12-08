@@ -57,7 +57,7 @@ fun AddImageButton(imageViewModel: ImageViewModel, currentPark: Park?, currentUs
             PackageManager.PERMISSION_GRANTED)
   }
 
-  var showConfirmationDialog by remember { mutableStateOf(false) }
+  var showConfirmationDialog = remember { mutableStateOf(false) }
   var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
 
   // Temporary file for storing the captured image
@@ -78,7 +78,7 @@ fun AddImageButton(imageViewModel: ImageViewModel, currentPark: Park?, currentUs
           contract = ActivityResultContracts.TakePicture(),
           onResult = { success ->
             if (success) {
-              showConfirmationDialog = true
+              showConfirmationDialog.value = true
             }
           })
 
@@ -114,38 +114,9 @@ fun AddImageButton(imageViewModel: ImageViewModel, currentPark: Park?, currentUs
   capturedImageUri?.let { uri ->
     currentPark?.let { park ->
       currentUser?.let { user ->
-        if (showConfirmationDialog) {
-          ConfirmImageDialog(
-              imageUri = uri,
-              onConfirm = {
-                imageViewModel.uploadImage(
-                    context,
-                    uri,
-                    park.pid,
-                    user.uid,
-                    { onImageUploadSuccess(tempFile) },
-                    { onImageUploadFailure() })
-                showConfirmationDialog = false
-                // tempFile.delete() // IMPORTANT: only delete the file when the viewmodel is done
-                // with
-                // it,
-                // will cause race conditions otherwise
-              },
-              onCancel = {
-                showConfirmationDialog = false
-                if (!tempFile.delete())
-                    Log.d(AddImageButtonParams.DEBUG_PREFIX, "Failed to delete cached photo file.")
-              })
-        }
+        ConfirmImageDialogWrapper(
+            context, showConfirmationDialog, imageViewModel, tempFile, uri, park, user)
       }
     }
   }
 }
-
-// TODO: make UI responsive depending on success/failure
-private fun onImageUploadSuccess(file: File) {
-  if (!file.delete())
-      Log.d(AddImageButtonParams.DEBUG_PREFIX, "Failed to delete cached photo file.")
-}
-
-private fun onImageUploadFailure() {}

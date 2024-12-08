@@ -1,6 +1,8 @@
 package com.android.streetworkapp.ui.image
 
+import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,7 +45,11 @@ import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
+import com.android.streetworkapp.model.image.ImageViewModel
+import com.android.streetworkapp.model.park.Park
+import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.ui.theme.ColorPalette
+import java.io.File
 
 /**
  * Displays a photo and allows the user to confirm or cancel the operation
@@ -70,7 +77,7 @@ fun ConfirmImageDialog(
                       max =
                           this@BoxWithConstraints.maxHeight *
                               0.8f) // Take at most 80% of the height
-          ) {
+                  .testTag("ConfirmImageDialog")) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.padding(16.dp)) {
@@ -164,3 +171,42 @@ fun ConfirmImageDialog(
     }
   }
 }
+
+@Composable
+fun ConfirmImageDialogWrapper(
+    context: Context,
+    showConfirmationDialog: MutableState<Boolean>,
+    imageViewModel: ImageViewModel,
+    tempFile: File,
+    imageUri: Uri,
+    currentPark: Park,
+    currentUser: User
+) {
+  if (showConfirmationDialog.value) {
+    ConfirmImageDialog(
+        imageUri = imageUri,
+        onConfirm = {
+          imageViewModel.uploadImage(
+              context,
+              imageUri,
+              currentPark.pid,
+              currentUser.uid,
+              { onImageUploadSuccess(tempFile) },
+              { onImageUploadFailure() })
+          showConfirmationDialog.value = false
+        },
+        onCancel = {
+          showConfirmationDialog.value = false
+          if (!tempFile.delete())
+              Log.d(AddImageButtonParams.DEBUG_PREFIX, "Failed to delete cached photo file.")
+        })
+  }
+}
+
+// TODO: make UI responsive depending on success/failure
+private fun onImageUploadSuccess(file: File) {
+  if (!file.delete())
+      Log.d(AddImageButtonParams.DEBUG_PREFIX, "Failed to delete cached photo file.")
+}
+
+private fun onImageUploadFailure() {}
