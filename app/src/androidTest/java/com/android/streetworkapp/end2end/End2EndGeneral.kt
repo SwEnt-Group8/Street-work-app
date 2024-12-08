@@ -30,11 +30,14 @@ import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.model.workout.WorkoutRepository
 import com.android.streetworkapp.model.workout.WorkoutViewModel
 import com.android.streetworkapp.ui.navigation.Route
+import com.android.streetworkapp.utils.GoogleAuthService
+import com.google.firebase.auth.FirebaseAuth
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
+import org.mockito.Mockito.RETURNS_DEFAULTS
 import org.mockito.Mockito.mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.wheneverBlocking
@@ -121,7 +124,8 @@ class End2EndGeneral {
           progressionViewModel,
           WorkoutViewModel(mock(WorkoutRepository::class.java)),
           TextModerationViewModel(mock(TextModerationRepository::class.java)),
-          PreferencesViewModel(mock(PreferencesRepository::class.java)))
+          PreferencesViewModel(mock(PreferencesRepository::class.java)),
+          GoogleAuthService("", mock(FirebaseAuth::class.java, RETURNS_DEFAULTS)))
     }
 
     composeTestRule.waitForIdle()

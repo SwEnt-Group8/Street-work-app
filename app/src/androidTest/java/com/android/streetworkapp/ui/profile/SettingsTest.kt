@@ -12,23 +12,30 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.sample.R
+import com.android.streetworkapp.model.preferences.PreferencesRepository
+import com.android.streetworkapp.model.preferences.PreferencesViewModel
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.utils.GoogleAuthService
+import com.google.firebase.auth.FirebaseAuth
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
+import org.mockito.Mockito.RETURNS_DEFAULTS
+import org.mockito.Mockito.mock
 
 @RunWith(AndroidJUnit4::class)
 class SettingsTest {
 
   @get:Rule val composeTestRule = createComposeRule()
 
-  private val navigationActions = Mockito.mock(NavigationActions::class.java)
-  private val userRepository = Mockito.mock(UserRepository::class.java)
+  private val navigationActions = mock(NavigationActions::class.java)
+  private val userRepository = mock(UserRepository::class.java)
   private val userViewModel = UserViewModel(userRepository)
+  private val preferencesViewModel = PreferencesViewModel(mock(PreferencesRepository::class.java))
+  private val authService = GoogleAuthService("", mock(FirebaseAuth::class.java, RETURNS_DEFAULTS))
 
   @Test
   fun isSettingsContentDisplayedForNullUser() {
@@ -37,7 +44,8 @@ class SettingsTest {
     var context: Context? = null
 
     composeTestRule.setContent {
-      SettingsContent(navigationActions, userViewModel, showSettingDialog)
+      SettingsContent(
+          navigationActions, userViewModel, preferencesViewModel, authService, showSettingDialog)
       context = LocalContext.current
     }
 
@@ -70,7 +78,8 @@ class SettingsTest {
     userViewModel.setCurrentUser(alice)
 
     composeTestRule.setContent {
-      SettingsContent(navigationActions, userViewModel, showSettingDialog)
+      SettingsContent(
+          navigationActions, userViewModel, preferencesViewModel, authService, showSettingDialog)
       context = LocalContext.current
     }
 

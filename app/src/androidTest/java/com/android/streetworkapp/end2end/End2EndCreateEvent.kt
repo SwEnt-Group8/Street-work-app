@@ -37,7 +37,9 @@ import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.model.workout.WorkoutViewModel
 import com.android.streetworkapp.ui.navigation.Screen
+import com.android.streetworkapp.utils.GoogleAuthService
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import okhttp3.OkHttpClient
 import org.junit.Before
@@ -45,6 +47,7 @@ import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.RETURNS_DEFAULTS
 import org.mockito.Mockito.mock
 
 @RunWith(AndroidJUnit4::class)
@@ -137,6 +140,7 @@ class End2EndCreateEvent {
           mock(WorkoutViewModel::class.java),
           mock(TextModerationViewModel::class.java),
           mock(PreferencesViewModel::class.java),
+          GoogleAuthService("", mock(FirebaseAuth::class.java, RETURNS_DEFAULTS)),
           true)
     }
   }
