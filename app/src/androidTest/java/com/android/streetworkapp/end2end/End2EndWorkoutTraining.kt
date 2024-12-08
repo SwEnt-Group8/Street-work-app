@@ -36,7 +36,6 @@ import com.android.streetworkapp.model.workout.WorkoutViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Route
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.InjectMocks
@@ -53,7 +52,6 @@ import org.mockito.kotlin.wheneverBlocking
  * is testing the app's Training Hub, specifically focusing on Push-ups in a Solo session. This test
  * ensures the app supports his favorite workout and provides a seamless experience.
  */
-@Ignore("Test does not work on CI but should run locally")
 class End2EndWorkoutTraining {
   @Mock private lateinit var userRepository: UserRepository
   @Mock private lateinit var workoutRepository: WorkoutRepository
