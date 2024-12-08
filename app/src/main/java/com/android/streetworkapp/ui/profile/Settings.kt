@@ -109,9 +109,14 @@ fun logout(
     userViewModel: UserViewModel,
     preferencesViewModel: PreferencesViewModel
 ) {
+  // Sign out from Google Service (disable auto-login)
   authService.signOut()
+
+  // Clear user viewmodel data
   userViewModel.setUser(null)
   userViewModel.setCurrentUser(null)
+
+  // Clear preferences parameters
   preferencesViewModel.setLoginState(false)
   preferencesViewModel.setUid("")
   preferencesViewModel.setName("")
