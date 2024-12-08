@@ -77,11 +77,11 @@ class ImageRepositoryFirestore(
     try {
       // checking the collection linked to the park is valid
       val document = db.collection(COLLECTION_PATH).document(park.imagesCollectionId).get().await()
-      if (!document.exists())
-          throw IllegalArgumentException(
-              "The ImagesCollection linked by this park doesn't exist, the entry in the db is corrupted.")
+      require(document.exists()) {
+        "The ImagesCollection linked by this park doesn't exist, the entry in the db is corrupted."
+      }
 
-      val parkImages = document.get("images") as? List<*>
+      val parkImages = document["images"] as? List<*>
       // Map each item to a ParkImage object, if an entry is invalid just skip it
       // I'm not going to do a separate function for deserialization, It's only used here
       return parkImages?.mapNotNull { image ->

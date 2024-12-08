@@ -212,4 +212,6 @@ private fun onImageUploadSuccess(file: File) {
       Log.d(AddImageButtonParams.DEBUG_PREFIX, "Failed to delete cached photo file.")
 }
 
-private fun onImageUploadFailure() {}
+private fun onImageUploadFailure() {
+  /*TBD*/
+}
