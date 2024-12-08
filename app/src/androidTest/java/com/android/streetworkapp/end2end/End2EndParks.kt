@@ -42,6 +42,8 @@ import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.model.workout.WorkoutViewModel
 import com.android.streetworkapp.ui.navigation.Route
+import com.android.streetworkapp.utils.GoogleAuthService
+import com.google.firebase.auth.FirebaseAuth
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.After
@@ -51,6 +53,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.RETURNS_DEFAULTS
 import org.mockito.Mockito.mock
 
 @RunWith(AndroidJUnit4::class)
@@ -118,7 +121,8 @@ class End2EndParks {
           WorkoutViewModel(mockk()),
           TextModerationViewModel(mockk()),
           ImageViewModel(mockk()),
-          PreferencesViewModel(mock(PreferencesRepository::class.java)))
+          PreferencesViewModel(mock(PreferencesRepository::class.java)),
+          GoogleAuthService("", mock(FirebaseAuth::class.java, RETURNS_DEFAULTS)))
       // setup so as we're already on the MAP route
     }
 
