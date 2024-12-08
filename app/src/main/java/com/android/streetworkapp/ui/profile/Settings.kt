@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.sample.R
+import com.android.streetworkapp.model.preferences.PreferencesViewModel
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.theme.ColorPalette
@@ -88,4 +89,24 @@ fun SettingsContent(
         showParentDialog.value = false
         // navigationActions.navigateTo(Screen.AUTH)
       })
+}
+
+/**
+ * Logs out the user by signing out from Google and the app.
+ *
+ * @param authService the Google authentication service
+ * @param userViewModel the user viewmodel
+ * @param preferencesViewModel the preferences viewmodel
+ */
+fun logout(
+    authService: GoogleAuthService,
+    userViewModel: UserViewModel,
+    preferencesViewModel: PreferencesViewModel
+) {
+  authService.signOut()
+  userViewModel.setCurrentUser(null)
+  preferencesViewModel.setLoginState(false)
+  preferencesViewModel.setUid("")
+  preferencesViewModel.setName("")
+  preferencesViewModel.setScore(0)
 }
