@@ -47,11 +47,7 @@ enum class Ranks(val score: Int) {
 
 /** Represents a type of achievement based on points obtained */
 enum class MedalsAchievement(val achievement: Achievement, val rank: Ranks) {
-  // Note: Bronze is used as a place holder for missing medals in the Figma (will be updated once
-  // the figma is updated)
-  NONE(
-      Achievement(R.drawable.bronze_achievement_icon, "No Medal", emptyList(), "Default Medal"),
-      Ranks.CEILING),
+
   BRONZE(
       Achievement(
           R.drawable.bronze_achievement_icon,
