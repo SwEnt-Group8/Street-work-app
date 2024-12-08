@@ -380,7 +380,11 @@ fun StreetWorkApp(
                   title = "Settings",
                   Content = {
                     SettingsContent(
-                        navigationActions, userViewModel, authService, showSettingsDialog)
+                        navigationActions,
+                        userViewModel,
+                        preferencesViewModel,
+                        authService,
+                        showSettingsDialog)
                   },
               )
             }

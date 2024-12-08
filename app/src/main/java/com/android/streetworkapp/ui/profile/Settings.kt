@@ -29,6 +29,7 @@ import com.android.streetworkapp.utils.GoogleAuthService
 fun SettingsContent(
     navigationActions: NavigationActions,
     userViewModel: UserViewModel,
+    preferencesViewModel: PreferencesViewModel,
     authService: GoogleAuthService,
     showParentDialog: MutableState<Boolean>
 ) {
