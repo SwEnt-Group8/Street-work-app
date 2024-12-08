@@ -58,12 +58,14 @@ fun SettingsContent(
               onClick = {
                 showParentDialog.value = false
                 logout(authService, userViewModel, preferencesViewModel)
-                Toast.makeText(context, "Not yet implemented", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                        context, context.getString(R.string.LogoutSuccess), Toast.LENGTH_SHORT)
+                    .show()
                 navigationActions.navigateTo(Route.AUTH)
               },
               colors = ColorPalette.BUTTON_COLOR,
               modifier = Modifier.testTag("LogOutButton")) {
-                Text("Log-out")
+                Text(context.getString(R.string.LogoutTitle))
               }
 
           Button(
