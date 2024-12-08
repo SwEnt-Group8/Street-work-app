@@ -120,7 +120,7 @@ class End2EndWorkoutTraining {
           ProgressionViewModel(mock(ProgressionRepository::class.java)),
           workoutViewModel,
           TextModerationViewModel(mock(TextModerationRepository::class.java)),
-          PreferencesViewModel(mock(PreferencesRepository::class.java)))
+          mock(PreferencesViewModel::class.java))
     }
     NavigationActions(testNavController).apply {
       composeTestRule.waitForIdle()
