@@ -172,6 +172,9 @@ fun ConfirmImageDialog(
   }
 }
 
+/**
+ * Wrapper for the ConfirmImageDialog, it's setup to allow the user to upload pictures on the db.
+ */
 @Composable
 fun ConfirmImageDialogWrapper(
     context: Context,

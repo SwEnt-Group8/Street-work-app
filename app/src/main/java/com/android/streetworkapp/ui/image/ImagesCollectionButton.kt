@@ -27,10 +27,12 @@ import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.theme.ColorPalette
 
+/** Button to access the images collection popup. */
 @Composable
 fun ImagesCollectionButton(
     imageViewModel: ImageViewModel,
-    userViewModel: UserViewModel,
+    userViewModel:
+        UserViewModel, // note: not used for now, will be used for the rating etc... later on.
     park: Park?
 ) {
 

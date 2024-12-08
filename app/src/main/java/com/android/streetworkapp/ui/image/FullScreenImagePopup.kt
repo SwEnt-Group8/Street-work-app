@@ -28,6 +28,7 @@ import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
 import com.android.streetworkapp.model.image.ParkImageLocal
 
+/** Fullscreen PopUp: it will display all the ParKImageLocal in the list in a HorizontalPager */
 @Composable
 fun FullScreenImagePopup(images: List<ParkImageLocal>, onDismiss: () -> Unit) {
   val imageUris by remember { mutableStateOf(images.map { it.image }) }
