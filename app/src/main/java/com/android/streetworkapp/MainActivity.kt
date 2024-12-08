@@ -20,9 +20,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.android.streetworkapp.device.network.isInternetAvailable
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
@@ -70,6 +72,7 @@ import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.ui.train.TrainChallengeScreen
 import com.android.streetworkapp.ui.train.TrainCoachScreen
 import com.android.streetworkapp.ui.train.TrainHubScreen
+import com.android.streetworkapp.ui.train.TrainParamScreen
 import com.android.streetworkapp.ui.train.TrainSoloScreen
 import com.android.streetworkapp.ui.tutorial.TutorialEvent
 import com.android.streetworkapp.ui.utils.CustomDialog
@@ -414,6 +417,21 @@ fun StreetWorkApp(
                 TrainChallengeScreen(
                     activity, isTimeDependent, time, sets, reps, workoutViewModel, innerPadding)
               })
+          composable(
+              route = Route.TRAIN_PARAM,
+              arguments =
+                  listOf(
+                      navArgument("activity") { type = NavType.StringType },
+                      navArgument("isTimeDependent") { type = NavType.BoolType },
+                      navArgument("type") { type = NavType.StringType })) { backStackEntry ->
+                val activity = backStackEntry.arguments?.getString("activity") ?: "defaultActivity"
+                val isTimeDependent =
+                    backStackEntry.arguments?.getBoolean("isTimeDependent") ?: false
+                val type = backStackEntry.arguments?.getString("type") ?: "defaultType"
+
+                // Call TrainParamScreen with the parameters
+                TrainParamScreen(navigationActions, activity, isTimeDependent, type)
+              }
         }
 
         if (e2eEventTesting) {

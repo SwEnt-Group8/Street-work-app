@@ -20,6 +20,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_DARK
 import kotlin.math.absoluteValue
@@ -201,13 +202,18 @@ fun Graph(modifier: Modifier = Modifier, graphConfiguration: GraphConfiguration)
       Text(
           text = xUnitLabel,
           color = axisColor,
-          modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 16.dp))
+          modifier =
+              Modifier.align(Alignment.BottomCenter).padding(bottom = 16.dp).testTag("XAxisLabel"))
 
       // Y-axis label
       Text(
           text = yUnitLabel,
           color = axisColor,
-          modifier = Modifier.align(Alignment.CenterStart).padding(start = 16.dp).rotate(-90f))
+          modifier =
+              Modifier.align(Alignment.CenterStart)
+                  .padding(start = 16.dp)
+                  .rotate(-90f)
+                  .testTag("YAxisLabel"))
     }
   }
 }
