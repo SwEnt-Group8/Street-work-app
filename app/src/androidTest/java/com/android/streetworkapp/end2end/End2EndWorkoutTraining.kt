@@ -21,6 +21,7 @@ import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.ParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
+import com.android.streetworkapp.model.preferences.PreferencesRepository
 import com.android.streetworkapp.model.preferences.PreferencesViewModel
 import com.android.streetworkapp.model.progression.ProgressionRepository
 import com.android.streetworkapp.model.progression.ProgressionViewModel
@@ -119,7 +120,7 @@ class End2EndWorkoutTraining {
           workoutViewModel,
           TextModerationViewModel(mock(TextModerationRepository::class.java)),
           mock(ImageViewModel::class.java),
-          mock(PreferencesViewModel::class.java))
+          PreferencesViewModel(mock(PreferencesRepository::class.java)))
     }
     NavigationActions(testNavController).apply {
       composeTestRule.waitForIdle()
