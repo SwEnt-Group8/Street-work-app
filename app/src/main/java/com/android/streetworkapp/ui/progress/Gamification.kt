@@ -5,10 +5,19 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
-import com.android.streetworkapp.ui.navigation.Screen
+import com.android.streetworkapp.ui.navigation.TopLevelDestinations
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+/**
+ * Use this function to give points to the user and to display it with a SnackBar.
+ *
+ * @param userViewModel: The userViewModel
+ * @param navigationActions: Used to go see the progression screen.
+ * @param points: Points obtained by the user.
+ * @param scope: Used to display the SnackBar.
+ * @param snackbarHostState: Used to display the SnackBar.
+ */
 fun updateAndDisplayPoints(
     userViewModel: UserViewModel,
     navigationActions: NavigationActions,
@@ -29,7 +38,7 @@ fun updateAndDisplayPoints(
     when (result) {
       SnackbarResult.Dismissed -> {}
       SnackbarResult.ActionPerformed -> {
-        navigationActions.navigateTo(Screen.PROGRESSION)
+        navigationActions.navigateTo(TopLevelDestinations.PROGRESSION)
       }
     }
   }

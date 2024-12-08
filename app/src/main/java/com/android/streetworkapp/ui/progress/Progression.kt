@@ -27,6 +27,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -81,9 +82,12 @@ fun ProgressScreen(
   val currentUser by userViewModel.currentUser.collectAsState()
   val currentProgression by progressionViewModel.currentProgression.collectAsState()
 
-  currentUser?.uid?.let { progressionViewModel.getOrAddProgression(it) }
-  currentUser?.let { progressionViewModel.checkScore(it.score) }
-  currentUser?.let { progressionViewModel.checkFriends(it.friends.size) }
+  LaunchedEffect(currentProgression) {
+    currentUser?.let {
+      progressionViewModel.getOrAddProgression(it.uid)
+      progressionViewModel.checkAchievements(it.friends.size, it.score)
+    }
+  }
 
   val progressionPercentage = // in case of error set it to 0, otherwise score/currentGoal
       (if (currentUser == null || currentProgression.currentGoal == 0) 0f
@@ -153,6 +157,9 @@ fun ProgressScreen(
           item {
             when (uiState.collectAsState().value) {
               DashboardStateProgression.Achievement -> {
+                currentUser?.let {
+                  progressionViewModel.checkAchievements(it.friends.size, it.score)
+                }
 
                 AchievementColumn(currentProgression.achievements)
               }
