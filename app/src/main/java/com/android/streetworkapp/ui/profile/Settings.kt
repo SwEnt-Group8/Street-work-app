@@ -20,6 +20,7 @@ import com.android.sample.R
 import com.android.streetworkapp.model.preferences.PreferencesViewModel
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.ui.utils.CustomDialog
 import com.android.streetworkapp.ui.utils.DialogType
@@ -58,6 +59,7 @@ fun SettingsContent(
                 showParentDialog.value = false
                 logout(authService, userViewModel, preferencesViewModel)
                 Toast.makeText(context, "Not yet implemented", Toast.LENGTH_SHORT).show()
+                navigationActions.navigateTo(Route.AUTH)
               },
               colors = ColorPalette.BUTTON_COLOR,
               modifier = Modifier.testTag("LogOutButton")) {
