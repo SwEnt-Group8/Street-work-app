@@ -106,6 +106,7 @@ fun logout(
     preferencesViewModel: PreferencesViewModel
 ) {
   authService.signOut()
+  userViewModel.setUser(null)
   userViewModel.setCurrentUser(null)
   preferencesViewModel.setLoginState(false)
   preferencesViewModel.setUid("")
