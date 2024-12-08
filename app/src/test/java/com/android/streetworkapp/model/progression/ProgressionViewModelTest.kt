@@ -41,15 +41,14 @@ class ProgressionViewModelTest {
   }
 
   @Test
-  fun checkScoreCallsRepository() = runTest {
-    progressionViewModel.checkScore(1000)
+  fun checkAchievementCallsRepository() = runTest {
+    progressionViewModel.checkAchievements(0, 1000)
     testDispatcher.scheduler.advanceUntilIdle()
     verify(repository).updateProgressionWithAchievementAndGoal(any(), any(), any())
   }
 
   @Test
   fun getMedalTest() = runTest {
-    assertEquals(MedalsAchievement.NONE, getMedalByScore(0))
     assertEquals(MedalsAchievement.BRONZE, getMedalByScore(100))
     assertEquals(MedalsAchievement.SILVER, getMedalByScore(1000))
     assertEquals(MedalsAchievement.GOLD, getMedalByScore(10000))

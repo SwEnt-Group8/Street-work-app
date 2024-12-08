@@ -30,6 +30,7 @@ import androidx.test.espresso.idling.CountingIdlingResource
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.streetworkapp.StreetWorkApp
 import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.image.ImageViewModel
 import com.android.streetworkapp.model.moderation.TextModerationViewModel
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
@@ -119,6 +120,7 @@ class End2EndParks {
           ProgressionViewModel(mockk()),
           WorkoutViewModel(mockk()),
           TextModerationViewModel(mockk()),
+          ImageViewModel(mockk()),
           PreferencesViewModel(mock(PreferencesRepository::class.java)),
           GoogleAuthService("", mock(FirebaseAuth::class.java, RETURNS_DEFAULTS)))
       // setup so as we're already on the MAP route

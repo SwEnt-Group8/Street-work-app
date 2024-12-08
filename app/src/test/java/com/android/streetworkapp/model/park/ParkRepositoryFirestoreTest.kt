@@ -3,6 +3,7 @@ package com.android.streetworkapp.model.park
 // Portions of this code were generated with the help of GitHub Copilot.
 
 import com.android.streetworkapp.model.parklocation.ParkLocation
+import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.CollectionReference
@@ -525,5 +526,20 @@ class ParkRepositoryFirestoreTest {
 
     // Assert
     verify(documentRef).update(mapOf("rating" to newRating, "nbrRating" to newNbrRating))
+  }
+
+  @Test
+  fun addImagesCollectionAddsCorrectCollectionIdToPark() = runTest {
+    val mockTask = mock(Task::class.java) as Task<Void>
+    whenever(mockTask.isComplete).thenReturn(true)
+
+    val parkId = "parkId"
+    val collectionId = "newCollectionId"
+    whenever(db.collection(any())).thenReturn(collection)
+    whenever(collection.document(parkId)).thenReturn(documentRef)
+    whenever(documentRef.update("imagesCollection", collectionId)).thenReturn(mockTask)
+
+    parkRepository.addImagesCollection(parkId, collectionId)
+    verify(documentRef).update("imagesCollectionId", collectionId)
   }
 }

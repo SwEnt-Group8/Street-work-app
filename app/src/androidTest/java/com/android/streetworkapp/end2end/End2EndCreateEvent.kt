@@ -23,6 +23,7 @@ import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventRepository
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
 import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.image.ImageViewModel
 import com.android.streetworkapp.model.moderation.TextModerationViewModel
 import com.android.streetworkapp.model.park.NominatimParkNameRepository
 import com.android.streetworkapp.model.park.ParkRepository
@@ -139,6 +140,7 @@ class End2EndCreateEvent {
           progressionViewModel,
           mock(WorkoutViewModel::class.java),
           mock(TextModerationViewModel::class.java),
+          mock(ImageViewModel::class.java),
           mock(PreferencesViewModel::class.java),
           GoogleAuthService("", mock(FirebaseAuth::class.java, RETURNS_DEFAULTS)),
           true)

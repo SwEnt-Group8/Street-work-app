@@ -29,7 +29,9 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.android.sample.R
+import com.android.streetworkapp.model.image.ImageViewModel
 import com.android.streetworkapp.model.park.Park
+import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.ui.theme.ColorPalette
 import java.io.File
 
@@ -45,7 +47,7 @@ object AddImageButtonParams {
  * @param currentPark The info of the park the image will be linked to
  */
 @Composable
-fun AddImageButton(currentPark: Park?) {
+fun AddImageButton(imageViewModel: ImageViewModel, currentPark: Park?, currentUser: User?) {
 
   val context = LocalContext.current
 
@@ -55,7 +57,7 @@ fun AddImageButton(currentPark: Park?) {
             PackageManager.PERMISSION_GRANTED)
   }
 
-  var showConfirmationDialog by remember { mutableStateOf(false) }
+  var showConfirmationDialog = remember { mutableStateOf(false) }
   var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
 
   // Temporary file for storing the captured image
@@ -76,7 +78,7 @@ fun AddImageButton(currentPark: Park?) {
           contract = ActivityResultContracts.TakePicture(),
           onResult = { success ->
             if (success) {
-              showConfirmationDialog = true
+              showConfirmationDialog.value = true
             }
           })
 
@@ -100,7 +102,7 @@ fun AddImageButton(currentPark: Park?) {
             modifier =
                 Modifier.size(36.dp)
                     .background(color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape)
-                    .padding(4.dp)) {
+                    .padding(2.dp)) {
               Icon(
                   painter = painterResource(id = R.drawable.add_a_photo_24px),
                   contentDescription = "Add Image",
@@ -109,22 +111,12 @@ fun AddImageButton(currentPark: Park?) {
             }
       }
 
-  capturedImageUri?.let {
-    if (showConfirmationDialog) {
-      ConfirmImageDialog(
-          imageUri = it,
-          onConfirm = {
-            // TODO: call the viewmodel to upload the file
-            showConfirmationDialog = false
-            // tempFile.delete() // IMPORTANT: only delete the file when the viewmodel is done with
-            // it,
-            // will cause race conditions otherwise
-          },
-          onCancel = {
-            showConfirmationDialog = false
-            if (!tempFile.delete())
-                Log.d(AddImageButtonParams.DEBUG_PREFIX, "Failed to delete cached photo file.")
-          })
+  capturedImageUri?.let { uri ->
+    currentPark?.let { park ->
+      currentUser?.let { user ->
+        ConfirmImageDialogWrapper(
+            context, showConfirmationDialog, imageViewModel, tempFile, uri, park, user)
+      }
     }
   }
 }
