@@ -22,11 +22,13 @@ import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.ui.utils.CustomDialog
 import com.android.streetworkapp.ui.utils.DialogType
+import com.android.streetworkapp.utils.GoogleAuthService
 
 @Composable
 fun SettingsContent(
     navigationActions: NavigationActions,
     userViewModel: UserViewModel,
+    authService: GoogleAuthService,
     showParentDialog: MutableState<Boolean>
 ) {
 

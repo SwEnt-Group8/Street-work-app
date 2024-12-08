@@ -379,7 +379,8 @@ fun StreetWorkApp(
                   tag = "Settings",
                   title = "Settings",
                   Content = {
-                    SettingsContent(navigationActions, userViewModel, showSettingsDialog)
+                    SettingsContent(
+                        navigationActions, userViewModel, authService, showSettingsDialog)
                   },
               )
             }
