@@ -312,7 +312,7 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore, testing: Boolea
   }
 
   /**
-   * Retrieves or sets up the imageCollection for a park
+   * Fills the imagesCollectionId of the park with collectionId parameter
    *
    * @param pid The parkId to add the collection to.
    * @param collectionId The id of the collection the park will be linked to.
