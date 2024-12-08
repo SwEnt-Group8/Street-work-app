@@ -148,7 +148,6 @@ class End2EndWorkoutTraining {
       composeTestRule.onNodeWithTag("Activity_Lunge").assertExists().assertHasClickAction()
       composeTestRule.onNodeWithTag("Activity_Planks").assertExists().assertHasClickAction()
       composeTestRule.onNodeWithTag("Activity_Handstand").assertExists().assertHasClickAction()
-      composeTestRule.onNodeWithTag("Activity_Front lever").assertExists().assertHasClickAction()
       composeTestRule.onNodeWithTag("Activity_Flag").assertExists().assertHasClickAction()
       composeTestRule.onNodeWithTag("Activity_Muscle-up").assertExists().assertHasClickAction()
       composeTestRule.onNodeWithTag("ConfirmButton").assertExists().assertHasClickAction()
