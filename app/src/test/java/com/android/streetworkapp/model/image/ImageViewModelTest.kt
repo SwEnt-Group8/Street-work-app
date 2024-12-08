@@ -5,6 +5,7 @@ import android.net.Uri
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.user.User
 import com.google.firebase.Timestamp
+import java.io.File
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -59,22 +60,32 @@ class ImageViewModelTest {
 
   @Test
   fun `retrieveImages saves images in the cache by their hash name`() = runTest {
+    val mockCacheFolder = temporaryFolder.newFolder()
     val park = Park(pid = "parkId")
     val userWhoUploadedImage = User("userId", "name", "mail", 10, emptyList(), "")
-    // 1x1 jpg format pixel in base64
-    val dummyBase64 =
-        "/9j/4AAQSkZJRgABAQEAYABgAAD/2wCEAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAf/CABEIAAEAAQMBIgACEQEDEQH/xAAUAAEAAAAAAAAAAAAAAAAAAAAK/9oACAEBAAAAAH8f/8QAFAEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAhAAAAB//8QAFAEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAxAAAAB//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPwB//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAgEBPwB//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAwEBPwB//9k="
+    // 1x1 jpg format pixel in base64, note: the images should all be in jpeg format for this test.
+    val dummiesBase64 =
+        listOf(
+            "/9j/4AAQSkZJRgABAQEAYABgAAD/2wCEAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAf/CABEIAAEAAQMBIgACEQEDEQH/xAAUAAEAAAAAAAAAAAAAAAAAAAAK/9oACAEBAAAAAH8f/8QAFAEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAhAAAAB//8QAFAEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAxAAAAB//8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPwB//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAgEBPwB//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAwEBPwB//9k=")
     val parkImagesDatabase =
         listOf(
-            ParkImageDatabase(dummyBase64, userWhoUploadedImage.uid, Pair(2, 0), Timestamp.now()))
+            ParkImageDatabase(
+                dummiesBase64[0], userWhoUploadedImage.uid, Pair(2, 0), Timestamp.now()))
     whenever(imageRepository.retrieveImages(park)).thenReturn(parkImagesDatabase)
-    whenever(context.cacheDir).thenReturn(temporaryFolder.newFolder())
+    whenever(context.cacheDir).thenReturn(mockCacheFolder)
 
     imageViewModel.retrieveImages(context, park) { localParkImages ->
       assert(localParkImages.size == parkImagesDatabase.size)
+
+      val parkFile = File(mockCacheFolder, park.pid)
       for ((index, parkImage) in localParkImages.withIndex()) {
+        val imageHash = imageViewModel.sha256(dummiesBase64[index])
+        // check that the file exists
+        val imageFile = File(parkFile, "${imageHash}.jpg")
+        assert(imageFile.exists())
         assert(parkImage.rating == parkImagesDatabase[index].rating)
         assert(parkImage.userId == parkImagesDatabase[index].userId)
+        assert(parkImage.uploadDate == parkImagesDatabase[index].uploadDate)
       }
     }
   }
