@@ -27,6 +27,8 @@ import androidx.navigation.navigation
 import com.android.streetworkapp.device.network.isInternetAvailable
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
 import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.image.ImageRepositoryFirestore
+import com.android.streetworkapp.model.image.ImageViewModel
 import com.android.streetworkapp.model.moderation.PerspectiveAPIRepository
 import com.android.streetworkapp.model.moderation.TextModerationViewModel
 import com.android.streetworkapp.model.park.NominatimParkNameRepository
@@ -137,6 +139,10 @@ fun StreetWorkAppMain(
   val textModerationRepository = PerspectiveAPIRepository(OkHttpClient())
   val textModerationViewModel = TextModerationViewModel(textModerationRepository)
 
+  // Instantiate Park Images flow
+  val imageRepository = ImageRepositoryFirestore(firestoreDB, parkRepository, userRepository)
+  val imageViewModel = ImageViewModel(imageRepository)
+
   // Get the preferences cached parameters
   val loginState by preferencesViewModel.loginState.collectAsState()
   val uid by preferencesViewModel.uid.collectAsState()
@@ -188,6 +194,7 @@ fun StreetWorkAppMain(
         progressionViewModel,
         workoutViewModel,
         textModerationViewModel,
+        imageViewModel,
         preferencesViewModel,
         startDestination = resolvedStartDestination!!)
   }
@@ -206,6 +213,7 @@ fun StreetWorkApp(
     progressionViewModel: ProgressionViewModel,
     workoutViewModel: WorkoutViewModel,
     textModerationViewModel: TextModerationViewModel,
+    imageViewModel: ImageViewModel,
     preferencesViewModel: PreferencesViewModel,
     navTestInvokationOnEachRecompose: Boolean = false,
     e2eEventTesting: Boolean = false,
@@ -324,7 +332,12 @@ fun StreetWorkApp(
             composable(Screen.PARK_OVERVIEW) {
               infoManager.Display(LocalContext.current)
               ParkOverviewScreen(
-                  parkViewModel, innerPadding, navigationActions, eventViewModel, userViewModel)
+                  parkViewModel,
+                  innerPadding,
+                  navigationActions,
+                  eventViewModel,
+                  userViewModel,
+                  imageViewModel)
             }
             composable(Screen.ADD_EVENT) {
               infoManager.Display(LocalContext.current)
