@@ -56,6 +56,7 @@ fun SettingsContent(
           Button(
               onClick = {
                 showParentDialog.value = false
+                logout(authService, userViewModel, preferencesViewModel)
                 Toast.makeText(context, "Not yet implemented", Toast.LENGTH_SHORT).show()
               },
               colors = ColorPalette.BUTTON_COLOR,
