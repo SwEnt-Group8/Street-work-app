@@ -60,13 +60,6 @@ fun TrainSoloScreen(
 
   val graphData = getGraphData(workoutData, activity, isTimeDependent, reps)
 
-  // Create a GraphConfiguration object with the data points
-  val graphConfig =
-      GraphConfiguration(dataPoints = graphData, xUnitLabel = "Time", yUnitLabel = "Reps")
-
-  // Pass the configuration to the Graph composable
-  Graph(modifier = Modifier.fillMaxSize(), graphConfiguration = graphConfig)
-
   Column(
       modifier =
           Modifier.fillMaxSize().padding(paddingValues).padding(16.dp).testTag("TrainSoloScreen"),
