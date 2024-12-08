@@ -20,10 +20,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.android.sample.R
 import com.android.streetworkapp.device.network.isInternetAvailable
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
 import com.android.streetworkapp.model.event.EventViewModel
@@ -75,7 +77,10 @@ import com.android.streetworkapp.ui.tutorial.TutorialEvent
 import com.android.streetworkapp.ui.utils.CustomDialog
 import com.android.streetworkapp.ui.utils.DialogType
 import com.android.streetworkapp.ui.utils.trainComposable
+import com.android.streetworkapp.utils.GoogleAuthService
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
 import kotlinx.serialization.json.JsonNull.content
 import okhttp3.OkHttpClient
 
@@ -137,6 +142,10 @@ fun StreetWorkAppMain(
   val textModerationRepository = PerspectiveAPIRepository(OkHttpClient())
   val textModerationViewModel = TextModerationViewModel(textModerationRepository)
 
+  // Instantiate Google Auth Service
+  val token = stringResource(R.string.default_web_client_id)
+  val authService = remember { GoogleAuthService(token, Firebase.auth) }
+
   // Get the preferences cached parameters
   val loginState by preferencesViewModel.loginState.collectAsState()
   val uid by preferencesViewModel.uid.collectAsState()
@@ -189,6 +198,7 @@ fun StreetWorkAppMain(
         workoutViewModel,
         textModerationViewModel,
         preferencesViewModel,
+        authService,
         startDestination = resolvedStartDestination!!)
   }
 }
@@ -207,6 +217,7 @@ fun StreetWorkApp(
     workoutViewModel: WorkoutViewModel,
     textModerationViewModel: TextModerationViewModel,
     preferencesViewModel: PreferencesViewModel,
+    authService: GoogleAuthService,
     navTestInvokationOnEachRecompose: Boolean = false,
     e2eEventTesting: Boolean = false,
     startDestination: String = Route.AUTH
