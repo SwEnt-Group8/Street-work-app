@@ -34,6 +34,8 @@ import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.model.workout.WorkoutRepository
 import com.android.streetworkapp.model.workout.WorkoutViewModel
+import com.android.streetworkapp.utils.GoogleAuthService
+import com.google.firebase.auth.FirebaseAuth
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
@@ -128,6 +130,7 @@ class BottomNavigationTest {
           TextModerationViewModel(mock(TextModerationRepository::class.java, RETURNS_DEFAULTS)),
           ImageViewModel(mock(ImageRepository::class.java)),
           PreferencesViewModel(mock(PreferencesRepository::class.java)),
+          GoogleAuthService("", mock(FirebaseAuth::class.java, RETURNS_DEFAULTS)),
           true)
     }
 

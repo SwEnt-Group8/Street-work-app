@@ -13,6 +13,9 @@
     <string name="DeleteAccountConfirmationTitle">Are you sure ?</string>
     <string name="DeleteAccountConfirmationContent">Do you really want to delete your account ? \n\nYou will loose all of your progression. \nThis action is irreversible.</string>
 
+    <string name="LogoutTitle">Log-out</string>
+    <string name="LogoutSuccess">You are logged out</string>
+
 
     // Friend removal :
     <string name="RemoveFriendAction">Remove friend</string>
