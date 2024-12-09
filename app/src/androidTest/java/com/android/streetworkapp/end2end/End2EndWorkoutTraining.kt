@@ -36,6 +36,8 @@ import com.android.streetworkapp.model.workout.WorkoutSession
 import com.android.streetworkapp.model.workout.WorkoutViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Route
+import com.android.streetworkapp.utils.GoogleAuthService
+import com.google.firebase.auth.FirebaseAuth
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Rule
@@ -122,7 +124,8 @@ class End2EndWorkoutTraining {
           workoutViewModel,
           TextModerationViewModel(mock(TextModerationRepository::class.java)),
           mock(ImageViewModel::class.java),
-          PreferencesViewModel(mock(PreferencesRepository::class.java)))
+          PreferencesViewModel(mock(PreferencesRepository::class.java)),
+          GoogleAuthService("", mock(FirebaseAuth::class.java)))
     }
     NavigationActions(testNavController).apply {
       composeTestRule.waitForIdle()
