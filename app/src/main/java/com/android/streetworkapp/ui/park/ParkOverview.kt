@@ -20,7 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
@@ -51,6 +51,7 @@ import androidx.navigation.compose.rememberNavController
 import com.android.sample.R
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventOverviewUiState
+import com.android.streetworkapp.model.event.EventStatus
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.image.ImageViewModel
 import com.android.streetworkapp.model.park.Park
@@ -392,6 +393,13 @@ fun EventItemList(eventViewModel: EventViewModel, navigationActions: NavigationA
  */
 @Composable
 fun EventItem(event: Event, eventViewModel: EventViewModel, navigationActions: NavigationActions) {
+  val statusColor =
+      when (event.status) {
+        EventStatus.CREATED -> Color.Red
+        EventStatus.STARTED -> Color.Green
+        EventStatus.ENDED -> Color.Gray
+      }
+
   ListItem(
       modifier = Modifier.padding(0.dp).testTag("eventItem"),
       headlineContent = { Text(text = event.title) },
@@ -409,9 +417,10 @@ fun EventItem(event: Event, eventViewModel: EventViewModel, navigationActions: N
       },
       leadingContent = {
         Icon(
-            imageVector = Icons.Default.AccountCircle,
+            imageVector = Icons.Default.Circle,
             contentDescription = "Profile Icon",
-            modifier = Modifier.size(56.dp).testTag("profileIcon"))
+            modifier = Modifier.size(56.dp).testTag("profileIcon"),
+            tint = statusColor)
       },
       trailingContent = {
         Button(

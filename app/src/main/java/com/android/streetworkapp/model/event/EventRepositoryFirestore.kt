@@ -72,6 +72,20 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
   }
 
   /**
+   * Delete an event from the database.
+   *
+   * @param event The event to delete.
+   */
+  override suspend fun deleteEvent(event: Event) {
+    require(event.eid.isNotEmpty())
+    try {
+      db.collection(COLLECTION_PATH).document(event.eid).delete().await()
+    } catch (e: Exception) {
+      Log.e("FirestoreError", "Error deleting event: ${e.message}")
+    }
+  }
+
+  /**
    * Add a participant to an event.
    *
    * @param eid The event ID.

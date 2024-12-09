@@ -351,6 +351,20 @@ fun StreetWorkApp(
                   host,
                   innerPadding)
             }
+
+            composable(Screen.EDIT_EVENT) {
+              infoManager.Display(LocalContext.current)
+              AddEventScreen(
+                  navigationActions,
+                  parkViewModel,
+                  eventViewModel,
+                  userViewModel,
+                  textModerationViewModel,
+                  scope,
+                  host,
+                  innerPadding,
+                  editEvent = true)
+            }
             composable(Screen.EVENT_OVERVIEW) {
               infoManager.Display(LocalContext.current)
               EventOverviewScreen(

@@ -37,6 +37,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -114,7 +115,8 @@ fun EventDetails(event: Event, userViewModel: UserViewModel) {
           event.title,
           modifier = Modifier.testTag("eventTitle"),
           fontSize = 24.sp,
-          style = TextStyle(textDecoration = TextDecoration.Underline))
+          style = TextStyle(textDecoration = TextDecoration.Underline),
+          textAlign = TextAlign.Center)
     }
 
     Row(
@@ -307,6 +309,24 @@ fun LeaveEventButton(
       modifier = Modifier.testTag("leaveEventButton"),
       colors = ColorPalette.BUTTON_COLOR.copy(containerColor = Color.Red)) {
         Text("Leave this event")
+      }
+}
+
+@Composable
+fun EditEventButton(
+    event: Event,
+    eventViewModel: EventViewModel,
+    navigationActions: NavigationActions
+) {
+  Button(
+      onClick = {
+        eventViewModel.setCurrentEvent(event)
+        navigationActions.navigateTo(Screen.EDIT_EVENT)
+      },
+      enabled = true,
+      modifier = Modifier.testTag("editEventButton"),
+      colors = ColorPalette.BUTTON_COLOR) {
+        Text("Edit this event")
       }
 }
 

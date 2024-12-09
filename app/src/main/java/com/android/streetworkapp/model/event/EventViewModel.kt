@@ -68,6 +68,13 @@ open class EventViewModel(private val repository: EventRepository) : ViewModel()
   open fun addEvent(event: Event) = viewModelScope.launch { repository.addEvent(event) }
 
   /**
+   * Delete an event from the database.
+   *
+   * @param event The event to delete.
+   */
+  fun deleteEvent(event: Event) = viewModelScope.launch { repository.deleteEvent(event) }
+
+  /**
    * Add a participant to an event.
    *
    * @param eid The event ID.

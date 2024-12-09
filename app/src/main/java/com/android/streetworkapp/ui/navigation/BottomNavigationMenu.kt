@@ -22,6 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.user.UserViewModel
+import com.android.streetworkapp.ui.event.EditEventButton
 import com.android.streetworkapp.ui.event.JoinEventButton
 import com.android.streetworkapp.ui.event.LeaveEventButton
 import com.android.streetworkapp.ui.theme.ColorPalette
@@ -111,7 +112,9 @@ fun EventBottomBar(
             modifier = Modifier.fillMaxWidth().padding(16.dp)) {
               user.value?.let { user ->
                 event.value?.let { event ->
-                  if (event.listParticipants.contains(user.uid)) {
+                  if (user.uid == event.owner) {
+                    EditEventButton(event, eventViewModel, navigationActions)
+                  } else if (event.listParticipants.contains(user.uid)) {
                     LeaveEventButton(event, eventViewModel, user, navigationActions)
                   } else {
                     JoinEventButton(
