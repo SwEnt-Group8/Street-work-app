@@ -49,7 +49,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.streetworkapp.model.progression.Achievement
-import com.android.streetworkapp.model.progression.ExerciseAchievement
 import com.android.streetworkapp.model.progression.MedalsAchievement
 import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.progression.SocialAchievement
@@ -58,6 +57,7 @@ import com.android.streetworkapp.model.workout.WorkoutRepositoryFirestore
 import com.android.streetworkapp.model.workout.WorkoutViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.theme.ColorPalette
+import com.android.streetworkapp.utils.toFormattedString
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -86,6 +86,9 @@ fun ProgressScreen(
 
   val currentUser by userViewModel.currentUser.collectAsState()
   val currentProgression by progressionViewModel.currentProgression.collectAsState()
+
+  val currentWorkout by workoutViewModel.workoutData.collectAsState()
+  currentUser?.uid?.let { workoutViewModel.getOrAddWorkoutData(it) }
 
   LaunchedEffect(currentProgression) {
     currentUser?.let {
@@ -170,6 +173,24 @@ fun ProgressScreen(
               }
               DashboardStateProgression.Training -> {
 
+                currentWorkout?.workoutSessions?.forEach { workout ->
+                  val date = workout.startTime.toFormattedString()
+                  workout.exercises.forEach {
+                    val newAchievement =
+                        Achievement(
+                            exerciseNameToIcon(it.name),
+                            "You trained your ${it.name} !",
+                            listOf("workout"),
+                            date)
+
+                    Box(modifier = Modifier.testTag("exerciseItem")) {
+                      AchievementItem(newAchievement, false)
+                      HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
+                    }
+                  }
+                }
+
+                /*
                 enumValues<ExerciseAchievement>().forEach {
                   it.achievement.description =
                       "Record : 0.0 sec" // TODO: use the progression MVVM with current record
@@ -178,6 +199,9 @@ fun ProgressScreen(
                     HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
                   }
                 }
+
+                   */
+
               }
             }
           }
@@ -374,4 +398,19 @@ sealed class DashboardStateProgression {
   data object Training : DashboardStateProgression()
 
   data object Achievement : DashboardStateProgression()
+}
+
+fun exerciseNameToIcon(name: String): Int {
+  return when (name) {
+    "Push-ups" -> R.drawable.train_pushup
+    "Dips" -> R.drawable.train_dips
+    "Burpee" -> R.drawable.train_burpee
+    "Lunge" -> R.drawable.train_lunge
+    "Planks" -> R.drawable.train_planks
+    "Handstand" -> R.drawable.train_hand_stand
+    "Front lever" -> R.drawable.train_front_lever
+    "Flag" -> R.drawable.train_flag
+    "Muscle-up" -> R.drawable.train_muscle_up
+    else -> R.drawable.handstand_org
+  }
 }
