@@ -6,7 +6,6 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import com.android.streetworkapp.model.progression.ExerciseAchievement
 import com.android.streetworkapp.model.progression.MedalsAchievement
 import com.android.streetworkapp.model.progression.Progression
 import com.android.streetworkapp.model.progression.ProgressionRepositoryFirestore
@@ -183,14 +182,13 @@ class ProgressionTest {
 
     composeTestRule.onNodeWithTag("TrainingTab").performClick()
 
-      /*
+    /*
     enumValues<ExerciseAchievement>().forEach { exercise ->
       composeTestRule.onNodeWithTag("exerciseItem" + exercise.name).assertExists()
     }
     TODO: update with new kind of exercise
 
        */
-
 
   }
 
