@@ -42,9 +42,9 @@ fun AnimatedCounter(
                   slideOutVertically { it } + fadeOut())
             }
           },
-          label = "") { c ->
+          label = "") { count ->
             Text(
-                text = c.toString(),
+                text = count.toString(),
                 style = style,
                 softWrap = false,
                 modifier = Modifier.testTag("counterValue"))
