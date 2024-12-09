@@ -171,7 +171,8 @@ fun AddEventScreen(
           Modifier.fillMaxSize()
               .testTag("addEventScreen")
               .padding(paddingValues)
-              .background(MaterialTheme.colorScheme.background)) {
+              .background(MaterialTheme.colorScheme.background),
+      contentAlignment = Alignment.Center) {
         Column(
             modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(18.dp),
@@ -245,8 +246,10 @@ fun AddEventScreen(
                           colors = ColorPalette.BUTTON_COLOR.copy(containerColor = Color.Red),
                           modifier = Modifier.testTag("deleteEventButton"),
                           onClick = {
+                            Toast.makeText(context, "Event deleted", Toast.LENGTH_LONG).show()
                             eventViewModel.deleteEvent(event)
                             parkViewModel.deleteEventFromPark(event.parkId, event.eid)
+                            navigationActions.navigateTo(Screen.PARK_OVERVIEW)
                           }) {
                             Text("Delete event")
                           }

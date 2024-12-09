@@ -42,6 +42,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.streetworkapp.model.event.Event
+import com.android.streetworkapp.model.event.EventStatus
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.progression.ScoreIncrease
@@ -327,6 +328,47 @@ fun EditEventButton(
       modifier = Modifier.testTag("editEventButton"),
       colors = ColorPalette.BUTTON_COLOR) {
         Text("Edit this event")
+      }
+}
+
+@Composable
+fun StatusButton(
+    event: Event,
+    eventViewModel: EventViewModel,
+    parkViewModel: ParkViewModel,
+    navigationActions: NavigationActions
+) {
+  val context = LocalContext.current
+  val (nextStatus, buttonText) =
+      when (event.status) {
+        EventStatus.CREATED -> Pair(EventStatus.STARTED, "Start Event")
+        EventStatus.STARTED -> Pair(EventStatus.ENDED, "End Event")
+        EventStatus.ENDED -> Pair(EventStatus.ENDED, "Event Ended")
+      }
+
+  val buttonColor =
+      when (event.status) {
+        EventStatus.CREATED -> ColorPalette.BUTTON_COLOR.copy(containerColor = Color.Green)
+        EventStatus.STARTED -> ColorPalette.BUTTON_COLOR.copy(containerColor = Color.Red)
+        EventStatus.ENDED -> ColorPalette.BUTTON_COLOR.copy(containerColor = Color.Gray)
+      }
+
+  Button(
+      onClick = {
+        if (nextStatus == EventStatus.ENDED) {
+          eventViewModel.deleteEvent(event)
+          parkViewModel.deleteEventFromPark(event.parkId, event.eid)
+          Toast.makeText(context, "Event ended", Toast.LENGTH_LONG).show()
+        } else {
+          eventViewModel.updateStatus(event.eid, nextStatus)
+          Toast.makeText(context, "Event started!", Toast.LENGTH_LONG).show()
+        }
+          navigationActions.navigateTo(Screen.PARK_OVERVIEW)
+      },
+      enabled = event.status != EventStatus.ENDED,
+      modifier = Modifier.testTag("statusButton"),
+      colors = buttonColor) {
+        Text(buttonText)
       }
 }
 

@@ -93,6 +93,16 @@ open class EventViewModel(private val repository: EventRepository) : ViewModel()
   fun removeParticipantFromEvent(eid: String, uid: String) {
     viewModelScope.launch { repository.removeParticipantFromEvent(eid, uid) }
   }
+
+  /**
+   * Update the status of an event.
+   *
+   * @param eid The event ID.
+   * @param status The new status.
+   */
+  fun updateStatus(eid: String, status: EventStatus) {
+    viewModelScope.launch { repository.updateStatus(eid, status) }
+  }
 }
 
 sealed class EventOverviewUiState {

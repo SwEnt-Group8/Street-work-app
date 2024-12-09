@@ -66,7 +66,6 @@ import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.ui.utils.CustomDialog
 import com.android.streetworkapp.utils.dateDifference
-import com.android.streetworkapp.utils.toFormattedString
 import com.google.firebase.firestore.FirebaseFirestore
 
 /**
@@ -411,7 +410,7 @@ fun EventItem(event: Event, eventViewModel: EventViewModel, navigationActions: N
       },
       overlineContent = {
         Text(
-            text = dateDifference(event.date.toFormattedString()),
+            text = dateDifference(event),
             fontWeight = FontWeight.Bold,
             modifier = Modifier.testTag("dateText"))
       },
@@ -436,14 +435,3 @@ fun EventItem(event: Event, eventViewModel: EventViewModel, navigationActions: N
       })
   HorizontalDivider()
 }
-
-/**
- * @Composable fun CreateEventButton(navigationActions: NavigationActions) { Row( modifier =
- *   Modifier.fillMaxWidth().padding(end = 32.dp), horizontalArrangement = Arrangement.End) {
- *   IconButton( onClick = { navigationActions.navigateTo(Screen.ADD_EVENT) }, modifier =
- *   Modifier.testTag("createEventButton").size(50.dp)) { Box( modifier = Modifier.fillMaxSize()
- *   .background( color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape) .padding(4.dp))
- *   { Icon( painter = painterResource(id = R.drawable.calendar_add_on), contentDescription =
- *   "Create Event", tint = Color.White, modifier =
- *   Modifier.align(Alignment.Center).size(30.dp).padding(start = 2.dp)) } } } }
- */

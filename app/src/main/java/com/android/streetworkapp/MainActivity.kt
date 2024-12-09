@@ -287,7 +287,8 @@ fun StreetWorkApp(
                       tabList = LIST_TOP_LEVEL_DESTINATION)
                 }
                 BottomNavigationMenuType.EVENT_OVERVIEW -> {
-                  EventBottomBar(eventViewModel, userViewModel, navigationActions, scope, host)
+                  EventBottomBar(
+                      eventViewModel, userViewModel, parkViewModel, navigationActions, scope, host)
                   // selected
                 }
                 BottomNavigationMenuType
