@@ -183,25 +183,12 @@ fun ProgressScreen(
                             listOf("workout"),
                             date)
 
-                    Box(modifier = Modifier.testTag("exerciseItem")) {
+                    Box(modifier = Modifier.testTag("exerciseItem${it.name}")) {
                       AchievementItem(newAchievement, false)
                       HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
                     }
                   }
                 }
-
-                /*
-                enumValues<ExerciseAchievement>().forEach {
-                  it.achievement.description =
-                      "Record : 0.0 sec" // TODO: use the progression MVVM with current record
-                  Box(modifier = Modifier.testTag("exerciseItem${it.name}")) {
-                    AchievementItem(it.achievement, true)
-                    HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
-                  }
-                }
-
-                   */
-
               }
             }
           }
