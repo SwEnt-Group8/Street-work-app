@@ -57,6 +57,16 @@ class ProgressionTest {
   val uid = "testUid"
   private val sessionId = "testSessionId"
   private val exercise = Exercise(name = "Push-ups", duration = 30)
+  private val exercise2 = Exercise(name = "Dips")
+  private val exercise3 = Exercise(name = "Burpee")
+  private val exercise4 = Exercise(name = "Lunge")
+  private val exercise5 = Exercise(name = "Planks")
+  private val exercise6 = Exercise(name = "Handstand")
+  private val exercise7 = Exercise(name = "Front lever")
+  private val exercise8 = Exercise(name = "Flag")
+  private val exercise9 = Exercise(name = "Muscle-up")
+  private val exerciseNew = Exercise(name = "NewExercise")
+
   private val sessionType = SessionType.SOLO
 
   private val existingSession =
@@ -66,7 +76,18 @@ class ProgressionTest {
           endTime = 0L,
           sessionType = sessionType,
           participants = listOf("testParticipant"),
-          exercises = listOf(exercise),
+          exercises =
+              listOf(
+                  exercise,
+                  exercise2,
+                  exercise3,
+                  exercise4,
+                  exercise5,
+                  exercise6,
+                  exercise7,
+                  exercise8,
+                  exercise9,
+                  exerciseNew),
           winner = null)
   private val workoutData = WorkoutData(userUid = uid, workoutSessions = listOf(existingSession))
 
@@ -229,7 +250,7 @@ class ProgressionTest {
 
     workoutData.workoutSessions.forEach { workoutSession ->
       workoutSession.exercises.forEach {
-        composeTestRule.onNodeWithTag("exerciseItem${it.name}").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("exerciseItem${it.name}").assertExists()
       }
     }
   }
