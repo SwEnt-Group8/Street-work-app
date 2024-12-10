@@ -43,7 +43,7 @@ fun ImagesCollectionButton(
     mutableStateOf(emptyList<ParkImageLocal>())
   } // this will store the park images
 
-  if (showImagesCollection) FullScreenImagePopup(parkImages) { showImagesCollection = false }
+  if (showImagesCollection) FullScreenImagePopup(parkImages, userViewModel) { showImagesCollection = false }
 
   IconButton(
       onClick = {
