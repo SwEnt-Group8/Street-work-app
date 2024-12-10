@@ -59,7 +59,8 @@ fun String.toEpochTimestamp(): Long {
 }
 
 /**
- * Calculate the difference between the current time and a given timestamp.
+ * Calculate the difference between the current time and a given timestamp and return a text
+ * according to event status
  *
  * @param event the event to calculate the difference for.
  * @return The difference in days or hours.
@@ -77,17 +78,18 @@ fun dateDifference(event: Event): String {
 
   val hours = duration.toHours() % 24
 
+  val statusText =
+      when (event.status) {
+        EventStatus.STARTED -> "event has begun!"
+        EventStatus.ENDED -> "event has ended"
+        EventStatus.CREATED -> "Starting soon!"
+      }
+
   return if (days > 0) {
     "in $days day(s)"
   } else {
-    if (hours == 0L) {
-      "in less than an hour"
-    } else if (hours < 0) {
-      if (event.status == EventStatus.STARTED) {
-        "event has begun!"
-      } else {
-        "Starting soon!"
-      }
+    if (hours <= 0) {
+      statusText
     } else {
       "in $hours hour(s)"
     }

@@ -102,7 +102,7 @@ fun EventBottomBar(
     parkViewModel: ParkViewModel,
     navigationActions: NavigationActions,
     scope: CoroutineScope = rememberCoroutineScope(),
-    snackbarHostState: SnackbarHostState? = null
+    snackBarHostState: SnackbarHostState? = null
 ) {
   val event = eventViewModel.currentEvent.collectAsState()
   val user = userViewModel.currentUser.collectAsState()
@@ -132,7 +132,7 @@ fun EventBottomBar(
                         user,
                         navigationActions,
                         scope,
-                        snackbarHostState)
+                        snackBarHostState)
                   }
                 }
               }

@@ -19,9 +19,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Circle
+import androidx.compose.material.icons.automirrored.filled.DirectionsRun
+import androidx.compose.material.icons.filled.DirectionsRun
+import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Timelapse
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -392,11 +396,11 @@ fun EventItemList(eventViewModel: EventViewModel, navigationActions: NavigationA
  */
 @Composable
 fun EventItem(event: Event, eventViewModel: EventViewModel, navigationActions: NavigationActions) {
-  val statusColor =
+  val (statusColor, statusIcon) =
       when (event.status) {
-        EventStatus.CREATED -> Color.Red
-        EventStatus.STARTED -> Color.Green
-        EventStatus.ENDED -> Color.Gray
+        EventStatus.CREATED -> Pair(Color.Red, Icons.Default.Timelapse)
+        EventStatus.STARTED -> Pair(Color.Green, Icons.AutoMirrored.Filled.DirectionsRun)
+        EventStatus.ENDED -> Pair(Color.Gray, Icons.Default.QuestionMark)
       }
 
   ListItem(
@@ -404,7 +408,7 @@ fun EventItem(event: Event, eventViewModel: EventViewModel, navigationActions: N
       headlineContent = { Text(text = event.title) },
       supportingContent = {
         Text(
-            "Participants ${event.listParticipants.size}/${event.maxParticipants}",
+            "Participants: ${event.listParticipants.size}/${event.maxParticipants}",
             fontWeight = FontWeight.Light,
             modifier = Modifier.testTag("participantsText"))
       },
@@ -415,11 +419,17 @@ fun EventItem(event: Event, eventViewModel: EventViewModel, navigationActions: N
             modifier = Modifier.testTag("dateText"))
       },
       leadingContent = {
-        Icon(
-            imageVector = Icons.Default.Circle,
-            contentDescription = "Profile Icon",
-            modifier = Modifier.size(56.dp).testTag("profileIcon"),
-            tint = statusColor)
+        Box(
+            modifier =
+                Modifier.size(56.dp)
+                    .background(color = statusColor, shape = CircleShape)
+                    .padding(2.dp)) {
+              Icon(
+                  imageVector = statusIcon,
+                  contentDescription = "Add Image",
+                  tint = Color.White,
+                  modifier = Modifier.align(Alignment.Center).fillMaxSize(0.75f))
+            }
       },
       trailingContent = {
         Button(

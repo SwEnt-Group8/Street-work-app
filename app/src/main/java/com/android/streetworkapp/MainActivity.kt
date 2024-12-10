@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
@@ -78,7 +77,6 @@ import com.android.streetworkapp.ui.utils.CustomDialog
 import com.android.streetworkapp.ui.utils.DialogType
 import com.android.streetworkapp.ui.utils.trainComposable
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.serialization.json.JsonNull.content
 import okhttp3.OkHttpClient
 
 class MainActivity : ComponentActivity() {
@@ -155,7 +153,7 @@ fun StreetWorkAppMain(
 
   // Ensure start destination and preferences parameters are resolved before displaying the app
   var resolvedStartDestination by remember { mutableStateOf<String?>(null) }
-  var resolvedPreferencesParameters by remember { mutableStateOf<Boolean>(false) }
+  var resolvedPreferencesParameters by remember { mutableStateOf(false) }
 
   // Determine start destination and be sure preferences parameters are correctly loaded
   if (loginState == true &&
@@ -200,7 +198,6 @@ fun StreetWorkAppMain(
   }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun StreetWorkApp(
@@ -231,7 +228,7 @@ fun StreetWorkApp(
   } // not using by here since I want to pass the mutableState to a fn
   var screenParams by remember { mutableStateOf<ScreenParams?>(null) }
 
-  var firstTimeLoaded by remember { mutableStateOf<Boolean>(true) }
+  var firstTimeLoaded by remember { mutableStateOf(true) }
 
   navigationActions.registerStringListenerOnDestinationChange(currentScreenName)
 
