@@ -118,7 +118,7 @@ class AddEventTest {
 
   @Test
   fun addEventScreenIsDisplayed() {
-    `when`(eventViewModel.getNewEid()).thenReturn("test")
+    `when`(eventRepository.getNewEid()).thenReturn("test")
     composeTestRule.setContent {
       AddEventScreen(
           navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel)
@@ -130,7 +130,7 @@ class AddEventTest {
 
   @Test
   fun addEventScreenWithUnchangedTimeDoesNotChangeScreen() {
-    `when`(eventViewModel.getNewEid()).thenReturn("test")
+    `when`(eventRepository.getNewEid()).thenReturn("test")
     composeTestRule.setContent {
       AddEventScreen(
           navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel)
@@ -146,7 +146,7 @@ class AddEventTest {
 
   @Test
   fun addEventScreenWithUnchangedTitleDoesNotChangeScreen() {
-    `when`(eventViewModel.getNewEid()).thenReturn("test")
+    `when`(eventRepository.getNewEid()).thenReturn("test")
     composeTestRule.setContent {
       AddEventScreen(
           navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel)
@@ -168,7 +168,7 @@ class AddEventTest {
 
   @Test
   fun emptyTitleDisplaysCorrectErrorMessage() {
-    whenever(eventViewModel.getNewEid()).thenReturn("test")
+    whenever(eventRepository.getNewEid()).thenReturn("test")
     composeTestRule.setContent {
       AddEventScreen(
           navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel)
@@ -182,7 +182,7 @@ class AddEventTest {
 
   @Test
   fun textEvaluationOnEvaluationErrorDisplaysCorrectErrorMessage() {
-    whenever(eventViewModel.getNewEid()).thenReturn("test")
+    whenever(eventRepository.getNewEid()).thenReturn("test")
     whenever(textModerationViewModel.analyzeText(any(), any(), any(), any())).thenAnswer {
         invocation ->
       val onErrorCallback = invocation.getArgument<() -> Unit>(2) // Get the onError lambda
@@ -192,7 +192,7 @@ class AddEventTest {
 
   @Test
   fun textEvaluationIsOverThresholdDisplaysCorrectErrorMessage() {
-    whenever(eventViewModel.getNewEid()).thenReturn("test")
+    whenever(eventRepository.getNewEid()).thenReturn("test")
     whenever(textModerationViewModel.analyzeText(any(), any(), any(), any())).thenAnswer {
         invocation ->
       val onTextEvaluationResult =
@@ -214,8 +214,8 @@ class AddEventTest {
 
   @Test
   fun textEvaluationOverThresholdAndOtherConditionsValidCallCreateEvent() = runTest {
-    whenever(eventViewModel.getNewEid()).thenReturn("test")
-    whenever(eventViewModel.addEvent(any())).thenAnswer {
+    whenever(eventRepository.getNewEid()).thenReturn("test")
+    whenever(eventRepository.addEvent(any())).thenAnswer {
       mockJob
     } // do nothing, we just want to check that it gets called correctly
     whenever(textModerationViewModel.analyzeText(any(), any(), any(), any())).thenAnswer {
@@ -233,12 +233,12 @@ class AddEventTest {
     composeTestRule.onNodeWithTag("titleTag").performTextInput("dummy title")
     composeTestRule.onNodeWithTag("addEventButton").performClick()
     composeTestRule.onNodeWithTag("errorMessage").assertDoesNotExist()
-    verify(eventViewModel).addEvent(any())
+    verify(eventRepository).addEvent(any())
   }
 
   @Test
   fun editEventScreenIsDisplayed() {
-    `when`(eventViewModel.getNewEid()).thenReturn("test")
+    `when`(eventRepository.getNewEid()).thenReturn("test")
 
     val owner = User(event.owner, "owner", "owner", 0, emptyList(), "owner")
 
