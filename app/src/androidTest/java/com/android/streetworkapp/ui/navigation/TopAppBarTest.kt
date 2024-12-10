@@ -1,6 +1,7 @@
 package com.android.streetworkapp.ui.navigation
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
@@ -67,7 +68,8 @@ class TopAppBarTest {
           TextModerationViewModel(mock(TextModerationRepository::class.java)),
           ImageViewModel(mock(ImageRepository::class.java)),
           PreferencesViewModel(mock(PreferencesRepository::class.java)),
-          GoogleAuthService("", mock(FirebaseAuth::class.java, RETURNS_DEFAULTS)),
+          GoogleAuthService(
+              "abc", mock(FirebaseAuth::class.java, RETURNS_DEFAULTS), LocalContext.current),
           true)
     }
 

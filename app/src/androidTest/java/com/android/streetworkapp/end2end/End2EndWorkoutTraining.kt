@@ -1,5 +1,6 @@
 package com.android.streetworkapp.end2end
 
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
@@ -125,7 +126,7 @@ class End2EndWorkoutTraining {
           TextModerationViewModel(mock(TextModerationRepository::class.java)),
           mock(ImageViewModel::class.java),
           PreferencesViewModel(mock(PreferencesRepository::class.java)),
-          GoogleAuthService("", mock(FirebaseAuth::class.java)))
+          GoogleAuthService("abc", mock(FirebaseAuth::class.java), LocalContext.current))
     }
     NavigationActions(testNavController).apply {
       composeTestRule.waitForIdle()

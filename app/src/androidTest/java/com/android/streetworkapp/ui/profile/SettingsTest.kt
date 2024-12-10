@@ -37,7 +37,6 @@ class SettingsTest {
   private val userRepository = mock(UserRepository::class.java)
   private val userViewModel = UserViewModel(userRepository)
   private val preferencesViewModel = PreferencesViewModel(mock(PreferencesRepository::class.java))
-  private val authService = GoogleAuthService("", mock(FirebaseAuth::class.java, RETURNS_DEFAULTS))
 
   @Test
   fun isSettingsContentDisplayedForNullUser() {
@@ -46,6 +45,9 @@ class SettingsTest {
     var context: Context? = null
 
     composeTestRule.setContent {
+      val authService =
+          GoogleAuthService(
+              "abc", mock(FirebaseAuth::class.java, RETURNS_DEFAULTS), LocalContext.current)
       SettingsContent(
           navigationActions, userViewModel, preferencesViewModel, authService, showSettingDialog)
       context = LocalContext.current
@@ -80,6 +82,9 @@ class SettingsTest {
     userViewModel.setCurrentUser(alice)
 
     composeTestRule.setContent {
+      val authService =
+          GoogleAuthService(
+              "abc", mock(FirebaseAuth::class.java, RETURNS_DEFAULTS), LocalContext.current)
       SettingsContent(
           navigationActions, userViewModel, preferencesViewModel, authService, showSettingDialog)
       context = LocalContext.current
@@ -109,6 +114,9 @@ class SettingsTest {
     userViewModel.setCurrentUser(alice)
 
     composeTestRule.setContent {
+      val authService =
+          GoogleAuthService(
+              "abc", mock(FirebaseAuth::class.java, RETURNS_DEFAULTS), LocalContext.current)
       SettingsContent(
           navigationActions, userViewModel, preferencesViewModel, authService, showSettingDialog)
       context = LocalContext.current

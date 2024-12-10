@@ -5,6 +5,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
@@ -130,7 +131,8 @@ class BottomNavigationTest {
           TextModerationViewModel(mock(TextModerationRepository::class.java, RETURNS_DEFAULTS)),
           ImageViewModel(mock(ImageRepository::class.java)),
           PreferencesViewModel(mock(PreferencesRepository::class.java)),
-          GoogleAuthService("", mock(FirebaseAuth::class.java, RETURNS_DEFAULTS)),
+          GoogleAuthService(
+              "abc", mock(FirebaseAuth::class.java, RETURNS_DEFAULTS), LocalContext.current),
           true)
     }
 

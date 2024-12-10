@@ -3,6 +3,7 @@ package com.android.streetworkapp.end2end
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.click
@@ -142,7 +143,10 @@ class End2EndCreateEvent {
           mock(TextModerationViewModel::class.java),
           mock(ImageViewModel::class.java),
           mock(PreferencesViewModel::class.java),
-          GoogleAuthService("", mock(FirebaseAuth::class.java, RETURNS_DEFAULTS)),
+          GoogleAuthService(
+              "abc",
+              mock(FirebaseAuth::class.java, RETURNS_DEFAULTS),
+              context = LocalContext.current),
           true)
     }
   }

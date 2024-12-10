@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.click
@@ -122,7 +123,8 @@ class End2EndParks {
           TextModerationViewModel(mockk()),
           ImageViewModel(mockk()),
           PreferencesViewModel(mock(PreferencesRepository::class.java)),
-          GoogleAuthService("", mock(FirebaseAuth::class.java, RETURNS_DEFAULTS)))
+          GoogleAuthService(
+              "abc", mock(FirebaseAuth::class.java, RETURNS_DEFAULTS), LocalContext.current))
       // setup so as we're already on the MAP route
     }
 
