@@ -176,7 +176,7 @@ fun ProgressScreen(
                     val newAchievement =
                         Achievement(
                             exerciseNameToIcon(it.name),
-                            "You trained your ${it.name} !",
+                            LocalContext.current.getString(R.string.Trained, it.name),
                             listOf("workout"),
                             date)
 
@@ -384,17 +384,23 @@ sealed class DashboardStateProgression {
   data object Achievement : DashboardStateProgression()
 }
 
+/**
+ * This function can be used to find the Icon corresponding to a given exercise name.
+ *
+ * @param name: The exercise name
+ */
+@Composable
 fun exerciseNameToIcon(name: String): Int {
   return when (name) {
-    "Push-ups" -> R.drawable.train_pushup
-    "Dips" -> R.drawable.train_dips
-    "Burpee" -> R.drawable.train_burpee
-    "Lunge" -> R.drawable.train_lunge
-    "Planks" -> R.drawable.train_planks
-    "Handstand" -> R.drawable.train_hand_stand
-    "Front lever" -> R.drawable.train_front_lever
-    "Flag" -> R.drawable.train_flag
-    "Muscle-up" -> R.drawable.train_muscle_up
+    LocalContext.current.getString(R.string.Pushups) -> R.drawable.train_pushup
+    LocalContext.current.getString(R.string.Dips) -> R.drawable.train_dips
+    LocalContext.current.getString(R.string.Burpee) -> R.drawable.train_burpee
+    LocalContext.current.getString(R.string.Lunge) -> R.drawable.train_lunge
+    LocalContext.current.getString(R.string.Planks) -> R.drawable.train_planks
+    LocalContext.current.getString(R.string.Handstand) -> R.drawable.train_hand_stand
+    LocalContext.current.getString(R.string.Frontlever) -> R.drawable.train_front_lever
+    LocalContext.current.getString(R.string.Flag) -> R.drawable.train_flag
+    LocalContext.current.getString(R.string.Muscleup) -> R.drawable.train_muscle_up
     else -> R.drawable.handstand_org
   }
 }
