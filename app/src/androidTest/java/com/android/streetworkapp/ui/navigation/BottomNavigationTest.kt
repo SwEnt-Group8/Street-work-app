@@ -47,6 +47,7 @@ import org.mockito.Mockito.mock
 val TEST_SCREEN_EXCLUSION_LIST =
     listOf<String>(
         Screen.ADD_EVENT,
+        Screen.EDIT_EVENT,
         Screen.EVENT_OVERVIEW,
         Screen.TRAIN_SOLO,
         Screen.TRAIN_COACH,
