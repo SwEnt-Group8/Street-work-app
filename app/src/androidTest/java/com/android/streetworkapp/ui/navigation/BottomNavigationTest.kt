@@ -131,7 +131,7 @@ class BottomNavigationTest {
           true)
     }
 
-      composeTestRule.waitForIdle()
+    composeTestRule.waitForIdle()
 
     val bottomNavTypeToTest =
         BottomNavigationMenuType.entries.filter { it != BottomNavigationMenuType.NONE }
