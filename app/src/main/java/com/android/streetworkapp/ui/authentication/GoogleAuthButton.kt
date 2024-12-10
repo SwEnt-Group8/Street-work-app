@@ -40,7 +40,7 @@ fun GoogleAuthButton(
   Button(
       onClick = {
         Log.d("SignInScreen", "Start sign-in")
-        authService.launchSignIn(context, launcher)
+        authService.launchSignIn(launcher)
       },
       modifier =
           Modifier.width(250.dp)
