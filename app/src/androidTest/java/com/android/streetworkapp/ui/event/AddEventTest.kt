@@ -2,7 +2,6 @@ package com.android.streetworkapp.ui.event
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -21,7 +20,6 @@ import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
-import com.android.streetworkapp.ui.navigation.EventBottomBar
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.Job
@@ -237,7 +235,7 @@ class AddEventTest {
   }
 
   @Test
-  fun editEventScreenIsDisplayed() {
+  fun ownerBottomBarIsDisplayed() = runTest {
     `when`(eventRepository.getNewEid()).thenReturn("test")
 
     val owner = User(event.owner, "owner", "owner", 0, emptyList(), "owner")
@@ -247,15 +245,21 @@ class AddEventTest {
     eventViewModel.setCurrentEvent(event)
 
     composeTestRule.setContent {
-      EventBottomBar(eventViewModel, userViewModel, parkViewModel, navigationActions)
+      AddEventScreen(
+          navigationActions,
+          parkViewModel,
+          eventViewModel,
+          userViewModel,
+          textModerationViewModel,
+          editEvent = true)
     }
 
     composeTestRule.waitForIdle()
 
-    composeTestRule.onNodeWithTag("editEventButton").assertIsDisplayed()
-    composeTestRule
-        .onNodeWithTag("statusButton")
-        .assertIsDisplayed()
-        .assertTextContains("Start Event")
+    composeTestRule.onNodeWithTag("deleteEventButton").assertIsDisplayed().performClick()
+
+    verify(eventRepository).deleteEvent(any())
+
+    verify(parkRepository).deleteEventFromPark(any(), any())
   }
 }

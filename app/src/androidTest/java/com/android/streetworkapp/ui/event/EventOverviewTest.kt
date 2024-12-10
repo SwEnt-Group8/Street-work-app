@@ -6,6 +6,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
@@ -26,6 +27,7 @@ import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.EventBottomBar
 import com.android.streetworkapp.ui.navigation.LIST_OF_SCREENS
 import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.navigation.ScreenParams
 import com.android.streetworkapp.utils.toFormattedString
 import com.google.firebase.Timestamp
@@ -188,7 +190,7 @@ class EventOverviewTest {
   }
 
   @Test
-  fun leaveEventButtonIsNotDisplayed() = runTest {
+  fun leaveEventButtonIsDisplayed() = runTest {
     eventViewModel.setCurrentEvent(event)
     userViewModel.setCurrentUser(participant)
 
@@ -229,5 +231,34 @@ class EventOverviewTest {
     verify(eventRepository).addParticipantToEvent(any(), any())
     verify(navigationActions).goBack()
     verify(userRepository).increaseUserScore(any(), any())
+  }
+
+  @Test
+  fun ownerBottomBarIsDisplayed() = runTest {
+    `when`(eventRepository.getNewEid()).thenReturn("test")
+
+    val owner = User(event.owner, "owner", "owner", 0, emptyList(), "owner")
+
+    userViewModel.setCurrentUser(owner)
+
+    eventViewModel.setCurrentEvent(event)
+
+    composeTestRule.setContent {
+      EventBottomBar(eventViewModel, userViewModel, parkViewModel, navigationActions)
+    }
+
+    composeTestRule.waitForIdle()
+
+    composeTestRule
+        .onNodeWithTag("statusButton")
+        .assertIsDisplayed()
+        .assertTextContains("Start Event")
+        .performClick()
+
+    verify(eventRepository).updateStatus(any(), any())
+
+    composeTestRule.onNodeWithTag("editEventButton").assertIsDisplayed().performClick()
+
+    verify(navigationActions).navigateTo(Screen.EDIT_EVENT)
   }
 }
