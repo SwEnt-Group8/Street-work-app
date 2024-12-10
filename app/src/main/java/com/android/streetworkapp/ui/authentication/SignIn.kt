@@ -117,7 +117,7 @@ fun SignInScreen(
                       .height(96.dp)
                       .testTag("loginScreenGoogleAuthButtonContainer"),
               contentAlignment = Alignment.Center) {
-                GoogleAuthButton(authService, context, launcher)
+                GoogleAuthButton(authService, launcher)
               }
         }
   }
