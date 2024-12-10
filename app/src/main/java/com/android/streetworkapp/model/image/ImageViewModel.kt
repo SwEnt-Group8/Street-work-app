@@ -7,6 +7,7 @@ import android.net.Uri
 import android.util.Base64
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.streetworkapp.model.park.Park
 import java.io.File
 import java.io.FileOutputStream
@@ -41,7 +42,8 @@ open class ImageViewModel(private val imageRepository: ImageRepository) : ViewMo
                 return@launch
               }
       try {
-        imageRepository.uploadImage(base64Image, parkId, userId)
+        val base64ImageHash = sha256(base64Image)
+        imageRepository.uploadImage(base64ImageHash, base64Image, parkId, userId)
         onImageUploadSuccess()
       } catch (e: Exception) {
         onImageUploadFailure() // Not going to bother explaining the exception in the UI
@@ -73,12 +75,11 @@ open class ImageViewModel(private val imageRepository: ImageRepository) : ViewMo
       }
 
       for (parkImage in retrievedImages) {
-        val imageHash = sha256(parkImage.imageB64)
 
         val decodedBytes = Base64.decode(parkImage.imageB64, Base64.DEFAULT)
         val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
 
-        val imageFile = File(parkFolder, "${imageHash}.jpg")
+        val imageFile = File(parkFolder, "${parkImage.imageHash}.jpg")
         if (!imageFile.exists()) { // image doesn't exist, we decode it
           FileOutputStream(imageFile).use { out ->
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
@@ -88,6 +89,7 @@ open class ImageViewModel(private val imageRepository: ImageRepository) : ViewMo
         val imageUri = Uri.fromFile(imageFile)
         val localParkImage =
             ParkImageLocal(
+                imageHash = parkImage.imageHash,
                 image = imageUri,
                 userId = parkImage.userId,
                 rating = parkImage.rating,
@@ -100,6 +102,23 @@ open class ImageViewModel(private val imageRepository: ImageRepository) : ViewMo
       imagesCallback(localParkImages.toList())
     }
   }
+
+    /**
+     * Deletes the image associated with the hash
+     * @param imageCollectionId The document id that the images is in.
+     * @param imageHash The hash of the base64 representation of the image.
+     * @param onImageDeleteSuccess Callback for deletion success.
+     * @param onImageDeleteFailure Callback for deletion failure.
+     */
+
+    open fun deleteImage(imageCollectionId: String, imageHash: String, onImageDeleteSuccess: () -> Unit, onImageDeleteFailure: () -> Unit) {
+        viewModelScope.launch {
+            if (imageRepository.deleteImage(imageCollectionId, imageHash))
+                onImageDeleteSuccess()
+            else
+                onImageDeleteFailure()
+        }
+    }
 
   /**
    * Takes an URI and returns its base64 encoding.
@@ -123,4 +142,14 @@ open class ImageViewModel(private val imageRepository: ImageRepository) : ViewMo
     val hashedBytes = digest.digest(string.toByteArray(Charsets.UTF_8))
     return hashedBytes.joinToString("") { "%02x".format(it) }
   }
+
+    /**
+     * Registers a callback that gets called each time the document gets updated
+     * @param imageCollectionId The id of the document to listen to.
+     * @param onCollectionUpdate The callback
+     */
+    open fun registerCollectionListener(imageCollectionId: String, onCollectionUpdate: () -> Unit) {
+        require(imageCollectionId.isNotEmpty()) {"Empty imageCollectionId"}
+        this.imageRepository.registerCollectionListener(imageCollectionId, onCollectionUpdate)
+    }
 }

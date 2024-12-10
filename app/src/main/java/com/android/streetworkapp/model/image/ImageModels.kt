@@ -18,7 +18,7 @@ data class ParkImageCollection(
 /**
  * A data class that represents an image related to a park in the database, uploaded by a user, and
  * associated with a rating.
- *
+ * @property imageHash The hash of the imageB64.
  * @property imageB64 The image in Base64 string format.
  * @property userId The id of the user who uploaded the image.
  * @property username The username associated to the userId
@@ -29,6 +29,7 @@ data class ParkImageCollection(
 // * Note: for the rating I would have used an unsigned int but there isn't a built in serializer
 // for it and I can't be bothered
 data class ParkImageDatabase(
+    val imageHash: String,
     val imageB64: String,
     val userId: String,
     val username: String,
@@ -40,6 +41,7 @@ data class ParkImageDatabase(
  * A data class that represents an image related to a park in the app, uploaded by a user, and
  * associated with a rating.
  *
+ * @property imageHash The hash of the imageB64.
  * @property image The [Uri] of the image.
  * @property userId The id of the user who uploaded the image.
  * @property username The username associated to the userId
@@ -48,6 +50,7 @@ data class ParkImageDatabase(
  * @property uploadDate The date the image was uploaded
  */
 data class ParkImageLocal(
+    val imageHash: String,
     val image: Uri,
     val userId: String,
     val username: String,

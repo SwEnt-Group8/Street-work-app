@@ -22,16 +22,15 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ThumbDown
 import androidx.compose.material.icons.filled.ThumbUp
-import androidx.compose.material.icons.outlined.ThumbDown
-import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,16 +38,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
+import com.android.streetworkapp.model.image.ImageViewModel
 import com.android.streetworkapp.model.image.ParkImageLocal
+import com.android.streetworkapp.model.park.Park
+import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.utils.toFormattedString
+import kotlinx.coroutines.launch
 
 private object FullScreenImagePopUpSetting {
     val popUpBackgroundColor = ColorPalette.PRINCIPLE_BACKGROUND_COLOR
@@ -60,14 +62,15 @@ private object FullScreenImagePopUpSetting {
 /** Fullscreen PopUp: it will display all the ParKImageLocal in the list in a HorizontalPager **/
 @SuppressLint("AutoboxingStateCreation")
 @Composable
-fun FullScreenImagePopup(images: List<ParkImageLocal>, userViewModel: UserViewModel, onDismiss: () -> Unit) {
-
-    val currentUser = userViewModel.currentUser.collectAsState().value
-
-    val imagesSize by remember { mutableIntStateOf(images.size) }
-
+fun FullScreenImagePopup(images: List<ParkImageLocal>, park: Park, userViewModel: UserViewModel, imageViewModel: ImageViewModel, onDismiss: () -> Unit) {
+  val currentUser = userViewModel.currentUser.collectAsState().value
+  val currentImages by rememberUpdatedState(images)
   // State for the pager to keep track of the current image
-  val pagerState = rememberPagerState(pageCount = { imagesSize })
+  val pagerState = rememberPagerState(pageCount = { currentImages.size })
+    val coroutineScope = rememberCoroutineScope() // Creates a coroutine scope for use inside composable
+
+  val currentImage = currentImages.getOrNull(pagerState.currentPage)
+
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -82,7 +85,7 @@ fun FullScreenImagePopup(images: List<ParkImageLocal>, userViewModel: UserViewMo
                   Modifier.fillMaxSize()
                       .background(FullScreenImagePopUpSetting.popUpBackgroundColor)
                       .let {
-                          if (imagesSize > 0) it.verticalScroll(rememberScrollState())
+                          if (currentImages.isNotEmpty()) it.verticalScroll(rememberScrollState())
                           else it
                       } //only have a vertical scroll if we have images
                       .testTag("fullscreenImagePopUp")) {
@@ -100,9 +103,9 @@ fun FullScreenImagePopup(images: List<ParkImageLocal>, userViewModel: UserViewMo
                       )
                   }
               }
-              if (imagesSize > 0) {
+              if (currentImages.isNotEmpty() && currentImage != null) {
                   Text(
-                      " #${pagerState.currentPage + 1}/${imagesSize}",
+                      " #${pagerState.currentPage + 1}/${currentImages.size}",
                       color = FullScreenImagePopUpSetting.fontColor,
                       fontWeight = FontWeight.SemiBold,
                       fontSize = 18.sp
@@ -112,14 +115,14 @@ fun FullScreenImagePopup(images: List<ParkImageLocal>, userViewModel: UserViewMo
                       state = pagerState,
                       modifier =
                       Modifier.fillMaxWidth().fillMaxHeight(0.7f).padding(vertical = 20.dp)
-                  ) { page ->
-                      ImageItem(imageUri = images[page].image)
+                  ) {
+                      ImageItem(imageUri = currentImage.image)
                   }
                   Row(
                       modifier = Modifier.fillMaxWidth(),
                       horizontalArrangement = Arrangement.Center
                   ) {
-                      if (currentUser?.uid != images[pagerState.currentPage].userId) {
+                      if (currentUser?.uid != currentImage.userId) {
                           Box(modifier = Modifier.padding(horizontal = 15.dp)) {
                               // Like Button
                               IconButton(
@@ -156,7 +159,9 @@ fun FullScreenImagePopup(images: List<ParkImageLocal>, userViewModel: UserViewMo
                           Box(modifier = Modifier.padding(horizontal = 15.dp)) {
                               // Dislike Button
                               IconButton(
-                                  onClick = { /*onDelete(imageUris[pagerState.currentPage])*/ },
+                                  onClick = {
+                                      deletePicture(currentImage, currentUser, park, imageViewModel, { coroutineScope.launch { pagerState.scrollToPage(pagerState.currentPage -1 )}}, {})
+                                  },
                                   modifier =
                                   Modifier.size(60.dp).clip(CircleShape)
                                       .background(FullScreenImagePopUpSetting.dislikeButtonColor)
@@ -177,22 +182,22 @@ fun FullScreenImagePopup(images: List<ParkImageLocal>, userViewModel: UserViewMo
                       modifier = Modifier.padding(vertical = 25.dp)
                   ) {
                       Text(
-                          "Uploaded by ${images[pagerState.currentPage].username}",
+                          "Uploaded by ${currentImages[pagerState.currentPage].username}",
                           color = FullScreenImagePopUpSetting.fontColor,
                           fontWeight = FullScreenImagePopUpSetting.imageInfoFontWeight
                       )
                       Text(
-                          "The ${images[pagerState.currentPage].uploadDate.toFormattedString()}",
+                          "The ${currentImages[pagerState.currentPage].uploadDate.toFormattedString()}",
                           color = FullScreenImagePopUpSetting.fontColor,
                           fontWeight = FullScreenImagePopUpSetting.imageInfoFontWeight
                       )
                       Text(
-                          "${images[pagerState.currentPage].rating.first} user(s) liked this picture",
+                          "${currentImages[pagerState.currentPage].rating.first} user(s) liked this picture",
                           color = FullScreenImagePopUpSetting.fontColor,
                           fontWeight = FullScreenImagePopUpSetting.imageInfoFontWeight
                       )
                       Text(
-                          "${images[pagerState.currentPage].rating.second} user(s) disliked this picture",
+                          "${currentImages[pagerState.currentPage].rating.second} user(s) disliked this picture",
                           color = FullScreenImagePopUpSetting.fontColor,
                           fontWeight = FullScreenImagePopUpSetting.imageInfoFontWeight
                       )
@@ -224,4 +229,11 @@ fun ImageItem(imageUri: Uri) {
         contentScale = ContentScale.Fit,
     )
   }
+}
+
+
+private fun deletePicture(image: ParkImageLocal, currentUser: User, park: Park, imageViewModel: ImageViewModel, onDeleteSuccess: () -> Unit, onDeleteFailure: () -> Unit) {
+    if (image.userId == currentUser.uid) { //a bit redundant to check since could fake this but whatever
+        imageViewModel.deleteImage(park.imagesCollectionId, image.imageHash, onDeleteSuccess, onDeleteFailure)
+    }
 }

@@ -43,7 +43,11 @@ fun ImagesCollectionButton(
     mutableStateOf(emptyList<ParkImageLocal>())
   } // this will store the park images
 
-  if (showImagesCollection) FullScreenImagePopup(parkImages, userViewModel) { showImagesCollection = false }
+  park?.let {
+      if (showImagesCollection) FullScreenImagePopup(
+          parkImages,
+          it , userViewModel, imageViewModel) { showImagesCollection = false }
+  }
 
   IconButton(
       onClick = {
@@ -52,20 +56,26 @@ fun ImagesCollectionButton(
           imageViewModel.retrieveImages(context, park) {
             parkImages = it
             showImagesCollection = true
+           imageViewModel.registerCollectionListener(park.imagesCollectionId
+           ) { imageViewModel.retrieveImages(context, park) { parkImages = it } }
           }
+
         }
       },
       modifier = Modifier.testTag("ImagesCollectionButton")) {
         Box(
             modifier =
-                Modifier.size(36.dp)
-                    .background(color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape)
-                    .padding(2.dp)) {
+            Modifier
+                .size(36.dp)
+                .background(color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape)
+                .padding(2.dp)) {
               Icon(
                   painter = painterResource(id = R.drawable.photo_library_24px),
                   contentDescription = "Add Image",
                   tint = Color.White,
-                  modifier = Modifier.align(Alignment.Center).fillMaxSize(0.75f))
+                  modifier = Modifier
+                      .align(Alignment.Center)
+                      .fillMaxSize(0.75f))
             }
       }
 }
