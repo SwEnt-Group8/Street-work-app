@@ -366,6 +366,7 @@ fun StreetWorkApp(
                   innerPadding,
                   editEvent = true)
             }
+
             composable(Screen.EVENT_OVERVIEW) {
               infoManager.Display(LocalContext.current)
               EventOverviewScreen(

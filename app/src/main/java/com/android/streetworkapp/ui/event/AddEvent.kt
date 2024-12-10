@@ -111,13 +111,14 @@ fun AddEventScreen(
 
   val context = LocalContext.current
 
+  val eid = eventViewModel.getNewEid()
   val event by remember {
     mutableStateOf(
         if (editEvent && eventToEdit?.value != null) {
           eventToEdit.value!!.copy()
         } else {
           Event(
-              eventViewModel.getNewEid(),
+              eid,
               "",
               "",
               1, // set to one by default, because the owner is also a participant
