@@ -29,16 +29,18 @@ class ImageRepositoryFirestore(
   override suspend fun uploadImage(imageB64: String, parkId: String, userId: String) {
     require(imageB64.isNotEmpty()) { "imageB64 should not be empty." }
     require(parkId.isNotEmpty()) { "parkId cannot be empty." }
-    require(userId.isNotEmpty() && this.userRepository.getUserByUid(userId) != null) {
-      "Invalid userId."
-    }
+
+    require(userId.isNotEmpty()) { "userId cannot be empty." }
+
+    val user = this.userRepository.getUserByUid(userId)
+    require(user != null) { "Invalid userId." }
 
     try {
-      // checking if the park already has an image collection
-      val park =
-          this.parkRepository.getParkByPid(parkId)
-              ?: throw IllegalArgumentException("Invalid parkId")
-      val parkImage = ParkImageDatabase(imageB64 = imageB64, userId = userId)
+      val park = this.parkRepository.getParkByPid(parkId)
+      require(park != null) { "Invalid parkId." }
+
+      val parkImage =
+          ParkImageDatabase(imageB64 = imageB64, userId = userId, username = user.username)
 
       val collectionId = park.imagesCollectionId
       if (collectionId.isEmpty()) { // no imagesCollection for the park yet
@@ -52,7 +54,7 @@ class ImageRepositoryFirestore(
         this.parkRepository.addImagesCollection(park.pid, newCollectionId)
       } else { // there already exists an imagesCollection
         val imagesCollection = db.collection(COLLECTION_PATH).document(collectionId)
-        val newImage = ParkImageDatabase(imageB64, userId)
+        val newImage = ParkImageDatabase(imageB64, userId, user.username)
         imagesCollection.update("images", FieldValue.arrayUnion(newImage)).await()
       }
     } catch (e: Exception) {
@@ -90,6 +92,7 @@ class ImageRepositoryFirestore(
 
               val imageB64 = imageMap["imageB64"] as? String ?: return@mapNotNull null
               val userId = imageMap["userId"] as? String ?: return@mapNotNull null
+              val username = imageMap["username"] as? String ?: return@mapNotNull null
               val ratingMap = imageMap["rating"] as? Map<*, *> ?: return@mapNotNull null
               val first = (ratingMap["first"] as? Number)?.toInt() ?: return@mapNotNull null
               val second = (ratingMap["second"] as? Number)?.toInt() ?: return@mapNotNull null
@@ -99,6 +102,7 @@ class ImageRepositoryFirestore(
               ParkImageDatabase(
                   imageB64 = imageB64,
                   userId = userId,
+                  username = username,
                   rating = Pair(first, second),
                   uploadDate = uploadDate)
             }

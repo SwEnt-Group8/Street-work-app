@@ -91,6 +91,7 @@ open class ImageViewModel(private val imageRepository: ImageRepository) : ViewMo
                 image = imageUri,
                 userId = parkImage.userId,
                 rating = parkImage.rating,
+                username = parkImage.username,
                 uploadDate = parkImage.uploadDate)
 
         localParkImages.add(localParkImage)

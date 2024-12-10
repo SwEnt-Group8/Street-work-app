@@ -21,6 +21,7 @@ data class ParkImageCollection(
  *
  * @property imageB64 The image in Base64 string format.
  * @property userId The id of the user who uploaded the image.
+ * @property username The username associated to the userId
  * @property rating A pair of integers representing the rating, where the first element represents
  *   all the positive ratings and the second the negative ones.
  * @property uploadDate The date the image was uploaded
@@ -30,6 +31,7 @@ data class ParkImageCollection(
 data class ParkImageDatabase(
     val imageB64: String,
     val userId: String,
+    val username: String,
     val rating: Pair<Int, Int> = Pair(0, 0),
     val uploadDate: Timestamp = Timestamp.now()
 )
@@ -40,6 +42,7 @@ data class ParkImageDatabase(
  *
  * @property image The [Uri] of the image.
  * @property userId The id of the user who uploaded the image.
+ * @property username The username associated to the userId
  * @property rating A pair of integers representing the rating, where the first element represents
  *   all the positive ratings and the second the negative ones.
  * @property uploadDate The date the image was uploaded
@@ -47,6 +50,7 @@ data class ParkImageDatabase(
 data class ParkImageLocal(
     val image: Uri,
     val userId: String,
+    val username: String,
     val rating: Pair<Int, Int> = Pair(0, 0),
     val uploadDate: Timestamp = Timestamp.now()
 )
