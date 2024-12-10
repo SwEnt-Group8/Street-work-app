@@ -114,7 +114,7 @@ fun AddEventScreen(
   val eid = eventViewModel.getNewEid()
   val event by remember {
     mutableStateOf(
-        if (editEvent && eventToEdit?.value != null) {
+        if (editEvent && eventToEdit != null) {
           eventToEdit.value!!.copy()
         } else {
           Event(
