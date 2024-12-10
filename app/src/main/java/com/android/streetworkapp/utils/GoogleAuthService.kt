@@ -62,6 +62,11 @@ class GoogleAuthService(
     mGoogleSignInClient.signOut()
   }
 
+  /** Revokes access to the app. */
+  override fun revokeAccess() {
+    mGoogleSignInClient.revokeAccess()
+  }
+
   /**
    * Gets the auth current user.
    *
