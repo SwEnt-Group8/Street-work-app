@@ -363,7 +363,7 @@ fun StatusButton(
           eventViewModel.updateStatus(event.eid, nextStatus)
           Toast.makeText(context, "Event started!", Toast.LENGTH_LONG).show()
         }
-          navigationActions.navigateTo(Screen.PARK_OVERVIEW)
+        navigationActions.navigateTo(Screen.PARK_OVERVIEW)
       },
       enabled = event.status != EventStatus.ENDED,
       modifier = Modifier.testTag("statusButton"),

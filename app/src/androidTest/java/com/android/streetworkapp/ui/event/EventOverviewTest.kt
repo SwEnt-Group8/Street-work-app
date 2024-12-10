@@ -172,7 +172,9 @@ class EventOverviewTest {
     eventViewModel.setCurrentEvent(event)
     userViewModel.setCurrentUser(joiner)
 
-    composeTestRule.setContent { EventBottomBar(eventViewModel, userViewModel, navigationActions) }
+    composeTestRule.setContent {
+      EventBottomBar(eventViewModel, userViewModel, parkViewModel, navigationActions)
+    }
 
     composeTestRule.waitForIdle()
 
@@ -190,7 +192,9 @@ class EventOverviewTest {
     eventViewModel.setCurrentEvent(event)
     userViewModel.setCurrentUser(participant)
 
-    composeTestRule.setContent { EventBottomBar(eventViewModel, userViewModel, navigationActions) }
+    composeTestRule.setContent {
+      EventBottomBar(eventViewModel, userViewModel, parkViewModel, navigationActions)
+    }
 
     composeTestRule.waitForIdle()
 
@@ -211,7 +215,8 @@ class EventOverviewTest {
       val scope = rememberCoroutineScope()
       val snackbarHostState = remember { SnackbarHostState() }
 
-      EventBottomBar(eventViewModel, userViewModel, navigationActions, scope, snackbarHostState)
+      EventBottomBar(
+          eventViewModel, userViewModel, parkViewModel, navigationActions, scope, snackbarHostState)
     }
 
     composeTestRule.waitForIdle()

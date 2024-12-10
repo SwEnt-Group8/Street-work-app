@@ -107,13 +107,13 @@ fun AddEventScreen(
     editEvent: Boolean = false
 ) {
 
-  val eventToEdit = eventViewModel.currentEvent.collectAsState()
+  val eventToEdit = if (editEvent) eventViewModel.currentEvent.collectAsState() else null
 
   val context = LocalContext.current
 
   val event by remember {
     mutableStateOf(
-        if (editEvent && eventToEdit.value != null) {
+        if (editEvent && eventToEdit?.value != null) {
           eventToEdit.value!!.copy()
         } else {
           Event(

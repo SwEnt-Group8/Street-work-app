@@ -2,6 +2,7 @@ package com.android.streetworkapp.ui.event
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -17,8 +18,10 @@ import com.android.streetworkapp.model.moderation.TextModerationRepository
 import com.android.streetworkapp.model.moderation.TextModerationViewModel
 import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.park.ParkViewModel
+import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
+import com.android.streetworkapp.ui.navigation.EventBottomBar
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.Job
@@ -61,8 +64,8 @@ class AddEventTest {
     parkRepository = mock(ParkRepository::class.java)
     parkViewModel = ParkViewModel(parkRepository)
 
-    // eventRepository = mock(EventRepository::class.java)
-    eventViewModel = mock(EventViewModel::class.java)
+    eventRepository = mock(EventRepository::class.java)
+    eventViewModel = EventViewModel(eventRepository)
 
     textModerationRepository = mock(TextModerationRepository::class.java)
     textModerationViewModel = mock(TextModerationViewModel::class.java)
@@ -231,5 +234,28 @@ class AddEventTest {
     composeTestRule.onNodeWithTag("addEventButton").performClick()
     composeTestRule.onNodeWithTag("errorMessage").assertDoesNotExist()
     verify(eventViewModel).addEvent(any())
+  }
+
+  @Test
+  fun editEventScreenIsDisplayed() {
+    `when`(eventViewModel.getNewEid()).thenReturn("test")
+
+    val owner = User(event.owner, "owner", "owner", 0, emptyList(), "owner")
+
+    userViewModel.setCurrentUser(owner)
+
+    eventViewModel.setCurrentEvent(event)
+
+    composeTestRule.setContent {
+      EventBottomBar(eventViewModel, userViewModel, parkViewModel, navigationActions)
+    }
+
+    composeTestRule.waitForIdle()
+
+    composeTestRule.onNodeWithTag("editEventButton").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("statusButton")
+        .assertIsDisplayed()
+        .assertTextContains("Start Event")
   }
 }
