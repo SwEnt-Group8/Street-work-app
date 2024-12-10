@@ -27,6 +27,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -36,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -45,10 +47,12 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.sample.R
 import com.android.streetworkapp.model.progression.Achievement
 import com.android.streetworkapp.model.progression.ExerciseAchievement
 import com.android.streetworkapp.model.progression.MedalsAchievement
 import com.android.streetworkapp.model.progression.ProgressionViewModel
+import com.android.streetworkapp.model.progression.SocialAchievement
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.theme.ColorPalette
@@ -57,6 +61,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 object ProgressionScreenSettings {
   val PROGRESSION_COLOR_BLUE = Color(0xFF007BFF)
   val PROGRESSION_COLOR_GRAY = Color(0xFFDDDDDD)
+  val ACHIEVEMEMENT_TYPE_SOCIAL = "SOCIAL"
   val progressBarSize = 145.dp
   val columnPadding = PaddingValues(0.dp, progressBarSize * 0.15f, 0.dp, 0.dp)
 }
@@ -77,8 +82,12 @@ fun ProgressScreen(
   val currentUser by userViewModel.currentUser.collectAsState()
   val currentProgression by progressionViewModel.currentProgression.collectAsState()
 
-  currentUser?.uid?.let { progressionViewModel.getOrAddProgression(it) }
-  currentUser?.let { progressionViewModel.checkScore(it.score) }
+  LaunchedEffect(currentProgression) {
+    currentUser?.let {
+      progressionViewModel.getOrAddProgression(it.uid)
+      progressionViewModel.checkAchievements(it.friends.size, it.score)
+    }
+  }
 
   val progressionPercentage = // in case of error set it to 0, otherwise score/currentGoal
       (if (currentUser == null || currentProgression.currentGoal == 0) 0f
@@ -133,12 +142,7 @@ fun ProgressScreen(
                   label = "Total score",
                   value = "${currentUser?.score}",
                   testTagPrefix = "metricCardScore")
-              MetricCard(
-                  label = "Parks visited",
-                  value = "<tbi>",
-                  testTagPrefix =
-                      "metricCardParksVisited") // TODO: to be implemented when Park visited metric
-              // will be done
+
               MetricCard(
                   label = "Friends added",
                   value = "${currentUser?.friends?.size}",
@@ -153,27 +157,11 @@ fun ProgressScreen(
           item {
             when (uiState.collectAsState().value) {
               DashboardStateProgression.Achievement -> {
-
-                if (currentProgression.achievements.isEmpty()) {
-
-                  Text(
-                      text = "You don't have any achievements yet!",
-                      fontSize = 15.sp,
-                      fontWeight = FontWeight.Normal,
-                      color = ColorPalette.SECONDARY_TEXT_COLOR,
-                      modifier = Modifier.padding(top = 10.dp).testTag("emptyAchievementsText"))
-                } else {
-
-                  Column {
-                    currentProgression.achievements.forEach { achievementName ->
-                      val achievementEnum = enumValueOf<MedalsAchievement>(achievementName)
-                      Box(modifier = Modifier.testTag("achievementItem")) {
-                        AchievementItem(achievementEnum.achievement, false)
-                        HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
-                      }
-                    }
-                  }
+                currentUser?.let {
+                  progressionViewModel.checkAchievements(it.friends.size, it.score)
                 }
+
+                AchievementColumn(currentProgression.achievements)
               }
               DashboardStateProgression.Training -> {
 
@@ -189,6 +177,40 @@ fun ProgressScreen(
             }
           }
         }
+  }
+}
+
+@Composable
+fun AchievementColumn(achievements: List<String>) {
+
+  if (achievements.isEmpty()) {
+
+    Text(
+        text = LocalContext.current.getString(R.string.ProgressionEmptyAchievements),
+        fontSize = 15.sp,
+        fontWeight = FontWeight.Normal,
+        color = ColorPalette.SECONDARY_TEXT_COLOR,
+        modifier = Modifier.padding(top = 10.dp).testTag("emptyAchievementsText"))
+  } else {
+
+    Column {
+      achievements.forEach { achievementName ->
+        if (achievementName.contains(ProgressionScreenSettings.ACHIEVEMEMENT_TYPE_SOCIAL)) {
+          val achievementEnum = enumValueOf<SocialAchievement>(achievementName)
+          Box(modifier = Modifier.testTag("achievementItem$achievementName")) {
+            AchievementItem(achievementEnum.achievement, false)
+            HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
+          }
+        } else {
+
+          val achievementEnum = enumValueOf<MedalsAchievement>(achievementName)
+          Box(modifier = Modifier.testTag("achievementItem")) {
+            AchievementItem(achievementEnum.achievement, false)
+            HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
+          }
+        }
+      }
+    }
   }
 }
 

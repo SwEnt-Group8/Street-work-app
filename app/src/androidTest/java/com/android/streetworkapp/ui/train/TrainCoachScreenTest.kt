@@ -25,7 +25,10 @@ class TrainCoachScreenTest {
       TrainCoachScreen(
           activity = testActivity,
           isTimeDependent = testIsTimeDependent,
-          workoutViewModel = workoutViewModel)
+          workoutViewModel = workoutViewModel,
+          time = 0,
+          sets = 0,
+          reps = 0)
     }
 
     // Verify the static title

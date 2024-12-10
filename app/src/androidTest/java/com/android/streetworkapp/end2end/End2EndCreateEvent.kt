@@ -23,6 +23,7 @@ import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventRepository
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
 import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.image.ImageViewModel
 import com.android.streetworkapp.model.moderation.TextModerationViewModel
 import com.android.streetworkapp.model.park.NominatimParkNameRepository
 import com.android.streetworkapp.model.park.ParkRepository
@@ -30,6 +31,7 @@ import com.android.streetworkapp.model.park.ParkRepositoryFirestore
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.OverpassParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
+import com.android.streetworkapp.model.preferences.PreferencesViewModel
 import com.android.streetworkapp.model.progression.ProgressionRepository
 import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.user.UserRepository
@@ -135,6 +137,8 @@ class End2EndCreateEvent {
           progressionViewModel,
           mock(WorkoutViewModel::class.java),
           mock(TextModerationViewModel::class.java),
+          mock(ImageViewModel::class.java),
+          mock(PreferencesViewModel::class.java),
           true)
     }
   }

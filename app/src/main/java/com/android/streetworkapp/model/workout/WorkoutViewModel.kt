@@ -1,5 +1,6 @@
 package com.android.streetworkapp.model.workout
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -89,6 +90,58 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
     }
   }
 
+  /**
+   * Adds or updates a specific exercise in the user's workout data. If the exercise doesn't exist,
+   * it adds it. If it exists, it updates the existing exercise.
+   *
+   * @param uid The UID of the user.
+   * @param sessionId The ID of the workout session.
+   * @param exercise The Exercise to add or update.
+   */
+  fun getOrAddExerciseToWorkout(
+      uid: String,
+      sessionId: String,
+      exercise: Exercise,
+      sessionType: SessionType
+  ) {
+    viewModelScope.launch {
+      try {
+        val currentWorkoutData = repository.getOrAddWorkoutData(uid)
+        val updatedWorkoutSessions = currentWorkoutData.workoutSessions.toMutableList()
+
+        // Find session or create a new one if it doesn't exist
+        val sessionIndex = updatedWorkoutSessions.indexOfFirst { it.sessionId == sessionId }
+        if (sessionIndex != -1) {
+          // Update existing session
+          val existingSession = updatedWorkoutSessions[sessionIndex]
+          val updatedExercises = existingSession.exercises.toMutableList()
+          val existingExercise = updatedExercises.find { it.name == exercise.name }
+          if (existingExercise != null) {
+            updatedExercises[updatedExercises.indexOf(existingExercise)] = exercise
+          } else {
+            updatedExercises.add(exercise)
+          }
+          updatedWorkoutSessions[sessionIndex] = existingSession.copy(exercises = updatedExercises)
+        } else {
+          // Create new session if none exists
+          val newSession =
+              WorkoutSession(
+                  sessionId = sessionId,
+                  sessionType = sessionType,
+                  exercises = listOf(exercise),
+                  startTime = System.currentTimeMillis() - (exercise.duration ?: 0),
+                  endTime = System.currentTimeMillis())
+          updatedWorkoutSessions.add(newSession)
+        }
+
+        // Update repository with the new/updated session
+        repository.addOrUpdateWorkoutSession(uid, updatedWorkoutSessions.last())
+        refreshWorkoutData(uid) // Refresh only if needed
+      } catch (e: Exception) {
+        Log.e("WorkoutViewModel", "Error in getOrAddExerciseToWorkout: ${e.message}")
+      }
+    }
+  }
   /**
    * Refreshes the current user's WorkoutData.
    *

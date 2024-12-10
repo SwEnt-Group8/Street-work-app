@@ -1,27 +1,29 @@
 package com.android.streetworkapp.utils
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_DARK
-import kotlin.math.abs
+import kotlin.math.absoluteValue
 
 data class GraphData(val x: Float, val y: Float)
 
@@ -36,6 +38,8 @@ data class GraphData(val x: Float, val y: Float)
  *   empty list.
  * @property strokeWidth The width of the graph lines in pixels. Default is 4f.
  * @property showDashedLines Determines whether dashed gridlines are shown. Default is true.
+ * @property hoverFirstPart The first part of the hover text. Default is "Session".
+ * @property hoverSecondPart The second part of the hover text. Default is "sec".
  */
 class GraphConfiguration(
     var graphColor: Color = INTERACTION_COLOR_DARK,
@@ -44,7 +48,9 @@ class GraphConfiguration(
     var yUnitLabel: String = "Reps",
     var dataPoints: List<GraphData> = emptyList(),
     var strokeWidth: Float = 4f,
-    var showDashedLines: Boolean = true
+    var showDashedLines: Boolean = true,
+    var hoverFirstPart: String = "Session",
+    var hoverSecondPart: String = "sec"
 )
 
 /**
@@ -54,7 +60,6 @@ class GraphConfiguration(
  *   empty modifier.
  * @param graphConfiguration The [GraphConfiguration] object containing the graph's settings
  */
-@SuppressLint("DefaultLocale")
 @Composable
 fun Graph(modifier: Modifier = Modifier, graphConfiguration: GraphConfiguration) {
   val graphColor = graphConfiguration.graphColor
@@ -63,109 +68,152 @@ fun Graph(modifier: Modifier = Modifier, graphConfiguration: GraphConfiguration)
   val xUnitLabel = graphConfiguration.xUnitLabel
   val yUnitLabel = graphConfiguration.yUnitLabel
   val strokeWidth = graphConfiguration.strokeWidth
+  val hoverfirstpart = graphConfiguration.hoverFirstPart
+  val hoversecondpart = graphConfiguration.hoverSecondPart
 
+  // State variables for hover functionality
   var hoverPosition by remember { mutableStateOf<Offset?>(null) }
   var hoverValue by remember { mutableStateOf<String?>(null) }
 
-  val density = LocalDensity.current
+  // Reset hover state when data points change
+  LaunchedEffect(dataPoints) {
+    hoverPosition = null
+    hoverValue = null
+  }
 
   if (dataPoints.isNotEmpty()) {
-    val xValues = dataPoints.map { it.x }
     val yValues = dataPoints.map { it.y }
-    val xMin = xValues.minOrNull() ?: 0f
-    val xMax = xValues.maxOrNull() ?: 1f
     val yMin = yValues.minOrNull() ?: 0f
     val yMax = yValues.maxOrNull() ?: 1f
 
     Box(modifier = modifier.padding(16.dp)) {
-      // Add X-axis and Y-axis labels as Text Composables
-      Text(
-          text = xUnitLabel,
-          modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 8.dp),
-          color = Color.Black)
-      Text(
-          text = yUnitLabel,
-          modifier = Modifier.align(Alignment.CenterStart).padding(start = 8.dp),
-          color = Color.Black)
-
       Canvas(
           modifier =
-              Modifier.fillMaxSize().pointerInput(Unit) {
+              Modifier.fillMaxSize().pointerInput(dataPoints) {
                 detectTapGestures { offset ->
-                  val graphWidth = with(density) { size.width - 32.dp.toPx() }
-                  val graphHeight = with(density) { size.height - 32.dp.toPx() }
+                  val width = size.width
+                  val height = size.height
+                  val xOffset = 32.dp.toPx()
+                  val yOffset = 32.dp.toPx()
+                  val graphWidth = width - xOffset * 2
+                  val graphHeight = height - yOffset * 2
 
-                  // Find the closest point
+                  // Find the closest data point to the tap position
                   val closestPoint =
                       dataPoints.minByOrNull {
-                        val x =
-                            ((it.x - xMin) / (xMax - xMin)) * graphWidth +
-                                with(density) { 16.dp.toPx() }
+                        val x = xOffset + (it.x / (dataPoints.size - 1)) * graphWidth
                         val y =
-                            graphHeight + with(density) { 16.dp.toPx() } -
-                                ((it.y - yMin) / (yMax - yMin)) * graphHeight
-                        abs(x - offset.x) + abs(y - offset.y)
+                            yOffset + graphHeight - ((it.y - yMin) / (yMax - yMin)) * graphHeight
+                        (x - offset.x).absoluteValue + (y - offset.y).absoluteValue
                       }
 
                   hoverPosition =
                       closestPoint?.let {
                         Offset(
-                            ((it.x - xMin) / (xMax - xMin)) * graphWidth +
-                                with(density) { 16.dp.toPx() },
-                            graphHeight + with(density) { 16.dp.toPx() } -
-                                ((it.y - yMin) / (yMax - yMin)) * graphHeight)
+                            xOffset + (it.x / (dataPoints.size - 1)) * graphWidth,
+                            yOffset + graphHeight - ((it.y - yMin) / (yMax - yMin)) * graphHeight)
                       }
                   hoverValue =
                       closestPoint?.let { point ->
-                        "(${String.format("%.1f", point.x)}, ${String.format("%.1f", point.y)})"
+                        "$hoverfirstpart ${point.x.toInt() + 1}, ${point.y.toInt()} $hoversecondpart"
                       }
                 }
               }) {
-            val width = with(density) { size.width - 32.dp.toPx() }
-            val height = with(density) { size.height - 32.dp.toPx() }
+            val width = size.width
+            val height = size.height
+            val xOffset = 32.dp.toPx()
+            val yOffset = 32.dp.toPx()
+            val graphWidth = width - xOffset * 2
+            val graphHeight = height - yOffset * 2
+            val xSpacing = graphWidth / (dataPoints.size - 1).coerceAtLeast(1)
 
-            val xOffset = with(density) { 16.dp.toPx() }
-            val yOffset = with(density) { 16.dp.toPx() }
-
-            // Draw X and Y axes
+            // Draw X-axis
             drawLine(
                 color = axisColor,
-                start = Offset(xOffset, height + yOffset),
-                end = Offset(width + xOffset, height + yOffset),
-                strokeWidth = with(density) { 2.dp.toPx() })
+                start = Offset(xOffset, height - yOffset),
+                end = Offset(width - xOffset, height - yOffset),
+                strokeWidth = 2.dp.toPx())
+
+            // Draw Y-axis
             drawLine(
                 color = axisColor,
-                start = Offset(xOffset, height + yOffset),
+                start = Offset(xOffset, height - yOffset),
                 end = Offset(xOffset, yOffset),
-                strokeWidth = with(density) { 2.dp.toPx() })
+                strokeWidth = 2.dp.toPx())
 
-            // Draw data lines
+            // Add triangle to X-axis tip
+            val xTrianglePath =
+                androidx.compose.ui.graphics.Path().apply {
+                  moveTo(width - xOffset + 5.dp.toPx(), height - yOffset)
+                  lineTo(width - xOffset - 5.dp.toPx(), height - yOffset - 5.dp.toPx())
+                  lineTo(width - xOffset - 5.dp.toPx(), height - yOffset + 5.dp.toPx())
+                  close()
+                }
+            drawPath(path = xTrianglePath, color = axisColor)
+
+            // Add triangle to Y-axis tip
+            val yTrianglePath =
+                androidx.compose.ui.graphics.Path().apply {
+                  moveTo(xOffset, yOffset - 5.dp.toPx())
+                  lineTo(xOffset - 5.dp.toPx(), yOffset + 5.dp.toPx())
+                  lineTo(xOffset + 5.dp.toPx(), yOffset + 5.dp.toPx())
+                  close()
+                }
+            drawPath(path = yTrianglePath, color = axisColor)
+
+            // Draw the graph line
             for (i in 1 until dataPoints.size) {
-              val start = dataPoints[i - 1]
-              val end = dataPoints[i]
-
-              val startX = ((start.x - xMin) / (xMax - xMin)) * width + xOffset
-              val startY = height + yOffset - ((start.y - yMin) / (yMax - yMin)) * height
-
-              val endX = ((end.x - xMin) / (xMax - xMin)) * width + xOffset
-              val endY = height + yOffset - ((end.y - yMin) / (yMax - yMin)) * height
+              val startX = xOffset + xSpacing * (i - 1)
+              val startY =
+                  yOffset + graphHeight -
+                      ((dataPoints[i - 1].y - yMin) / (yMax - yMin)) * graphHeight
+              val endX = xOffset + xSpacing * i
+              val endY =
+                  yOffset + graphHeight - ((dataPoints[i].y - yMin) / (yMax - yMin)) * graphHeight
 
               drawLine(
                   color = graphColor,
                   start = Offset(startX, startY),
                   end = Offset(endX, endY),
-                  strokeWidth = with(density) { strokeWidth.dp.toPx() },
-                  cap = StrokeCap.Round)
+                  strokeWidth = strokeWidth)
             }
 
-            // Draw hover position
+            // Draw hover indicator
             hoverPosition?.let { position ->
-              drawCircle(
-                  color = INTERACTION_COLOR_DARK,
-                  radius = with(density) { 5.dp.toPx() },
-                  center = position)
+              drawCircle(color = graphColor, radius = 5.dp.toPx(), center = position)
             }
           }
+
+      // Display hover value relative to hoverPosition
+      hoverPosition?.let { position ->
+        hoverValue?.let { value ->
+          Box(
+              modifier =
+                  Modifier.absoluteOffset(
+                          x = with(LocalDensity.current) { position.x.toDp() - 50.dp },
+                          y = with(LocalDensity.current) { position.y.toDp() - 30.dp })
+                      .padding(8.dp)) {
+                Text(text = value, color = Color.Black, modifier = Modifier.padding(4.dp))
+              }
+        }
+      }
+
+      // X-axis label
+      Text(
+          text = xUnitLabel,
+          color = axisColor,
+          modifier =
+              Modifier.align(Alignment.BottomCenter).padding(bottom = 16.dp).testTag("XAxisLabel"))
+
+      // Y-axis label
+      Text(
+          text = yUnitLabel,
+          color = axisColor,
+          modifier =
+              Modifier.align(Alignment.CenterStart)
+                  .padding(start = 16.dp)
+                  .rotate(-90f)
+                  .testTag("YAxisLabel"))
     }
   }
 }

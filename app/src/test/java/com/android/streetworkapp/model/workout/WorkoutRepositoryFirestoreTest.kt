@@ -78,7 +78,7 @@ class WorkoutRepositoryFirestoreTest {
   @Test
   fun addOrUpdateWorkoutSessionUpdatesWorkoutData() = runTest {
     val uid = "testUid"
-    val workoutSession = WorkoutSession("sessionId", 123L, 0L, SessionType.ALONE)
+    val workoutSession = WorkoutSession("sessionId", 123L, 0L, SessionType.SOLO)
 
     val existingWorkoutData = WorkoutData(uid, listOf(workoutSession))
     `when`(document.exists()).thenReturn(true)
@@ -93,8 +93,8 @@ class WorkoutRepositoryFirestoreTest {
   @Test
   fun deleteWorkoutSessionRemovesSession() = runTest {
     val uid = "testUid"
-    val sessionToDelete = WorkoutSession("sessionId", 123L, 0L, SessionType.ALONE)
-    val remainingSession = WorkoutSession("remainingSessionId", 456L, 0L, SessionType.ALONE)
+    val sessionToDelete = WorkoutSession("sessionId", 123L, 0L, SessionType.SOLO)
+    val remainingSession = WorkoutSession("remainingSessionId", 456L, 0L, SessionType.SOLO)
 
     val existingWorkoutData = WorkoutData(uid, listOf(sessionToDelete, remainingSession))
 
@@ -178,5 +178,44 @@ class WorkoutRepositoryFirestoreTest {
     val capturedUpdate = captor.firstValue
     val expectedFieldPath = "workoutSessions.$sessionId.exercises.$exerciseIndex"
     assertEquals(updatedExercise, capturedUpdate[expectedFieldPath])
+  }
+
+  @Test
+  fun saveWorkoutDataSavesDataToFirestore() = runTest {
+    val uid = "testUid"
+    val workoutData =
+        WorkoutData(
+            userUid = uid,
+            workoutSessions =
+                listOf(
+                    WorkoutSession(
+                        sessionId = "sessionId1",
+                        startTime = 123456789L,
+                        endTime = 123456999L,
+                        sessionType = SessionType.SOLO,
+                        participants = listOf("user1", "user2"),
+                        exercises =
+                            listOf(
+                                Exercise(
+                                    name = "Push-up",
+                                    reps = 10,
+                                    sets = 3,
+                                    weight = 20f,
+                                    duration = 30)),
+                        winner = null)))
+
+    // Mock Firestore interactions
+    `when`(db.collection(any())).thenReturn(collection)
+    `when`(collection.document(any())).thenReturn(documentRef)
+
+    // Call the function
+    repository.saveWorkoutData(uid, workoutData)
+
+    // Verify the data was saved to Firestore
+    val captor = argumentCaptor<WorkoutData>()
+    verify(documentRef).set(captor.capture())
+
+    // Check the captured value matches the expected WorkoutData
+    assertEquals(workoutData, captor.firstValue)
   }
 }

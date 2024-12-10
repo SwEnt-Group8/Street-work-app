@@ -18,12 +18,16 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.streetworkapp.StreetWorkApp
 import com.android.streetworkapp.model.event.EventRepository
 import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.image.ImageRepository
+import com.android.streetworkapp.model.image.ImageViewModel
 import com.android.streetworkapp.model.moderation.TextModerationRepository
 import com.android.streetworkapp.model.moderation.TextModerationViewModel
 import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.ParkLocationRepository
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
+import com.android.streetworkapp.model.preferences.PreferencesRepository
+import com.android.streetworkapp.model.preferences.PreferencesViewModel
 import com.android.streetworkapp.model.progression.ProgressionRepository
 import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.user.UserRepository
@@ -46,7 +50,8 @@ val TEST_SCREEN_EXCLUSION_LIST =
         Screen.EVENT_OVERVIEW,
         Screen.TRAIN_SOLO,
         Screen.TRAIN_COACH,
-        Screen.TRAIN_CHALLENGE)
+        Screen.TRAIN_CHALLENGE,
+        Screen.TRAIN_PARAM)
 
 @RunWith(AndroidJUnit4::class)
 class BottomNavigationTest {
@@ -121,6 +126,8 @@ class BottomNavigationTest {
           ProgressionViewModel(mock(ProgressionRepository::class.java, RETURNS_DEFAULTS)),
           WorkoutViewModel(mock(WorkoutRepository::class.java, RETURNS_DEFAULTS)),
           TextModerationViewModel(mock(TextModerationRepository::class.java, RETURNS_DEFAULTS)),
+          ImageViewModel(mock(ImageRepository::class.java)),
+          PreferencesViewModel(mock(PreferencesRepository::class.java)),
           true)
     }
 

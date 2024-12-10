@@ -46,45 +46,60 @@ enum class Ranks(val score: Int) {
 }
 
 /** Represents a type of achievement based on points obtained */
-enum class MedalsAchievement(val achievement: Achievement) {
-  // Note: Bronze is used as a place holder for missing medals in the Figma (will be updated once
-  // the figma is updated)
-  NONE(
-      Achievement(
-          R.drawable.bronze_achievement_icon,
-          "No Medal",
-          emptyList(),
-          "You have no medal yet, try to obtain more points!")),
+enum class MedalsAchievement(val achievement: Achievement, val rank: Ranks) {
+
   BRONZE(
       Achievement(
           R.drawable.bronze_achievement_icon,
           "Bronze Medal",
           listOf("Bronze"),
-          "You obtained 100 Points!")),
+          "You obtained 100 Points!"),
+      Ranks.BRONZE),
   SILVER(
       Achievement(
           R.drawable.silver_achievement_icon,
           "Silver Medal",
           listOf("Silver"),
-          "You obtained 1000 Points!")),
+          "You obtained 1000 Points!"),
+      Ranks.SILVER),
   GOLD(
       Achievement(
           R.drawable.gold_achievement_icon,
           "Gold Medal",
           listOf("Gold"),
-          "You obtained 10000 Points!")),
+          "You obtained 10000 Points!"),
+      Ranks.GOLD),
   PLATINUM(
       Achievement(
           R.drawable.bronze_achievement_icon,
           "Platinum Medal",
           listOf("Platinum"),
-          "You obtained 100000 Points!"))
+          "You obtained 100000 Points!"),
+      Ranks.PLATINUM)
 }
 
 /** Represents a type of achievement linked to the performance of the user on different exercises */
 enum class ExerciseAchievement(val achievement: Achievement) {
-  HANDSTAND(Achievement(R.drawable.handstand, "Handstand", emptyList(), "")),
-  FRONT_LEVER(Achievement(R.drawable.front_lever, "Front Lever", emptyList(), ""))
+  HANDSTAND(Achievement(R.drawable.train_hand_stand, "Handstand", emptyList(), "")),
+  FRONT_LEVER(Achievement(R.drawable.train_front_lever, "Front Lever", emptyList(), ""))
+}
+
+/** Represents a type of achievement linked to the social interactions of the user */
+enum class SocialAchievement(val achievement: Achievement, val numberOfFriends: Int) {
+  SOCIAL1(
+      Achievement(
+          R.drawable.first_friend_achievement,
+          "First Friend",
+          listOf("Social"),
+          "You added your first friend!"),
+      1),
+  SOCIAL3(
+      Achievement(
+          R.drawable.group_friend_achievement,
+          "Workout Group",
+          listOf("Social"),
+          "You added 3 friends!"),
+      3)
 }
 
 /** Represents the number of points obtained for different actions in the app */

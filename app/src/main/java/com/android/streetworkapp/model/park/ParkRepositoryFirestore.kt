@@ -312,6 +312,25 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore, testing: Boolea
   }
 
   /**
+   * Fills the imagesCollectionId of the park with collectionId parameter
+   *
+   * @param pid The parkId to add the collection to.
+   * @param collectionId The id of the collection the park will be linked to.
+   */
+  override suspend fun addImagesCollection(pid: String, collectionId: String) {
+    require(pid.isNotEmpty()) { PID_EMPTY }
+    require(collectionId.isNotEmpty()) { "collectionId can't be null" }
+    try {
+      db.collection(COLLECTION_PATH)
+          .document(pid)
+          .update("imagesCollectionId", collectionId)
+          .await()
+    } catch (e: Exception) {
+      Log.e("FirestoreError", "Error adding collectionId to park: ${e.message}")
+    }
+  }
+
+  /**
    * Convert a Firestore document to a park object.
    *
    * @param document The Firestore document.
@@ -349,6 +368,8 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore, testing: Boolea
             emptyList<String>()
           }
 
+      val imagesCollectionId = document["imagesCollectionId"] as? String ?: ""
+
       Park(
           pid,
           name,
@@ -359,7 +380,8 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore, testing: Boolea
           capacity,
           occupancy,
           events,
-          votersUIDs)
+          votersUIDs,
+          imagesCollectionId)
     } catch (e: Exception) {
       Log.e("FirestoreError", "Error converting document to park: ${e.message}")
       null
