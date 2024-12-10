@@ -15,6 +15,9 @@ interface AuthService {
   // Handle the sign-out process
   fun signOut()
 
+  // Revoke access to the app
+  fun revokeAccess()
+
   // Returns the current signed-in user (null if none)
   fun getCurrentUser(): FirebaseUser?
 }
