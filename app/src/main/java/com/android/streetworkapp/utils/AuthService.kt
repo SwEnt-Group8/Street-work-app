@@ -1,6 +1,5 @@
 package com.android.streetworkapp.utils
 
-import android.content.Context
 import android.content.Intent
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.result.ActivityResult
@@ -10,7 +9,6 @@ import com.google.firebase.auth.FirebaseUser
 interface AuthService {
   // Trigger the sign-in process :
   fun launchSignIn(
-      context: Context,
       launcher: ManagedActivityResultLauncher<Intent, ActivityResult>,
   )
 
