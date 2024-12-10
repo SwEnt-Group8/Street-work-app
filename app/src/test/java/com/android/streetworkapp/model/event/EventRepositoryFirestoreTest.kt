@@ -75,7 +75,7 @@ class EventRepositoryFirestoreTest {
     `when`(document.get("maxParticipants")).thenReturn(event.maxParticipants.toLong())
     `when`(document.get("parkId")).thenReturn(event.parkId)
     `when`(document.get("listParticipants")).thenReturn(event.listParticipants)
-    `when`(document.get("status")).thenReturn(event.status)
+    `when`(document.get("status")).thenReturn("CREATED")
   }
 
   @Test
