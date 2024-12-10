@@ -70,8 +70,7 @@ class End2EndGeneral {
               score = Ranks.GOLD.score + (Ranks.PLATINUM.score - Ranks.GOLD.score) / 3,
               friends = listOf(mockedUserUid),
               picture = "",
-              parks = listOf(""))
-      ))
+              parks = listOf(""))))
 
   private val mockedUser =
       User(

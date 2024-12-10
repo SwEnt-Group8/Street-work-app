@@ -32,8 +32,8 @@ class TrainHubScreenTest {
     // Mock ViewModels
     userViewModel =
         UserViewModel(userRepository).apply {
-          setCurrentUser(User("testUid", "testUsername", "testEmail", 0, emptyList(), "",
-              parks = listOf("")))
+          setCurrentUser(
+              User("testUid", "testUsername", "testEmail", 0, emptyList(), "", parks = listOf("")))
         }
     workoutViewModel = WorkoutViewModel(workoutRepository)
   }
