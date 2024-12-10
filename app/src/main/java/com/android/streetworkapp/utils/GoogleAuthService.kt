@@ -40,17 +40,8 @@ class GoogleAuthService(
     mGoogleSignInClient = GoogleSignIn.getClient(context, gso)
   }
 
-  override fun launchSignIn(
-      context: android.content.Context,
-      launcher: ManagedActivityResultLauncher<Intent, ActivityResult>
-  ) {
-    val gso =
-        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(token)
-            .requestEmail()
-            .build()
-    val googleSignInClient = GoogleSignIn.getClient(context, gso)
-    launcher.launch(googleSignInClient.signInIntent)
+  override fun launchSignIn(launcher: ManagedActivityResultLauncher<Intent, ActivityResult>) {
+    launcher.launch(mGoogleSignInClient.signInIntent)
   }
 
   override fun signOut() {
