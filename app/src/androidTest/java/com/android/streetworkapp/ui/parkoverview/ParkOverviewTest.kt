@@ -158,8 +158,7 @@ class ParkOverviewTest {
     composeTestRule.onNodeWithTag("ImagesCollectionButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("createEventButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("eventItem").assertTextContains("Group workout")
-    composeTestRule
-        .onNodeWithTag("participantsText", useUnmergedTree = true)
+    composeTestRule.onNodeWithTag("participantsText", useUnmergedTree = true)
     composeTestRule
         .onNodeWithTag("dateText", useUnmergedTree = true)
         .assertTextContains(dateDifference(eventList.events.first()))
