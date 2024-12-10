@@ -2,6 +2,7 @@
 
 package com.android.streetworkapp.utils
 
+import android.content.Context
 import android.content.Intent
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -21,7 +22,11 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-class GoogleAuthService(private val token: String, private val auth: FirebaseAuth) : AuthService {
+class GoogleAuthService(
+    private val token: String,
+    private val auth: FirebaseAuth,
+    private val context: Context
+) : AuthService {
 
   override fun launchSignIn(
       context: android.content.Context,
