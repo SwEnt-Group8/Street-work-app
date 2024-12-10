@@ -11,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.AuthResult
@@ -27,6 +28,17 @@ class GoogleAuthService(
     private val auth: FirebaseAuth,
     private val context: Context
 ) : AuthService {
+
+  private val mGoogleSignInClient: GoogleSignInClient
+
+  init {
+    val gso =
+        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(token)
+            .requestEmail()
+            .build()
+    mGoogleSignInClient = GoogleSignIn.getClient(context, gso)
+  }
 
   override fun launchSignIn(
       context: android.content.Context,
