@@ -75,6 +75,7 @@ class EventRepositoryFirestoreTest {
     `when`(document.get("maxParticipants")).thenReturn(event.maxParticipants.toLong())
     `when`(document.get("parkId")).thenReturn(event.parkId)
     `when`(document.get("listParticipants")).thenReturn(event.listParticipants)
+    `when`(document.get("status")).thenReturn("CREATED")
   }
 
   @Test
@@ -148,5 +149,23 @@ class EventRepositoryFirestoreTest {
   fun documentToEvent_works() {
     val fetchedEvent = eventRepository.documentToEvent(document)
     assertEquals(event, fetchedEvent)
+  }
+
+  @Test
+  fun updateStatus_calls_update() = runTest {
+    `when`(documentRef.update(eq("status"), any())).thenReturn(Tasks.forResult(null))
+
+    eventRepository.updateStatus(event.eid, EventStatus.ENDED)
+
+    verify(documentRef, timeout(1000)).update(eq("status"), any())
+  }
+
+  @Test
+  fun deleteEvent_calls_delete() = runTest {
+    `when`(documentRef.delete()).thenReturn(Tasks.forResult(null))
+
+    eventRepository.deleteEvent(event)
+
+    verify(documentRef, timeout(1000)).delete()
   }
 }

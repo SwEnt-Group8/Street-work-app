@@ -26,7 +26,6 @@ import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.park.ParkOverviewScreen
 import com.android.streetworkapp.ui.park.RatingComponent
 import com.android.streetworkapp.utils.dateDifference
-import com.android.streetworkapp.utils.toFormattedString
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -164,7 +163,7 @@ class ParkOverviewTest {
         .assertTextContains("Participants 3/5")
     composeTestRule
         .onNodeWithTag("dateText", useUnmergedTree = true)
-        .assertTextContains(dateDifference(eventList.events.first().date.toFormattedString()))
+        .assertTextContains(dateDifference(eventList.events.first()))
     composeTestRule
         .onNodeWithTag("eventButtonText", useUnmergedTree = true)
         .assertTextContains("About")

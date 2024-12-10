@@ -1,5 +1,7 @@
 package com.android.streetworkapp.utils
 
+import com.android.streetworkapp.model.event.Event
+import com.android.streetworkapp.model.event.EventStatus
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.time.Duration
@@ -59,11 +61,13 @@ fun String.toEpochTimestamp(): Long {
 /**
  * Calculate the difference between the current time and a given timestamp.
  *
- * @param endTimestamp The end timestamp as a string.
+ * @param event the event to calculate the difference for.
  * @return The difference in days or hours.
  */
-fun dateDifference(endTimestamp: String): String {
+fun dateDifference(event: Event): String {
   val formatter = DateTimeFormatter.ofPattern(DATE_TIME_PATTERN)
+
+  val endTimestamp = event.date.toFormattedString()
 
   val end = LocalDateTime.parse(endTimestamp, formatter)
 
@@ -79,7 +83,11 @@ fun dateDifference(endTimestamp: String): String {
     if (hours == 0L) {
       "in less than an hour"
     } else if (hours < 0) {
-      "expired"
+      if (event.status == EventStatus.STARTED) {
+        "event has begun!"
+      } else {
+        "Starting soon!"
+      }
     } else {
       "in $hours hour(s)"
     }

@@ -2,6 +2,7 @@ package com.android.streetworkapp.ui.event
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -17,8 +18,10 @@ import com.android.streetworkapp.model.moderation.TextModerationRepository
 import com.android.streetworkapp.model.moderation.TextModerationViewModel
 import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.park.ParkViewModel
+import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
+import com.android.streetworkapp.ui.navigation.EventBottomBar
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.Job
@@ -61,8 +64,8 @@ class AddEventTest {
     parkRepository = mock(ParkRepository::class.java)
     parkViewModel = ParkViewModel(parkRepository)
 
-    // eventRepository = mock(EventRepository::class.java)
-    eventViewModel = mock(EventViewModel::class.java)
+    eventRepository = mock(EventRepository::class.java)
+    eventViewModel = EventViewModel(eventRepository)
 
     textModerationRepository = mock(TextModerationRepository::class.java)
     textModerationViewModel = mock(TextModerationViewModel::class.java)
@@ -115,7 +118,7 @@ class AddEventTest {
 
   @Test
   fun addEventScreenIsDisplayed() {
-    `when`(eventViewModel.getNewEid()).thenReturn("test")
+    `when`(eventRepository.getNewEid()).thenReturn("test")
     composeTestRule.setContent {
       AddEventScreen(
           navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel)
@@ -127,7 +130,7 @@ class AddEventTest {
 
   @Test
   fun addEventScreenWithUnchangedTimeDoesNotChangeScreen() {
-    `when`(eventViewModel.getNewEid()).thenReturn("test")
+    `when`(eventRepository.getNewEid()).thenReturn("test")
     composeTestRule.setContent {
       AddEventScreen(
           navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel)
@@ -143,7 +146,7 @@ class AddEventTest {
 
   @Test
   fun addEventScreenWithUnchangedTitleDoesNotChangeScreen() {
-    `when`(eventViewModel.getNewEid()).thenReturn("test")
+    `when`(eventRepository.getNewEid()).thenReturn("test")
     composeTestRule.setContent {
       AddEventScreen(
           navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel)
@@ -165,7 +168,7 @@ class AddEventTest {
 
   @Test
   fun emptyTitleDisplaysCorrectErrorMessage() {
-    whenever(eventViewModel.getNewEid()).thenReturn("test")
+    whenever(eventRepository.getNewEid()).thenReturn("test")
     composeTestRule.setContent {
       AddEventScreen(
           navigationActions, parkViewModel, eventViewModel, userViewModel, textModerationViewModel)
@@ -179,7 +182,7 @@ class AddEventTest {
 
   @Test
   fun textEvaluationOnEvaluationErrorDisplaysCorrectErrorMessage() {
-    whenever(eventViewModel.getNewEid()).thenReturn("test")
+    whenever(eventRepository.getNewEid()).thenReturn("test")
     whenever(textModerationViewModel.analyzeText(any(), any(), any(), any())).thenAnswer {
         invocation ->
       val onErrorCallback = invocation.getArgument<() -> Unit>(2) // Get the onError lambda
@@ -189,7 +192,7 @@ class AddEventTest {
 
   @Test
   fun textEvaluationIsOverThresholdDisplaysCorrectErrorMessage() {
-    whenever(eventViewModel.getNewEid()).thenReturn("test")
+    whenever(eventRepository.getNewEid()).thenReturn("test")
     whenever(textModerationViewModel.analyzeText(any(), any(), any(), any())).thenAnswer {
         invocation ->
       val onTextEvaluationResult =
@@ -211,8 +214,8 @@ class AddEventTest {
 
   @Test
   fun textEvaluationOverThresholdAndOtherConditionsValidCallCreateEvent() = runTest {
-    whenever(eventViewModel.getNewEid()).thenReturn("test")
-    whenever(eventViewModel.addEvent(any())).thenAnswer {
+    whenever(eventRepository.getNewEid()).thenReturn("test")
+    whenever(eventRepository.addEvent(any())).thenAnswer {
       mockJob
     } // do nothing, we just want to check that it gets called correctly
     whenever(textModerationViewModel.analyzeText(any(), any(), any(), any())).thenAnswer {
@@ -230,6 +233,29 @@ class AddEventTest {
     composeTestRule.onNodeWithTag("titleTag").performTextInput("dummy title")
     composeTestRule.onNodeWithTag("addEventButton").performClick()
     composeTestRule.onNodeWithTag("errorMessage").assertDoesNotExist()
-    verify(eventViewModel).addEvent(any())
+    verify(eventRepository).addEvent(any())
+  }
+
+  @Test
+  fun editEventScreenIsDisplayed() {
+    `when`(eventRepository.getNewEid()).thenReturn("test")
+
+    val owner = User(event.owner, "owner", "owner", 0, emptyList(), "owner")
+
+    userViewModel.setCurrentUser(owner)
+
+    eventViewModel.setCurrentEvent(event)
+
+    composeTestRule.setContent {
+      EventBottomBar(eventViewModel, userViewModel, parkViewModel, navigationActions)
+    }
+
+    composeTestRule.waitForIdle()
+
+    composeTestRule.onNodeWithTag("editEventButton").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("statusButton")
+        .assertIsDisplayed()
+        .assertTextContains("Start Event")
   }
 }
