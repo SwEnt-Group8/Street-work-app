@@ -152,7 +152,7 @@ fun StreetWorkAppMain(
 
   // Instantiate Google Auth Service
   val token = stringResource(R.string.default_web_client_id)
-  val authService = remember { GoogleAuthService(token, Firebase.auth) }
+  val authService = GoogleAuthService(token, Firebase.auth, LocalContext.current)
 
   // Get the preferences cached parameters
   val loginState by preferencesViewModel.loginState.collectAsState()
