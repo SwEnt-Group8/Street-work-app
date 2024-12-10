@@ -23,6 +23,13 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+/**
+ * A class that handles Google authentication.
+ *
+ * @param token The token to use for authentication.
+ * @param auth The Firebase authentication instance.
+ * @param context The context to use for authentication.
+ */
 class GoogleAuthService(
     private val token: String,
     private val auth: FirebaseAuth,
@@ -40,19 +47,37 @@ class GoogleAuthService(
     mGoogleSignInClient = GoogleSignIn.getClient(context, gso)
   }
 
+  /**
+   * Launches the sign-in activity.
+   *
+   * @param launcher The launcher to use for the activity result.
+   */
   override fun launchSignIn(launcher: ManagedActivityResultLauncher<Intent, ActivityResult>) {
     launcher.launch(mGoogleSignInClient.signInIntent)
   }
 
+  /** Signs out the user. */
   override fun signOut() {
     auth.signOut()
     mGoogleSignInClient.signOut()
   }
 
+  /**
+   * Gets the auth current user.
+   *
+   * @return The auth current user.
+   */
   override fun getCurrentUser(): FirebaseUser? {
     return auth.currentUser
   }
 
+  /**
+   * Remembers the Firebase authentication launcher.
+   *
+   * @param onAuthComplete The function to call when authentication is complete.
+   * @param onAuthError The function to call when authentication fails.
+   * @return The Firebase authentication launcher.
+   */
   @Composable
   fun rememberFirebaseAuthLauncher(
       onAuthComplete: (AuthResult) -> Unit,
