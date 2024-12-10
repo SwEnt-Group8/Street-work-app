@@ -321,7 +321,12 @@ fun StreetWorkApp(
           navigation(startDestination = Screen.PROGRESSION, route = Route.PROGRESSION) {
             composable(Screen.PROGRESSION) {
               infoManager.Display(LocalContext.current)
-              ProgressScreen(navigationActions, userViewModel, progressionViewModel, innerPadding)
+              ProgressScreen(
+                  navigationActions,
+                  userViewModel,
+                  progressionViewModel,
+                  workoutViewModel,
+                  innerPadding)
             }
           }
           navigation(

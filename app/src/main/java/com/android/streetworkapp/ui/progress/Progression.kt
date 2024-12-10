@@ -49,13 +49,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.streetworkapp.model.progression.Achievement
-import com.android.streetworkapp.model.progression.ExerciseAchievement
 import com.android.streetworkapp.model.progression.MedalsAchievement
 import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.progression.SocialAchievement
 import com.android.streetworkapp.model.user.UserViewModel
+import com.android.streetworkapp.model.workout.WorkoutViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.theme.ColorPalette
+import com.android.streetworkapp.utils.toFormattedString
 import kotlinx.coroutines.flow.MutableStateFlow
 
 object ProgressionScreenSettings {
@@ -76,11 +77,15 @@ fun ProgressScreen(
     navigationActions: NavigationActions, // Note: not used yet
     userViewModel: UserViewModel,
     progressionViewModel: ProgressionViewModel,
+    workoutViewModel: WorkoutViewModel,
     paddingValues: PaddingValues = PaddingValues(0.dp)
 ) {
 
   val currentUser by userViewModel.currentUser.collectAsState()
   val currentProgression by progressionViewModel.currentProgression.collectAsState()
+
+  val currentWorkout by workoutViewModel.workoutData.collectAsState()
+  currentUser?.uid?.let { workoutViewModel.getOrAddWorkoutData(it) }
 
   LaunchedEffect(currentProgression) {
     currentUser?.let {
@@ -165,12 +170,20 @@ fun ProgressScreen(
               }
               DashboardStateProgression.Training -> {
 
-                enumValues<ExerciseAchievement>().forEach {
-                  it.achievement.description =
-                      "Record : 0.0 sec" // TODO: use the progression MVVM with current record
-                  Box(modifier = Modifier.testTag("exerciseItem${it.name}")) {
-                    AchievementItem(it.achievement, true)
-                    HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
+                currentWorkout?.workoutSessions?.forEach { workout ->
+                  val date = workout.startTime.toFormattedString()
+                  workout.exercises.forEach {
+                    val newAchievement =
+                        Achievement(
+                            exerciseNameToIcon(it.name),
+                            LocalContext.current.getString(R.string.Trained, it.name),
+                            listOf("workout"),
+                            date)
+
+                    Box(modifier = Modifier.testTag("exerciseItem${it.name}")) {
+                      AchievementItem(newAchievement, false)
+                      HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
+                    }
                   }
                 }
               }
@@ -369,4 +382,25 @@ sealed class DashboardStateProgression {
   data object Training : DashboardStateProgression()
 
   data object Achievement : DashboardStateProgression()
+}
+
+/**
+ * This function can be used to find the Icon corresponding to a given exercise name.
+ *
+ * @param name: The exercise name
+ */
+@Composable
+fun exerciseNameToIcon(name: String): Int {
+  return when (name) {
+    LocalContext.current.getString(R.string.Pushups) -> R.drawable.train_pushup
+    LocalContext.current.getString(R.string.Dips) -> R.drawable.train_dips
+    LocalContext.current.getString(R.string.Burpee) -> R.drawable.train_burpee
+    LocalContext.current.getString(R.string.Lunge) -> R.drawable.train_lunge
+    LocalContext.current.getString(R.string.Planks) -> R.drawable.train_planks
+    LocalContext.current.getString(R.string.Handstand) -> R.drawable.train_hand_stand
+    LocalContext.current.getString(R.string.Frontlever) -> R.drawable.train_front_lever
+    LocalContext.current.getString(R.string.Flag) -> R.drawable.train_flag
+    LocalContext.current.getString(R.string.Muscleup) -> R.drawable.train_muscle_up
+    else -> R.drawable.handstand_org
+  }
 }

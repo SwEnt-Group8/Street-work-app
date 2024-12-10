@@ -65,6 +65,18 @@
 
     // Progression UI
     <string name="ProgressionEmptyAchievements">You do not have any achievements yet!</string>
+    <string name="Trained">You trained your %s !</string>
+
+    <string name="Pushups">Push-ups</string>
+    <string name="Dips">Dips</string>
+    <string name="Burpee">Burpee</string>
+    <string name="Lunge">Lunge</string>
+    <string name="Planks">Planks</string>
+    <string name="Handstand">Handstand</string>
+    <string name="Frontlever">Front lever</string>
+    <string name="Flag">Flag</string>
+    <string name="Muscleup">Muscle-up</string>
+
 
     // Workout UI
     <string name="WorkoutDurationMessage1">I want to do %02d min and %02d seconds of %s</string>
