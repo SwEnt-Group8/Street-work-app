@@ -33,7 +33,6 @@ import com.android.streetworkapp.utils.GoogleAuthService
 @Composable
 fun GoogleAuthButton(
     authService: GoogleAuthService,
-    context: android.content.Context,
     launcher: ManagedActivityResultLauncher<Intent, ActivityResult>
 ) {
 
