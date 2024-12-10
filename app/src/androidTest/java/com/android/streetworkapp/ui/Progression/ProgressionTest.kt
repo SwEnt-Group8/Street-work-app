@@ -116,6 +116,8 @@ class ProgressionTest {
             winner = null)
     val workoutData = WorkoutData(userUid = uid, workoutSessions = listOf(existingSession))
 
+    coEvery { workoutRepository.getOrAddWorkoutData(any()) } answers { workoutData }
+
     progressionViewModel = ProgressionViewModel(progressionRepository)
   }
 
@@ -127,7 +129,7 @@ class ProgressionTest {
           Progression()
         }
     composeTestRule.setContent {
-      ProgressScreen(navigationActions, userViewModel, progressionViewModel)
+      ProgressScreen(navigationActions, userViewModel, progressionViewModel, workoutViewModel)
     }
     composeTestRule.onNodeWithTag("progressionScreen").assertIsDisplayed()
   }
@@ -141,7 +143,7 @@ class ProgressionTest {
         }
 
     composeTestRule.setContent {
-      ProgressScreen(navigationActions, userViewModel, progressionViewModel)
+      ProgressScreen(navigationActions, userViewModel, progressionViewModel, workoutViewModel)
     }
     composeTestRule.onNodeWithTag("progressionScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("circularProgressBar").assertIsDisplayed()
@@ -169,7 +171,7 @@ class ProgressionTest {
         }
 
     composeTestRule.setContent {
-      ProgressScreen(navigationActions, userViewModel, progressionViewModel)
+      ProgressScreen(navigationActions, userViewModel, progressionViewModel, workoutViewModel)
     }
 
     composeTestRule.onNodeWithTag("AchievementTab").performClick()
@@ -217,7 +219,7 @@ class ProgressionTest {
         }
 
     composeTestRule.setContent {
-      ProgressScreen(navigationActions, userViewModel, progressionViewModel)
+      ProgressScreen(navigationActions, userViewModel, progressionViewModel, workoutViewModel)
     }
     composeTestRule.onNodeWithTag("AchievementTab").performClick()
 
@@ -273,7 +275,7 @@ class ProgressionTest {
         }
 
     composeTestRule.setContent {
-      ProgressScreen(navigationActions, userViewModel, progressionViewModel)
+      ProgressScreen(navigationActions, userViewModel, progressionViewModel, workoutViewModel)
     }
 
     composeTestRule.onNodeWithTag("AchievementTab").performClick()

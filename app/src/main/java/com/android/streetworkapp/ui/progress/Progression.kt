@@ -53,12 +53,10 @@ import com.android.streetworkapp.model.progression.MedalsAchievement
 import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.progression.SocialAchievement
 import com.android.streetworkapp.model.user.UserViewModel
-import com.android.streetworkapp.model.workout.WorkoutRepositoryFirestore
 import com.android.streetworkapp.model.workout.WorkoutViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.utils.toFormattedString
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 
 object ProgressionScreenSettings {
@@ -79,8 +77,7 @@ fun ProgressScreen(
     navigationActions: NavigationActions, // Note: not used yet
     userViewModel: UserViewModel,
     progressionViewModel: ProgressionViewModel,
-    workoutViewModel: WorkoutViewModel =
-        WorkoutViewModel(WorkoutRepositoryFirestore(FirebaseFirestore.getInstance())),
+    workoutViewModel: WorkoutViewModel,
     paddingValues: PaddingValues = PaddingValues(0.dp)
 ) {
 
