@@ -46,6 +46,7 @@ class GoogleAuthService(
 
   override fun signOut() {
     auth.signOut()
+    mGoogleSignInClient.signOut()
   }
 
   override fun getCurrentUser(): FirebaseUser? {
