@@ -142,6 +142,16 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
       }
     }
   }
+
+  /**
+   * Deletes the WorkoutData linked to the uid.
+   *
+   * @param uid The uid of the user.
+   */
+  fun deleteWorkoutDataByUid(uid: String) {
+    viewModelScope.launch { repository.deleteWorkoutDataByUid(uid) }
+  }
+
   /**
    * Refreshes the current user's WorkoutData.
    *
