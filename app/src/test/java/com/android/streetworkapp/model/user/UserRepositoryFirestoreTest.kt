@@ -659,7 +659,7 @@ class UserRepositoryFirestoreTest {
     assertEquals("john@example.com", user?.email)
     assertEquals(100, user?.score)
     assertEquals(listOf("friend1", "friend2"), user?.friends)
-    assertEquals(listOf("park1", "park2"), user?.friends)
+    assertEquals(listOf("park1", "park2"), user?.parks)
   }
 
   @Test
@@ -745,9 +745,12 @@ class UserRepositoryFirestoreTest {
     assertTrue(user?.friends?.isEmpty() == true) // Friends list should be empty
   }
 
-
   @Test
   fun documentToUserWithMissingParksSetsEmptyParksList() {
+    whenever(document.id).thenReturn("user123")
+    whenever(document.getString("username")).thenReturn("John Doe")
+    whenever(document.getString("email")).thenReturn("john@example.com")
+    whenever(document.getLong("score")).thenReturn(100L)
     whenever(document.get("parks")).thenReturn(null) // Missing Parks
 
     val user = userRepository.documentToUser(document)
@@ -758,6 +761,10 @@ class UserRepositoryFirestoreTest {
 
   @Test
   fun documentToUserWithParksOfIncorrectTypeSetsEmptyParksList() {
+    whenever(document.id).thenReturn("user123")
+    whenever(document.getString("username")).thenReturn("John Doe")
+    whenever(document.getString("email")).thenReturn("john@example.com")
+    whenever(document.getLong("score")).thenReturn(100L)
     whenever(document.get("friends")).thenReturn("not a list") // Incorrect type
 
     val user = userRepository.documentToUser(document)
@@ -768,6 +775,10 @@ class UserRepositoryFirestoreTest {
 
   @Test
   fun documentToUserWithExceptionWhenGettingParksSetsEmptyParksList() {
+    whenever(document.id).thenReturn("user123")
+    whenever(document.getString("username")).thenReturn("John Doe")
+    whenever(document.getString("email")).thenReturn("john@example.com")
+    whenever(document.getLong("score")).thenReturn(100L)
     // Simulate exception when accessing 'friends' field
     whenever(document.get("parks")).thenThrow(RuntimeException("Test exception"))
 
