@@ -128,7 +128,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
   }
 
   /**
-   * Retrieves the parks of a user from Firestore based on the provided user ID (uid).
+   * Retrieves the list of parks of a user from Firestore based on the provided user ID (uid).
    *
    * @param uid The unique ID of the user whose friends are being retrieved.
    * @return A list of ID of park visited by the user, or null if an error occurs.
