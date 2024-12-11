@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() {
+open class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() {
 
   private val _workoutData = MutableStateFlow<WorkoutData?>(null)
   val workoutData: StateFlow<WorkoutData?> = _workoutData.asStateFlow()

@@ -2,7 +2,6 @@ package com.android.streetworkapp.ui.map
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,10 +25,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -99,8 +96,6 @@ fun MapScreen(
 
   val parkList = parkViewModel.parkList.collectAsState()
 
-  var selectedPark by remember { mutableStateOf(Park()) }
-
   LaunchedEffect(parks) { parkViewModel.getOrCreateAllParksByLocation(parks) }
 
   Box(modifier = Modifier.testTag("mapScreen")) {
@@ -114,7 +109,8 @@ fun MapScreen(
     GoogleMap(
         onMapLoaded = callbackOnMapLoaded,
         modifier = Modifier.fillMaxSize().padding(innerPaddingValues).testTag("googleMap"),
-        cameraPositionState = cameraPositionState) {
+        cameraPositionState = cameraPositionState,
+        contentDescription = "GoogleMap") {
 
           // Add a marker for the user's current location
           MapEffect { map ->
@@ -124,8 +120,6 @@ fun MapScreen(
               map.isMyLocationEnabled = true
             }
           }
-
-          Log.d("Parklist", parkList.toString())
 
           // marker for parks
           parkList.value
@@ -143,15 +137,12 @@ fun MapScreen(
                     icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE),
                     onClick = {
                       markerState.showInfoWindow()
-                      if (selectedPark == park) {
-                        selectedPark = Park()
-                        markerState.hideInfoWindow()
-                        parkViewModel.getOrCreateParkByLocation(park.location)
-                        parkViewModel.setParkLocation(park.location)
-                        navigationActions.navigateTo(Screen.PARK_OVERVIEW)
-                      }
-                      selectedPark = park
                       true
+                    },
+                    onInfoWindowClick = {
+                      parkViewModel.setPark(park)
+                      parkViewModel.setParkLocation(park.location)
+                      navigationActions.navigateTo(Screen.PARK_OVERVIEW)
                     }) {
                       MarkerInfoWindowContent(park)
                     }
