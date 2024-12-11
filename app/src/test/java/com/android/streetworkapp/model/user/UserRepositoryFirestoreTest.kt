@@ -176,6 +176,35 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
+  fun getParksByUidWithValidUidReturnsListOfParks() = runTest {
+    // Mock User DocumentSnapshot
+    val userDocument = mock<DocumentSnapshot>()
+    whenever(userDocument.exists()).thenReturn(true)
+    whenever(userDocument.id).thenReturn("user123")
+    whenever(userDocument.get("parks")).thenReturn(listOf("park1", "park2"))
+
+    // Mock Task for user document retrieval
+    val userDocumentTaskCompletionSource = TaskCompletionSource<DocumentSnapshot>()
+    userDocumentTaskCompletionSource.setResult(userDocument)
+    val userDocumentTask = userDocumentTaskCompletionSource.task
+
+    // Mock CollectionReference and DocumentReference for user
+    whenever(db.collection("users")).thenReturn(collection)
+    whenever(collection.document("user123")).thenReturn(documentRef)
+    whenever(documentRef.get()).thenReturn(userDocumentTask)
+
+    // Call the repository method
+    val parksList = userRepository.getParksByUid("user123")
+
+    // Assert the result is not null and contains expected values
+    assertNotNull(parksList)
+    assertEquals(2, parksList?.size)
+
+    assertEquals("park1", parksList?.get(0))
+    assertEquals("park2", parksList?.get(1))
+  }
+
+  @Test
   fun getUserByEmailWithValidEmailReturnsUser() = runBlocking {
     // Setup the DocumentSnapshot
     `when`(document.exists()).thenReturn(true)
@@ -453,6 +482,24 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
+  fun getParksByUidWithExceptionReturnsNull() = runTest {
+    // Mock Firestore interactions to throw an exception when fetching user document
+    whenever(db.collection("users")).thenReturn(collection)
+    whenever(collection.document("user123")).thenReturn(documentRef)
+
+    val taskCompletionSource = TaskCompletionSource<DocumentSnapshot>()
+    taskCompletionSource.setException(Exception("Firestore exception"))
+    val task = taskCompletionSource.task
+    whenever(documentRef.get()).thenReturn(task)
+
+    // Call the method under test
+    val parksList = userRepository.getParksByUid("user123")
+
+    // Assert that the method returns null
+    assertNull(parksList)
+  }
+
+  @Test
   fun addUserWithExceptionLogsError() = runTest {
     // Prepare a user object
     val user =
@@ -547,6 +594,30 @@ class UserRepositoryFirestoreTest {
 
     // Verify that 'update' and 'commit' were called
     verify(batch, times(2)).update(any<DocumentReference>(), any<String>(), any<Any>())
+    verify(batch).commit()
+  }
+
+  @Test
+  fun addNewParkWithExceptionLogsError() = runTest {
+    // Mock Firestore interactions to throw an exception during batch commit
+    val userRef = mock<DocumentReference>()
+    val parkId = "park123"
+
+    whenever(db.collection("users")).thenReturn(collection)
+    whenever(db.batch()).thenReturn(batch)
+    whenever(collection.document("user123")).thenReturn(userRef)
+    whenever(batch.update(any<DocumentReference>(), any<String>(), any<Any>())).thenReturn(batch)
+
+    val taskCompletionSource = TaskCompletionSource<Void>()
+    taskCompletionSource.setException(Exception("Firestore exception"))
+    val task = taskCompletionSource.task
+    whenever(batch.commit()).thenReturn(task)
+
+    // Call the method under test
+    userRepository.addNewPark("user123", parkId)
+
+    // Verify that 'update' and 'commit' were called
+    verify(batch, times(1)).update(any<DocumentReference>(), any<String>(), any<Any>())
     verify(batch).commit()
   }
 
