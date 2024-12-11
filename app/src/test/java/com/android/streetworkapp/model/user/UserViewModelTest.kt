@@ -155,16 +155,15 @@ class UserViewModelTest {
     verify(repository).getFriendsByUid(uid)
   }
 
-    @Test
-    fun getParksByUidCallsRepositoryWithCorrectUid() = runTest {
-        val uid = "user123"
-        val parks =
-            listOf("park1","park2")
-        whenever(repository.getParksByUid(uid)).thenReturn(parks)
-        userViewModel.getParksByUid(uid)
-        testDispatcher.scheduler.advanceUntilIdle()
-        verify(repository).getParksByUid(uid)
-    }
+  @Test
+  fun getParksByUidCallsRepositoryWithCorrectUid() = runTest {
+    val uid = "user123"
+    val parks = listOf("park1", "park2")
+    whenever(repository.getParksByUid(uid)).thenReturn(parks)
+    userViewModel.getParksByUid(uid)
+    testDispatcher.scheduler.advanceUntilIdle()
+    verify(repository).getParksByUid(uid)
+  }
 
   @Test
   fun addUserCallsRepositoryWithCorrectUser() = runTest {
@@ -213,14 +212,14 @@ class UserViewModelTest {
     verify(repository).removeFriend(uid, friendUid)
   }
 
-    @Test
-    fun addNewParkCallsRepositoryWithCorrectUids() = runTest {
-        val uid = "user123"
-        val parksID = "park123"
-        userViewModel.addNewPark(uid, parksID)
-        testDispatcher.scheduler.advanceUntilIdle()
-        verify(repository).addNewPark(uid, parksID)
-    }
+  @Test
+  fun addNewParkCallsRepositoryWithCorrectUids() = runTest {
+    val uid = "user123"
+    val parksID = "park123"
+    userViewModel.addNewPark(uid, parksID)
+    testDispatcher.scheduler.advanceUntilIdle()
+    verify(repository).addNewPark(uid, parksID)
+  }
 
   @Test
   fun deleteUserByUidCallsRepositoryWithCorrectId() = runTest {

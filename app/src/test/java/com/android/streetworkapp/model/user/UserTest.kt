@@ -22,8 +22,8 @@ class UserTest {
     assertEquals("john.doe@example.com", user.email)
     assertEquals(100, user.score)
     assertEquals(listOf("456", "789"), user.friends)
-      assertEquals("url", user.picture)
-      assertEquals(listOf("1011", "1213"), user.parks)
+    assertEquals("url", user.picture)
+    assertEquals(listOf("1011", "1213"), user.parks)
   }
 
   @Test
@@ -42,7 +42,7 @@ class UserTest {
     assertEquals("john.doe@example.com", user.email)
     assertEquals(100, user.score)
     assertTrue(user.friends.isEmpty())
-      assertEquals("", user.parks)
-      assertTrue(user.parks.isEmpty())
+    assertEquals("", user.parks)
+    assertTrue(user.parks.isEmpty())
   }
 }
