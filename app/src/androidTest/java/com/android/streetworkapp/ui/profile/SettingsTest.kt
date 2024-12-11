@@ -111,7 +111,7 @@ class SettingsTest {
   fun testLogoutButtonNavigatesToAuthScreen() {
     val showSettingDialog = mutableStateOf(false)
     var context: Context? = null
-    val alice = User("uid-alice", "Alice", "alice@gmail.com", 42, emptyList(), "")
+    val alice = User("uid-alice", "Alice", "alice@gmail.com", 42, emptyList(), "", emptyList())
     userViewModel.setCurrentUser(alice)
 
     composeTestRule.setContent {
