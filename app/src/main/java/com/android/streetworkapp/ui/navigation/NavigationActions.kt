@@ -1,5 +1,6 @@
 package com.android.streetworkapp.ui.navigation
 
+import android.widget.Toast
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Place
@@ -45,7 +46,8 @@ data class ScreenParams(
     val bottomBarType: BottomNavigationMenuType = BottomNavigationMenuType.DEFAULT,
     val isTopBarVisible: Boolean = true,
     val topAppBarManager: TopAppBarManager?,
-    val hasSearchBar: Boolean = false
+    val hasSearchBar: Boolean = false,
+    var backNavigationCallback: () -> Unit = {}
 ) {
   companion object {
     val AUTH =
@@ -64,7 +66,8 @@ data class ScreenParams(
                     actions =
                         listOf(
                             TopAppBarManager.TopAppBarAction.SEARCH,
-                            TopAppBarManager.TopAppBarAction.INFO)),
+                            TopAppBarManager.TopAppBarAction.INFO,
+                            TopAppBarManager.TopAppBarAction.FILTER)),
             hasSearchBar = true)
     val PROFILE =
         ScreenParams(
@@ -273,6 +276,8 @@ open class NavigationActions(
 
   /** Navigate back to the previous screen. */
   open fun goBack() {
+    Toast.makeText(navController.context, "NavActions - Callback", Toast.LENGTH_SHORT).show()
+    ScreenParams.PARK_OVERVIEW.backNavigationCallback()
     navController.popBackStack()
   }
 
@@ -366,5 +371,12 @@ open class NavigationActions(
   fun navigateToTrainParam(activity: String, isTimeDependent: Boolean, type: String) {
     val route = "TrainParam/$activity/$isTimeDependent/$type"
     navController.navigate(route)
+  }
+
+  fun setParkOverviewCallback(backNavigationCallback: () -> Unit) {
+    ScreenParams.PARK_OVERVIEW.backNavigationCallback = {
+      backNavigationCallback()
+      Toast.makeText(navController.context, "Screen - Callback", Toast.LENGTH_SHORT).show()
+    }
   }
 }
