@@ -3,6 +3,9 @@ package com.android.streetworkapp.model.workout
 import android.util.Log
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRepository {
@@ -160,6 +163,91 @@ class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRep
     } catch (e: Exception) {
       Log.e(ERROR_TAG, "Error saving WorkoutData for UID=$uid: ${e.message}")
     }
+  }
+  /**
+   * Sends a pairing request from one user to another.
+   *
+   * @param fromUid The UID of the user sending the request.
+   * @param toUid The UID of the user receiving the request.
+   */
+  override suspend fun sendPairingRequest(fromUid: String, toUid: String) {
+    val pairingRequest =
+        PairingRequest(
+            requestId = db.collection("pairingRequests").document().id,
+            fromUid = fromUid,
+            toUid = toUid)
+    db.collection("pairingRequests").document(pairingRequest.requestId).set(pairingRequest).await()
+  }
+
+  /**
+   * Observes pairing requests for a specific user.
+   *
+   * @param uid The UID of the user.
+   */
+  override fun observePairingRequests(uid: String): Flow<List<PairingRequest>> = callbackFlow {
+    val subscription =
+        db.collection("pairingRequests").whereEqualTo("toUid", uid).addSnapshotListener {
+            snapshot,
+            e ->
+          if (e != null) {
+            Log.e(ERROR_TAG, "Listen failed.", e)
+            close(e) // Close the flow on error
+          }
+          if (snapshot != null && !snapshot.isEmpty) {
+            try {
+              val requests = snapshot.toObjects(PairingRequest::class.java)
+              trySend(requests).isSuccess
+            } catch (e: Exception) {
+              Log.e(ERROR_TAG, "Error parsing documents", e)
+            }
+          }
+        }
+    awaitClose { subscription.remove() }
+  }
+
+  /**
+   * Responds to a pairing request by updating its status.
+   *
+   * @param requestId The ID of the pairing request.
+   * @param isAccepted True if the request is accepted, false if rejected.
+   */
+  override suspend fun respondToPairingRequest(requestId: String, isAccepted: Boolean) {
+    val status = if (isAccepted) RequestStatus.ACCEPTED else RequestStatus.REJECTED
+    db.collection("pairingRequests").document(requestId).update("status", status.name).await()
+  }
+
+  /**
+   * Observes the workout sessions for a specific user.
+   *
+   * @param uid The UID of the user.
+   */
+  override fun observeWorkoutSessions(uid: String): Flow<List<WorkoutSession>> = callbackFlow {
+    val subscription =
+        db.collection(COLLECTION_PATH)
+            .document(uid)
+            .collection(WORKOUT_SESSIONS)
+            .addSnapshotListener { snapshot, e ->
+              if (e != null) {
+                Log.e(ERROR_TAG, "Listen failed.", e)
+                close(e) // Close the flow on error
+              }
+              if (snapshot != null) {
+                val sessions = snapshot.toObjects(WorkoutSession::class.java)
+                trySend(sessions).isSuccess
+              }
+            }
+    awaitClose { subscription.remove() }
+  }
+
+  /**
+   * Adds a comment to a workout session.
+   *
+   * @param sessionId The ID of the session.
+   * @param comment The comment to add.
+   */
+  override suspend fun addCommentToSession(sessionId: String, comment: Comment) {
+    val sessionPath = "$COLLECTION_PATH/${comment.authorUid}/$WORKOUT_SESSIONS/$sessionId/comments"
+    db.collection(sessionPath).add(comment).await()
   }
 
   /**
