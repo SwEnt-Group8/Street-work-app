@@ -17,16 +17,21 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.sample.R
+import com.android.streetworkapp.model.preferences.PreferencesViewModel
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.ui.utils.CustomDialog
 import com.android.streetworkapp.ui.utils.DialogType
+import com.android.streetworkapp.utils.GoogleAuthService
 
 @Composable
 fun SettingsContent(
     navigationActions: NavigationActions,
     userViewModel: UserViewModel,
+    preferencesViewModel: PreferencesViewModel,
+    authService: GoogleAuthService,
     showParentDialog: MutableState<Boolean>
 ) {
 
@@ -52,11 +57,15 @@ fun SettingsContent(
           Button(
               onClick = {
                 showParentDialog.value = false
-                Toast.makeText(context, "Not yet implemented", Toast.LENGTH_SHORT).show()
+                logout(authService, userViewModel, preferencesViewModel)
+                Toast.makeText(
+                        context, context.getString(R.string.LogoutSuccess), Toast.LENGTH_SHORT)
+                    .show()
+                navigationActions.navigateTo(Route.AUTH)
               },
               colors = ColorPalette.BUTTON_COLOR,
               modifier = Modifier.testTag("LogOutButton")) {
-                Text("Log-out")
+                Text(context.getString(R.string.LogoutTitle))
               }
 
           Button(
@@ -86,4 +95,31 @@ fun SettingsContent(
         showParentDialog.value = false
         // navigationActions.navigateTo(Screen.AUTH)
       })
+}
+
+/**
+ * Logs out the user by signing out from Google and the app.
+ *
+ * @param authService the Google authentication service
+ * @param userViewModel the user viewmodel
+ * @param preferencesViewModel the preferences viewmodel
+ */
+fun logout(
+    authService: GoogleAuthService,
+    userViewModel: UserViewModel,
+    preferencesViewModel: PreferencesViewModel
+) {
+  // Sign out and revoke access from Google Service (disable auto-login)
+  authService.signOut()
+  authService.revokeAccess()
+
+  // Clear user viewmodel data
+  userViewModel.setUser(null)
+  userViewModel.setCurrentUser(null)
+
+  // Clear preferences parameters
+  preferencesViewModel.setLoginState(false)
+  preferencesViewModel.setUid("")
+  preferencesViewModel.setName("")
+  preferencesViewModel.setScore(0)
 }

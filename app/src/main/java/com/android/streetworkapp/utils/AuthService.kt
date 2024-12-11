@@ -1,6 +1,5 @@
 package com.android.streetworkapp.utils
 
-import android.content.Context
 import android.content.Intent
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.result.ActivityResult
@@ -10,12 +9,14 @@ import com.google.firebase.auth.FirebaseUser
 interface AuthService {
   // Trigger the sign-in process :
   fun launchSignIn(
-      context: Context,
       launcher: ManagedActivityResultLauncher<Intent, ActivityResult>,
   )
 
   // Handle the sign-out process
   fun signOut()
+
+  // Revoke access to the app
+  fun revokeAccess()
 
   // Returns the current signed-in user (null if none)
   fun getCurrentUser(): FirebaseUser?
