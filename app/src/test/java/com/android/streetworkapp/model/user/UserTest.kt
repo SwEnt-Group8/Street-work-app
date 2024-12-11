@@ -42,7 +42,7 @@ class UserTest {
     assertEquals("john.doe@example.com", user.email)
     assertEquals(100, user.score)
     assertTrue(user.friends.isEmpty())
-    assertEquals("", user.parks)
+    assertEquals("", user.picture)
     assertTrue(user.parks.isEmpty())
   }
 }
