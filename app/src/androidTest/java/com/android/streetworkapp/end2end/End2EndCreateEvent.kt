@@ -1,6 +1,5 @@
 package com.android.streetworkapp.end2end
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -279,10 +278,8 @@ class End2EndCreateEvent {
     val yOffsetCorr =
         bottomBarBounds
             .height // for some reason the height of the map matches the one of the screen not the
-    // actual size it does :)))))))))), this is an ugly fix to correct the position
+    // actual size it does, this is an ugly fix to correct the position
     // of the click
-
-    Log.d("e2eCoor", "xClickOffset: $xClickOffset, yClickOffset: $yOffsetCorr")
 
     composeTestRule.onNodeWithTag("mapScreen").performTouchInput {
       click(Offset(xClickOffset.toPx(), yClickOffset.toPx() - yOffsetCorr.toPx()))
