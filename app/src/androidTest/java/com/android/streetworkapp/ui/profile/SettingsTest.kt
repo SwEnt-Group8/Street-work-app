@@ -66,7 +66,8 @@ class SettingsTest {
   fun isSettingsContentDisplayedForUser() {
     val showSettingDialog = mutableStateOf(false)
     var context: Context? = null
-    val alice = User("uid-alice", "Alice", "alice@gmail.com", 42, emptyList(), "")
+    val alice =
+        User("uid-alice", "Alice", "alice@gmail.com", 42, emptyList(), "", parks = emptyList())
     userViewModel.setCurrentUser(alice)
 
     composeTestRule.setContent {

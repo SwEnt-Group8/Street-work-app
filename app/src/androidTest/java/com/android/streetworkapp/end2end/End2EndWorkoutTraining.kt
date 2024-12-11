@@ -9,7 +9,6 @@ import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.espresso.contrib.NavigationViewActions.navigateTo
 import androidx.test.rule.GrantPermissionRule
 import com.android.streetworkapp.StreetWorkApp
 import com.android.streetworkapp.model.event.EventRepository
@@ -75,7 +74,8 @@ class End2EndWorkoutTraining {
           email = "workout.tester@example.com",
           score = 100000,
           friends = emptyList(),
-          picture = "")
+          picture = "",
+          parks = emptyList())
 
   @Before
   fun setUp() {

@@ -81,7 +81,6 @@ import com.android.streetworkapp.ui.utils.CustomDialog
 import com.android.streetworkapp.ui.utils.DialogType
 import com.android.streetworkapp.ui.utils.trainComposable
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.serialization.json.JsonNull.content
 import okhttp3.OkHttpClient
 
 class MainActivity : ComponentActivity() {
@@ -182,7 +181,8 @@ fun StreetWorkAppMain(
         userViewModel.getUserByUidAndSetAsCurrentUser(uid!!)
       } else {
         Log.d("MainActivity", "Internet not available, loading user $uid from cache")
-        val offlineUser = User(uid.orEmpty(), name.orEmpty(), "", score ?: 0, emptyList(), "")
+        val offlineUser =
+            User(uid.orEmpty(), name.orEmpty(), "", score ?: 0, emptyList(), "", emptyList())
         userViewModel.setCurrentUser(offlineUser)
       }
     }

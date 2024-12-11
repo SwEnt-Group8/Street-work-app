@@ -15,7 +15,8 @@ class UserTest {
             email = "john.doe@example.com",
             score = 100,
             friends = listOf("456", "789"),
-            picture = "")
+            picture = "",
+            parks = emptyList())
     assertEquals("123", user.uid)
     assertEquals("John Doe", user.username)
     assertEquals("john.doe@example.com", user.email)
@@ -32,7 +33,8 @@ class UserTest {
             email = "john.doe@example.com",
             score = 100,
             friends = emptyList(),
-            picture = "")
+            picture = "",
+            parks = emptyList())
     assertEquals("123", user.uid)
     assertEquals("John Doe", user.username)
     assertEquals("john.doe@example.com", user.email)

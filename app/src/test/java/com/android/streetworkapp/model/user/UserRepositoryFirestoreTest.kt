@@ -268,7 +268,8 @@ class UserRepositoryFirestoreTest {
             email = "john.doe@example.com",
             score = 100,
             friends = listOf("friend1", "friend2"),
-            picture = "")
+            picture = "",
+            parks = emptyList())
 
     `when`(db.collection("users")).thenReturn(collection)
     `when`(collection.document(user.uid)).thenReturn(documentRef)
@@ -461,7 +462,8 @@ class UserRepositoryFirestoreTest {
             email = "test@example.com",
             score = 0,
             friends = emptyList(),
-            picture = "")
+            picture = "",
+            parks = emptyList())
 
     // Mock Firestore interactions to throw an exception
     whenever(db.collection("users")).thenReturn(collection)
@@ -711,7 +713,8 @@ class UserRepositoryFirestoreTest {
                 "john.doe@example.com",
                 100,
                 listOf("friend1", "friend2"),
-                picture = ""))
+                picture = "",
+                parks = emptyList()))
 
     // Assert the result is not null and contains expected values
     assertNotNull(user)
@@ -741,7 +744,15 @@ class UserRepositoryFirestoreTest {
     `when`(documentRef.set(any(User::class.java))).thenReturn(Tasks.forResult(null))
 
     // Call the repository method
-    val newUser = User("invalid", "New User", "new.user@example.com", 0, emptyList(), picture = "")
+    val newUser =
+        User(
+            "invalid",
+            "New User",
+            "new.user@example.com",
+            0,
+            emptyList(),
+            picture = "",
+            parks = emptyList())
     val user = userRepository.getOrAddUserByUid("invalid", newUser)
 
     // Assert the result is not null and contains expected values
@@ -777,7 +788,8 @@ class UserRepositoryFirestoreTest {
                 "john.doe@example.com",
                 100,
                 listOf("friend1", "friend2"),
-                picture = ""))
+                picture = "",
+                parks = emptyList()))
 
     // Assert that the method returns null
     assertNull(user)
