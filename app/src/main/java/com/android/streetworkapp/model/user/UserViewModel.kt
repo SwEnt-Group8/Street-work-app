@@ -32,6 +32,15 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
     get() = _parks
 
   /**
+   * Sets the user to the provided User object.
+   *
+   * @param user The User object to set as the user.
+   */
+  fun setUser(user: User?) {
+    _user.value = user
+  }
+
+  /**
    * Sets the current user to the provided User object.
    *
    * @param user The User object to set as the current user.

@@ -31,7 +31,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -53,7 +52,8 @@ import com.google.firebase.ktx.Firebase
 fun SignInScreen(
     navigationActions: NavigationActions,
     userViewModel: UserViewModel,
-    preferencesViewModel: PreferencesViewModel
+    preferencesViewModel: PreferencesViewModel,
+    authService: GoogleAuthService
 ) {
 
   val user by userViewModel.user.collectAsState()
@@ -61,11 +61,7 @@ fun SignInScreen(
   // This part of the code handles google sign-in :
   var firebaseUser by remember { mutableStateOf(Firebase.auth.currentUser) }
 
-  val token = stringResource(R.string.default_web_client_id)
   val context = LocalContext.current
-
-  // Create an instance of GoogleAuthService (helper class for authentication) :
-  val authService = remember { GoogleAuthService(token, Firebase.auth) }
 
   // Instantiate the launcher for the sign-in process :
   val launcher =
@@ -121,7 +117,7 @@ fun SignInScreen(
                       .height(96.dp)
                       .testTag("loginScreenGoogleAuthButtonContainer"),
               contentAlignment = Alignment.Center) {
-                GoogleAuthButton(authService, context, launcher)
+                GoogleAuthButton(authService, launcher)
               }
         }
   }

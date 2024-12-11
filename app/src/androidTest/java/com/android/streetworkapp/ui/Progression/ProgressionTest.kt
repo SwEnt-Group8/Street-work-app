@@ -6,7 +6,6 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import com.android.streetworkapp.model.progression.ExerciseAchievement
 import com.android.streetworkapp.model.progression.MedalsAchievement
 import com.android.streetworkapp.model.progression.Progression
 import com.android.streetworkapp.model.progression.ProgressionRepositoryFirestore
@@ -16,6 +15,12 @@ import com.android.streetworkapp.model.progression.SocialAchievement
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
+import com.android.streetworkapp.model.workout.Exercise
+import com.android.streetworkapp.model.workout.SessionType
+import com.android.streetworkapp.model.workout.WorkoutData
+import com.android.streetworkapp.model.workout.WorkoutRepositoryFirestore
+import com.android.streetworkapp.model.workout.WorkoutSession
+import com.android.streetworkapp.model.workout.WorkoutViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.progress.ProgressScreen
 import io.mockk.MockKAnnotations
@@ -35,6 +40,9 @@ class ProgressionTest {
   @MockK private lateinit var progressionRepository: ProgressionRepositoryFirestore
   private lateinit var progressionViewModel: ProgressionViewModel
 
+  @MockK private lateinit var workoutRepository: WorkoutRepositoryFirestore
+  private lateinit var workoutViewModel: WorkoutViewModel
+
   @get:Rule val composeTestRule = createComposeRule()
 
   private val mockedUser =
@@ -47,12 +55,69 @@ class ProgressionTest {
           picture = "",
           parks = listOf(""))
 
+  val uid = "testUid"
+  private val sessionId = "testSessionId"
+  private val exercise = Exercise(name = "Push-ups", duration = 30)
+  private val exercise2 = Exercise(name = "Dips")
+  private val exercise3 = Exercise(name = "Burpee")
+  private val exercise4 = Exercise(name = "Lunge")
+  private val exercise5 = Exercise(name = "Planks")
+  private val exercise6 = Exercise(name = "Handstand")
+  private val exercise7 = Exercise(name = "Front lever")
+  private val exercise8 = Exercise(name = "Flag")
+  private val exercise9 = Exercise(name = "Muscle-up")
+  private val exerciseNew = Exercise(name = "NewExercise")
+
+  private val sessionType = SessionType.SOLO
+
+  private val existingSession =
+      WorkoutSession(
+          sessionId = sessionId,
+          startTime = 0L,
+          endTime = 0L,
+          sessionType = sessionType,
+          participants = listOf("testParticipant"),
+          exercises =
+              listOf(
+                  exercise,
+                  exercise2,
+                  exercise3,
+                  exercise4,
+                  exercise5,
+                  exercise6,
+                  exercise7,
+                  exercise8,
+                  exercise9,
+                  exerciseNew),
+          winner = null)
+  private val workoutData = WorkoutData(userUid = uid, workoutSessions = listOf(existingSession))
+
   @Before
   fun setUp() {
     MockKAnnotations.init(this, relaxed = true)
     userViewModel = UserViewModel(userRepository)
 
     userViewModel.setCurrentUser(mockedUser)
+
+    workoutViewModel = WorkoutViewModel(workoutRepository)
+
+    val uid = "testUid"
+    val sessionId = "testSessionId"
+    val exercise = Exercise(name = "Push-up", duration = 30)
+    val sessionType = SessionType.SOLO
+
+    val existingSession =
+        WorkoutSession(
+            sessionId = sessionId,
+            startTime = 0L,
+            endTime = 0L,
+            sessionType = sessionType,
+            participants = listOf("testParticipant"),
+            exercises = listOf(),
+            winner = null)
+    val workoutData = WorkoutData(userUid = uid, workoutSessions = listOf(existingSession))
+
+    coEvery { workoutRepository.getOrAddWorkoutData(any()) } answers { workoutData }
 
     progressionViewModel = ProgressionViewModel(progressionRepository)
   }
@@ -65,7 +130,7 @@ class ProgressionTest {
           Progression()
         }
     composeTestRule.setContent {
-      ProgressScreen(navigationActions, userViewModel, progressionViewModel)
+      ProgressScreen(navigationActions, userViewModel, progressionViewModel, workoutViewModel)
     }
     composeTestRule.onNodeWithTag("progressionScreen").assertIsDisplayed()
   }
@@ -79,7 +144,7 @@ class ProgressionTest {
         }
 
     composeTestRule.setContent {
-      ProgressScreen(navigationActions, userViewModel, progressionViewModel)
+      ProgressScreen(navigationActions, userViewModel, progressionViewModel, workoutViewModel)
     }
     composeTestRule.onNodeWithTag("progressionScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("circularProgressBar").assertIsDisplayed()
@@ -107,7 +172,7 @@ class ProgressionTest {
         }
 
     composeTestRule.setContent {
-      ProgressScreen(navigationActions, userViewModel, progressionViewModel)
+      ProgressScreen(navigationActions, userViewModel, progressionViewModel, workoutViewModel)
     }
 
     composeTestRule.onNodeWithTag("AchievementTab").performClick()
@@ -155,7 +220,7 @@ class ProgressionTest {
         }
 
     composeTestRule.setContent {
-      ProgressScreen(navigationActions, userViewModel, progressionViewModel)
+      ProgressScreen(navigationActions, userViewModel, progressionViewModel, workoutViewModel)
     }
     composeTestRule.onNodeWithTag("AchievementTab").performClick()
 
@@ -178,14 +243,18 @@ class ProgressionTest {
           mockedProgression
         }
 
+    coEvery { workoutRepository.getOrAddWorkoutData(any()) } answers { workoutData }
+
     composeTestRule.setContent {
-      ProgressScreen(navigationActions, userViewModel, progressionViewModel)
+      ProgressScreen(navigationActions, userViewModel, progressionViewModel, workoutViewModel)
     }
 
     composeTestRule.onNodeWithTag("TrainingTab").performClick()
 
-    enumValues<ExerciseAchievement>().forEach { exercise ->
-      composeTestRule.onNodeWithTag("exerciseItem" + exercise.name).assertExists()
+    workoutData.workoutSessions.forEach { workoutSession ->
+      workoutSession.exercises.forEach {
+        composeTestRule.onNodeWithTag("exerciseItem${it.name}").assertExists()
+      }
     }
   }
 
@@ -207,7 +276,7 @@ class ProgressionTest {
         }
 
     composeTestRule.setContent {
-      ProgressScreen(navigationActions, userViewModel, progressionViewModel)
+      ProgressScreen(navigationActions, userViewModel, progressionViewModel, workoutViewModel)
     }
 
     composeTestRule.onNodeWithTag("AchievementTab").performClick()

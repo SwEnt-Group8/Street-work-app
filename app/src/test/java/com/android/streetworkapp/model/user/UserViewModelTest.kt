@@ -244,6 +244,14 @@ class UserViewModelTest {
   }
 
   @Test
+  fun setUserUpdatesUser() = runTest {
+    val user = User("user123", "John Doe", "john@example.com", 100, emptyList(), picture = "")
+    userViewModel.setUser(user)
+    val observedUser = userViewModel.user.first()
+    assertEquals(user, observedUser)
+  }
+
+  @Test
   fun getUserUpdatesUser() = runTest {
     val user =
         User(
