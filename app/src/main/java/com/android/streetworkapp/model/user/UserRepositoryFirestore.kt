@@ -256,6 +256,33 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
   }
 
   /**
+   * Removes a user from all friends lists in Firestore.
+   *
+   * @param uid The unique ID of the user to remove from all friends lists.
+   */
+  override suspend fun removeUserFromAllFriendsLists(uid: String) {
+    require(uid.isNotEmpty()) { UID_EMPTY }
+    try {
+      // Get all users that have the user in their friends list
+      val querySnapshot = db.collection("users").whereArrayContains("friends", uid).get().await()
+
+      // Start a Firestore batch operation for all updates
+      val batch = db.batch()
+
+      // Remove the user from all friends lists
+      querySnapshot.documents.forEach { doc ->
+        val friendRef = db.collection("users").document(doc.id)
+        batch.update(friendRef, "friends", FieldValue.arrayRemove(uid))
+      }
+
+      // Commit the batch
+      batch.commit().await()
+    } catch (e: Exception) {
+      Log.e("FirestoreError", "Error removing user from all friends lists: ${e.message}")
+    }
+  }
+
+  /**
    * Deletes a user from Firestore based on the provided UID.
    *
    * @param uid The unique UID of the user to delete.
