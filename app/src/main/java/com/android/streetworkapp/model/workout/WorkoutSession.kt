@@ -47,6 +47,13 @@ enum class SessionStatus {
   COMPLETED // Session finished
 }
 
+/**
+ * A data class representing an exercise performed in a workout session.
+ *
+ * @param authorUid UID of the author of the comment
+ * @param text The text content of the comment
+ * @param timestamp The timestamp of the comment creation
+ */
 data class Comment(
     val authorUid: String,
     val text: String,
