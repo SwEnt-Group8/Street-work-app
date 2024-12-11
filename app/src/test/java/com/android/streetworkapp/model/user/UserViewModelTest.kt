@@ -320,6 +320,18 @@ class UserViewModelTest {
   }
 
   @Test
+  fun getParksByUidUpdatesParks() = runTest {
+    val uid = "user123"
+    val parks = listOf("park1", "park2")
+    whenever(repository.getParksByUid(uid)).thenReturn(parks)
+    userViewModel.getParksByUid(uid)
+    testDispatcher.scheduler.advanceUntilIdle()
+    val observedParks = userViewModel.parks.first()
+    verify(repository).getParksByUid(uid)
+    assertEquals(parks, observedParks)
+  }
+
+  @Test
   fun getOrAddUserByUidCallsRepositoryWithCorrectUidAndUser() = runTest {
     val uid = "user123"
     val user =
