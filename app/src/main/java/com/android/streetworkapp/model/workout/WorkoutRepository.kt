@@ -23,4 +23,6 @@ interface WorkoutRepository {
   suspend fun deleteWorkoutSession(uid: String, sessionId: String)
 
   suspend fun saveWorkoutData(uid: String, workoutData: WorkoutData)
+
+  suspend fun deleteWorkoutDataByUid(uid: String)
 }
