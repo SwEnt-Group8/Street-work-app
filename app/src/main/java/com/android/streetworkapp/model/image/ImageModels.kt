@@ -33,7 +33,7 @@ data class ParkImageDatabase(
     val imageB64: String,
     val userId: String,
     val username: String,
-    val rating: Pair<Int, Int> = Pair(0, 0),
+    //val rating: Pair<Int, Int> = Pair(0, 0),
     val uploadDate: Timestamp = Timestamp.now()
 )
 

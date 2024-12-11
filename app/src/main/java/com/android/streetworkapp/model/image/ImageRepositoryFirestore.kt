@@ -6,6 +6,7 @@ import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.user.UserRepository
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -131,7 +132,44 @@ class ImageRepositoryFirestore(
         imageCollectionId: String,
         imageHash: String,
         voteType: Boolean
-    ) {
+    ): Boolean {
+        require(imageCollectionId.isNotEmpty()) {"Empty imageCollectionId."}
+        require(imageHash.isNotEmpty()) {"Empty imageHash."}
+
+        try {
+            val docRef =
+                db.collection(ImageRepositoryFirestore.COLLECTION_PATH).document(imageCollectionId)
+            val document = docRef.get().await()
+            val images = document.get("images") as? List<Map<String, Any>> ?: return false
+
+            // Step 3: Find the image with the matching imageHash
+            val updatedImages = images.map { image ->
+                if (image["imageHash"] == imageHash) {
+                    // Step 4: Update the votes for the matched image
+                    val currentVotes = image["votes"] as? List<Int> ?: listOf(0, 0)
+                    val updatedVotes = listOf(
+                        currentVotes[0] + if (voteType) 1 else 0,  // Likes (first element of the Pair)
+                        currentVotes[1] + if (voteType) 0 else 1 // Dislikes (second element of the Pair)
+                    )
+
+                    // Return the updated image with new votes
+                    image.toMutableMap().apply {
+                        put("votes", updatedVotes)
+                    }
+                } else {
+                    image // No change for this image
+                }
+            }
+
+            docRef.update("images", updatedImages).await()
+            return true
+        } catch (e: Exception) {
+            Log.d(
+                DEBUG_PREFIX,
+                e.message
+                    ?: "An exception occurred but the message associated with it couldn't be retrieved.")
+            return false
+        }
 
     }
 
@@ -196,7 +234,7 @@ class ImageRepositoryFirestore(
                     imageB64 = imageB64,
                     userId = userId,
                     username = username,
-                    rating = Pair(first, second),
+                    //rating = Pair(first, second),
                     uploadDate = uploadDate)
             }
                 .getOrNull()

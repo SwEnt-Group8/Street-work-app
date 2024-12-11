@@ -26,7 +26,7 @@ interface ImageRepository {
    * Updates the score of the image with hash imageHash in document imageCollectionId
    * @param voteType The vote type. True if a positive vote, false if a negative vote.
    */
-  suspend fun imageVote(imageCollectionId: String, imageHash: String, voteType: Boolean)
+  suspend fun imageVote(imageCollectionId: String, imageHash: String, voteType: Boolean): Boolean
 
   /**
    * Deletes all the images related to a user

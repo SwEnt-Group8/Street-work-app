@@ -126,7 +126,7 @@ fun FullScreenImagePopup(images: List<ParkImageLocal>, park: Park, userViewModel
                           Box(modifier = Modifier.padding(horizontal = 15.dp)) {
                               // Like Button
                               IconButton(
-                                  onClick = { /*onLike(imageUris[pagerState.currentPage])*/ },
+                                  onClick = { imageViewModel.imageVote(park.imagesCollectionId, currentImage.imageHash, true) },
                                   modifier =
                                   Modifier.size(60.dp)
                                       .clip(CircleShape)
@@ -143,7 +143,7 @@ fun FullScreenImagePopup(images: List<ParkImageLocal>, park: Park, userViewModel
                           Box(modifier = Modifier.padding(horizontal = 15.dp)) {
                               // Dislike Button
                               IconButton(
-                                  onClick = { /*onDislike(imageUris[pagerState.currentPage])*/ },
+                                  onClick = { imageViewModel.imageVote(park.imagesCollectionId, currentImage.imageHash, false) },
                                   modifier =
                                   Modifier.size(60.dp).clip(CircleShape)
                                       .background(FullScreenImagePopUpSetting.dislikeButtonColor)

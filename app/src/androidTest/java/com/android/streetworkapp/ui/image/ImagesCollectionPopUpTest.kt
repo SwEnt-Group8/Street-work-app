@@ -36,14 +36,14 @@ class ImagesCollectionPopUpTest {
     }
 
     localParkImages =
-        listOf(ParkImageLocal(testImageFile.toUri(), "userId", Pair(0, 0), Timestamp.now()))
+        listOf(ParkImageLocal("dummyHash", testImageFile.toUri(), "userId", "username", Pair(0, 0), Timestamp.now()))
   }
 
   // Note: as the image is an AsyncImage, I won't test it
   @Test
   fun `components are displayed correctly`() {
 
-    composeTestRule.setContent { FullScreenImagePopup(localParkImages) {} }
+    composeTestRule.setContent { FullScreenImagePopup(localParkImages, mock(), mock(), mock()) {} }
 
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("fullscreenImagePopUp").assertIsDisplayed()
@@ -55,7 +55,7 @@ class ImagesCollectionPopUpTest {
   fun `closing popUp calls dismiss`() {
     val onDismiss = mock(Runnable::class.java)
 
-    composeTestRule.setContent { FullScreenImagePopup(localParkImages) { onDismiss.run() } }
+    composeTestRule.setContent { FullScreenImagePopup(localParkImages, mock(), mock(), mock()) { onDismiss.run() } }
 
     composeTestRule.waitForIdle()
 

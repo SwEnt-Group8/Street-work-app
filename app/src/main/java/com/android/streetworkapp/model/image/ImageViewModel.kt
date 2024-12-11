@@ -92,7 +92,8 @@ open class ImageViewModel(private val imageRepository: ImageRepository) : ViewMo
                 imageHash = parkImage.imageHash,
                 image = imageUri,
                 userId = parkImage.userId,
-                rating = parkImage.rating,
+                //rating = parkImage.rating,
+                rating = Pair(0, 0),
                 username = parkImage.username,
                 uploadDate = parkImage.uploadDate)
 
@@ -101,6 +102,14 @@ open class ImageViewModel(private val imageRepository: ImageRepository) : ViewMo
 
       imagesCallback(localParkImages.toList())
     }
+  }
+
+  open fun imageVote(        imageCollectionId: String,
+                             imageHash: String,
+                             voteType: Boolean) {
+      viewModelScope.launch {
+          imageRepository.imageVote(imageCollectionId, imageHash, voteType)
+      }
   }
 
     /**
@@ -149,7 +158,9 @@ open class ImageViewModel(private val imageRepository: ImageRepository) : ViewMo
      * @param onCollectionUpdate The callback
      */
     open fun registerCollectionListener(imageCollectionId: String, onCollectionUpdate: () -> Unit) {
-        require(imageCollectionId.isNotEmpty()) {"Empty imageCollectionId"}
-        this.imageRepository.registerCollectionListener(imageCollectionId, onCollectionUpdate)
+        viewModelScope.launch {
+            require(imageCollectionId.isNotEmpty()) { "Empty imageCollectionId" }
+            imageRepository.registerCollectionListener(imageCollectionId, onCollectionUpdate)
+        }
     }
 }
