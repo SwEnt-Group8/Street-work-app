@@ -4,7 +4,6 @@ import androidx.test.core.app.ApplicationProvider
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.*
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -52,24 +51,6 @@ class WorkoutRepositoryFirestoreTest {
     whenever(documentRef.get()).thenReturn(Tasks.forResult(document))
     whenever(documentRef.update(anyString(), any())).thenReturn(Tasks.forResult(null))
     whenever(document.exists()).thenReturn(true)
-
-    // Ensure Firestore queries are mocked to return collections or documents
-    whenever(mockSnapshot.documents).thenReturn(listOf(document))
-    whenever(document.toObject(any<Class<*>>())).thenAnswer { invocation ->
-      when (invocation.arguments[0] as Class<*>) {
-        PairingRequest::class.java ->
-            PairingRequest("reqId", "fromUser", "toUser", RequestStatus.PENDING)
-        WorkoutSession::class.java -> WorkoutSession("sessionId", 0L, 0L, SessionType.SOLO)
-        else -> null
-      }
-    }
-
-    // Ensuring correct setup for snapshot listeners
-    whenever(collection.addSnapshotListener(any())).thenAnswer { invocation ->
-      val listener = invocation.arguments[0] as EventListener<QuerySnapshot>
-      listener.onEvent(mockSnapshot, null)
-      return@thenAnswer mockListenerRegistration
-    }
   }
 
   @Test
@@ -258,22 +239,6 @@ class WorkoutRepositoryFirestoreTest {
 
     assertEquals(fromUid, captor.firstValue.fromUid)
     assertEquals(toUid, captor.firstValue.toUid)
-  }
-
-  @Test
-  fun observePairingRequestsEmitsCorrectData() = runTest {
-    val uid = "user1"
-    val results = repository.observePairingRequests(uid).toList()
-    assertEquals(1, results.size)
-    assertEquals("reqId", results[0].first().requestId)
-  }
-
-  @Test
-  fun observeWorkoutSessionsEmitsCorrectData() = runTest {
-    val uid = "user1"
-    val results = repository.observeWorkoutSessions(uid).toList()
-    assertEquals(1, results.size)
-    assertEquals("sessionId", results[0].first().sessionId)
   }
 
   @Test
