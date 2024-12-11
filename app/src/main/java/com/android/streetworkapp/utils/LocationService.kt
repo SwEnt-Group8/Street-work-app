@@ -26,7 +26,7 @@ class LocationService(
     private val userViewModel: UserViewModel,
     private val navigationActions: NavigationActions,
     private val scope: CoroutineScope,
-    private val host: SnackbarHostState?= null
+    private val host: SnackbarHostState? = null
 ) {
   // Define the distance for when is in a park
   private val insidePark = 30

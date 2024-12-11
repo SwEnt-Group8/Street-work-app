@@ -102,7 +102,8 @@ fun MapScreen(
     parkLocationViewModel.findNearbyParks(
         initialLatLng.value.latitude, initialLatLng.value.longitude)
     Log.d("Localisation", "fetch new park")
-    locationService.rewardParkDiscovery(initialLatLng.value, parkLocationViewModel.parks.value)
+    locationService.rewardParkDiscovery(
+        userViewModel.currentUser.value, initialLatLng.value, parkLocationViewModel.parks.value)
   }
 
   val parks = parkLocationViewModel.parks.collectAsState().value
