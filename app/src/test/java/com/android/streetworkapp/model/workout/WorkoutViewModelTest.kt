@@ -159,6 +159,7 @@ class WorkoutViewModelTest {
     assertEquals(1, capturedSession.exercises.size)
     assertEquals(exercise, capturedSession.exercises.first())
   }
+
   @Test
   fun sendPairingRequestCallsRepository() = runTest {
     val fromUid = "fromUser"
@@ -193,7 +194,9 @@ class WorkoutViewModelTest {
   @Test
   fun observeWorkoutSessionsUpdatesFlowCorrectly() = runTest {
     val uid = "testUid"
-    val session = WorkoutSession(sessionId = "sessionId", startTime = 0L, endTime = 0L, sessionType = SessionType.SOLO)
+    val session =
+        WorkoutSession(
+            sessionId = "sessionId", startTime = 0L, endTime = 0L, sessionType = SessionType.SOLO)
     val flow = flowOf(listOf(session))
     `when`(repository.observeWorkoutSessions(uid)).thenReturn(flow)
 
