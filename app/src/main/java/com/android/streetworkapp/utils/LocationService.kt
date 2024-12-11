@@ -10,6 +10,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.core.app.ActivityCompat
 import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.model.progression.ScoreIncrease
+import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.progress.updateAndDisplayPoints
@@ -25,7 +26,7 @@ class LocationService(
     private val userViewModel: UserViewModel,
     private val navigationActions: NavigationActions,
     private val scope: CoroutineScope,
-    private val host: SnackbarHostState?
+    private val host: SnackbarHostState?= null
 ) {
   // Define the distance for when is in a park
   private val insidePark = 30
@@ -51,7 +52,7 @@ class LocationService(
     fusedLocationClient.removeLocationUpdates(callback)
   }
 
-  fun rewardParkDiscovery(userLocation: LatLng, parksLocation: List<ParkLocation>) {
+  fun rewardParkDiscovery(user: User?, userLocation: LatLng, parksLocation: List<ParkLocation>) {
 
     val results = FloatArray(1)
     Log.d("Localisation", "check all park distance")
@@ -63,10 +64,10 @@ class LocationService(
       val distance = results[0]
       if (distance < insidePark) {
         Log.d("Localisation", "found close park")
-        userViewModel.currentUser.value?.let {
+        user?.let {
           // add new park in user list
           userViewModel.getParksByUid(it.uid)
-          val currentParks = userViewModel.parks.value
+          val currentParks = user.parks
           if (!currentParks.contains(park.id)) {
             Log.d("Localisation", "park is new")
             userViewModel.addNewPark(it.uid, park.id)
