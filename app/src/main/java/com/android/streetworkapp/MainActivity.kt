@@ -441,19 +441,17 @@ fun StreetWorkApp(
                   innerPadding)
             }
 
-              trainComposable(
-                  route = Screen.TRAIN_COACH,
-                  content = { activity, isTimeDependent, time, sets, reps ->
-                      TrainCoachScreen(
-                          activity,
-                          isTimeDependent,
-                          time,
-                          sets,
-                          reps,
-                          workoutViewModel,
-                          userViewModel,
-                          innerPadding)
-                  })
+            trainComposable(
+                route = Screen.TRAIN_COACH,
+                content = { activity, isTimeDependent, time, _, reps ->
+                  TrainCoachScreen(
+                      activity,
+                      isTimeDependent,
+                      reps,
+                      workoutViewModel,
+                      userViewModel,
+                      innerPadding)
+                })
           }
 
           trainComposable(
