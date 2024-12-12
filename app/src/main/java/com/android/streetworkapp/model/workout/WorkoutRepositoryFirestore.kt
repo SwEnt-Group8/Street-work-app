@@ -170,7 +170,11 @@ class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRep
   override suspend fun deleteWorkoutDataByUid(uid: String) {
     require(uid.isNotEmpty()) { "The user UID must not be empty." }
     try {
-      db.collection(COLLECTION_PATH).document(uid).delete().await()
+      val querySnapshot = db.collection(COLLECTION_PATH).whereEqualTo("userUid", uid).get().await()
+
+      for (document in querySnapshot.documents) {
+        db.collection(COLLECTION_PATH).document(document.id).delete().await()
+      }
     } catch (e: Exception) {
       Log.e(ERROR_TAG, "Error deleting WorkoutData for UID=$uid: ${e.message}")
     }
