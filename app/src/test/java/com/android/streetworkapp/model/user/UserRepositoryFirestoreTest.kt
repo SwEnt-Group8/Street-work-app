@@ -606,7 +606,6 @@ class UserRepositoryFirestoreTest {
     whenever(db.collection("users")).thenReturn(collection)
     whenever(db.batch()).thenReturn(batch)
     whenever(collection.document("user123")).thenReturn(userRef)
-    whenever(batch.update(any<DocumentReference>(), any<String>(), any<Any>())).thenReturn(batch)
 
     val taskCompletionSource = TaskCompletionSource<Void>()
     taskCompletionSource.setException(Exception("Firestore exception"))
@@ -617,8 +616,7 @@ class UserRepositoryFirestoreTest {
     userRepository.addNewPark("user123", parkId)
 
     // Verify that 'update' and 'commit' were called
-    verify(batch, times(1)).update(any<DocumentReference>(), any<String>(), any<Any>())
-    verify(batch).commit()
+    verify(userRef, times(1)).update(any<String>(), any<Any>())
   }
 
   @Test
