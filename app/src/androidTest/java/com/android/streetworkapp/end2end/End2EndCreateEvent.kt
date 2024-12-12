@@ -276,12 +276,9 @@ class End2EndCreateEvent {
 
         val bottomBarBounds =
             composeTestRule.onNodeWithTag("bottomNavigationMenu").getUnclippedBoundsInRoot()
-        val yOffsetCorr =
-            bottomBarBounds
-                .height // for some reason the height of the map matches the one of the screen not
-        // the
-        // actual size it does, this is an ugly fix to correct the position
-        // of the click
+        val yOffsetCorr = bottomBarBounds.height
+        // for some reason the height of the map matches the one of the screen not the actual size
+        // it does, this is an ugly fix to correct the position of the click
 
         composeTestRule.onNodeWithTag("mapScreen").performTouchInput {
           click(Offset(xClickOffset.toPx(), yClickOffset.toPx() - yOffsetCorr.toPx()))
@@ -306,25 +303,25 @@ class End2EndCreateEvent {
         // create an event
         composeTestRule.onNodeWithTag("createEventButton").assertIsDisplayed().performClick()
 
-        composeTestRule.waitForIdle()
-
-        // I'm for real this does not work between 00:00 and 01:00 UTC time
         composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
 
         composeTestRule.onNodeWithTag("titleTag").assertIsDisplayed().performTextClearance()
+
         composeTestRule.onNodeWithTag("titleTag").performTextInput(event.title)
 
         composeTestRule.onNodeWithTag("descriptionTag").assertIsDisplayed().performTextClearance()
+
         composeTestRule.onNodeWithTag("descriptionTag").performTextInput(event.description)
 
         composeTestRule.onNodeWithTag("dateIcon").performClick()
+
         composeTestRule.onNodeWithTag("validateDate").performClick()
+
         composeTestRule.onNodeWithTag("timeIcon").performClick()
+
         composeTestRule.onNodeWithTag("validateTime").performClick()
 
         composeTestRule.onNodeWithTag("addEventButton").assertIsDisplayed().performClick()
-
-        composeTestRule.waitForIdle()
 
         verify(eventDocumentRef).set(any())
 
