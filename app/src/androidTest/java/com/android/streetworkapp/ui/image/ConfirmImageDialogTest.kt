@@ -83,7 +83,7 @@ class ConfirmImageDialogTest {
   @Test
   fun `Dialog is shown when showConfirmationDialog is true`() {
     val showDialogState = mutableStateOf(true)
-    val user = User("", "", "", 0, emptyList(), "")
+    val user = User("", "", "", 0, emptyList(), "", parks = emptyList())
     composeTestRule.setContent {
       ConfirmImageDialogWrapper(
           mock(), showDialogState, mock(), mock(), testImageFile.toUri(), Park(), user)
@@ -97,7 +97,7 @@ class ConfirmImageDialogTest {
   fun `ConfirmImageDialogWrapper calls uploadImage on confirmation`() {
     val showDialogState = mutableStateOf(true)
     val park = Park(pid = "parkId")
-    val user = User("userId", "", "", 0, emptyList(), "")
+    val user = User("userId", "", "", 0, emptyList(), "", parks = emptyList())
     doNothing().whenever(imageViewModel).uploadImage(any(), any(), any(), any(), any(), any())
 
     composeTestRule.setContent {

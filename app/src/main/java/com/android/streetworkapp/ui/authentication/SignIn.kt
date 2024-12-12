@@ -175,5 +175,6 @@ fun createNewUserFromFirebaseUser(firebaseUser: FirebaseUser): User {
       email = firebaseUser.email ?: "",
       score = 0,
       friends = emptyList(),
-      picture = firebaseUser.photoUrl?.toString() ?: "")
+      picture = firebaseUser.photoUrl?.toString() ?: "",
+      parks = emptyList())
 }

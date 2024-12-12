@@ -176,6 +176,35 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
+  fun getParksByUidWithValidUidReturnsListOfParks() = runTest {
+    // Mock User DocumentSnapshot
+    val userDocument = mock<DocumentSnapshot>()
+    whenever(userDocument.exists()).thenReturn(true)
+    whenever(userDocument.id).thenReturn("user123")
+    whenever(userDocument.get("parks")).thenReturn(listOf("park1", "park2"))
+
+    // Mock Task for user document retrieval
+    val userDocumentTaskCompletionSource = TaskCompletionSource<DocumentSnapshot>()
+    userDocumentTaskCompletionSource.setResult(userDocument)
+    val userDocumentTask = userDocumentTaskCompletionSource.task
+
+    // Mock CollectionReference and DocumentReference for user
+    whenever(db.collection("users")).thenReturn(collection)
+    whenever(collection.document("user123")).thenReturn(documentRef)
+    whenever(documentRef.get()).thenReturn(userDocumentTask)
+
+    // Call the repository method
+    val parksList = userRepository.getParksByUid("user123")
+
+    // Assert the result is not null and contains expected values
+    assertNotNull(parksList)
+    assertEquals(2, parksList?.size)
+
+    assertEquals("park1", parksList?.get(0))
+    assertEquals("park2", parksList?.get(1))
+  }
+
+  @Test
   fun getUserByEmailWithValidEmailReturnsUser() = runBlocking {
     // Setup the DocumentSnapshot
     `when`(document.exists()).thenReturn(true)
@@ -268,7 +297,8 @@ class UserRepositoryFirestoreTest {
             email = "john.doe@example.com",
             score = 100,
             friends = listOf("friend1", "friend2"),
-            picture = "")
+            picture = "",
+            parks = emptyList())
 
     `when`(db.collection("users")).thenReturn(collection)
     `when`(collection.document(user.uid)).thenReturn(documentRef)
@@ -452,6 +482,24 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
+  fun getParksByUidWithExceptionReturnsNull() = runTest {
+    // Mock Firestore interactions to throw an exception when fetching user document
+    whenever(db.collection("users")).thenReturn(collection)
+    whenever(collection.document("user123")).thenReturn(documentRef)
+
+    val taskCompletionSource = TaskCompletionSource<DocumentSnapshot>()
+    taskCompletionSource.setException(Exception("Firestore exception"))
+    val task = taskCompletionSource.task
+    whenever(documentRef.get()).thenReturn(task)
+
+    // Call the method under test
+    val parksList = userRepository.getParksByUid("user123")
+
+    // Assert that the method returns null
+    assertNull(parksList)
+  }
+
+  @Test
   fun addUserWithExceptionLogsError() = runTest {
     // Prepare a user object
     val user =
@@ -461,7 +509,8 @@ class UserRepositoryFirestoreTest {
             email = "test@example.com",
             score = 0,
             friends = emptyList(),
-            picture = "")
+            picture = "",
+            parks = emptyList())
 
     // Mock Firestore interactions to throw an exception
     whenever(db.collection("users")).thenReturn(collection)
@@ -549,6 +598,28 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
+  fun addNewParkWithExceptionLogsError() = runTest {
+    // Mock Firestore interactions to throw an exception during batch commit
+    val userRef = mock<DocumentReference>()
+    val parkId = "park123"
+
+    whenever(db.collection("users")).thenReturn(collection)
+    whenever(db.batch()).thenReturn(batch)
+    whenever(collection.document("user123")).thenReturn(userRef)
+
+    val taskCompletionSource = TaskCompletionSource<Void>()
+    taskCompletionSource.setException(Exception("Firestore exception"))
+    val task = taskCompletionSource.task
+    whenever(batch.commit()).thenReturn(task)
+
+    // Call the method under test
+    userRepository.addNewPark("user123", parkId)
+
+    // Verify that 'update' and 'commit' were called
+    verify(userRef, times(1)).update(any<String>(), any<Any>())
+  }
+
+  @Test
   fun deleteUserByUidWithExceptionLogsError() = runTest {
     // Mock Firestore interactions to throw an exception
     whenever(db.collection("users")).thenReturn(collection)
@@ -574,6 +645,7 @@ class UserRepositoryFirestoreTest {
     whenever(document.getString("email")).thenReturn("john@example.com")
     whenever(document.getLong("score")).thenReturn(100L)
     whenever(document.get("friends")).thenReturn(listOf("friend1", "friend2"))
+    whenever(document.get("parks")).thenReturn(listOf("park1", "park2"))
 
     // Call the function
     val user = userRepository.documentToUser(document)
@@ -585,6 +657,7 @@ class UserRepositoryFirestoreTest {
     assertEquals("john@example.com", user?.email)
     assertEquals(100, user?.score)
     assertEquals(listOf("friend1", "friend2"), user?.friends)
+    assertEquals(listOf("park1", "park2"), user?.parks)
   }
 
   @Test
@@ -671,6 +744,49 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
+  fun documentToUserWithMissingParksSetsEmptyParksList() {
+    whenever(document.id).thenReturn("user123")
+    whenever(document.getString("username")).thenReturn("John Doe")
+    whenever(document.getString("email")).thenReturn("john@example.com")
+    whenever(document.getLong("score")).thenReturn(100L)
+    whenever(document.get("parks")).thenReturn(null) // Missing Parks
+
+    val user = userRepository.documentToUser(document)
+
+    assertNotNull(user)
+    assertTrue(user?.parks?.isEmpty() == true) // parks list should be empty
+  }
+
+  @Test
+  fun documentToUserWithParksOfIncorrectTypeSetsEmptyParksList() {
+    whenever(document.id).thenReturn("user123")
+    whenever(document.getString("username")).thenReturn("John Doe")
+    whenever(document.getString("email")).thenReturn("john@example.com")
+    whenever(document.getLong("score")).thenReturn(100L)
+    whenever(document.get("friends")).thenReturn("not a list") // Incorrect type
+
+    val user = userRepository.documentToUser(document)
+
+    assertNotNull(user)
+    assertTrue(user?.parks?.isEmpty() == true) // parks list should be empty
+  }
+
+  @Test
+  fun documentToUserWithExceptionWhenGettingParksSetsEmptyParksList() {
+    whenever(document.id).thenReturn("user123")
+    whenever(document.getString("username")).thenReturn("John Doe")
+    whenever(document.getString("email")).thenReturn("john@example.com")
+    whenever(document.getLong("score")).thenReturn(100L)
+    // Simulate exception when accessing 'friends' field
+    whenever(document.get("parks")).thenThrow(RuntimeException("Test exception"))
+
+    val user = userRepository.documentToUser(document)
+
+    assertNotNull(user)
+    assertTrue(user?.parks?.isEmpty() == true) // parks list should be empty
+  }
+
+  @Test
   fun documentToUserWithExceptionWhenGettingFieldsReturnsNull() {
     whenever(document.id).thenReturn("user123")
     // Simulate exception when accessing 'name' field
@@ -711,7 +827,8 @@ class UserRepositoryFirestoreTest {
                 "john.doe@example.com",
                 100,
                 listOf("friend1", "friend2"),
-                picture = ""))
+                picture = "",
+                parks = emptyList()))
 
     // Assert the result is not null and contains expected values
     assertNotNull(user)
@@ -741,7 +858,15 @@ class UserRepositoryFirestoreTest {
     `when`(documentRef.set(any(User::class.java))).thenReturn(Tasks.forResult(null))
 
     // Call the repository method
-    val newUser = User("invalid", "New User", "new.user@example.com", 0, emptyList(), picture = "")
+    val newUser =
+        User(
+            "invalid",
+            "New User",
+            "new.user@example.com",
+            0,
+            emptyList(),
+            picture = "",
+            parks = emptyList())
     val user = userRepository.getOrAddUserByUid("invalid", newUser)
 
     // Assert the result is not null and contains expected values
@@ -777,7 +902,8 @@ class UserRepositoryFirestoreTest {
                 "john.doe@example.com",
                 100,
                 listOf("friend1", "friend2"),
-                picture = ""))
+                picture = "",
+                parks = emptyList()))
 
     // Assert that the method returns null
     assertNull(user)

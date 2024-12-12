@@ -27,6 +27,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -34,6 +35,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -55,6 +57,7 @@ import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.image.ImageViewModel
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkViewModel
+import com.android.streetworkapp.model.progression.ScoreIncrease
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
@@ -62,11 +65,13 @@ import com.android.streetworkapp.ui.image.AddImageButton
 import com.android.streetworkapp.ui.image.ImagesCollectionButton
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
+import com.android.streetworkapp.ui.progress.updateAndDisplayPoints
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.ui.utils.CustomDialog
 import com.android.streetworkapp.utils.dateDifference
 import com.android.streetworkapp.utils.toFormattedString
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * Display the overview of a park, including park details and a list of events.
@@ -85,7 +90,9 @@ fun ParkOverviewScreen(
     eventViewModel: EventViewModel,
     userViewModel: UserViewModel =
         UserViewModel(UserRepositoryFirestore(FirebaseFirestore.getInstance())),
-    imageViewModel: ImageViewModel
+    imageViewModel: ImageViewModel,
+    scope: CoroutineScope = rememberCoroutineScope(),
+    host: SnackbarHostState? = null
 ) {
 
   // MVVM calls for park state :
@@ -136,7 +143,15 @@ fun ParkOverviewScreen(
           onSubmit = {
             Log.d("ParkOverview", "RatingDialog: Submitting rating")
             handleRating(
-                context, currentPark.value, currentUser, starRating.intValue, parkViewModel)
+                context,
+                currentPark.value,
+                currentUser,
+                starRating.intValue,
+                parkViewModel,
+                userViewModel,
+                navigationActions,
+                scope,
+                host)
           },
           onDismiss = { starRating.intValue = 3 })
 
@@ -263,20 +278,25 @@ fun RatingButton(showRatingDialog: MutableState<Boolean>) {
 }
 
 /**
- * Verifies that the current state is correct and then rates the park.
+ * Verifies that the current state is correct and then rates the park and add 10p to user
  *
  * @param context The context of the application.
  * @param park The park to rate.
  * @param user The user who is rating the park.
  * @param starRating The rating value.
  * @param parkViewModel The park view model.
+ * @param userViewModel The user view model
  */
 fun handleRating(
     context: Context?,
     park: Park?,
     user: User?,
     starRating: Int,
-    parkViewModel: ParkViewModel?
+    parkViewModel: ParkViewModel?,
+    userViewModel: UserViewModel,
+    navigationActions: NavigationActions,
+    scope: CoroutineScope,
+    snackbarHostState: SnackbarHostState? = null
 ) {
   Log.d("ParkOverview", "handleRating: {park=$park ; user=$user ; rating=$starRating")
 
@@ -303,6 +323,14 @@ fun handleRating(
       Log.d("ParkOverview", "handleRating: Adding rating to park")
       if (context != null) Toast.makeText(context, "Rating submitted", Toast.LENGTH_SHORT).show()
       parkViewModel.addRating(park.pid, user.uid, starRating.toFloat())
+      if (snackbarHostState != null) {
+        updateAndDisplayPoints(
+            userViewModel,
+            navigationActions,
+            ScoreIncrease.ADD_RATING.points,
+            scope,
+            snackbarHostState)
+      }
     }
   }
 }

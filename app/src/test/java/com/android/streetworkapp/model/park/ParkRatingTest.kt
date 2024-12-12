@@ -2,7 +2,11 @@ package com.android.streetworkapp.model.park
 
 import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.model.user.User
+import com.android.streetworkapp.model.user.UserRepository
+import com.android.streetworkapp.model.user.UserViewModel
+import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.park.handleRating
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -19,6 +23,10 @@ class ParkRatingTest {
   private lateinit var parkRepository: ParkRepository
   private lateinit var parkViewModel: ParkViewModel
   private lateinit var emptyPark: Park
+  private lateinit var userRepository: UserRepository
+  private lateinit var userViewModel: UserViewModel
+  private lateinit var navigationActions: NavigationActions
+  private lateinit var scope: CoroutineScope
   private val testDispatcher = StandardTestDispatcher()
 
   @OptIn(ExperimentalCoroutinesApi::class)
@@ -29,18 +37,25 @@ class ParkRatingTest {
     parkViewModel = ParkViewModel(parkRepository)
     emptyPark =
         Park("pid", "name", ParkLocation(0.0, 0.0, ""), "", 1f, 1, 10, 0, emptyList(), emptyList())
+
+    userRepository = Mockito.mock(UserRepository::class.java)
+    userViewModel = UserViewModel(userRepository)
+    // Mock additional parameters
+    navigationActions = Mockito.mock(NavigationActions::class.java)
+    scope = CoroutineScope(testDispatcher)
   }
 
   @Test
   fun handlerCorrectlyCallingAddRatingForStarRatingValues() = runTest {
     // Instantiate basic (but correct) user :
-    val user = User("uid", "username", "email", 0, emptyList(), picture = "")
+    val user = User("uid", "username", "email", 0, emptyList(), picture = "", emptyList())
 
     val starRatingValues = listOf(1, 2, 3, 4, 5, 0, -1, 100)
 
     // Any value of starRating different from 1 to 5 should not call addRating in handleRating :
     for (starRating in starRatingValues) {
-      handleRating(null, emptyPark, user, starRating, parkViewModel)
+      handleRating(
+          null, emptyPark, user, starRating, parkViewModel, userViewModel, navigationActions, scope)
       testDispatcher.scheduler.advanceUntilIdle()
 
       if (starRating in 1..5) {
@@ -56,16 +71,17 @@ class ParkRatingTest {
   @Test
   fun handlerCorrectlyCallingAddRatingForUserValues() = runTest {
     // Instantiate basic (but correct) park :
-    val user1 = User("uid1", "username1", "email1", 0, emptyList(), picture = "")
-    val user2 = User("uid2", "username2", "email2", 0, emptyList(), picture = "")
-    val user3 = User("uid3", "username3", "email3", 0, emptyList(), picture = "")
+    val user1 = User("uid1", "username1", "email1", 0, emptyList(), picture = "", emptyList())
+    val user2 = User("uid2", "username2", "email2", 0, emptyList(), picture = "", emptyList())
+    val user3 = User("uid3", "username3", "email3", 0, emptyList(), picture = "", emptyList())
 
     val userValues = listOf(null, user1, user2, null, user3)
     val starRating = 4
 
     // Any value of starRating different from 1 to 5 should not call addRating in handleRating :
     for (user in userValues) {
-      handleRating(null, emptyPark, user, starRating, parkViewModel)
+      handleRating(
+          null, emptyPark, user, starRating, parkViewModel, userViewModel, navigationActions, scope)
       testDispatcher.scheduler.advanceUntilIdle()
 
       if (user != null) {
@@ -82,7 +98,7 @@ class ParkRatingTest {
   @Test
   fun handlerCorrectlyCallingAddRatingForParkValues() = runTest {
     val starRating = 1
-    val user = User("uid", "username", "email", 0, emptyList(), picture = "")
+    val user = User("uid", "username", "email", 0, emptyList(), picture = "", emptyList())
 
     // Testing for park with no rating and park with rating :
     val ratedPark =
@@ -102,7 +118,8 @@ class ParkRatingTest {
 
     // Any value of starRating different from 1 to 5 should not call addRating in handleRating :
     for (park in parkValues) {
-      handleRating(null, park, user, starRating, parkViewModel)
+      handleRating(
+          null, park, user, starRating, parkViewModel, userViewModel, navigationActions, scope)
       testDispatcher.scheduler.advanceUntilIdle()
 
       if (park != null && !park.votersUIDs.contains(user.uid)) {

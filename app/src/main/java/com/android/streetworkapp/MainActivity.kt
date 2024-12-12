@@ -195,7 +195,8 @@ fun StreetWorkAppMain(
         userViewModel.getUserByUidAndSetAsCurrentUser(uid!!)
       } else {
         Log.d("MainActivity", "Internet not available, loading user $uid from cache")
-        val offlineUser = User(uid.orEmpty(), name.orEmpty(), "", score ?: 0, emptyList(), "")
+        val offlineUser =
+            User(uid.orEmpty(), name.orEmpty(), "", score ?: 0, emptyList(), "", emptyList())
         userViewModel.setCurrentUser(offlineUser)
       }
     }
@@ -343,10 +344,13 @@ fun StreetWorkApp(
               MapScreen(
                   parkLocationViewModel,
                   parkViewModel,
+                  userViewModel,
                   navigationActions,
                   searchQuery,
                   mapCallbackOnMapLoaded,
-                  innerPadding)
+                  innerPadding,
+                  scope,
+                  host)
               screenParams?.topAppBarManager?.setActionCallback(
                   TopAppBarManager.TopAppBarAction.SEARCH) {
                     showSearchBar.value = true
@@ -360,7 +364,9 @@ fun StreetWorkApp(
                   navigationActions,
                   eventViewModel,
                   userViewModel,
-                  imageViewModel)
+                  imageViewModel,
+                  scope,
+                  host)
             }
             composable(Screen.ADD_EVENT) {
               infoManager.Display(LocalContext.current)
