@@ -171,7 +171,7 @@ class EventRepositoryFirestoreTest {
   }
 
   @Test
-  fun removeParticipantFromAllEvents_removesParticipantAndDeletesEvents() = runTest {
+  fun removeParticipantFromAllEventsRemovesParticipantAndDeletesEvents() = runTest {
     // Mock the collection
     whenever(db.collection("events")).thenReturn(collection)
 
