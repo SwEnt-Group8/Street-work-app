@@ -10,8 +10,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -30,6 +32,8 @@ import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.ui.utils.CustomDialog
 import com.android.streetworkapp.ui.utils.DialogType
 import com.android.streetworkapp.utils.GoogleAuthService
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 @Composable
 fun SettingsContent(
@@ -46,7 +50,17 @@ fun SettingsContent(
 
   val currentUser = remember { userViewModel.currentUser.value }
   val showConfirmUserDelete = remember { mutableStateOf(false) }
+  var firebaseUser by remember { mutableStateOf(Firebase.auth.currentUser) }
   val context = LocalContext.current
+
+  // Firebase authentication launcher to manage the sign-in process
+  val launcher =
+      authService.rememberFirebaseAuthLauncher(
+          onAuthComplete = { result -> firebaseUser = result.user },
+          onAuthError = {
+            firebaseUser = null
+            Log.d("Settings", "Sign-in failed : $it")
+          })
 
   Column(
       modifier = Modifier.fillMaxWidth().testTag("SettingsContent"),
@@ -93,12 +107,6 @@ fun SettingsContent(
       title = context.getString(R.string.DeleteAccountConfirmationTitle),
       Content = { Text(context.getString(R.string.DeleteAccountConfirmationContent)) },
       onSubmit = {
-        // Friends - remove user from friends list of all friends.
-        // Parks - remove user ratings for parks.
-        // Parks - remove user in participants of each event.
-        // Progression - delete user progression
-        // userViewModel.deleteUser(currentUser)
-
         Toast.makeText(context, "Not yet implemented", Toast.LENGTH_SHORT).show()
 
         showParentDialog.value = false
