@@ -17,8 +17,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.sample.R
+import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.preferences.PreferencesViewModel
+import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.user.UserViewModel
+import com.android.streetworkapp.model.workout.WorkoutViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.ui.theme.ColorPalette
@@ -30,6 +34,10 @@ import com.android.streetworkapp.utils.GoogleAuthService
 fun SettingsContent(
     navigationActions: NavigationActions,
     userViewModel: UserViewModel,
+    parkViewModel: ParkViewModel,
+    eventViewModel: EventViewModel,
+    progressionViewModel: ProgressionViewModel,
+    workoutViewModel: WorkoutViewModel,
     preferencesViewModel: PreferencesViewModel,
     authService: GoogleAuthService,
     showParentDialog: MutableState<Boolean>
