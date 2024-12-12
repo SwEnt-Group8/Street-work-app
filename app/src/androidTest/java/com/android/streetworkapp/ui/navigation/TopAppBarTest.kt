@@ -28,8 +28,8 @@ import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.model.workout.WorkoutRepository
 import com.android.streetworkapp.model.workout.WorkoutViewModel
-import com.google.firebase.Timestamp
 import com.android.streetworkapp.utils.GoogleAuthService
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import io.mockk.mockk
 import org.junit.Before
