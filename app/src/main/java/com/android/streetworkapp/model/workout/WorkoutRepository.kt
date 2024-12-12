@@ -1,5 +1,7 @@
 package com.android.streetworkapp.model.workout
 
+import kotlinx.coroutines.flow.Flow
+
 interface WorkoutRepository {
   suspend fun getOrAddWorkoutData(uid: String): WorkoutData
 
@@ -23,4 +25,14 @@ interface WorkoutRepository {
   suspend fun deleteWorkoutSession(uid: String, sessionId: String)
 
   suspend fun saveWorkoutData(uid: String, workoutData: WorkoutData)
+
+  suspend fun sendPairingRequest(fromUid: String, toUid: String)
+
+  fun observePairingRequests(uid: String): Flow<List<PairingRequest>>
+
+  suspend fun respondToPairingRequest(requestId: String, isAccepted: Boolean)
+
+  fun observeWorkoutSessions(uid: String): Flow<List<WorkoutSession>>
+
+  suspend fun addCommentToSession(sessionId: String, comment: Comment)
 }

@@ -33,14 +33,13 @@ import com.android.streetworkapp.utils.GoogleAuthService
 @Composable
 fun GoogleAuthButton(
     authService: GoogleAuthService,
-    context: android.content.Context,
     launcher: ManagedActivityResultLauncher<Intent, ActivityResult>
 ) {
 
   Button(
       onClick = {
         Log.d("SignInScreen", "Start sign-in")
-        authService.launchSignIn(context, launcher)
+        authService.launchSignIn(launcher)
       },
       modifier =
           Modifier.width(250.dp)

@@ -6,6 +6,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -41,8 +42,12 @@ fun AnimatedCounter(
                   slideOutVertically { it } + fadeOut())
             }
           },
-          label = "") { c ->
-            Text(text = c.toString(), style = style, softWrap = false)
+          label = "") { count ->
+            Text(
+                text = count.toString(),
+                style = style,
+                softWrap = false,
+                modifier = Modifier.testTag("counterValue"))
           }
     }
   }

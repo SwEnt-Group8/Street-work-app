@@ -5,6 +5,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
@@ -34,6 +35,8 @@ import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.model.workout.WorkoutRepository
 import com.android.streetworkapp.model.workout.WorkoutViewModel
+import com.android.streetworkapp.utils.GoogleAuthService
+import com.google.firebase.auth.FirebaseAuth
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
@@ -129,6 +132,8 @@ class BottomNavigationTest {
           TextModerationViewModel(mock(TextModerationRepository::class.java, RETURNS_DEFAULTS)),
           ImageViewModel(mock(ImageRepository::class.java)),
           PreferencesViewModel(mock(PreferencesRepository::class.java)),
+          GoogleAuthService(
+              "abc", mock(FirebaseAuth::class.java, RETURNS_DEFAULTS), LocalContext.current),
           true)
     }
 
