@@ -44,6 +44,8 @@ import com.android.streetworkapp.model.preferences.PreferencesRepositoryDataStor
 import com.android.streetworkapp.model.preferences.PreferencesViewModel
 import com.android.streetworkapp.model.progression.ProgressionRepositoryFirestore
 import com.android.streetworkapp.model.progression.ProgressionViewModel
+import com.android.streetworkapp.model.storage.S3Clients
+import com.android.streetworkapp.model.storage.S3StorageClient
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
@@ -113,6 +115,9 @@ fun StreetWorkAppMain(
     testInvokation: NavigationActions.() -> Unit = {},
     internetAvailable: Boolean = false
 ) {
+  // Setup s3Client
+  val storageClient =
+      S3StorageClient(S3StorageClient.getDigitalOceanS3Client(), S3Clients.DIGITAL_OCEAN.endpoint)
 
   // repositories
   val overpassParkLocationRepo = OverpassParkLocationRepository(OkHttpClient())
