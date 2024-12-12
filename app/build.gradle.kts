@@ -41,6 +41,9 @@ android {
     //fetching keys
     val mapsApiKey: String = localProperties.getProperty("MAPS_API_KEY") ?: ""
     val perspectiveApiKey: String = System.getenv("PERSPECTIVE_API_KEY") ?: localProperties.getProperty("PERSPECTIVE_API_KEY", "")
+    val digitalOceanSpaceAccessKey: String = System.getenv("DIGITAL_OCEAN_SPACE_ACCESS_KEY") ?: localProperties.getProperty("DIGITAL_OCEAN_SPACE_ACCESS_KEY", "")
+    val digitalOceanSpaceSecretKey: String = System.getenv("DIGITAL_OCEAN_SPACE_SECRET_KEY") ?: localProperties.getProperty("DIGITAL_OCEAN_SPACE_SECRET_KEY", "")
+
 
     defaultConfig {
         applicationId = "com.android.streetworkapp"
@@ -56,6 +59,9 @@ android {
 
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
         buildConfigField("String", "PERSPECTIVE_API_KEY", "\"${perspectiveApiKey}\"")
+        buildConfigField("String", "DIGITAL_OCEAN_SPACE_ACCESS_KEY", "\"${digitalOceanSpaceAccessKey}\"")
+        buildConfigField("String", "DIGITAL_OCEAN_SPACE_SECRET_KEY", "\"${digitalOceanSpaceSecretKey}\"")
+
     }
 
     buildTypes {
@@ -255,6 +261,8 @@ dependencies {
     implementation(libs.datastore.preferences)
     implementation(libs.datastore.core)
 
+    //Online storage
+    implementation(libs.awsSdkKotlinS3)
 }
 
 configurations.configureEach {
