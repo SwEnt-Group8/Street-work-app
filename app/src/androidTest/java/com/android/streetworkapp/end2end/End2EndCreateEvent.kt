@@ -286,7 +286,7 @@ class End2EndCreateEvent {
     }
 
     // need to wait before clicking again else the click is considered as a double click
-    composeTestRule.waitUntil {
+    composeTestRule.waitUntil(3000) {
       runBlocking { delay(2000) }
       true
     }
@@ -294,12 +294,6 @@ class End2EndCreateEvent {
     composeTestRule.onNodeWithTag("mapScreen").performTouchInput {
       click(Offset(xClickOffset.toPx(), yClickOffset.toPx() - yOffsetCorr.toPx() - 3))
     }
-
-    // parkViewModel.setCurrentPark(park)
-    // UiDevice does not seem to navigate properly to the next screen, so we manually set the
-    // current screen to Park Overview
-
-    // currentScreen = Screen.PARK_OVERVIEW
 
     composeTestRule.waitUntil(
         5000) { // this value is arbitrary, we just don't want the test to completely halt. Might
@@ -333,15 +327,13 @@ class End2EndCreateEvent {
     composeTestRule.waitForIdle()
 
     // verify that the event is properly displayed on the park overview screen
-    composeTestRule.waitUntil(
-        5000) { // this value is arbitrary, we just don't want the test to completely halt. Might
-          // need to tune it for the CI
-          composeTestRule.onNodeWithTag("parkOverviewScreen").isDisplayed()
-        }
+    composeTestRule.waitUntil(5000) {
+      composeTestRule.onNodeWithTag("parkOverviewScreen").isDisplayed()
+    }
 
     composeTestRule.onNodeWithTag("parkOverviewScreen").assertIsDisplayed()
 
-    composeTestRule.waitUntil { composeTestRule.onNodeWithTag("eventButton").isDisplayed() }
+    composeTestRule.waitUntil(5000) { composeTestRule.onNodeWithTag("eventButton").isDisplayed() }
 
     composeTestRule.onNodeWithText(event.title).assertIsDisplayed()
 
