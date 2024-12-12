@@ -1,5 +1,6 @@
 package com.android.streetworkapp.ui.profile
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -130,4 +131,49 @@ fun logout(
   preferencesViewModel.setUid("")
   preferencesViewModel.setName("")
   preferencesViewModel.setScore(0)
+}
+
+/**
+ * Deletes the user account and all associated data.
+ *
+ * @param authService the Google authentication service
+ * @param userViewModel the user viewmodel
+ * @param parkViewModel the park viewmodel
+ * @param eventViewModel the event viewmodel
+ * @param progressionViewModel the progression viewmodel
+ * @param workoutViewModel the workout viewmodel
+ */
+fun deleteAccount(
+    authService: GoogleAuthService,
+    userViewModel: UserViewModel,
+    parkViewModel: ParkViewModel,
+    eventViewModel: EventViewModel,
+    progressionViewModel: ProgressionViewModel,
+    workoutViewModel: WorkoutViewModel
+): Boolean {
+  // Get the current UID and abort if it is empty
+  val currentUserUid = userViewModel.currentUser.value?.uid ?: ""
+  if (currentUserUid.isEmpty()) {
+    Log.d("Settings", "User UID is empty, cannot delete account.")
+    return false
+  }
+
+  // Delete the Firebase user authentication and abort if the user is null
+  if (authService.getCurrentUser() == null) {
+    Log.d("Settings", "Firebase user is null, cannot delete account.")
+    return false
+  }
+  authService.deleteAuthUser()
+
+  // Delete the user data from the User viewmodel
+  userViewModel.deleteUserByUid(currentUserUid)
+  userViewModel.removeUserFromAllFriendsLists(currentUserUid)
+
+  // Delete the user data from the other viewmodels
+  parkViewModel.deleteRatingFromAllParks(currentUserUid)
+  eventViewModel.removeParticipantFromAllEvents(currentUserUid)
+  progressionViewModel.deleteProgressionByUid(currentUserUid)
+  workoutViewModel.deleteWorkoutDataByUid(currentUserUid)
+
+  return true
 }
