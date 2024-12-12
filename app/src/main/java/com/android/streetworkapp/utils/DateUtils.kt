@@ -1,5 +1,6 @@
 package com.android.streetworkapp.utils
 
+import com.android.sample.R
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventStatus
 import com.google.firebase.Timestamp
@@ -80,9 +81,9 @@ fun dateDifference(event: Event): String {
 
   val statusText =
       when (event.status) {
-        EventStatus.STARTED -> "event has begun!"
-        EventStatus.ENDED -> "event has ended"
-        EventStatus.CREATED -> "Starting soon!"
+        EventStatus.STARTED -> R.string.event_started.toString()
+        EventStatus.ENDED -> R.string.event_ended.toString()
+        EventStatus.CREATED -> R.string.event_soon.toString()
       }
 
   return if (days > 0) {

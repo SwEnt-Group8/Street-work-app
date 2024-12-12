@@ -31,6 +31,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -398,8 +399,9 @@ fun EventItemList(eventViewModel: EventViewModel, navigationActions: NavigationA
 fun EventItem(event: Event, eventViewModel: EventViewModel, navigationActions: NavigationActions) {
   val (statusColor, statusIcon) =
       when (event.status) {
-        EventStatus.CREATED -> Pair(Color.Red, Icons.Default.Timelapse)
-        EventStatus.STARTED -> Pair(Color.Green, Icons.AutoMirrored.Filled.DirectionsRun)
+        EventStatus.CREATED -> Pair(MaterialTheme.colorScheme.error, Icons.Default.Timelapse)
+        EventStatus.STARTED ->
+            Pair(ColorPalette.DARK_GREEN, Icons.AutoMirrored.Filled.DirectionsRun)
         EventStatus.ENDED -> Pair(Color.Gray, Icons.Default.QuestionMark)
       }
 

@@ -244,7 +244,9 @@ fun AddEventScreen(
 
                     if (editEvent) {
                       Button(
-                          colors = ColorPalette.BUTTON_COLOR.copy(containerColor = Color.Red),
+                          colors =
+                              ColorPalette.BUTTON_COLOR.copy(
+                                  containerColor = MaterialTheme.colorScheme.error),
                           modifier = Modifier.testTag("deleteEventButton"),
                           onClick = {
                             Toast.makeText(context, "Event deleted", Toast.LENGTH_LONG).show()

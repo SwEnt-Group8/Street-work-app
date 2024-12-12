@@ -23,6 +23,7 @@ import androidx.compose.material.icons.twotone.Face
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.SnackbarHostState
@@ -348,8 +349,10 @@ fun StatusButton(
 
   val buttonColor =
       when (event.status) {
-        EventStatus.CREATED -> ColorPalette.BUTTON_COLOR.copy(containerColor = Color.Green)
-        EventStatus.STARTED -> ColorPalette.BUTTON_COLOR.copy(containerColor = Color.Red)
+        EventStatus.CREATED ->
+            ColorPalette.BUTTON_COLOR.copy(containerColor = ColorPalette.DARK_GREEN)
+        EventStatus.STARTED ->
+            ColorPalette.BUTTON_COLOR.copy(containerColor = MaterialTheme.colorScheme.error)
         EventStatus.ENDED -> ColorPalette.BUTTON_COLOR.copy(containerColor = Color.Gray)
       }
 

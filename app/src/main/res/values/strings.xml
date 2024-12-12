@@ -80,4 +80,9 @@
     <string name="no_performance_history">No performance history available.</string>
     <string name="x_axis_label_session">Session</string>
     <string name="y_axis_label_total_reps">Total reps</string>
+
+    //Event statuses
+    <string name="event_soon">Starting soon!</string>
+    <string name="event_started">Event has begun!</string>
+    <string name="event_ended">Event has ended</string>
 </resources>
