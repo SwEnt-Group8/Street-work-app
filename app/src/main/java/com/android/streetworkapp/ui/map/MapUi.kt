@@ -122,7 +122,7 @@ fun MapScreen(
   var selectedPark by remember { mutableStateOf(Park()) }
 
   // Set values for park filtering :
-  val filter = FilterSettings()
+  val filter = remember { FilterSettings() }
   val parkFilter = ParkFilter(filter)
   val userFilterInput = FilterSettings()
 
@@ -159,7 +159,7 @@ fun MapScreen(
               .filter {
                 Log.d("ParkFilter", "Filtering park ${it.name}")
 
-                eventViewModel.getEvents(it)
+                it.let { eventViewModel.getEvents(it) }
                 val uiState = eventViewModel.uiState.value
 
                 Log.d("ParkFilter", "UI State fetched : $uiState")
