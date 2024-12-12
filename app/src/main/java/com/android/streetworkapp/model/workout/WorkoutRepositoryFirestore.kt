@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
+private const val PAIRING_REQUESTS = "pairingRequests"
+
 class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRepository {
 
   companion object {
@@ -173,10 +175,10 @@ class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRep
   override suspend fun sendPairingRequest(fromUid: String, toUid: String) {
     val pairingRequest =
         PairingRequest(
-            requestId = db.collection("pairingRequests").document().id,
+            requestId = db.collection(PAIRING_REQUESTS).document().id,
             fromUid = fromUid,
             toUid = toUid)
-    db.collection("pairingRequests").document(pairingRequest.requestId).set(pairingRequest).await()
+    db.collection(PAIRING_REQUESTS).document(pairingRequest.requestId).set(pairingRequest).await()
   }
 
   /**
@@ -186,9 +188,8 @@ class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRep
    */
   override fun observePairingRequests(uid: String): Flow<List<PairingRequest>> = callbackFlow {
     val subscription =
-        db.collection("pairingRequests").whereEqualTo("toUid", uid).addSnapshotListener {
-            snapshot,
-            e ->
+        db.collection(PAIRING_REQUESTS).whereEqualTo("toUid", uid).addSnapshotListener { snapshot, e
+          ->
           if (e != null) {
             Log.e(ERROR_TAG, "Listen failed.", e)
             close(e) // Close the flow on error
@@ -213,7 +214,7 @@ class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRep
    */
   override suspend fun respondToPairingRequest(requestId: String, isAccepted: Boolean) {
     val status = if (isAccepted) RequestStatus.ACCEPTED else RequestStatus.REJECTED
-    db.collection("pairingRequests").document(requestId).update("status", status.name).await()
+    db.collection(PAIRING_REQUESTS).document(requestId).update("status", status.name).await()
   }
 
   /**
