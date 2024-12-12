@@ -321,10 +321,10 @@ class End2EndCreateEvent {
          * composeTestRule.onNodeWithTag("timeIcon").performClick()
          *
          * composeTestRule.onNodeWithTag("validateTime").performClick()
-         *
-         * composeTestRule.onNodeWithTag("addEventButton").assertIsDisplayed().performClick()
          */
           
+        composeTestRule.onNodeWithTag("addEventButton").assertIsDisplayed().performClick()
+
         verify(eventDocumentRef).set(any())
 
         verify(parkDocumentRef).update(eq("events"), any())
