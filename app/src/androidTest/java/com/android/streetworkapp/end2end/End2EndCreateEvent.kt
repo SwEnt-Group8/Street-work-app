@@ -280,7 +280,7 @@ class End2EndCreateEvent {
         val yOffsetCorr =
             bottomBarBounds
                 .height // for some reason the height of the map matches the one of the screen not
-                        // the
+        // the
         // actual size it does, this is an ugly fix to correct the position
         // of the click
 
@@ -298,12 +298,9 @@ class End2EndCreateEvent {
           click(Offset(xClickOffset.toPx(), yClickOffset.toPx() - yOffsetCorr.toPx() - 3))
         }
 
-        composeTestRule.waitUntil(
-            5000) { // this value is arbitrary, we just don't want the test to completely halt.
-                    // Might
-              // need to tune it for the CI
-              composeTestRule.onNodeWithTag("parkOverviewScreen").isDisplayed()
-            }
+        composeTestRule.waitUntil(5000) {
+          composeTestRule.onNodeWithTag("parkOverviewScreen").isDisplayed()
+        }
 
         composeTestRule.onNodeWithTag("parkOverviewScreen").assertIsDisplayed()
 
