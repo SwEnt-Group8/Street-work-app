@@ -96,6 +96,8 @@ fun ParkOverviewScreen(
   // MVVM calls for event state of the park :
   currentPark.value?.let { eventViewModel.getEvents(it) }
 
+  val uiState = eventViewModel.uiState.collectAsState().value
+
   // MVVM calls for user state :
   val currentUser = userViewModel.currentUser.collectAsState().value
 
@@ -141,7 +143,7 @@ fun ParkOverviewScreen(
           onDismiss = { starRating.intValue = 3 })
 
       HorizontalDivider(modifier = Modifier.fillMaxWidth())
-      EventItemList(eventViewModel, navigationActions)
+      EventItemList(eventViewModel, navigationActions, uiState)
     }
   }
 }
@@ -355,8 +357,11 @@ fun InteractiveRatingComponent(rating: MutableState<Int>) {
  * @param navigationActions The navigation actions to navigate to other screens.
  */
 @Composable
-fun EventItemList(eventViewModel: EventViewModel, navigationActions: NavigationActions) {
-  val uiState = eventViewModel.uiState.collectAsState().value
+fun EventItemList(
+    eventViewModel: EventViewModel,
+    navigationActions: NavigationActions,
+    uiState: EventOverviewUiState
+) {
 
   Column(modifier = Modifier.testTag("eventItemList")) {
     Text(
