@@ -26,6 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
@@ -36,6 +37,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,11 +47,13 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.navigation.compose.rememberNavController
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
+import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.park.InteractiveRatingComponent
@@ -73,6 +77,7 @@ import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.MarkerInfoWindow
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * The MapScreen composable displays a Google Map with markers for nearby parks.
@@ -85,17 +90,20 @@ import com.google.maps.android.compose.rememberMarkerState
 fun MapScreen(
     parkLocationViewModel: ParkLocationViewModel,
     parkViewModel: ParkViewModel,
+    userViewModel: UserViewModel,
     eventViewModel: EventViewModel,
-    navigationActions: NavigationActions,
+    navigationActions: NavigationActions = NavigationActions(rememberNavController()),
     searchQuery: MutableState<String>,
     callbackOnMapLoaded: () -> Unit = {},
     innerPaddingValues: PaddingValues = PaddingValues(0.dp),
-    showFilterSettings: MutableState<Boolean> = mutableStateOf(false),
+    scope: CoroutineScope = rememberCoroutineScope(),
+    host: SnackbarHostState? = null,
+    showFilterSettings: MutableState<Boolean> = mutableStateOf(false)
 ) {
 
   val context = LocalContext.current
   // call utils for location management
-  val locationService = LocationService(context)
+  val locationService = LocationService(context, userViewModel, navigationActions, scope, host)
   val permissionManager = PermissionManager(context)
   // Initiate initial fail-safe value
   var initialLatLng = remember { mutableStateOf(LatLng(46.518659400000004, 6.566561505148001)) }
@@ -112,6 +120,9 @@ fun MapScreen(
   LaunchedEffect(initialLatLng.value) {
     parkLocationViewModel.findNearbyParks(
         initialLatLng.value.latitude, initialLatLng.value.longitude)
+    Log.d("Localisation", "fetch new park")
+    locationService.rewardParkDiscovery(
+        userViewModel.currentUser.value, initialLatLng.value, parkLocationViewModel.parks.value)
   }
 
   val parks = parkLocationViewModel.parks.collectAsState().value

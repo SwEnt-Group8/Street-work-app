@@ -72,6 +72,20 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
   }
 
   /**
+   * Delete an event from the database.
+   *
+   * @param event The event to delete.
+   */
+  override suspend fun deleteEvent(event: Event) {
+    require(event.eid.isNotEmpty())
+    try {
+      db.collection(COLLECTION_PATH).document(event.eid).delete().await()
+    } catch (e: Exception) {
+      Log.e("FirestoreError", "Error deleting event: ${e.message}")
+    }
+  }
+
+  /**
    * Add a participant to an event.
    *
    * @param eid The event ID.
@@ -127,6 +141,21 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
     }
   }
 
+  /**
+   * Update the status of an event.
+   *
+   * @param eid The event ID.
+   * @param status The new status.
+   */
+  override suspend fun updateStatus(eid: String, status: EventStatus) {
+    require(eid.isNotEmpty())
+    try {
+      db.collection(COLLECTION_PATH).document(eid).update("status", status).await()
+    } catch (e: Exception) {
+      Log.e("FirestoreError", "Error updating event status: ${e.message}")
+    }
+  }
+
   fun documentToEvent(document: DocumentSnapshot): Event? {
     return if (document.exists()) {
       Event(
@@ -138,7 +167,8 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
           date = document["date"] as Timestamp,
           owner = document["owner"] as String,
           listParticipants = (document["listParticipants"] as List<*>).filterIsInstance<String>(),
-          parkId = document["parkId"] as String)
+          parkId = document["parkId"] as String,
+          status = EventStatus.valueOf(document["status"] as String))
     } else {
       Log.e("FirestoreError", "Error converting document to event: Document does not exist.")
       null

@@ -25,6 +25,7 @@ object Screen {
   const val ADD_FRIEND = "AddFriend Screen"
   const val PARK_OVERVIEW = "Park Overview Screen"
   const val ADD_EVENT = "Add Event Screen"
+  const val EDIT_EVENT = "Edit Event Screen"
   const val EVENT_OVERVIEW = "Event Overview Screen"
   const val PROGRESSION = "Progression Screen"
   const val TRAIN_HUB = "Train Hub Screen"
@@ -104,6 +105,15 @@ data class ScreenParams(
                     hasNavigationIcon = true,
                     navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON,
                     actions = listOf(TopAppBarManager.TopAppBarAction.INFO)))
+    val EDIT_EVENT =
+        ScreenParams(
+            Screen.EDIT_EVENT,
+            topAppBarManager =
+                TopAppBarManager(
+                    "Event Creation",
+                    hasNavigationIcon = true,
+                    navigationIcon = TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON,
+                    actions = listOf(TopAppBarManager.TopAppBarAction.INFO)))
     val EVENT_OVERVIEW =
         ScreenParams(
             Screen.EVENT_OVERVIEW,
@@ -162,6 +172,7 @@ val LIST_OF_SCREENS =
         ScreenParams.ADD_FRIEND,
         ScreenParams.PARK_OVERVIEW,
         ScreenParams.ADD_EVENT,
+        ScreenParams.EDIT_EVENT,
         ScreenParams.EVENT_OVERVIEW,
         ScreenParams.PROGRESSION,
         ScreenParams.TRAIN_HUB,

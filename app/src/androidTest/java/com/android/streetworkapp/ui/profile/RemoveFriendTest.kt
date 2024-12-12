@@ -34,8 +34,11 @@ class RemoveFriendTest {
 
   @Test
   fun isFriendDeletionDisplayingCorrectly() = runTest {
-    val currentUser = User("uid-alice", "Alice", "alice@gmail.com", 42, listOf("uid-bob"), "")
-    val friend = User("uid-bob", "Bob", "bob@gmail.com", 64, listOf("uid-alice"), "")
+    val currentUser =
+        User(
+            "uid-alice", "Alice", "alice@gmail.com", 42, listOf("uid-bob"), "", parks = emptyList())
+    val friend =
+        User("uid-bob", "Bob", "bob@gmail.com", 64, listOf("uid-alice"), "", parks = emptyList())
 
     userViewModel.setCurrentUser(currentUser) // called in friendMenu, inside FriendItem
 

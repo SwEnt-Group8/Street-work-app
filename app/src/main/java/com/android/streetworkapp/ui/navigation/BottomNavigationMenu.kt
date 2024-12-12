@@ -21,9 +21,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.user.UserViewModel
+import com.android.streetworkapp.ui.event.EditEventButton
 import com.android.streetworkapp.ui.event.JoinEventButton
 import com.android.streetworkapp.ui.event.LeaveEventButton
+import com.android.streetworkapp.ui.event.StatusButton
 import com.android.streetworkapp.ui.theme.ColorPalette
 import kotlinx.coroutines.CoroutineScope
 
@@ -96,9 +99,10 @@ fun BottomNavigationMenu(
 fun EventBottomBar(
     eventViewModel: EventViewModel,
     userViewModel: UserViewModel,
+    parkViewModel: ParkViewModel,
     navigationActions: NavigationActions,
     scope: CoroutineScope = rememberCoroutineScope(),
-    snackbarHostState: SnackbarHostState? = null
+    snackBarHostState: SnackbarHostState? = null
 ) {
   val event = eventViewModel.currentEvent.collectAsState()
   val user = userViewModel.currentUser.collectAsState()
@@ -111,7 +115,14 @@ fun EventBottomBar(
             modifier = Modifier.fillMaxWidth().padding(16.dp)) {
               user.value?.let { user ->
                 event.value?.let { event ->
-                  if (event.listParticipants.contains(user.uid)) {
+                  if (user.uid == event.owner) {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        modifier = Modifier.fillMaxWidth()) {
+                          EditEventButton(event, eventViewModel, navigationActions)
+                          StatusButton(event, eventViewModel, parkViewModel, navigationActions)
+                        }
+                  } else if (event.listParticipants.contains(user.uid)) {
                     LeaveEventButton(event, eventViewModel, user, navigationActions)
                   } else {
                     JoinEventButton(
@@ -121,7 +132,7 @@ fun EventBottomBar(
                         user,
                         navigationActions,
                         scope,
-                        snackbarHostState)
+                        snackBarHostState)
                   }
                 }
               }
