@@ -218,4 +218,27 @@ class WorkoutRepositoryFirestoreTest {
     // Check the captured value matches the expected WorkoutData
     assertEquals(workoutData, captor.firstValue)
   }
+
+  @Test
+  fun deleteWorkoutDataByUidDeletesSingleDocument() = runTest {
+    val uid = "testUid"
+    val documentId = "docId1"
+
+    // Mock the query snapshot and document
+    val document = mock(DocumentSnapshot::class.java)
+    val querySnapshot = mock(QuerySnapshot::class.java)
+    val query = mock(Query::class.java)
+
+    `when`(document.id).thenReturn(documentId)
+    `when`(querySnapshot.documents).thenReturn(listOf(document))
+    `when`(query.get()).thenReturn(Tasks.forResult(querySnapshot))
+    `when`(db.collection(anyString()).whereEqualTo(anyString(), anyString())).thenReturn(query)
+    `when`(db.collection(anyString()).document(anyString())).thenReturn(documentRef)
+
+    // Call the function
+    repository.deleteWorkoutDataByUid(uid)
+
+    // Verify that the document was deleted
+    verify(documentRef).delete()
+  }
 }
