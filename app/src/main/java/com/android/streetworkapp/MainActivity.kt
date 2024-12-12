@@ -340,6 +340,7 @@ fun StreetWorkApp(
               MapScreen(
                   parkLocationViewModel,
                   parkViewModel,
+                  eventViewModel,
                   navigationActions,
                   searchQuery,
                   mapCallbackOnMapLoaded,

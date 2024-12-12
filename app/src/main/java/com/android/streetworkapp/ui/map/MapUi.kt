@@ -45,6 +45,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import com.android.streetworkapp.model.event.Event
+import com.android.streetworkapp.model.event.EventOverviewUiState
+import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
@@ -83,11 +86,12 @@ import com.google.maps.android.compose.rememberMarkerState
 fun MapScreen(
     parkLocationViewModel: ParkLocationViewModel,
     parkViewModel: ParkViewModel,
+    eventViewModel: EventViewModel,
     navigationActions: NavigationActions,
     searchQuery: MutableState<String>,
     callbackOnMapLoaded: () -> Unit = {},
     innerPaddingValues: PaddingValues = PaddingValues(0.dp),
-    showFilterSettings: MutableState<Boolean> = mutableStateOf(false)
+    showFilterSettings: MutableState<Boolean> = mutableStateOf(false),
 ) {
 
   val context = LocalContext.current
@@ -152,7 +156,23 @@ fun MapScreen(
           parkList.value
               .filterNotNull()
               .filter { it.name.contains(searchQuery.value, ignoreCase = true) }
-              .filter { parkFilter.filter(it) }
+              .filter {
+                Log.d("ParkFilter", "Filtering park ${it.name}")
+
+                eventViewModel.getEvents(it)
+                val uiState = eventViewModel.uiState.value
+
+                Log.d("ParkFilter", "UI State fetched : $uiState")
+
+                val eventList: List<Event> =
+                    when (uiState) {
+                      is EventOverviewUiState.NotEmpty -> uiState.eventList
+                      else -> emptyList()
+                    }
+                Log.d("ParkFilter", "Event list for park ${it.name} fetched : $eventList")
+                Log.d("ParkFilter", "But, park has event list ${it.events}")
+                parkFilter.filter(eventList, it)
+              }
               .forEach { park ->
                 ++markerIndex
 
@@ -260,7 +280,7 @@ fun ParkFilterSettings(userFilterInput: FilterSettings) {
     HorizontalDivider()
 
     Text(
-        "I want to be able to join : ${if (userFilterInput.shouldNotBeFull.value) "yes" else "no"}",
+        "Should the park have joinable events : ${if (userFilterInput.shouldNotBeFull.value) "yes" else "no"}",
         fontSize = Type.bodyLarge.fontSize)
     Row(modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth(0.8f)) {
       FilterChip(
