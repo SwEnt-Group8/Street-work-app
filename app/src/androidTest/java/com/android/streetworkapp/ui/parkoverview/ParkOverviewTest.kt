@@ -1,5 +1,7 @@
 package com.android.streetworkapp.ui.parkoverview
 
+import android.content.Context
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
@@ -143,6 +145,7 @@ class ParkOverviewTest {
       it.getArgument<(List<Event>) -> Unit>(1)(listOf(eventList.events.first()))
     }
     parkViewModel.setCurrentPark(park)
+    var context : Context? = null
 
     composeTestRule.setContent {
       ParkOverviewScreen(
@@ -151,6 +154,7 @@ class ParkOverviewTest {
           navigationActions = navigationActions,
           userViewModel = userViewModel,
           imageViewModel = imageViewModel)
+        context = LocalContext.current
     }
     composeTestRule.waitForIdle()
 
@@ -159,9 +163,10 @@ class ParkOverviewTest {
     composeTestRule.onNodeWithTag("createEventButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("eventItem").assertTextContains("Group workout")
     composeTestRule.onNodeWithTag("participantsText", useUnmergedTree = true)
+      assert(context != null)
     composeTestRule
         .onNodeWithTag("dateText", useUnmergedTree = true)
-        .assertTextContains(dateDifference(eventList.events.first()))
+        .assertTextContains(dateDifference(context!!, eventList.events.first()))
     composeTestRule
         .onNodeWithTag("eventButtonText", useUnmergedTree = true)
         .assertTextContains("About")
