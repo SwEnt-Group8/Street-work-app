@@ -238,7 +238,7 @@ class AddEventTest {
   fun ownerBottomBarIsDisplayed() = runTest {
     `when`(eventRepository.getNewEid()).thenReturn("test")
 
-    val owner = User(event.owner, "owner", "owner", 0, emptyList(), "owner")
+    val owner = User(event.owner, "owner", "owner", 0, emptyList(), "owner", emptyList())
 
     userViewModel.setCurrentUser(owner)
 
