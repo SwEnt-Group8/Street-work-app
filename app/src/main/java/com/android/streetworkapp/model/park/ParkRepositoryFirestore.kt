@@ -8,10 +8,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
 /** A repository interface using Firestore for park data. */
-class ParkRepositoryFirestore(private val db: FirebaseFirestore, testing: Boolean = false) :
-    ParkRepository {
+class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepository {
 
-  private val COLLECTION_PATH: String = if (testing) "testParks" else "parks"
+  private val COLLECTION_PATH = "parks"
 
   companion object {
     private const val INVALID_RATING_MESSAGE = "Rating must be between 1 and 5."
