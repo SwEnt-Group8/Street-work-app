@@ -12,6 +12,9 @@ import com.android.streetworkapp.utils.toFormattedString
  * @param participants List of participants in the session
  * @param exercises List of exercises performed in the session
  * @param winner The winner of the session (only applicable for CHALLENGE sessions)
+ * @param status The status of the session (e.g., PENDING, ONGOING, COMPLETED)
+ * @param coachUid The UID of the coach (only applicable for COACH sessions)
+ * @param comments List of comments on the session
  */
 data class WorkoutSession(
     val sessionId: String,
@@ -20,7 +23,10 @@ data class WorkoutSession(
     val sessionType: SessionType,
     val participants: List<String> = emptyList(),
     val exercises: List<Exercise> = emptyList(),
-    val winner: String? = null
+    val winner: String? = null,
+    val status: SessionStatus = SessionStatus.ONGOING,
+    val coachUid: String? = null,
+    val comments: List<Comment> = emptyList()
 ) {
   fun getFormattedStartTime(): String = startTime.toFormattedString()
 
@@ -33,3 +39,23 @@ enum class SessionType {
   COACH, // Referee-observed session
   CHALLENGE // Competitive session
 }
+
+/** An enum class representing the status of a workout session. */
+enum class SessionStatus {
+  PENDING, // Session waiting for confirmation
+  ONGOING, // Session in progress
+  COMPLETED // Session finished
+}
+
+/**
+ * A data class representing an exercise performed in a workout session.
+ *
+ * @param authorUid UID of the author of the comment
+ * @param text The text content of the comment
+ * @param timestamp The timestamp of the comment creation
+ */
+data class Comment(
+    val authorUid: String,
+    val text: String,
+    val timestamp: Long = System.currentTimeMillis()
+)
