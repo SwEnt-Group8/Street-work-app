@@ -85,7 +85,7 @@ fun ParkOverviewScreen(
     eventViewModel: EventViewModel,
     userViewModel: UserViewModel =
         UserViewModel(UserRepositoryFirestore(FirebaseFirestore.getInstance())),
-    imageViewModel: ImageViewModel
+    imageViewModel: ImageViewModel,
 ) {
 
   // MVVM calls for park state :

@@ -57,11 +57,11 @@ fun AddImageButton(imageViewModel: ImageViewModel, currentPark: Park?, currentUs
             PackageManager.PERMISSION_GRANTED)
   }
 
-  var showConfirmationDialog = remember { mutableStateOf(false) }
+  val showConfirmationDialog = remember { mutableStateOf(false) }
   var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
 
   // Temporary file for storing the captured image
-  val tempFile by remember {
+  val tempImageFile by remember {
     mutableStateOf(
         File(context.cacheDir, "temp_image_for_park_upload.jpg").apply {
           if (exists() && !delete()) {
@@ -71,7 +71,7 @@ fun AddImageButton(imageViewModel: ImageViewModel, currentPark: Park?, currentUs
   }
 
   capturedImageUri =
-      FileProvider.getUriForFile(context, "${context.packageName}.provider", tempFile)
+      FileProvider.getUriForFile(context, "${context.packageName}.provider", tempImageFile)
 
   val cameraLauncher =
       rememberLauncherForActivityResult(
@@ -115,7 +115,7 @@ fun AddImageButton(imageViewModel: ImageViewModel, currentPark: Park?, currentUs
     currentPark?.let { park ->
       currentUser?.let { user ->
         ConfirmImageDialogWrapper(
-            context, showConfirmationDialog, imageViewModel, tempFile, uri, park, user)
+            context, tempImageFile, uri, showConfirmationDialog, imageViewModel, park, user)
       }
     }
   }

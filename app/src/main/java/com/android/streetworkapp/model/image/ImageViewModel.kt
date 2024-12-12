@@ -1,17 +1,14 @@
 package com.android.streetworkapp.model.image
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Base64
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.streetworkapp.model.park.Park
 import java.io.File
-import java.io.FileOutputStream
 import java.security.MessageDigest
+import java.util.UUID
 import kotlinx.coroutines.launch
 
 open class ImageViewModel(private val imageRepository: ImageRepository) : ViewModel() {
@@ -27,7 +24,7 @@ open class ImageViewModel(private val imageRepository: ImageRepository) : ViewMo
    */
   open fun uploadImage(
       context: Context,
-      imageUri: Uri,
+      image: File,
       parkId: String,
       userId: String,
       onImageUploadSuccess: () -> Unit,
@@ -35,15 +32,10 @@ open class ImageViewModel(private val imageRepository: ImageRepository) : ViewMo
   ) {
     viewModelScope.launch {
       // I'm just going to assume the imageUri is valid, would need to use contentResolver etc...
-      val base64Image =
-          uriToBase64(context, imageUri)
-              ?: run {
-                onImageUploadFailure()
-                return@launch
-              }
+
       try {
-        val base64ImageHash = sha256(base64Image)
-        imageRepository.uploadImage(base64ImageHash, base64Image, parkId, userId)
+        val uniqueIdentifier = UUID.randomUUID().toString()
+        imageRepository.uploadImage(uniqueIdentifier, image.readBytes(), parkId, userId)
         onImageUploadSuccess()
       } catch (e: Exception) {
         onImageUploadFailure() // Not going to bother explaining the exception in the UI
@@ -59,75 +51,36 @@ open class ImageViewModel(private val imageRepository: ImageRepository) : ViewMo
    * @param imagesCallback A function that gets called once all the images have been decoded and
    *   saved to disk. It takes the decoded list as parameter.
    */
-  open fun retrieveImages(
-      context: Context,
-      park: Park,
-      imagesCallback: (List<ParkImageLocal>) -> Unit
-  ) {
+  open fun retrieveImages(context: Context, park: Park, imagesCallback: (List<ParkImage>) -> Unit) {
     viewModelScope.launch {
       val retrievedImages = imageRepository.retrieveImages(park)
-      val cacheDir = context.cacheDir
-      val localParkImages = mutableListOf<ParkImageLocal>()
-
-      val parkFolder = File(cacheDir, park.pid)
-      if (!parkFolder.exists()) {
-        parkFolder.mkdirs()
-      }
-
-      for (parkImage in retrievedImages) {
-
-        val decodedBytes = Base64.decode(parkImage.imageB64, Base64.DEFAULT)
-        val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
-
-        val imageFile = File(parkFolder, "${parkImage.imageHash}.jpg")
-        if (!imageFile.exists()) { // image doesn't exist, we decode it
-          FileOutputStream(imageFile).use { out ->
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
-          }
-        }
-
-        val imageUri = Uri.fromFile(imageFile)
-        val localParkImage =
-            ParkImageLocal(
-                imageHash = parkImage.imageHash,
-                image = imageUri,
-                userId = parkImage.userId,
-                //rating = parkImage.rating,
-                rating = Pair(0, 0),
-                username = parkImage.username,
-                uploadDate = parkImage.uploadDate)
-
-        localParkImages.add(localParkImage)
-      }
-
-      imagesCallback(localParkImages.toList())
+      imagesCallback(retrievedImages)
     }
   }
 
-  open fun imageVote(        imageCollectionId: String,
-                             imageHash: String,
-                             voteType: Boolean) {
-      viewModelScope.launch {
-          imageRepository.imageVote(imageCollectionId, imageHash, voteType)
-      }
+  open fun imageVote(imageCollectionId: String, imageHash: String, voteType: Boolean) {
+    viewModelScope.launch { imageRepository.imageVote(imageCollectionId, imageHash, voteType) }
   }
 
-    /**
-     * Deletes the image associated with the hash
-     * @param imageCollectionId The document id that the images is in.
-     * @param imageHash The hash of the base64 representation of the image.
-     * @param onImageDeleteSuccess Callback for deletion success.
-     * @param onImageDeleteFailure Callback for deletion failure.
-     */
-
-    open fun deleteImage(imageCollectionId: String, imageHash: String, onImageDeleteSuccess: () -> Unit, onImageDeleteFailure: () -> Unit) {
-        viewModelScope.launch {
-            if (imageRepository.deleteImage(imageCollectionId, imageHash))
-                onImageDeleteSuccess()
-            else
-                onImageDeleteFailure()
-        }
+  /**
+   * Deletes the image associated with the hash
+   *
+   * @param imageCollectionId The document id that the images is in.
+   * @param imageHash The hash of the base64 representation of the image.
+   * @param onImageDeleteSuccess Callback for deletion success.
+   * @param onImageDeleteFailure Callback for deletion failure.
+   */
+  open fun deleteImage(
+      imageCollectionId: String,
+      imageHash: String,
+      onImageDeleteSuccess: () -> Unit,
+      onImageDeleteFailure: () -> Unit
+  ) {
+    viewModelScope.launch {
+      if (imageRepository.deleteImage(imageCollectionId, imageHash)) onImageDeleteSuccess()
+      else onImageDeleteFailure()
     }
+  }
 
   /**
    * Takes an URI and returns its base64 encoding.
@@ -152,15 +105,16 @@ open class ImageViewModel(private val imageRepository: ImageRepository) : ViewMo
     return hashedBytes.joinToString("") { "%02x".format(it) }
   }
 
-    /**
-     * Registers a callback that gets called each time the document gets updated
-     * @param imageCollectionId The id of the document to listen to.
-     * @param onCollectionUpdate The callback
-     */
-    open fun registerCollectionListener(imageCollectionId: String, onCollectionUpdate: () -> Unit) {
-        viewModelScope.launch {
-            require(imageCollectionId.isNotEmpty()) { "Empty imageCollectionId" }
-            imageRepository.registerCollectionListener(imageCollectionId, onCollectionUpdate)
-        }
+  /**
+   * Registers a callback that gets called each time the document gets updated
+   *
+   * @param imageCollectionId The id of the document to listen to.
+   * @param onCollectionUpdate The callback
+   */
+  open fun registerCollectionListener(imageCollectionId: String, onCollectionUpdate: () -> Unit) {
+    viewModelScope.launch {
+      require(imageCollectionId.isNotEmpty()) { "Empty imageCollectionId" }
+      imageRepository.registerCollectionListener(imageCollectionId, onCollectionUpdate)
     }
+  }
 }

@@ -22,7 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.android.sample.R
 import com.android.streetworkapp.model.image.ImageViewModel
-import com.android.streetworkapp.model.image.ParkImageLocal
+import com.android.streetworkapp.model.image.ParkImage
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.theme.ColorPalette
@@ -40,13 +40,14 @@ fun ImagesCollectionButton(
 
   var showImagesCollection by remember { mutableStateOf(false) }
   var parkImages by remember {
-    mutableStateOf(emptyList<ParkImageLocal>())
+    mutableStateOf(emptyList<ParkImage>())
   } // this will store the park images
 
   park?.let {
-      if (showImagesCollection) FullScreenImagePopup(
-          parkImages,
-          it , userViewModel, imageViewModel) { showImagesCollection = false }
+    if (showImagesCollection)
+        FullScreenImagePopup(parkImages, it, userViewModel, imageViewModel) {
+          showImagesCollection = false
+        }
   }
 
   IconButton(
@@ -56,26 +57,23 @@ fun ImagesCollectionButton(
           imageViewModel.retrieveImages(context, park) {
             parkImages = it
             showImagesCollection = true
-           imageViewModel.registerCollectionListener(park.imagesCollectionId
-           ) { imageViewModel.retrieveImages(context, park) { parkImages = it } }
+            imageViewModel.registerCollectionListener(park.imagesCollectionId) {
+              imageViewModel.retrieveImages(context, park) { parkImages = it }
+            }
           }
-
         }
       },
       modifier = Modifier.testTag("ImagesCollectionButton")) {
         Box(
             modifier =
-            Modifier
-                .size(36.dp)
-                .background(color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape)
-                .padding(2.dp)) {
+                Modifier.size(36.dp)
+                    .background(color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape)
+                    .padding(2.dp)) {
               Icon(
                   painter = painterResource(id = R.drawable.photo_library_24px),
                   contentDescription = "Add Image",
                   tint = Color.White,
-                  modifier = Modifier
-                      .align(Alignment.Center)
-                      .fillMaxSize(0.75f))
+                  modifier = Modifier.align(Alignment.Center).fillMaxSize(0.75f))
             }
       }
 }
