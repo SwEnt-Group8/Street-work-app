@@ -11,6 +11,9 @@ import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextClearance
+import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.size
@@ -66,6 +69,7 @@ import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
 class End2EndCreateEvent {
@@ -229,6 +233,7 @@ class End2EndCreateEvent {
    * overview screen. Warning: this test fails between 00:00 and 01:00 UTC time because of the date
    * comparison
    */
+  // @Ignore("Test does not seem to pass on CI")
   @Test
   fun e2eCanCreateEventAndDisplayIt() =
       runTest(timeout = Duration.parse("1m")) {
@@ -295,32 +300,37 @@ class End2EndCreateEvent {
         composeTestRule.waitUntil(5000) {
           composeTestRule.onNodeWithTag("parkOverviewScreen").isDisplayed()
         }
+
+        composeTestRule.onNodeWithTag("parkOverviewScreen").assertIsDisplayed()
+
+        // create an event
+        composeTestRule.onNodeWithTag("createEventButton").assertIsDisplayed().performClick()
+
+        composeTestRule.waitForIdle()
+
+        // I'm for real this does not work between 00:00 and 01:00 UTC time
+        composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
+
+        composeTestRule.onNodeWithTag("titleTag").assertIsDisplayed().performTextClearance()
+        composeTestRule.onNodeWithTag("titleTag").performTextInput(event.title)
+
+        composeTestRule.onNodeWithTag("descriptionTag").assertIsDisplayed().performTextClearance()
+        composeTestRule.onNodeWithTag("descriptionTag").performTextInput(event.description)
+
+        composeTestRule.onNodeWithTag("dateIcon").performClick()
+        composeTestRule.onNodeWithTag("validateDate").performClick()
+        composeTestRule.onNodeWithTag("timeIcon").performClick()
+        composeTestRule.onNodeWithTag("validateTime").performClick()
+
+        composeTestRule.onNodeWithTag("addEventButton").assertIsDisplayed().performClick()
+
+        composeTestRule.waitForIdle()
+
+        verify(eventDocumentRef).set(any())
+
+        verify(parkDocumentRef).update(eq("events"), any())
+
         /**
-         * composeTestRule.onNodeWithTag("parkOverviewScreen").assertIsDisplayed()
-         *
-         * // create an event
-         * composeTestRule.onNodeWithTag("createEventButton").assertIsDisplayed().performClick()
-         *
-         * composeTestRule.waitForIdle()
-         *
-         * // I'm for real this does not work between 00:00 and 01:00 UTC time
-         * composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
-         *
-         * composeTestRule.onNodeWithTag("titleTag").assertIsDisplayed().performTextClearance()
-         * composeTestRule.onNodeWithTag("titleTag").performTextInput(event.title)
-         *
-         * composeTestRule.onNodeWithTag("descriptionTag").assertIsDisplayed().performTextClearance()
-         * composeTestRule.onNodeWithTag("descriptionTag").performTextInput(event.description)
-         *
-         * composeTestRule.onNodeWithTag("dateIcon").performClick()
-         * composeTestRule.onNodeWithTag("validateDate").performClick()
-         * composeTestRule.onNodeWithTag("timeIcon").performClick()
-         * composeTestRule.onNodeWithTag("validateTime").performClick()
-         *
-         * composeTestRule.onNodeWithTag("addEventButton").assertIsDisplayed().performClick()
-         *
-         * composeTestRule.waitForIdle()
-         *
          * // verify that the event is properly displayed on the park overview screen
          * composeTestRule.waitUntil(5000) {
          * composeTestRule.onNodeWithTag("parkOverviewScreen").isDisplayed() }
@@ -333,10 +343,6 @@ class End2EndCreateEvent {
          * composeTestRule.onNodeWithText(event.title).assertIsDisplayed()
          *
          * composeTestRule.onNodeWithTag("eventButton").assertIsDisplayed().performClick()
-         *
-         * verify(eventDocumentRef).set(any())
-         *
-         * verify(parkDocumentRef).update(eq("events"), any())
          *
          * composeTestRule.waitForIdle()
          *
