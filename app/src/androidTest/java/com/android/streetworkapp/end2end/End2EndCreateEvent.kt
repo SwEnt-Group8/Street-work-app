@@ -3,10 +3,17 @@ package com.android.streetworkapp.end2end
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.click
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.unit.height
+import androidx.compose.ui.unit.size
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.android.streetworkapp.StreetWorkApp
@@ -45,6 +52,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 import kotlin.time.Duration
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -256,29 +265,37 @@ class End2EndCreateEvent {
         composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
         composeTestRule.onNodeWithTag("googleMap").assertIsDisplayed()
 
+        val bounds = composeTestRule.onNodeWithTag("mapScreen").getUnclippedBoundsInRoot()
+        val xClickOffset = bounds.left + bounds.size.width / 2
+        val yClickOffset = bounds.top + bounds.size.height / 2
+
+        val bottomBarBounds =
+            composeTestRule.onNodeWithTag("bottomNavigationMenu").getUnclippedBoundsInRoot()
+        val yOffsetCorr =
+            bottomBarBounds
+                .height // for some reason the height of the map matches the one of the screen not
+        // the
+        // actual size it does, this is an ugly fix to correct the position
+        // of the click
+
+        composeTestRule.onNodeWithTag("mapScreen").performTouchInput {
+          click(Offset(xClickOffset.toPx(), yClickOffset.toPx() - yOffsetCorr.toPx()))
+        }
+
+        // need to wait before clicking again else the click is considered as a double click
+        composeTestRule.waitUntil(3000) {
+          runBlocking { delay(2000) }
+          true
+        }
+
+        composeTestRule.onNodeWithTag("mapScreen").performTouchInput {
+          click(Offset(xClickOffset.toPx(), yClickOffset.toPx() - yOffsetCorr.toPx() - 3))
+        }
+
+        composeTestRule.waitUntil(5000) {
+          composeTestRule.onNodeWithTag("parkOverviewScreen").isDisplayed()
+        }
         /**
-         * val bounds = composeTestRule.onNodeWithTag("mapScreen").getUnclippedBoundsInRoot() val
-         * xClickOffset = bounds.left + bounds.size.width / 2 val yClickOffset = bounds.top +
-         * bounds.size.height / 2
-         *
-         * val bottomBarBounds =
-         * composeTestRule.onNodeWithTag("bottomNavigationMenu").getUnclippedBoundsInRoot() val
-         * yOffsetCorr = bottomBarBounds .height // for some reason the height of the map matches
-         * the one of the screen not // the // actual size it does, this is an ugly fix to correct
-         * the position // of the click
-         *
-         * composeTestRule.onNodeWithTag("mapScreen").performTouchInput {
-         * click(Offset(xClickOffset.toPx(), yClickOffset.toPx() - yOffsetCorr.toPx())) }
-         *
-         * // need to wait before clicking again else the click is considered as a double click
-         * composeTestRule.waitUntil(3000) { runBlocking { delay(2000) } true }
-         *
-         * composeTestRule.onNodeWithTag("mapScreen").performTouchInput {
-         * click(Offset(xClickOffset.toPx(), yClickOffset.toPx() - yOffsetCorr.toPx() - 3)) }
-         *
-         * composeTestRule.waitUntil(5000) {
-         * composeTestRule.onNodeWithTag("parkOverviewScreen").isDisplayed() }
-         *
          * composeTestRule.onNodeWithTag("parkOverviewScreen").assertIsDisplayed()
          *
          * // create an event
