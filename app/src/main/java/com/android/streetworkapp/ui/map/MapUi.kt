@@ -26,9 +26,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -131,6 +131,8 @@ fun MapScreen(
 
   var selectedPark by remember { mutableStateOf(Park()) }
 
+  LaunchedEffect(parks) { parkViewModel.getOrCreateAllParksByLocation(parks) }
+
   // Fetching all events :
   LaunchedEffect(parkList) { eventViewModel.getEventsByParkList(parkList.value.filterNotNull()) }
   val eventMap = eventViewModel.eventList.collectAsState().value
@@ -153,8 +155,6 @@ fun MapScreen(
   val filter = FilterSettings()
   val parkFilter = ParkFilter(filter)
   val userFilterInput = FilterSettings()
-
-  LaunchedEffect(parks) { parkViewModel.getOrCreateAllParksByLocation(parks) }
 
   Box(modifier = Modifier.testTag("mapScreen")) {
     // Create a CameraPositionState to control the camera position
