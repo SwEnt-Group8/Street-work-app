@@ -13,7 +13,7 @@ import com.google.firebase.Timestamp
 class ParkFilter(private val filterSettings: FilterSettings) {
 
   fun filter(eventList: List<Event>, park: Park): Boolean {
-    Log.d("ParkFilter", "Filtering park ${park.name}")
+    // Log.d("ParkFilter", "Filtering park ${park.name}")
 
     return filterRating(park) &&
         filterEventsDensity(park) &&
@@ -33,7 +33,6 @@ class ParkFilter(private val filterSettings: FilterSettings) {
    * Filter the events based on the status. There should be at least one event that matches the
    * desired status.
    *
-   * @param park The park to filter.
    * @param eventList The list of events of the park.
    */
   private fun filterEventStatus(eventList: List<Event>): Boolean {
@@ -41,9 +40,11 @@ class ParkFilter(private val filterSettings: FilterSettings) {
     when (eventList.isEmpty()) {
       true -> return true
       false ->
-          return eventList.any {
-            val event = it
-            return filterSettings.eventStatus.any { it.isStatus(event.date) }
+          return eventList.any { event ->
+            Log.d(
+                "ParkFilter",
+                "Filtering events with status ${filterSettings.eventStatus} for event $event")
+            filterSettings.eventStatus.any { it.isStatus(event.date) }
           }
     }
   }
@@ -52,15 +53,21 @@ class ParkFilter(private val filterSettings: FilterSettings) {
    * Filter the events based on the full status. If a spot is desired, there should be at least one
    * event that is not full.
    *
-   * @param park The park to filter.
    * @param eventList The list of events of the park.
    */
   private fun filterFullEvent(eventList: List<Event>): Boolean {
-    return !filterSettings.shouldNotBeFull.value ||
-        when (eventList.isEmpty()) {
-          true -> return false // No events => no event with remaining spots
-          false -> return eventList.any { it.participants < it.maxParticipants }
-        }
+    // Log.d(
+    //    "ParkFilter",
+    //   "Filtering fullness of events with rule shouldNotBeFull =
+    // ${filterSettings.shouldNotBeFull.value}")
+    if (!filterSettings.shouldNotBeFull.value) return true
+    else {
+      Log.d("ParkFilter", "Searching non-full events {$eventList}")
+      return when (eventList.isEmpty()) {
+        true -> false // No events => no event with remaining spots
+        false -> eventList.any { it.participants < it.maxParticipants }
+      }
+    }
   }
 }
 
@@ -134,7 +141,7 @@ enum class EventStatus {
 
   fun isStatus(eventDate: Timestamp): Boolean {
     return when (this) {
-      CREATED -> eventDate.seconds < Timestamp.now().seconds
+      CREATED -> eventDate.seconds > Timestamp.now().seconds
       ONGOING -> eventDate.seconds == Timestamp.now().seconds
       FINISHED -> eventDate.seconds < Timestamp.now().seconds
     }
