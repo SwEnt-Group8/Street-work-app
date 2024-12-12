@@ -7,5 +7,5 @@ data class User(
     val score: Int,
     val friends: List<String>,
     val picture: String,
-    val parks: List<String>,
+    val parks: List<String> = emptyList()
 )

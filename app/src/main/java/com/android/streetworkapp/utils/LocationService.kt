@@ -28,8 +28,10 @@ class LocationService(
     private val scope: CoroutineScope,
     private val host: SnackbarHostState? = null
 ) {
-  // Define the distance for when is in a park
-  private val insidePark = 30
+  // Define the distance for when user is in a park
+    companion object{
+        const val PARK_RADIUS = 30 // meter
+    }
 
   // Define the FusedLocationProviderClient to get location
   private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
@@ -62,7 +64,7 @@ class LocationService(
           userLocation.latitude, userLocation.longitude, park.lat, park.lon, results)
 
       val distance = results[0]
-      if (distance < insidePark) {
+      if (distance < PARK_RADIUS) {
         Log.d("Localisation", "found close park")
         user?.let {
           // add new park in user list

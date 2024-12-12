@@ -287,14 +287,9 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     require(uid.isNotEmpty()) { UID_EMPTY }
     require(parkId.isNotEmpty()) { "park ID must not be empty" }
     try {
-      // Start a Firestore batch operation
-      val batch = db.batch()
-
       // Add parkId to the user's park list
       val userRef = db.collection("users").document(uid)
-      batch.update(userRef, "parks", FieldValue.arrayUnion(parkId))
-
-      batch.commit().await()
+      userRef.update("parks", FieldValue.arrayUnion(parkId))
     } catch (e: Exception) {
       Log.e("FirestoreError", "Error adding new park: ${e.message}")
     }
