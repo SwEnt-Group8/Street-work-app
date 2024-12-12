@@ -12,7 +12,7 @@
 
     <string name="DeleteAccountTitle">Delete account</string>
     <string name="DeleteAccountConfirmationTitle">Are you sure ?</string>
-    <string name="DeleteAccountConfirmationContent">Do you really want to delete your account ? \n\nYou will loose all of your progression. \nThis action is irreversible. \nYou may need to login again to perform this action.</string>
+    <string name="DeleteAccountConfirmationContent">Do you really want to delete your account ? \n\nYou will loose all of your progression. \n\nThis action is irreversible. \nYou may need to login again to perform this action.</string>
     <string name="DeleteAccountSuccess">Account deleted</string>
     <string name="DeleteAccountFailure">Error - could not delete account</string>
 
