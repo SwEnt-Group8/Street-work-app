@@ -165,8 +165,15 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
    */
   fun observePairingRequests(uid: String) {
     viewModelScope.launch {
-      repository.observePairingRequests(uid).collect { _pairingRequests.value = it }
+      repository.observePairingRequests(uid).collect { pairingRequests ->
+        _pairingRequests.value = pairingRequests
+        Log.d("WorkoutViewModel", "Pairing Requests Updated: $uid")
+      }
     }
+  }
+
+  fun clearPairingRequests() {
+    _pairingRequests.value = null
   }
 
   /**
@@ -174,9 +181,72 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
    *
    * @param requestId The ID of the pairing request.
    * @param isAccepted Whether the request is accepted or rejected.
+   * @param currentUserUid The UID of the user responding to the request.
+   * @param fromUid The UID of the user who sent the request.
    */
-  fun respondToPairingRequest(requestId: String, isAccepted: Boolean) {
-    viewModelScope.launch { repository.respondToPairingRequest(requestId, isAccepted) }
+  fun respondToPairingRequest(
+      requestId: String,
+      isAccepted: Boolean,
+      currentUserUid: String,
+      fromUid: String
+  ) {
+    viewModelScope.launch {
+      repository.respondToPairingRequest(requestId, isAccepted, currentUserUid, fromUid)
+      if (isAccepted) refreshWorkoutData(currentUserUid)
+    }
+  }
+  /**
+   * Observes accepted pairing requests where the user is the coach.
+   *
+   * @param fromUid The UID of the coach (current user).
+   */
+  fun observeAcceptedPairingRequests(fromUid: String) {
+    viewModelScope.launch {
+      repository.observeAcceptedPairingRequests(fromUid).collect { _pairingRequests.value = it }
+    }
+  }
+
+  /**
+   * Retrieves a specific workout session by its session ID.
+   *
+   * @param uid The UID of the user whose session is being retrieved.
+   * @param sessionId The ID of the workout session.
+   * @return The `WorkoutSession` if found, or null if not.
+   */
+  suspend fun getWorkoutSessionBySessionId(uid: String, sessionId: String): WorkoutSession? {
+    return try {
+      repository.getWorkoutSessionBySessionId(uid, sessionId)
+    } catch (e: Exception) {
+      Log.e("WorkoutViewModel", "Error retrieving workout session: ${e.message}")
+      null
+    }
+  }
+
+  /**
+   * Updates specific attributes of a workout session.
+   *
+   * @param uid The UID of the user whose session is being updated.
+   * @param sessionId The ID of the workout session.
+   * @param updates A map containing the attributes to update.
+   */
+  fun updateSessionAttributes(uid: String, sessionId: String, updates: Map<String, Any>) {
+    viewModelScope.launch {
+      try {
+        repository.updateSessionAttributes(uid, sessionId, updates)
+      } catch (e: Exception) {
+        Log.e("WorkoutViewModel", "Error updating session attributes: ${e.message}")
+      }
+    }
+  }
+
+  /**
+   * Updates the status of a pairing request.
+   *
+   * @param requestId The ID of the pairing request.
+   * @param status The new status of the request.
+   */
+  fun updatePairingRequestStatus(requestId: String, status: RequestStatus) {
+    viewModelScope.launch { repository.updatePairingRequestStatus(requestId, status) }
   }
 
   /**
