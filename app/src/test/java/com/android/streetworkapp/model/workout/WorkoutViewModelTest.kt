@@ -158,4 +158,12 @@ class WorkoutViewModelTest {
     assertEquals(1, capturedSession.exercises.size)
     assertEquals(exercise, capturedSession.exercises.first())
   }
+
+  @Test
+  fun deleteWorkoutDataByUidCallsRepository() = runTest {
+    val uid = "testUid"
+    workoutViewModel.deleteWorkoutDataByUid(uid)
+    testDispatcher.scheduler.advanceUntilIdle()
+    verify(repository).deleteWorkoutDataByUid(uid)
+  }
 }
