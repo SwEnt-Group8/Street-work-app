@@ -13,6 +13,9 @@
     <string name="DeleteAccountConfirmationTitle">Are you sure ?</string>
     <string name="DeleteAccountConfirmationContent">Do you really want to delete your account ? \n\nYou will loose all of your progression. \nThis action is irreversible.</string>
 
+    <string name="LogoutTitle">Log-out</string>
+    <string name="LogoutSuccess">You are logged out</string>
+
 
     // Friend removal :
     <string name="RemoveFriendAction">Remove friend</string>
@@ -62,6 +65,18 @@
 
     // Progression UI
     <string name="ProgressionEmptyAchievements">You do not have any achievements yet!</string>
+    <string name="Trained">You trained your %s !</string>
+
+    <string name="Pushups">Push-ups</string>
+    <string name="Dips">Dips</string>
+    <string name="Burpee">Burpee</string>
+    <string name="Lunge">Lunge</string>
+    <string name="Planks">Planks</string>
+    <string name="Handstand">Handstand</string>
+    <string name="Frontlever">Front lever</string>
+    <string name="Flag">Flag</string>
+    <string name="Muscleup">Muscle-up</string>
+
 
     // Workout UI
     <string name="WorkoutDurationMessage1">I want to do %02d min and %02d seconds of %s</string>

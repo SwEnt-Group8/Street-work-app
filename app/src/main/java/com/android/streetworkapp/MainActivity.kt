@@ -20,12 +20,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import com.android.sample.R
 import com.android.streetworkapp.device.network.isInternetAvailable
 import com.android.streetworkapp.model.event.EventRepositoryFirestore
 import com.android.streetworkapp.model.event.EventViewModel
@@ -42,6 +44,8 @@ import com.android.streetworkapp.model.preferences.PreferencesRepositoryDataStor
 import com.android.streetworkapp.model.preferences.PreferencesViewModel
 import com.android.streetworkapp.model.progression.ProgressionRepositoryFirestore
 import com.android.streetworkapp.model.progression.ProgressionViewModel
+import com.android.streetworkapp.model.storage.S3Clients
+import com.android.streetworkapp.model.storage.S3StorageClient
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
@@ -80,8 +84,10 @@ import com.android.streetworkapp.ui.tutorial.TutorialEvent
 import com.android.streetworkapp.ui.utils.CustomDialog
 import com.android.streetworkapp.ui.utils.DialogType
 import com.android.streetworkapp.ui.utils.trainComposable
+import com.android.streetworkapp.utils.GoogleAuthService
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.serialization.json.JsonNull.content
+import com.google.firebase.ktx.Firebase
 import okhttp3.OkHttpClient
 
 class MainActivity : ComponentActivity() {
@@ -109,6 +115,9 @@ fun StreetWorkAppMain(
     testInvokation: NavigationActions.() -> Unit = {},
     internetAvailable: Boolean = false
 ) {
+  // Setup s3Client
+  val storageClient =
+      S3StorageClient(S3StorageClient.getDigitalOceanS3Client(), S3Clients.DIGITAL_OCEAN.endpoint)
 
   // repositories
   val overpassParkLocationRepo = OverpassParkLocationRepository(OkHttpClient())
@@ -145,6 +154,10 @@ fun StreetWorkAppMain(
   // Instantiate Park Images flow
   val imageRepository = ImageRepositoryFirestore(firestoreDB, parkRepository, userRepository)
   val imageViewModel = ImageViewModel(imageRepository)
+
+  // Instantiate Google Auth Service
+  val token = stringResource(R.string.default_web_client_id)
+  val authService = GoogleAuthService(token, Firebase.auth, LocalContext.current)
 
   // Get the preferences cached parameters
   val loginState by preferencesViewModel.loginState.collectAsState()
@@ -199,6 +212,7 @@ fun StreetWorkAppMain(
         textModerationViewModel,
         imageViewModel,
         preferencesViewModel,
+        authService,
         startDestination = resolvedStartDestination!!)
   }
 }
@@ -218,6 +232,7 @@ fun StreetWorkApp(
     textModerationViewModel: TextModerationViewModel,
     imageViewModel: ImageViewModel,
     preferencesViewModel: PreferencesViewModel,
+    authService: GoogleAuthService,
     navTestInvokationOnEachRecompose: Boolean = false,
     e2eEventTesting: Boolean = false,
     startDestination: String = Route.AUTH
@@ -305,13 +320,18 @@ fun StreetWorkApp(
               route = Route.AUTH,
           ) {
             composable(Screen.AUTH) {
-              SignInScreen(navigationActions, userViewModel, preferencesViewModel)
+              SignInScreen(navigationActions, userViewModel, preferencesViewModel, authService)
             }
           }
           navigation(startDestination = Screen.PROGRESSION, route = Route.PROGRESSION) {
             composable(Screen.PROGRESSION) {
               infoManager.Display(LocalContext.current)
-              ProgressScreen(navigationActions, userViewModel, progressionViewModel, innerPadding)
+              ProgressScreen(
+                  navigationActions,
+                  userViewModel,
+                  progressionViewModel,
+                  workoutViewModel,
+                  innerPadding)
             }
           }
           navigation(
@@ -384,7 +404,12 @@ fun StreetWorkApp(
                   tag = "Settings",
                   title = "Settings",
                   Content = {
-                    SettingsContent(navigationActions, userViewModel, showSettingsDialog)
+                    SettingsContent(
+                        navigationActions,
+                        userViewModel,
+                        preferencesViewModel,
+                        authService,
+                        showSettingsDialog)
                   },
               )
             }
