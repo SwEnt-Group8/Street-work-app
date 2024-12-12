@@ -11,6 +11,7 @@ import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.size
@@ -295,12 +296,13 @@ class End2EndCreateEvent {
         }
 
         composeTestRule.onNodeWithTag("parkOverviewScreen").assertIsDisplayed()
+
+        // create an event
+        composeTestRule.onNodeWithTag("createEventButton").assertIsDisplayed().performClick()
+
+        composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
+
         /**
-         * // create an event
-         * composeTestRule.onNodeWithTag("createEventButton").assertIsDisplayed().performClick()
-         *
-         * composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
-         *
          * composeTestRule.onNodeWithTag("titleTag").assertIsDisplayed().performTextClearance()
          *
          * composeTestRule.onNodeWithTag("titleTag").performTextInput(event.title)
