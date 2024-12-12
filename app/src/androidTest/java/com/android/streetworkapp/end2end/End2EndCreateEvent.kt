@@ -56,6 +56,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
+import kotlin.time.Duration
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -235,131 +236,139 @@ class End2EndCreateEvent {
    * comparison
    */
   @Test
-  fun e2eCanCreateEventAndDisplayIt() = runTest {
-    // This one needs to be initialized here because it evaluateText is a suspend function
-    `when`(textModerationRepository.evaluateText(any(), any()))
-        .thenReturn(TextEvaluation.Result(true))
+  fun e2eCanCreateEventAndDisplayIt() =
+      runTest(timeout = Duration.parse("1m")) {
+        // This one needs to be initialized here because it evaluateText is a suspend function
+        `when`(textModerationRepository.evaluateText(any(), any()))
+            .thenReturn(TextEvaluation.Result(true))
 
-    composeTestRule.setContent {
-      StreetWorkApp(
-          parkLocationViewModel,
-          { navigateTo(currentScreen) },
-          { mapISLoaded = true },
-          userViewModel,
-          parkViewModel,
-          eventViewModel,
-          mock(ProgressionViewModel::class.java),
-          mock(WorkoutViewModel::class.java),
-          textModerationViewModel,
-          mock(ImageViewModel::class.java),
-          mock(PreferencesViewModel::class.java),
-          GoogleAuthService(
-              "abc",
-              mock(FirebaseAuth::class.java, RETURNS_DEFAULTS),
-              context = LocalContext.current))
-    }
+        composeTestRule.setContent {
+          StreetWorkApp(
+              parkLocationViewModel,
+              { navigateTo(currentScreen) },
+              { mapISLoaded = true },
+              userViewModel,
+              parkViewModel,
+              eventViewModel,
+              mock(ProgressionViewModel::class.java),
+              mock(WorkoutViewModel::class.java),
+              textModerationViewModel,
+              mock(ImageViewModel::class.java),
+              mock(PreferencesViewModel::class.java),
+              GoogleAuthService(
+                  "abc",
+                  mock(FirebaseAuth::class.java, RETURNS_DEFAULTS),
+                  context = LocalContext.current))
+        }
 
-    // Wait for the map to be loaded
-    composeTestRule.waitUntil(100000) { mapISLoaded }
-    composeTestRule.waitForIdle()
+        // Wait for the map to be loaded
+        composeTestRule.waitUntil(100000) { mapISLoaded }
+        composeTestRule.waitForIdle()
 
-    // test the map screen
-    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
+        // test the map screen
+        composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
 
-    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("googleMap").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("googleMap").assertIsDisplayed()
 
-    val bounds = composeTestRule.onNodeWithTag("mapScreen").getUnclippedBoundsInRoot()
-    val xClickOffset = bounds.left + bounds.size.width / 2
-    val yClickOffset = bounds.top + bounds.size.height / 2
+        val bounds = composeTestRule.onNodeWithTag("mapScreen").getUnclippedBoundsInRoot()
+        val xClickOffset = bounds.left + bounds.size.width / 2
+        val yClickOffset = bounds.top + bounds.size.height / 2
 
-    val bottomBarBounds =
-        composeTestRule.onNodeWithTag("bottomNavigationMenu").getUnclippedBoundsInRoot()
-    val yOffsetCorr =
-        bottomBarBounds
-            .height // for some reason the height of the map matches the one of the screen not the
-    // actual size it does, this is an ugly fix to correct the position
-    // of the click
+        val bottomBarBounds =
+            composeTestRule.onNodeWithTag("bottomNavigationMenu").getUnclippedBoundsInRoot()
+        val yOffsetCorr =
+            bottomBarBounds
+                .height // for some reason the height of the map matches the one of the screen not
+                        // the
+        // actual size it does, this is an ugly fix to correct the position
+        // of the click
 
-    composeTestRule.onNodeWithTag("mapScreen").performTouchInput {
-      click(Offset(xClickOffset.toPx(), yClickOffset.toPx() - yOffsetCorr.toPx()))
-    }
+        composeTestRule.onNodeWithTag("mapScreen").performTouchInput {
+          click(Offset(xClickOffset.toPx(), yClickOffset.toPx() - yOffsetCorr.toPx()))
+        }
 
-    // need to wait before clicking again else the click is considered as a double click
-    composeTestRule.waitUntil(3000) {
-      runBlocking { delay(2000) }
-      true
-    }
+        // need to wait before clicking again else the click is considered as a double click
+        composeTestRule.waitUntil(3000) {
+          runBlocking { delay(2000) }
+          true
+        }
 
-    composeTestRule.onNodeWithTag("mapScreen").performTouchInput {
-      click(Offset(xClickOffset.toPx(), yClickOffset.toPx() - yOffsetCorr.toPx() - 3))
-    }
+        composeTestRule.onNodeWithTag("mapScreen").performTouchInput {
+          click(Offset(xClickOffset.toPx(), yClickOffset.toPx() - yOffsetCorr.toPx() - 3))
+        }
 
-    composeTestRule.waitUntil(
-        5000) { // this value is arbitrary, we just don't want the test to completely halt. Might
-          // need to tune it for the CI
+        composeTestRule.waitUntil(
+            5000) { // this value is arbitrary, we just don't want the test to completely halt.
+                    // Might
+              // need to tune it for the CI
+              composeTestRule.onNodeWithTag("parkOverviewScreen").isDisplayed()
+            }
+
+        composeTestRule.onNodeWithTag("parkOverviewScreen").assertIsDisplayed()
+
+        // create an event
+        composeTestRule.onNodeWithTag("createEventButton").assertIsDisplayed().performClick()
+
+        composeTestRule.waitForIdle()
+
+        // I'm for real this does not work between 00:00 and 01:00 UTC time
+        composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
+
+        composeTestRule.onNodeWithTag("titleTag").assertIsDisplayed().performTextClearance()
+        composeTestRule.onNodeWithTag("titleTag").performTextInput(event.title)
+
+        composeTestRule.onNodeWithTag("descriptionTag").assertIsDisplayed().performTextClearance()
+        composeTestRule.onNodeWithTag("descriptionTag").performTextInput(event.description)
+
+        composeTestRule.onNodeWithTag("dateIcon").performClick()
+        composeTestRule.onNodeWithTag("validateDate").performClick()
+        composeTestRule.onNodeWithTag("timeIcon").performClick()
+        composeTestRule.onNodeWithTag("validateTime").performClick()
+
+        composeTestRule.onNodeWithTag("addEventButton").assertIsDisplayed().performClick()
+
+        composeTestRule.waitForIdle()
+
+        // verify that the event is properly displayed on the park overview screen
+        composeTestRule.waitUntil(5000) {
           composeTestRule.onNodeWithTag("parkOverviewScreen").isDisplayed()
         }
 
-    composeTestRule.onNodeWithTag("parkOverviewScreen").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("parkOverviewScreen").assertIsDisplayed()
 
-    // create an event
-    composeTestRule.onNodeWithTag("createEventButton").assertIsDisplayed().performClick()
+        composeTestRule.waitUntil(5000) {
+          composeTestRule.onNodeWithTag("eventButton").isDisplayed()
+        }
 
-    composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText(event.title).assertIsDisplayed()
 
-    // I'm for real this does not work between 00:00 and 01:00 UTC time
-    composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("eventButton").assertIsDisplayed().performClick()
 
-    composeTestRule.onNodeWithTag("titleTag").assertIsDisplayed().performTextClearance()
-    composeTestRule.onNodeWithTag("titleTag").performTextInput(event.title)
+        verify(eventDocumentRef).set(any())
 
-    composeTestRule.onNodeWithTag("descriptionTag").assertIsDisplayed().performTextClearance()
-    composeTestRule.onNodeWithTag("descriptionTag").performTextInput(event.description)
+        verify(parkDocumentRef).update(eq("events"), any())
 
-    composeTestRule.onNodeWithTag("dateIcon").performClick()
-    composeTestRule.onNodeWithTag("validateDate").performClick()
-    composeTestRule.onNodeWithTag("timeIcon").performClick()
-    composeTestRule.onNodeWithTag("validateTime").performClick()
+        composeTestRule.waitForIdle()
 
-    composeTestRule.onNodeWithTag("addEventButton").assertIsDisplayed().performClick()
+        // navigate to the event overview screen and verify that the event is properly displayed
+        composeTestRule.onNodeWithTag("eventOverviewScreen").assertIsDisplayed()
 
-    composeTestRule.waitForIdle()
+        composeTestRule
+            .onNodeWithTag("eventTitle")
+            .assertIsDisplayed()
+            .assertTextContains(event.title)
 
-    // verify that the event is properly displayed on the park overview screen
-    composeTestRule.waitUntil(5000) {
-      composeTestRule.onNodeWithTag("parkOverviewScreen").isDisplayed()
-    }
+        composeTestRule.onNodeWithTag("eventOwner").assertIsDisplayed()
 
-    composeTestRule.onNodeWithTag("parkOverviewScreen").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("date").assertIsDisplayed()
 
-    composeTestRule.waitUntil(5000) { composeTestRule.onNodeWithTag("eventButton").isDisplayed() }
+        composeTestRule.onNodeWithTag("eventDescription").assertIsDisplayed()
 
-    composeTestRule.onNodeWithText(event.title).assertIsDisplayed()
+        composeTestRule.onNodeWithTag("participants").assertIsDisplayed()
 
-    composeTestRule.onNodeWithTag("eventButton").assertIsDisplayed().performClick()
+        composeTestRule.onNodeWithTag("participantsTab").assertIsDisplayed().performClick()
 
-    verify(eventDocumentRef).set(any())
-
-    verify(parkDocumentRef).update(eq("events"), any())
-
-    composeTestRule.waitForIdle()
-
-    // navigate to the event overview screen and verify that the event is properly displayed
-    composeTestRule.onNodeWithTag("eventOverviewScreen").assertIsDisplayed()
-
-    composeTestRule.onNodeWithTag("eventTitle").assertIsDisplayed().assertTextContains(event.title)
-
-    composeTestRule.onNodeWithTag("eventOwner").assertIsDisplayed()
-
-    composeTestRule.onNodeWithTag("date").assertIsDisplayed()
-
-    composeTestRule.onNodeWithTag("eventDescription").assertIsDisplayed()
-
-    composeTestRule.onNodeWithTag("participants").assertIsDisplayed()
-
-    composeTestRule.onNodeWithTag("participantsTab").assertIsDisplayed().performClick()
-
-    composeTestRule.onNodeWithTag("participantsList").assertIsDisplayed()
-  }
+        composeTestRule.onNodeWithTag("participantsList").assertIsDisplayed()
+      }
 }
