@@ -159,7 +159,7 @@ class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRep
    * @param workoutData The WorkoutData to save.
    */
   override suspend fun saveWorkoutData(uid: String, workoutData: WorkoutData) {
-    require(uid.isNotEmpty()) { "The user UID must not be empty." }
+    require(uid.isNotEmpty()) { ERROR_UID_EMPTY }
     try {
       db.collection(COLLECTION_PATH).document(uid).set(workoutData).await()
     } catch (e: Exception) {
@@ -257,7 +257,7 @@ class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRep
    * @param uid The UID of the user.
    */
   override suspend fun deleteWorkoutDataByUid(uid: String) {
-    require(uid.isNotEmpty()) { "The user UID must not be empty." }
+    require(uid.isNotEmpty()) { ERROR_UID_EMPTY }
     try {
       val querySnapshot = db.collection(COLLECTION_PATH).whereEqualTo("userUid", uid).get().await()
 
