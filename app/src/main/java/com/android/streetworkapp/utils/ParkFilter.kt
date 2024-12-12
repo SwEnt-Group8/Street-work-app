@@ -87,7 +87,7 @@ enum class EventDensity {
   fun getThreshold(): Int {
     return when (this) {
       LOW -> 3
-      MEDIUM -> 8
+      MEDIUM -> 7
       HIGH -> 999
     }
   }
@@ -95,7 +95,7 @@ enum class EventDensity {
   fun isIncluded(eventCount: Int): Boolean {
     return when (this) {
       LOW -> eventCount in 0..2
-      MEDIUM -> eventCount in 3..7
+      MEDIUM -> eventCount in 3..6
       HIGH -> eventCount > 7
     }
   }
