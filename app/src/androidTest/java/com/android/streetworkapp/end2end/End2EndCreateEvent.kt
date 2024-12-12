@@ -11,9 +11,6 @@ import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextClearance
-import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.size
@@ -69,7 +66,6 @@ import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
-import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
 class End2EndCreateEvent {
@@ -299,21 +295,20 @@ class End2EndCreateEvent {
         }
 
         composeTestRule.onNodeWithTag("parkOverviewScreen").assertIsDisplayed()
-
-        // create an event
-        composeTestRule.onNodeWithTag("createEventButton").assertIsDisplayed().performClick()
-
-        composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
-
-        composeTestRule.onNodeWithTag("titleTag").assertIsDisplayed().performTextClearance()
-
-        composeTestRule.onNodeWithTag("titleTag").performTextInput(event.title)
-
-        composeTestRule.onNodeWithTag("descriptionTag").assertIsDisplayed().performTextClearance()
-
-        composeTestRule.onNodeWithTag("descriptionTag").performTextInput(event.description)
-
         /**
+         * // create an event
+         * composeTestRule.onNodeWithTag("createEventButton").assertIsDisplayed().performClick()
+         *
+         * composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
+         *
+         * composeTestRule.onNodeWithTag("titleTag").assertIsDisplayed().performTextClearance()
+         *
+         * composeTestRule.onNodeWithTag("titleTag").performTextInput(event.title)
+         *
+         * composeTestRule.onNodeWithTag("descriptionTag").assertIsDisplayed().performTextClearance()
+         *
+         * composeTestRule.onNodeWithTag("descriptionTag").performTextInput(event.description)
+         *
          * composeTestRule.onNodeWithTag("dateIcon").performClick()
          *
          * composeTestRule.onNodeWithTag("validateDate").performClick()
@@ -321,13 +316,13 @@ class End2EndCreateEvent {
          * composeTestRule.onNodeWithTag("timeIcon").performClick()
          *
          * composeTestRule.onNodeWithTag("validateTime").performClick()
+         *
+         * composeTestRule.onNodeWithTag("addEventButton").assertIsDisplayed().performClick()
+         *
+         * verify(eventDocumentRef).set(any())
+         *
+         * verify(parkDocumentRef).update(eq("events"), any())
          */
-        composeTestRule.onNodeWithTag("addEventButton").assertIsDisplayed().performClick()
-
-        verify(eventDocumentRef).set(any())
-
-        verify(parkDocumentRef).update(eq("events"), any())
-
         /**
          * // verify that the event is properly displayed on the park overview screen
          * composeTestRule.waitUntil(5000) {
