@@ -145,7 +145,7 @@ class ParkOverviewTest {
       it.getArgument<(List<Event>) -> Unit>(1)(listOf(eventList.events.first()))
     }
     parkViewModel.setCurrentPark(park)
-    var context : Context? = null
+    var context: Context? = null
 
     composeTestRule.setContent {
       ParkOverviewScreen(
@@ -154,7 +154,7 @@ class ParkOverviewTest {
           navigationActions = navigationActions,
           userViewModel = userViewModel,
           imageViewModel = imageViewModel)
-        context = LocalContext.current
+      context = LocalContext.current
     }
     composeTestRule.waitForIdle()
 
@@ -163,7 +163,7 @@ class ParkOverviewTest {
     composeTestRule.onNodeWithTag("createEventButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("eventItem").assertTextContains("Group workout")
     composeTestRule.onNodeWithTag("participantsText", useUnmergedTree = true)
-      assert(context != null)
+    assert(context != null)
     composeTestRule
         .onNodeWithTag("dateText", useUnmergedTree = true)
         .assertTextContains(dateDifference(context!!, eventList.events.first()))

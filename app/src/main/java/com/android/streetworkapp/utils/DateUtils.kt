@@ -1,7 +1,6 @@
 package com.android.streetworkapp.utils
 
 import android.content.Context
-import androidx.compose.ui.platform.LocalContext
 import com.android.sample.R
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventStatus
