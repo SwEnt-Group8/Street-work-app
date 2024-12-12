@@ -42,6 +42,8 @@ import com.android.streetworkapp.model.preferences.PreferencesRepositoryDataStor
 import com.android.streetworkapp.model.preferences.PreferencesViewModel
 import com.android.streetworkapp.model.progression.ProgressionRepositoryFirestore
 import com.android.streetworkapp.model.progression.ProgressionViewModel
+import com.android.streetworkapp.model.storage.S3Clients
+import com.android.streetworkapp.model.storage.S3StorageClient
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
@@ -111,6 +113,9 @@ fun StreetWorkAppMain(
     testInvokation: NavigationActions.() -> Unit = {},
     internetAvailable: Boolean = false
 ) {
+  // Setup s3Client
+  val storageClient =
+      S3StorageClient(S3StorageClient.getDigitalOceanS3Client(), S3Clients.DIGITAL_OCEAN.endpoint)
 
   // repositories
   val overpassParkLocationRepo = OverpassParkLocationRepository(OkHttpClient())
@@ -164,7 +169,7 @@ fun StreetWorkAppMain(
 
   // Ensure start destination and preferences parameters are resolved before displaying the app
   var resolvedStartDestination by remember { mutableStateOf<String?>(null) }
-  var resolvedPreferencesParameters by remember { mutableStateOf<Boolean>(false) }
+  var resolvedPreferencesParameters by remember { mutableStateOf(false) }
 
   // Determine start destination and be sure preferences parameters are correctly loaded
   if (loginState == true &&
@@ -188,7 +193,8 @@ fun StreetWorkAppMain(
         userViewModel.getUserByUidAndSetAsCurrentUser(uid!!)
       } else {
         Log.d("MainActivity", "Internet not available, loading user $uid from cache")
-        val offlineUser = User(uid.orEmpty(), name.orEmpty(), "", score ?: 0, emptyList(), "")
+        val offlineUser =
+            User(uid.orEmpty(), name.orEmpty(), "", score ?: 0, emptyList(), "", emptyList())
         userViewModel.setCurrentUser(offlineUser)
       }
     }
@@ -240,7 +246,7 @@ fun StreetWorkApp(
   } // not using by here since I want to pass the mutableState to a fn
   var screenParams by remember { mutableStateOf<ScreenParams?>(null) }
 
-  var firstTimeLoaded by remember { mutableStateOf<Boolean>(true) }
+  var firstTimeLoaded by remember { mutableStateOf(true) }
 
   navigationActions.registerStringListenerOnDestinationChange(currentScreenName)
 
@@ -296,7 +302,8 @@ fun StreetWorkApp(
                       tabList = LIST_TOP_LEVEL_DESTINATION)
                 }
                 BottomNavigationMenuType.EVENT_OVERVIEW -> {
-                  EventBottomBar(eventViewModel, userViewModel, navigationActions, scope, host)
+                  EventBottomBar(
+                      eventViewModel, userViewModel, parkViewModel, navigationActions, scope, host)
                   // selected
                 }
                 BottomNavigationMenuType
@@ -334,10 +341,13 @@ fun StreetWorkApp(
               MapScreen(
                   parkLocationViewModel,
                   parkViewModel,
+                  userViewModel,
                   navigationActions,
                   searchQuery,
                   mapCallbackOnMapLoaded,
-                  innerPadding)
+                  innerPadding,
+                  scope,
+                  host)
               screenParams?.topAppBarManager?.setActionCallback(
                   TopAppBarManager.TopAppBarAction.SEARCH) {
                     showSearchBar.value = true
@@ -351,7 +361,9 @@ fun StreetWorkApp(
                   navigationActions,
                   eventViewModel,
                   userViewModel,
-                  imageViewModel)
+                  imageViewModel,
+                  scope,
+                  host)
             }
             composable(Screen.ADD_EVENT) {
               infoManager.Display(LocalContext.current)
@@ -365,6 +377,21 @@ fun StreetWorkApp(
                   host,
                   innerPadding)
             }
+
+            composable(Screen.EDIT_EVENT) {
+              infoManager.Display(LocalContext.current)
+              AddEventScreen(
+                  navigationActions,
+                  parkViewModel,
+                  eventViewModel,
+                  userViewModel,
+                  textModerationViewModel,
+                  scope,
+                  host,
+                  innerPadding,
+                  editEvent = true)
+            }
+
             composable(Screen.EVENT_OVERVIEW) {
               infoManager.Display(LocalContext.current)
               EventOverviewScreen(

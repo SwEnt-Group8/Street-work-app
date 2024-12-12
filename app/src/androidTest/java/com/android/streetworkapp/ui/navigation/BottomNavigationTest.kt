@@ -50,6 +50,7 @@ import org.mockito.Mockito.mock
 val TEST_SCREEN_EXCLUSION_LIST =
     listOf<String>(
         Screen.ADD_EVENT,
+        Screen.EDIT_EVENT,
         Screen.EVENT_OVERVIEW,
         Screen.TRAIN_SOLO,
         Screen.TRAIN_COACH,
@@ -135,6 +136,8 @@ class BottomNavigationTest {
               "abc", mock(FirebaseAuth::class.java, RETURNS_DEFAULTS), LocalContext.current),
           true)
     }
+
+    composeTestRule.waitForIdle()
 
     val bottomNavTypeToTest =
         BottomNavigationMenuType.entries.filter { it != BottomNavigationMenuType.NONE }

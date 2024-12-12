@@ -24,8 +24,8 @@ data class Event(
     var date: Timestamp,
     var owner: String,
     var listParticipants: List<String> = emptyList(),
-    var parkId: String = "Unknown Park"
-    // Default parameters can be removed once the viewModels are updated
+    var parkId: String = "Unknown Park",
+    var status: EventStatus = EventStatus.CREATED
 )
 
 /**
@@ -39,4 +39,10 @@ data class EventList(val events: List<Event>)
 object EventConstants {
   const val MAX_NUMBER_PARTICIPANTS = 10
   const val MIN_NUMBER_PARTICIPANTS = 2
+}
+
+enum class EventStatus {
+  CREATED,
+  STARTED,
+  ENDED
 }

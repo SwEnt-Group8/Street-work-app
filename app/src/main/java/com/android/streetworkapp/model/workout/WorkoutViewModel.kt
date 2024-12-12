@@ -13,6 +13,12 @@ open class WorkoutViewModel(private val repository: WorkoutRepository) : ViewMod
   private val _workoutData = MutableStateFlow<WorkoutData?>(null)
   val workoutData: StateFlow<WorkoutData?> = _workoutData.asStateFlow()
 
+  private val _pairingRequests = MutableStateFlow<List<PairingRequest>?>(null)
+  val pairingRequests: StateFlow<List<PairingRequest>?> = _pairingRequests.asStateFlow()
+
+  private val _workoutSessions = MutableStateFlow<List<WorkoutSession>?>(null)
+  val workoutSessions: StateFlow<List<WorkoutSession>?> = _workoutSessions.asStateFlow()
+
   /**
    * Fetches or initializes the user's WorkoutData.
    *
@@ -142,6 +148,58 @@ open class WorkoutViewModel(private val repository: WorkoutRepository) : ViewMod
       }
     }
   }
+  /**
+   * Sends a pairing request from one user to another.
+   *
+   * @param fromUid The UID of the user sending the request.
+   * @param toUid The UID of the user receiving the request.
+   */
+  fun sendPairingRequest(fromUid: String, toUid: String) {
+    viewModelScope.launch { repository.sendPairingRequest(fromUid, toUid) }
+  }
+
+  /**
+   * Observes pairing requests for a specific user.
+   *
+   * @param uid The UID of the user.
+   */
+  fun observePairingRequests(uid: String) {
+    viewModelScope.launch {
+      repository.observePairingRequests(uid).collect { _pairingRequests.value = it }
+    }
+  }
+
+  /**
+   * Responds to a pairing request by updating its status.
+   *
+   * @param requestId The ID of the pairing request.
+   * @param isAccepted Whether the request is accepted or rejected.
+   */
+  fun respondToPairingRequest(requestId: String, isAccepted: Boolean) {
+    viewModelScope.launch { repository.respondToPairingRequest(requestId, isAccepted) }
+  }
+
+  /**
+   * Observes workout sessions for a specific user.
+   *
+   * @param uid The UID of the user.
+   */
+  fun observeWorkoutSessions(uid: String) {
+    viewModelScope.launch {
+      repository.observeWorkoutSessions(uid).collect { _workoutSessions.value = it }
+    }
+  }
+
+  /**
+   * Adds a comment to a specific workout session.
+   *
+   * @param sessionId The ID of the session.
+   * @param comment The comment to add.
+   */
+  fun addCommentToSession(sessionId: String, comment: Comment) {
+    viewModelScope.launch { repository.addCommentToSession(sessionId, comment) }
+  }
+
   /**
    * Refreshes the current user's WorkoutData.
    *
