@@ -229,6 +229,14 @@ open class UserViewModel(private val repository: UserRepository) : ViewModel() {
       viewModelScope.launch { repository.removeFriend(uid, friendUid) }
 
   /**
+   * Removes a user from all friends lists in Firestore.
+   *
+   * @param uid The unique ID of the user to remove from all friends lists.
+   */
+  fun removeUserFromAllFriendsLists(uid: String) =
+      viewModelScope.launch { repository.removeUserFromAllFriendsLists(uid) }
+
+  /**
    * Deletes a user from Firestore based on the provided ID.
    *
    * @param uid The unique ID of the user to delete.

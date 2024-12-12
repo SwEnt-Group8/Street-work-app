@@ -12,11 +12,19 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.sample.R
+import com.android.streetworkapp.model.event.EventRepository
+import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.park.ParkRepository
+import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.preferences.PreferencesRepository
 import com.android.streetworkapp.model.preferences.PreferencesViewModel
+import com.android.streetworkapp.model.progression.ProgressionRepository
+import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
+import com.android.streetworkapp.model.workout.WorkoutRepository
+import com.android.streetworkapp.model.workout.WorkoutViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.utils.GoogleAuthService
@@ -36,6 +44,14 @@ class SettingsTest {
   private val navigationActions = mock(NavigationActions::class.java)
   private val userRepository = mock(UserRepository::class.java)
   private val userViewModel = UserViewModel(userRepository)
+  private val parkRepository = mock(ParkRepository::class.java)
+  private val parkViewModel = ParkViewModel(parkRepository)
+  private val eventRepository = mock(EventRepository::class.java)
+  private val eventViewModel = EventViewModel(eventRepository)
+  private val progressionRepository = mock(ProgressionRepository::class.java)
+  private val progressionViewModel = ProgressionViewModel(progressionRepository)
+  private val workoutRepository = mock(WorkoutRepository::class.java)
+  private val workoutViewModel = WorkoutViewModel(workoutRepository)
   private val preferencesViewModel = PreferencesViewModel(mock(PreferencesRepository::class.java))
 
   @Test
@@ -49,7 +65,15 @@ class SettingsTest {
           GoogleAuthService(
               "abc", mock(FirebaseAuth::class.java, RETURNS_DEFAULTS), LocalContext.current)
       SettingsContent(
-          navigationActions, userViewModel, preferencesViewModel, authService, showSettingDialog)
+          navigationActions,
+          userViewModel,
+          parkViewModel,
+          eventViewModel,
+          progressionViewModel,
+          workoutViewModel,
+          preferencesViewModel,
+          authService,
+          showSettingDialog)
       context = LocalContext.current
     }
 
@@ -86,7 +110,15 @@ class SettingsTest {
           GoogleAuthService(
               "abc", mock(FirebaseAuth::class.java, RETURNS_DEFAULTS), LocalContext.current)
       SettingsContent(
-          navigationActions, userViewModel, preferencesViewModel, authService, showSettingDialog)
+          navigationActions,
+          userViewModel,
+          parkViewModel,
+          eventViewModel,
+          progressionViewModel,
+          workoutViewModel,
+          preferencesViewModel,
+          authService,
+          showSettingDialog)
       context = LocalContext.current
     }
 
@@ -118,7 +150,15 @@ class SettingsTest {
           GoogleAuthService(
               "abc", mock(FirebaseAuth::class.java, RETURNS_DEFAULTS), LocalContext.current)
       SettingsContent(
-          navigationActions, userViewModel, preferencesViewModel, authService, showSettingDialog)
+          navigationActions,
+          userViewModel,
+          parkViewModel,
+          eventViewModel,
+          progressionViewModel,
+          workoutViewModel,
+          preferencesViewModel,
+          authService,
+          showSettingDialog)
       context = LocalContext.current
     }
 

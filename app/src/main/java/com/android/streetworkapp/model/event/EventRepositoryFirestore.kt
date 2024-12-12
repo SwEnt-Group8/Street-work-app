@@ -127,6 +127,42 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
     }
   }
 
+  /**
+   * Remove a participant from all events and delete events where the user is the owner.
+   *
+   * @param uid The user ID.
+   */
+  override suspend fun removeParticipantFromAllEvents(uid: String) {
+    require(uid.isNotEmpty())
+    try {
+      val events =
+          db.collection(COLLECTION_PATH)
+              .whereArrayContains(FIELD_LIST_PARTICIPANTS, uid)
+              .get()
+              .await()
+
+      for (document in events.documents) {
+        val event = documentToEvent(document)
+        if (event != null) {
+          if (event.owner == uid) {
+            db.collection(COLLECTION_PATH).document(event.eid).delete().await()
+          } else {
+            db.collection(COLLECTION_PATH)
+                .document(event.eid)
+                .update(
+                    FIELD_PARTICIPANTS,
+                    FieldValue.increment(-1),
+                    FIELD_LIST_PARTICIPANTS,
+                    FieldValue.arrayRemove(uid))
+                .await()
+          }
+        }
+      }
+    } catch (e: Exception) {
+      Log.e("FirestoreError", "Error removing participant from all events: ${e.message}")
+    }
+  }
+
   fun documentToEvent(document: DocumentSnapshot): Event? {
     return if (document.exists()) {
       Event(

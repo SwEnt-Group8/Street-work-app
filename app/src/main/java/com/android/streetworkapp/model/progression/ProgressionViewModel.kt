@@ -66,6 +66,15 @@ open class ProgressionViewModel(private val repository: ProgressionRepository) :
             newAchievements,
             _currentProgression.value.currentGoal)
       }
+
+  /**
+   * Deletes the progression linked to the uid
+   *
+   * @param uid: The uid of the user
+   */
+  fun deleteProgressionByUid(uid: String) {
+    viewModelScope.launch { repository.deleteProgressionByUid(uid) }
+  }
 }
 
 /**

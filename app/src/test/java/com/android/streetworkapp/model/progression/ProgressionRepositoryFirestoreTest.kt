@@ -8,13 +8,16 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
+import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
@@ -96,5 +99,29 @@ class ProgressionRepositoryFirestoreTest {
     assert(result.progressionId == "test")
     assert(result.uid == "test")
     assert(result.achievements == emptyList<Achievement>())
+  }
+
+  @Test
+  fun deleteProgressionByUidDeletesDocument() = runTest {
+    val uid = "testUid"
+    val documentId = "docId1"
+
+    // Mock the query snapshot and document
+    val document = mock(DocumentSnapshot::class.java)
+    val querySnapshot = mock(QuerySnapshot::class.java)
+    val query = mock(Query::class.java)
+
+    `when`(document.id).thenReturn(documentId)
+    `when`(querySnapshot.documents).thenReturn(listOf(document))
+    `when`(querySnapshot.isEmpty).thenReturn(false)
+    `when`(query.get()).thenReturn(Tasks.forResult(querySnapshot))
+    `when`(db.collection(anyString()).whereEqualTo(anyString(), anyString())).thenReturn(query)
+    `when`(db.collection(anyString()).document(anyString())).thenReturn(documentRef)
+
+    // Call the function
+    progressionRepository.deleteProgressionByUid(uid)
+
+    // Verify that the document was deleted
+    verify(documentRef).delete()
   }
 }

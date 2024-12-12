@@ -12,4 +12,6 @@ interface ProgressionRepository {
       achievements: List<String>,
       goal: Int
   )
+
+  suspend fun deleteProgressionByUid(uid: String)
 }

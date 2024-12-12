@@ -219,6 +219,14 @@ open class ParkViewModel(
       }
 
   /**
+   * Delete rating of an user from all parks.
+   *
+   * @param uid The user ID.
+   */
+  fun deleteRatingFromAllParks(uid: String) =
+      viewModelScope.launch { repository.deleteRatingFromAllParks(uid) }
+
+  /**
    * Delete a park by its ID.
    *
    * @param pid The park ID.

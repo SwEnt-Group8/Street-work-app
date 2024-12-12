@@ -26,5 +26,7 @@ interface UserRepository {
 
   suspend fun removeFriend(uid: String, friendUid: String)
 
+  suspend fun removeUserFromAllFriendsLists(uid: String)
+
   suspend fun deleteUserByUid(uid: String)
 }

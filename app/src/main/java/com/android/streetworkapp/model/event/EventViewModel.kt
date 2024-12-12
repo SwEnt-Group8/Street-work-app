@@ -86,6 +86,15 @@ open class EventViewModel(private val repository: EventRepository) : ViewModel()
   fun removeParticipantFromEvent(eid: String, uid: String) {
     viewModelScope.launch { repository.removeParticipantFromEvent(eid, uid) }
   }
+
+  /**
+   * Remove a participant from all events and delete events where the user is the owner.
+   *
+   * @param uid The user ID.
+   */
+  fun removeParticipantFromAllEvents(uid: String) {
+    viewModelScope.launch { repository.removeParticipantFromAllEvents(uid) }
+  }
 }
 
 sealed class EventOverviewUiState {

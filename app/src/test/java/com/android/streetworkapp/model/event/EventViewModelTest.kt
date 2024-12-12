@@ -85,4 +85,11 @@ class EventViewModelTest {
     testDispatcher.scheduler.advanceUntilIdle()
     verify(repository).removeParticipantFromEvent(any(), any())
   }
+
+  @Test
+  fun removeParticipantFromAllEventsCallsRepository() = runTest {
+    eventViewModel.removeParticipantFromAllEvents("user123")
+    testDispatcher.scheduler.advanceUntilIdle()
+    verify(repository).removeParticipantFromAllEvents("user123")
+  }
 }

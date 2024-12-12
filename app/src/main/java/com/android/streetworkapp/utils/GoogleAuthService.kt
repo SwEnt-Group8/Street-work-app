@@ -4,6 +4,7 @@ package com.android.streetworkapp.utils
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
@@ -65,6 +66,17 @@ class GoogleAuthService(
   /** Revokes access to the app. */
   override fun revokeAccess() {
     mGoogleSignInClient.revokeAccess()
+  }
+
+  /** Deletes the authenticated user. */
+  fun deleteAuthUser() {
+    auth.currentUser?.delete()?.addOnCompleteListener { task ->
+      if (task.isSuccessful) {
+        Log.d("GoogleAuthService", "User account deleted.")
+      } else {
+        Log.d("GoogleAuthService", "Failed to delete user account.")
+      }
+    }
   }
 
   /**

@@ -252,6 +252,24 @@ class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRep
   }
 
   /**
+   * Deletes the entire WorkoutData for a user from Firestore.
+   *
+   * @param uid The UID of the user.
+   */
+  override suspend fun deleteWorkoutDataByUid(uid: String) {
+    require(uid.isNotEmpty()) { "The user UID must not be empty." }
+    try {
+      val querySnapshot = db.collection(COLLECTION_PATH).whereEqualTo("userUid", uid).get().await()
+
+      for (document in querySnapshot.documents) {
+        db.collection(COLLECTION_PATH).document(document.id).delete().await()
+      }
+    } catch (e: Exception) {
+      Log.e(ERROR_TAG, "Error deleting WorkoutData for UID=$uid: ${e.message}")
+    }
+  }
+
+  /**
    * Converts a Firestore document to a WorkoutData object.
    *
    * @param document The document to convert.

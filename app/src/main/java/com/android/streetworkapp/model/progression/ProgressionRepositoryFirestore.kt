@@ -64,6 +64,25 @@ class ProgressionRepositoryFirestore(private val db: FirebaseFirestore) : Progre
   }
 
   /**
+   * Used to delete a progression object by its uid
+   *
+   * @param uid: the uid of the user
+   */
+  override suspend fun deleteProgressionByUid(uid: String) {
+    require(uid.isNotEmpty()) { "Empty UID" }
+    try {
+      val document = db.collection(COLLECTION_PATH).whereEqualTo("uid", uid).get().await()
+      if (document.isEmpty) {
+        Log.e("FirestoreError", "No progression found for user with uid: $uid")
+      } else {
+        db.collection(COLLECTION_PATH).document(document.documents[0].id).delete().await()
+      }
+    } catch (e: Exception) {
+      Log.e("FirestoreError", "Error deleting Progression from user uid: ${e.message}")
+    }
+  }
+
+  /**
    * Used to convert a document to a Progression Object
    *
    * @param document: the document to convert
