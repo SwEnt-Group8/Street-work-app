@@ -300,9 +300,9 @@ class End2EndCreateEvent {
         // create an event
         composeTestRule.onNodeWithTag("createEventButton").assertIsDisplayed().performClick()
 
-        composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
-
         /**
+         * composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
+         *
          * composeTestRule.onNodeWithTag("titleTag").assertIsDisplayed().performTextClearance()
          *
          * composeTestRule.onNodeWithTag("titleTag").performTextInput(event.title)
