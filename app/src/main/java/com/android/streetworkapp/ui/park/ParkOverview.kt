@@ -19,14 +19,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.automirrored.filled.DirectionsRun
+import androidx.compose.material.icons.filled.DirectionsRun
+import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Timelapse
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -53,6 +58,7 @@ import androidx.navigation.compose.rememberNavController
 import com.android.sample.R
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventOverviewUiState
+import com.android.streetworkapp.model.event.EventStatus
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.image.ImageViewModel
 import com.android.streetworkapp.model.park.Park
@@ -69,7 +75,6 @@ import com.android.streetworkapp.ui.progress.updateAndDisplayPoints
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.ui.utils.CustomDialog
 import com.android.streetworkapp.utils.dateDifference
-import com.android.streetworkapp.utils.toFormattedString
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 
@@ -420,26 +425,41 @@ fun EventItemList(eventViewModel: EventViewModel, navigationActions: NavigationA
  */
 @Composable
 fun EventItem(event: Event, eventViewModel: EventViewModel, navigationActions: NavigationActions) {
+  val (statusColor, statusIcon) =
+      when (event.status) {
+        EventStatus.CREATED -> Pair(MaterialTheme.colorScheme.error, Icons.Default.Timelapse)
+        EventStatus.STARTED ->
+            Pair(ColorPalette.DARK_GREEN, Icons.AutoMirrored.Filled.DirectionsRun)
+        EventStatus.ENDED -> Pair(Color.Gray, Icons.Default.QuestionMark)
+      }
+
   ListItem(
       modifier = Modifier.padding(0.dp).testTag("eventItem"),
       headlineContent = { Text(text = event.title) },
       supportingContent = {
         Text(
-            "Participants ${event.listParticipants.size}/${event.maxParticipants}",
+            "Participants: ${event.listParticipants.size}/${event.maxParticipants}",
             fontWeight = FontWeight.Light,
             modifier = Modifier.testTag("participantsText"))
       },
       overlineContent = {
         Text(
-            text = dateDifference(event.date.toFormattedString()),
+            text = dateDifference(event),
             fontWeight = FontWeight.Bold,
             modifier = Modifier.testTag("dateText"))
       },
       leadingContent = {
-        Icon(
-            imageVector = Icons.Default.AccountCircle,
-            contentDescription = "Profile Icon",
-            modifier = Modifier.size(56.dp).testTag("profileIcon"))
+        Box(
+            modifier =
+                Modifier.size(56.dp)
+                    .background(color = statusColor, shape = CircleShape)
+                    .padding(2.dp)) {
+              Icon(
+                  imageVector = statusIcon,
+                  contentDescription = "Add Image",
+                  tint = Color.White,
+                  modifier = Modifier.align(Alignment.Center).fillMaxSize(0.75f))
+            }
       },
       trailingContent = {
         Button(
@@ -455,14 +475,3 @@ fun EventItem(event: Event, eventViewModel: EventViewModel, navigationActions: N
       })
   HorizontalDivider()
 }
-
-/**
- * @Composable fun CreateEventButton(navigationActions: NavigationActions) { Row( modifier =
- *   Modifier.fillMaxWidth().padding(end = 32.dp), horizontalArrangement = Arrangement.End) {
- *   IconButton( onClick = { navigationActions.navigateTo(Screen.ADD_EVENT) }, modifier =
- *   Modifier.testTag("createEventButton").size(50.dp)) { Box( modifier = Modifier.fillMaxSize()
- *   .background( color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape) .padding(4.dp))
- *   { Icon( painter = painterResource(id = R.drawable.calendar_add_on), contentDescription =
- *   "Create Event", tint = Color.White, modifier =
- *   Modifier.align(Alignment.Center).size(30.dp).padding(start = 2.dp)) } } } }
- */
