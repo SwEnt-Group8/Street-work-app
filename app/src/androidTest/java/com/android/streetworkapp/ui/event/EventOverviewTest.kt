@@ -82,7 +82,7 @@ class EventOverviewTest {
             occupancy = 5,
             events = emptyList())
 
-    participant = User("123", "test", "test", 0, listOf(), "test")
+    participant = User("123", "test", "test", 0, emptyList(), "test", emptyList())
     joiner = participant.copy(uid = "joiner")
     owner = participant.copy(uid = "124", username = "owner")
 
@@ -237,7 +237,7 @@ class EventOverviewTest {
   fun ownerBottomBarIsDisplayed() = runTest {
     `when`(eventRepository.getNewEid()).thenReturn("test")
 
-    val owner = User(event.owner, "owner", "owner", 0, emptyList(), "owner")
+    val owner = User(event.owner, "owner", "owner", 0, emptyList(), "owner", emptyList())
 
     userViewModel.setCurrentUser(owner)
 
