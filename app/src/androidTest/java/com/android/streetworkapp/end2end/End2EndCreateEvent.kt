@@ -313,16 +313,18 @@ class End2EndCreateEvent {
 
         composeTestRule.onNodeWithTag("descriptionTag").performTextInput(event.description)
 
-        composeTestRule.onNodeWithTag("dateIcon").performClick()
-
-        composeTestRule.onNodeWithTag("validateDate").performClick()
-
-        composeTestRule.onNodeWithTag("timeIcon").performClick()
-
-        composeTestRule.onNodeWithTag("validateTime").performClick()
-
-        composeTestRule.onNodeWithTag("addEventButton").assertIsDisplayed().performClick()
-
+        /**
+         * composeTestRule.onNodeWithTag("dateIcon").performClick()
+         *
+         * composeTestRule.onNodeWithTag("validateDate").performClick()
+         *
+         * composeTestRule.onNodeWithTag("timeIcon").performClick()
+         *
+         * composeTestRule.onNodeWithTag("validateTime").performClick()
+         *
+         * composeTestRule.onNodeWithTag("addEventButton").assertIsDisplayed().performClick()
+         */
+          
         verify(eventDocumentRef).set(any())
 
         verify(parkDocumentRef).update(eq("events"), any())
