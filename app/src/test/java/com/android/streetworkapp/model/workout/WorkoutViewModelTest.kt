@@ -3,6 +3,7 @@ package com.android.streetworkapp.model.workout
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -157,6 +158,62 @@ class WorkoutViewModelTest {
     assertEquals(sessionType, capturedSession.sessionType)
     assertEquals(1, capturedSession.exercises.size)
     assertEquals(exercise, capturedSession.exercises.first())
+  }
+
+  @Test
+  fun sendPairingRequestCallsRepository() = runTest {
+    val fromUid = "fromUser"
+    val toUid = "toUser"
+    workoutViewModel.sendPairingRequest(fromUid, toUid)
+    testDispatcher.scheduler.advanceUntilIdle()
+    verify(repository).sendPairingRequest(fromUid, toUid)
+  }
+
+  @Test
+  fun observePairingRequestsUpdatesFlowCorrectly() = runTest {
+    val uid = "testUid"
+    val pairingRequest = PairingRequest(requestId = "reqId", fromUid = "fromUser", toUid = "toUser")
+    val flow = flowOf(listOf(pairingRequest))
+    `when`(repository.observePairingRequests(uid)).thenReturn(flow)
+
+    workoutViewModel.observePairingRequests(uid)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    assertEquals(listOf(pairingRequest), workoutViewModel.pairingRequests.value)
+  }
+
+  @Test
+  fun respondToPairingRequestCallsRepository() = runTest {
+    val requestId = "requestId"
+    val isAccepted = true
+    workoutViewModel.respondToPairingRequest(requestId, isAccepted)
+    testDispatcher.scheduler.advanceUntilIdle()
+    verify(repository).respondToPairingRequest(requestId, isAccepted)
+  }
+
+  @Test
+  fun observeWorkoutSessionsUpdatesFlowCorrectly() = runTest {
+    val uid = "testUid"
+    val session =
+        WorkoutSession(
+            sessionId = "sessionId", startTime = 0L, endTime = 0L, sessionType = SessionType.SOLO)
+    val flow = flowOf(listOf(session))
+    `when`(repository.observeWorkoutSessions(uid)).thenReturn(flow)
+
+    workoutViewModel.observeWorkoutSessions(uid)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    assertEquals(listOf(session), workoutViewModel.workoutSessions.value)
+  }
+
+  @Test
+  fun addCommentToSessionCallsRepository() = runTest {
+    val sessionId = "sessionId"
+    val comment = Comment(authorUid = "user123", text = "Nice workout!")
+
+    workoutViewModel.addCommentToSession(sessionId, comment)
+    testDispatcher.scheduler.advanceUntilIdle()
+    verify(repository).addCommentToSession(sessionId, comment)
   }
 
   @Test
