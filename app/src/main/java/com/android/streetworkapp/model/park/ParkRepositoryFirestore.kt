@@ -312,6 +312,30 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore, testing: Boolea
   }
 
   /**
+   * Delete rating of an user from all parks.
+   *
+   * @param uid The user ID of the person whose rating will be deleted.
+   */
+  override suspend fun deleteRatingFromAllParks(uid: String) {
+    require(uid.isNotEmpty()) { "UID cannot be empty." }
+    try {
+      val parks = db.collection(COLLECTION_PATH).get().await()
+      for (document in parks.documents) {
+        val park = document.toObject(Park::class.java)
+        if (park != null && uid in park.votersUIDs) {
+          park.nbrRating = (park.nbrRating - 1).coerceAtLeast(0)
+          db.collection(COLLECTION_PATH)
+              .document(park.pid)
+              .update("votersUIDs", FieldValue.arrayRemove(uid), "nbrRating", park.nbrRating)
+              .await()
+        }
+      }
+    } catch (e: Exception) {
+      Log.e("FirestoreError", "Error deleting rating from all parks: ${e.message}")
+    }
+  }
+
+  /**
    * Fills the imagesCollectionId of the park with collectionId parameter
    *
    * @param pid The parkId to add the collection to.
