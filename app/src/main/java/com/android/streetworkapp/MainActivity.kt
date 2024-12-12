@@ -115,9 +115,6 @@ fun StreetWorkAppMain(
     testInvokation: NavigationActions.() -> Unit = {},
     internetAvailable: Boolean = false
 ) {
-  // Setup s3Client
-  val storageClient =
-      S3StorageClient(S3StorageClient.getDigitalOceanS3Client(), S3Clients.DIGITAL_OCEAN.endpoint)
 
   // repositories
   val overpassParkLocationRepo = OverpassParkLocationRepository(OkHttpClient())
@@ -152,7 +149,12 @@ fun StreetWorkAppMain(
   val textModerationViewModel = TextModerationViewModel(textModerationRepository)
 
   // Instantiate Park Images flow
-  val imageRepository = ImageRepositoryFirestore(firestoreDB, parkRepository, userRepository)
+  val storageClient =
+      S3StorageClient(
+          S3StorageClient.getDigitalOceanS3Client(),
+          S3Clients.DIGITAL_OCEAN.endpoint) // Setup the s3 client wrapper
+  val imageRepository =
+      ImageRepositoryFirestore(firestoreDB, storageClient, parkRepository, userRepository)
   val imageViewModel = ImageViewModel(imageRepository)
 
   // Instantiate Google Auth Service
@@ -360,7 +362,8 @@ fun StreetWorkApp(
                   navigationActions,
                   eventViewModel,
                   userViewModel,
-                  imageViewModel)
+                  imageViewModel,
+              )
             }
             composable(Screen.ADD_EVENT) {
               infoManager.Display(LocalContext.current)
