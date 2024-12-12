@@ -29,9 +29,9 @@ class LocationService(
     private val host: SnackbarHostState? = null
 ) {
   // Define the distance for when user is in a park
-    companion object{
-        const val PARK_RADIUS = 30 // meter
-    }
+  companion object {
+    const val PARK_RADIUS = 30 // meter
+  }
 
   // Define the FusedLocationProviderClient to get location
   private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
