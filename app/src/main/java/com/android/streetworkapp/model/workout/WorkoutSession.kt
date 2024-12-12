@@ -17,10 +17,10 @@ import com.android.streetworkapp.utils.toFormattedString
  * @param comments List of comments on the session
  */
 data class WorkoutSession(
-    val sessionId: String,
-    val startTime: Long,
-    val endTime: Long,
-    val sessionType: SessionType,
+    val sessionId: String = "",
+    val startTime: Long = 0L,
+    val endTime: Long = 0L,
+    val sessionType: SessionType = SessionType.SOLO,
     val participants: List<String> = emptyList(),
     val exercises: List<Exercise> = emptyList(),
     val winner: String? = null,
