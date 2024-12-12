@@ -8,7 +8,9 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import com.android.streetworkapp.StreetWorkApp
+import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventRepository
+import com.android.streetworkapp.model.event.EventStatus
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.image.ImageRepository
 import com.android.streetworkapp.model.image.ImageViewModel
@@ -27,8 +29,10 @@ import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.model.workout.WorkoutRepository
 import com.android.streetworkapp.model.workout.WorkoutViewModel
 import com.android.streetworkapp.utils.GoogleAuthService
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import io.mockk.mockk
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.RETURNS_DEFAULTS
@@ -37,6 +41,18 @@ import org.mockito.Mockito.mock
 class TopAppBarTest {
 
   @get:Rule val composeTestRule = createComposeRule()
+
+  private lateinit var eventRepository: EventRepository
+  private lateinit var eventViewModel: EventViewModel
+
+  private val event =
+      Event("1", "title", "", 1, 2, Timestamp.now(), "123", emptyList(), "123", EventStatus.CREATED)
+
+  @Before
+  fun setUp() {
+    eventRepository = mock(EventRepository::class.java, RETURNS_DEFAULTS)
+    eventViewModel = EventViewModel(eventRepository)
+  }
 
   @Test
   fun changingTitleInManagerMakesItChangeOnScreen() {
@@ -52,6 +68,7 @@ class TopAppBarTest {
 
   @Test
   fun isDisplayedCorrectlyOnScreens() {
+    eventViewModel.setCurrentEvent(event)
     val currentScreenParam =
         mutableStateOf(
             LIST_OF_SCREENS.first()) // can't call setContent twice per test so we use this instead
@@ -62,7 +79,7 @@ class TopAppBarTest {
           {},
           UserViewModel(mock(UserRepository::class.java, RETURNS_DEFAULTS)),
           ParkViewModel(mock(ParkRepository::class.java, RETURNS_DEFAULTS)),
-          EventViewModel(mock(EventRepository::class.java, RETURNS_DEFAULTS)),
+          eventViewModel,
           ProgressionViewModel(mock(ProgressionRepository::class.java, RETURNS_DEFAULTS)),
           WorkoutViewModel(mock(WorkoutRepository::class.java, RETURNS_DEFAULTS)),
           TextModerationViewModel(mock(TextModerationRepository::class.java)),
