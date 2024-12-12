@@ -921,4 +921,36 @@ class UserRepositoryFirestoreTest {
 
     verify(documentRef, times(2)).get()
   }
+
+  @Test
+  fun removeUserFromAllFriendsListsWithValidUidRemovesUserFromFriendsLists(): Unit = runBlocking {
+    // Mock a user document that contains "user123" in their friends list
+    val friendDocRef = mock<DocumentReference>()
+    val friendDocument = mock<DocumentSnapshot>()
+    whenever(friendDocument.id).thenReturn("friend1")
+    whenever(friendDocument.get("friends")).thenReturn(listOf("user123"))
+    whenever(friendDocument.reference).thenReturn(friendDocRef)
+
+    // Mock QuerySnapshot to return the friend document
+    val querySnapshot = mock<QuerySnapshot>()
+    whenever(querySnapshot.documents).thenReturn(listOf(friendDocument))
+
+    // Mock Firestore query
+    whenever(db.collection("users")).thenReturn(collection)
+    val query = mock<Query>()
+    whenever(collection.whereArrayContains("friends", "user123")).thenReturn(query)
+    whenever(query.get()).thenReturn(Tasks.forResult(querySnapshot))
+
+    // Mock WriteBatch behavior
+    whenever(db.batch()).thenReturn(batch)
+    whenever(batch.update(friendDocRef, "friends", emptyList<String>())).thenReturn(batch)
+    whenever(batch.commit()).thenReturn(Tasks.forResult(null))
+
+    // Call the repository method
+    userRepository.removeUserFromAllFriendsLists("user123")
+
+    // Verify the batch operations
+    verify(batch).update(friendDocRef, "friends", emptyList<String>()) // Remove "user123"
+    verify(batch).commit() // Ensure the changes are committed
+  }
 }
