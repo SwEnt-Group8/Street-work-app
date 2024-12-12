@@ -47,5 +47,5 @@ interface WorkoutRepository {
 
   fun observeWorkoutSessions(uid: String): Flow<List<WorkoutSession>>
 
-  suspend fun addCommentToSession(sessionId: String, comment: Comment)
+  suspend fun addCommentToSession(uid: String, sessionId: String, comment: Comment)
 }

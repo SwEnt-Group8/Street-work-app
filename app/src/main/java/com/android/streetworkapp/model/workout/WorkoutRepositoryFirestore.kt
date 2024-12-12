@@ -409,12 +409,18 @@ class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRep
   /**
    * Adds a comment to a workout session.
    *
+   * @param uid The UID of the user.
    * @param sessionId The ID of the session.
    * @param comment The comment to add.
    */
-  override suspend fun addCommentToSession(sessionId: String, comment: Comment) {
-    val sessionPath = "$COLLECTION_PATH/${comment.authorUid}/$WORKOUT_SESSIONS/$sessionId/comments"
-    db.collection(sessionPath).add(comment).await()
+  override suspend fun addCommentToSession(uid: String, sessionId: String, comment: Comment) {
+    val commentsCollectionPath =
+        db.collection(COLLECTION_PATH)
+            .document(uid)
+            .collection(WORKOUT_SESSIONS)
+            .document(sessionId)
+            .collection("comments")
+    commentsCollectionPath.add(comment).await()
   }
 
   /**

@@ -263,11 +263,12 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
   /**
    * Adds a comment to a specific workout session.
    *
+   * @param uid The UID of the user.
    * @param sessionId The ID of the session.
    * @param comment The comment to add.
    */
-  fun addCommentToSession(sessionId: String, comment: Comment) {
-    viewModelScope.launch { repository.addCommentToSession(sessionId, comment) }
+  fun addCommentToSession(uid: String, sessionId: String, comment: Comment) {
+    viewModelScope.launch { repository.addCommentToSession(uid, sessionId, comment) }
   }
 
   /**
