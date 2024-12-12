@@ -1,6 +1,5 @@
 package com.android.streetworkapp.ui.navigation
 
-import android.widget.Toast
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Place
