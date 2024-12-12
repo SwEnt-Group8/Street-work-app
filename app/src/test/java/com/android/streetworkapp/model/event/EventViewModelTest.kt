@@ -87,6 +87,20 @@ class EventViewModelTest {
   }
 
   @Test
+  fun deleteEventCallsRepository() = runTest {
+    eventViewModel.deleteEvent(event)
+    testDispatcher.scheduler.advanceUntilIdle()
+    verify(repository).deleteEvent(any())
+  }
+
+  @Test
+  fun updateStatusCallsRepository() = runTest {
+    eventViewModel.updateStatus(event.eid, EventStatus.ENDED)
+    testDispatcher.scheduler.advanceUntilIdle()
+    verify(repository).updateStatus(any(), any())
+  }
+
+  @Test
   fun removeParticipantFromAllEventsCallsRepository() = runTest {
     eventViewModel.removeParticipantFromAllEvents("user123")
     testDispatcher.scheduler.advanceUntilIdle()

@@ -128,6 +128,28 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
   }
 
   /**
+   * Retrieves the list of parks of a user from Firestore based on the provided user ID (uid).
+   *
+   * @param uid The unique ID of the user whose friends are being retrieved.
+   * @return A list of ID of park visited by the user, or null if an error occurs.
+   */
+  override suspend fun getParksByUid(uid: String): List<String>? {
+    require(uid.isNotEmpty()) { UID_EMPTY }
+    return try {
+      // Get the user's document first to retrieve the list of friend UIDs
+      val document = db.collection(COLLECTION_PATH).document(uid).get().await()
+      val parksIds =
+          (document["parks"] as? List<*>) // safecast
+              ?.mapNotNull { it as? String } ?: emptyList()
+
+      parksIds
+    } catch (e: Exception) {
+      Log.e("FirestoreError", "Error getting parks of user ID: $uid. Reason: ${e.message}")
+      null
+    }
+  }
+
+  /**
    * Adds a new user to Firestore.
    *
    * @param user The User object to add to Firestore.
@@ -256,6 +278,24 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
   }
 
   /**
+   * Adds the newly discovered park in the parks lists in Firestore.
+   *
+   * @param uid The unique ID of the user.
+   * @param parkId The ID of the park to add to the user's parks list.
+   */
+  override suspend fun addNewPark(uid: String, parkId: String) {
+    require(uid.isNotEmpty()) { UID_EMPTY }
+    require(parkId.isNotEmpty()) { "park ID must not be empty" }
+    try {
+      // Add parkId to the user's park list
+      val userRef = db.collection("users").document(uid)
+      userRef.update("parks", FieldValue.arrayUnion(parkId))
+    } catch (e: Exception) {
+      Log.e("FirestoreError", "Error adding new park: ${e.message}")
+    }
+  }
+
+  /**
    * Removes a user from all friends lists in Firestore.
    *
    * @param uid The unique ID of the user to remove from all friends lists.
@@ -317,15 +357,25 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
             Log.e("FirestoreError", "Error retrieving friends list", e)
             emptyList<String>() // Return an empty list in case of an exception
           }
+      // Safely handle the 'parks' field
+      val parks =
+          try {
+            document["parks"] as? List<*> ?: emptyList<String>()
+          } catch (e: Exception) {
+            Log.e("FirestoreError", "Error retrieving parks list", e)
+            emptyList<String>() // Return an empty list in case of an exception
+          }
 
       val validFriends = friends.filterIsInstance<String>()
+      val validParks = parks.filterIsInstance<String>()
       User(
           uid = uid,
           username = username,
           email = email,
           score = score,
           friends = validFriends,
-          picture = picture)
+          picture = picture,
+          parks = validParks)
     } catch (e: Exception) {
       Log.e("FirestoreError", "Error converting document to User", e)
       null
