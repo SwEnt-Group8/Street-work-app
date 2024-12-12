@@ -95,7 +95,7 @@ fun SettingsContent(
               onClick = { showConfirmUserDelete.value = true },
               colors = ColorPalette.BUTTON_COLOR,
               modifier = Modifier.testTag("DeleteAccountButton")) {
-                Text("Delete account")
+                Text(context.getString(R.string.DeleteAccountTitle))
               }
         }
       }
@@ -107,10 +107,33 @@ fun SettingsContent(
       title = context.getString(R.string.DeleteAccountConfirmationTitle),
       Content = { Text(context.getString(R.string.DeleteAccountConfirmationContent)) },
       onSubmit = {
-        Toast.makeText(context, "Not yet implemented", Toast.LENGTH_SHORT).show()
+        // If the Firebase user is not saved make it sign in
+        if (firebaseUser == null) {
+          authService.launchSignIn(launcher)
+        }
 
-        showParentDialog.value = false
-        // navigationActions.navigateTo(Screen.AUTH)
+        val deletionSucceed =
+            deleteAccount(
+                authService,
+                userViewModel,
+                parkViewModel,
+                eventViewModel,
+                progressionViewModel,
+                workoutViewModel)
+
+        if (deletionSucceed) {
+          logout(authService, userViewModel, preferencesViewModel)
+          Toast.makeText(
+                  context, context.getString(R.string.DeleteAccountSuccess), Toast.LENGTH_SHORT)
+              .show()
+          showParentDialog.value = false
+          navigationActions.navigateTo(Route.AUTH)
+        } else {
+          Toast.makeText(
+                  context, context.getString(R.string.DeleteAccountFailure), Toast.LENGTH_SHORT)
+              .show()
+          showParentDialog.value = false
+        }
       })
 }
 
