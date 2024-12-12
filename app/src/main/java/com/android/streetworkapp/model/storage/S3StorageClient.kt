@@ -23,14 +23,14 @@ enum class S3Clients(
       secretKey =
           BuildConfig
               .DIGITAL_OCEAN_SPACE_SECRET_KEY) // note: the region doesn't actually matter for
-                                               // digitalocean but we have to specify it
+  // digitalocean but we have to specify it
 }
 
 class S3StorageClient(
     private val s3Client: S3Client,
     private val endpoint: String
 ) { // unfortunately didn't find a way to retrieve endpoint from s3client, have to store it in the
-    // class
+  // class
 
   private val DEBUG_PREFIX = "S3StorageClient:"
 
