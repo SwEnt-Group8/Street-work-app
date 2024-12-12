@@ -20,6 +20,10 @@ open class EventViewModel(private val repository: EventRepository) : ViewModel()
   val currentEvent: StateFlow<Event?>
     get() = _currentEvent
 
+  private val _eventList: MutableStateFlow<Map<String, Event>> = MutableStateFlow(emptyMap())
+  val eventList: StateFlow<Map<String, Event>>
+    get() = _eventList
+
   fun setCurrentEvent(event: Event?) {
     _currentEvent.value = event
   }
@@ -29,6 +33,33 @@ open class EventViewModel(private val repository: EventRepository) : ViewModel()
       val fetchedEvent = repository.getEventByEid(eid)
       _currentEvent.value = fetchedEvent
     }
+  }
+
+  /**
+   * Get a list of events by their IDs.
+   *
+   * @param eids The list of event IDs.
+   */
+  fun getEventsByEid(eids: List<String>) {
+    val fetchedEvents = mutableMapOf<String, Event>()
+    viewModelScope.launch {
+      eids.forEach {
+        val event = repository.getEventByEid(it)
+        if (event != null) fetchedEvents[it] = event
+      }
+      _eventList.value = fetchedEvents
+    }
+  }
+
+  /**
+   * Get a list of events from the park they are in.
+   *
+   * @param parks The list of parks.
+   */
+  fun getEventsByParkList(parks: List<Park>) {
+    val eids = parks.flatMap { it.events }
+
+    getEventsByEid(eids)
   }
 
   fun setUiState(state: EventOverviewUiState) {

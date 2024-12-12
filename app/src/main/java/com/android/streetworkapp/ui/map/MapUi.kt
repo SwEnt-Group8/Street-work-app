@@ -46,7 +46,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import com.android.streetworkapp.model.event.Event
-import com.android.streetworkapp.model.event.EventOverviewUiState
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkViewModel
@@ -121,8 +120,26 @@ fun MapScreen(
 
   var selectedPark by remember { mutableStateOf(Park()) }
 
+  // Fetching all events :
+  LaunchedEffect(parkList) { eventViewModel.getEventsByParkList(parkList.value.filterNotNull()) }
+  val eventMap = eventViewModel.eventList.collectAsState().value
+
+  fun fetchEventMap(park: Park): List<Event> {
+    // Log.d("ParkFilter", "Fetching event map for park ${park.name}")
+    val eventList: MutableList<Event> = mutableListOf()
+    park.events.forEach() {
+      val event = eventMap[it]
+      if (event != null) eventList.add(event)
+    }
+    if (eventList.isNotEmpty()) {
+      Log.d("ParkFilter", "Event list for park ${park.name} fetched : $eventList")
+    }
+
+    return eventList
+  }
+
   // Set values for park filtering :
-  val filter = remember { FilterSettings() }
+  val filter = FilterSettings()
   val parkFilter = ParkFilter(filter)
   val userFilterInput = FilterSettings()
 
@@ -157,21 +174,10 @@ fun MapScreen(
               .filterNotNull()
               .filter { it.name.contains(searchQuery.value, ignoreCase = true) }
               .filter {
-                Log.d("ParkFilter", "Filtering park ${it.name}")
+                // Log.d("ParkFilter", "Filtering park ${it.name} with event list ${it.events}")
 
-                LaunchedEffect(it) { eventViewModel.getEvents(it) }
+                val eventList = fetchEventMap(it)
 
-                val uiState = eventViewModel.uiState.value
-
-                Log.d("ParkFilter", "UI State fetched : $uiState")
-
-                val eventList: List<Event> =
-                    when (uiState) {
-                      is EventOverviewUiState.NotEmpty -> uiState.eventList
-                      else -> emptyList()
-                    }
-                Log.d("ParkFilter", "Event list for park ${it.name} fetched : $eventList")
-                Log.d("ParkFilter", "But, park has event list ${it.events}")
                 parkFilter.filter(eventList, it)
               }
               .forEach { park ->
