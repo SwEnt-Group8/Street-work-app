@@ -159,7 +159,8 @@ fun MapScreen(
               .filter {
                 Log.d("ParkFilter", "Filtering park ${it.name}")
 
-                it.let { eventViewModel.getEvents(it) }
+                LaunchedEffect(it) { eventViewModel.getEvents(it) }
+
                 val uiState = eventViewModel.uiState.value
 
                 Log.d("ParkFilter", "UI State fetched : $uiState")
