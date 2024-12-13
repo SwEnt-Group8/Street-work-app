@@ -14,6 +14,8 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextClearance
+import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.size
@@ -68,6 +70,7 @@ import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
 class End2EndCreateEvent {
@@ -202,6 +205,7 @@ class End2EndCreateEvent {
     `when`(eventDocument.get("maxParticipants")).thenReturn(event.maxParticipants.toLong())
     `when`(eventDocument.get("parkId")).thenReturn(event.parkId)
     `when`(eventDocument.get("listParticipants")).thenReturn(event.listParticipants)
+    `when`(eventDocument.get("status")).thenReturn("CREATED")
 
     // repositories
     `when`(parkLocationRepository.search(any(), any(), any(), any())).then {
@@ -254,7 +258,8 @@ class End2EndCreateEvent {
           GoogleAuthService(
               "abc",
               mock(FirebaseAuth::class.java, RETURNS_DEFAULTS),
-              context = LocalContext.current))
+              context = LocalContext.current),
+          navTestInvokationOnEachRecompose = true)
     }
 
     // Wait for the map to be loaded
@@ -291,43 +296,56 @@ class End2EndCreateEvent {
       click(Offset(xClickOffset.toPx(), yClickOffset.toPx() - yOffsetCorr.toPx() - 3))
     }
 
+    // need to wait before clicking again else the click is considered as a double click
+    composeTestRule.waitUntil(3000) {
+      runBlocking { delay(2000) }
+      true
+    }
+
+    currentScreen = Screen.PARK_OVERVIEW
+
     composeTestRule.waitUntil(5000) {
       composeTestRule.onNodeWithTag("parkOverviewScreen").isDisplayed()
     }
 
     // create an event
-    // composeTestRule.onNodeWithTag("createEventButton").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("createEventButton").assertIsDisplayed().performClick()
 
-    /**
-     * composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
-     *
-     * composeTestRule.onNodeWithTag("titleTag").assertIsDisplayed().performTextClearance()
-     *
-     * composeTestRule.onNodeWithTag("titleTag").performTextInput(event.title)
-     *
-     * composeTestRule.onNodeWithTag("descriptionTag").assertIsDisplayed().performTextClearance()
-     *
-     * composeTestRule.onNodeWithTag("descriptionTag").performTextInput(event.description)
-     *
-     * composeTestRule.onNodeWithTag("dateIcon").performClick()
-     *
-     * composeTestRule.onNodeWithTag("validateDate").performClick()
-     *
-     * composeTestRule.onNodeWithTag("timeIcon").performClick()
-     *
-     * composeTestRule.onNodeWithTag("validateTime").performClick()
-     *
-     * composeTestRule.onNodeWithTag("addEventButton").assertIsDisplayed().performClick()
-     *
-     * verify(eventDocumentRef).set(any())
-     *
-     * verify(parkDocumentRef).update(eq("events"), any())
-     */
+    currentScreen = Screen.ADD_EVENT
+
+    composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("titleTag").assertIsDisplayed().performTextClearance()
+
+    composeTestRule.onNodeWithTag("titleTag").performTextInput(event.title)
+
+    composeTestRule.onNodeWithTag("descriptionTag").assertIsDisplayed().performTextClearance()
+
+    composeTestRule.onNodeWithTag("descriptionTag").performTextInput(event.description)
+
+    composeTestRule.onNodeWithTag("dateIcon").performClick()
+
+    composeTestRule.onNodeWithTag("validateDate").performClick()
+
+    composeTestRule.onNodeWithTag("timeIcon").performClick()
+
+    composeTestRule.onNodeWithTag("validateTime").performClick()
+
+    composeTestRule.onNodeWithTag("addEventButton").assertIsDisplayed().performClick()
+
+    verify(eventDocumentRef).set(any())
+
+    verify(parkDocumentRef).update(eq("events"), any())
+
+    currentScreen = Screen.PARK_OVERVIEW
+
     composeTestRule.waitUntil(5000) { composeTestRule.onNodeWithTag("eventButton").isDisplayed() }
 
     composeTestRule.onNodeWithText(event.title).assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("eventButton").assertIsDisplayed().performClick()
+
+    currentScreen = Screen.EVENT_OVERVIEW
 
     composeTestRule.waitForIdle()
 

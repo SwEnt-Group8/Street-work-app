@@ -153,6 +153,7 @@ fun MapScreen(
                       true
                     },
                     onInfoWindowClick = {
+                      Log.d("e2eCreateEvent", "Park: ${park.name}")
                       parkViewModel.setPark(park)
                       parkViewModel.setParkLocation(park.location)
                       navigationActions.navigateTo(Screen.PARK_OVERVIEW)

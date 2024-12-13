@@ -28,10 +28,12 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
 
   override suspend fun getEventByEid(eid: String): Event? {
     require(eid.isNotEmpty())
+    Log.d("e2eCreateEvent", "getEventByEid: $eid")
     return try {
       val document = db.collection(COLLECTION_PATH).document(eid).get().await()
       documentToEvent(document)
     } catch (e: Exception) {
+      Log.e("e2eCreateEvent", "failed to getEventByEid: $e")
       Log.e("FirestoreError", "Error getting event with ID: $eid. Reason: ${e.message}")
       null
     }
@@ -48,10 +50,13 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
       onSuccess: (List<Event>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
+    Log.d("e2eCreateEvent", "getEvents: ${park.events}")
     try {
       val eventList = park.events.mapNotNull { getEventByEid(it) }
+      Log.d("e2eCreateEvent", "getEvents: ${eventList.first()}")
       onSuccess(eventList)
     } catch (e: Exception) {
+      Log.d("e2eCreateEvent", "failed to getEvents: $e")
       onFailure(e)
       Log.e("FirestoreError", "Error getting events: ${e.message}")
     }
