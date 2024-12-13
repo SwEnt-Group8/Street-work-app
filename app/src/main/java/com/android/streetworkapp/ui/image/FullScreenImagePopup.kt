@@ -71,7 +71,7 @@ fun FullScreenImagePopup(
     onDismiss: () -> Unit
 ) {
   val currentUser = userViewModel.currentUser.collectAsState().value
-  val currentImages by rememberUpdatedState(images)
+  val currentImages by rememberUpdatedState(images.sortedBy {it.rating.getImageScore()})
   // State for the pager to keep track of the current image
   val pagerState = rememberPagerState(pageCount = { currentImages.size })
   val coroutineScope = rememberCoroutineScope()
