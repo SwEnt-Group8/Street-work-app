@@ -33,3 +33,8 @@ data class ParkImage(
     val rating: Pair<Int, Int> = Pair(0, 0),
     val uploadDate: Timestamp = Timestamp.now()
 )
+
+
+enum class VOTE_TYPE(val value: Int) {
+    POSITIVE(1), NEGATIVE(1)
+}

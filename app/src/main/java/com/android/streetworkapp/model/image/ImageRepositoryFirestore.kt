@@ -138,18 +138,19 @@ class ImageRepositoryFirestore(
     }
   }
 
-  /**
-   * Updates the score of the image with hash imageHash in document imageCollectionId
-   *
-   * @param voteType The vote type. True if a positive vote, false if a negative vote.
-   */
+    /**
+     * Updates the score of the image with hash imageHash in document imageCollectionId
+     * @param imageCollectionId The collection the image belongs to.
+     * @param imageUrl The url of the image of whom to register the vote to.
+     * @param vote The vote type. True if a positive vote, false if a negative vote.
+     */
   override suspend fun imageVote(
       imageCollectionId: String,
-      imageHash: String,
-      voteType: Boolean
+      imageUrl: String,
+      vote: VOTE_TYPE
   ): Boolean {
     require(imageCollectionId.isNotEmpty()) { "Empty imageCollectionId." }
-    require(imageHash.isNotEmpty()) { "Empty imageHash." }
+    require(imageUrl.isNotEmpty()) { "Empty imageHash." }
 
     try {
       val docRef =
@@ -157,20 +158,17 @@ class ImageRepositoryFirestore(
       val document = docRef.get().await()
       val images = document.get("images") as? List<Map<String, Any>> ?: return false
 
-      // Step 3: Find the image with the matching imageHash
+        //pretty inefficient to go through the whole list but whatever
       val updatedImages =
           images.map { image ->
-            if (image["imageHash"] == imageHash) {
-              // Step 4: Update the votes for the matched image
-              val currentVotes = image["votes"] as? List<Int> ?: listOf(0, 0)
+            if (image["imageUrl"] == imageUrl) {
+              val currentVotes = image["ratings"] as? List<Int> ?: listOf(0, 0)
               val updatedVotes =
-                  listOf(
-                      currentVotes[0] + if (voteType) 1 else 0, // Likes (first element of the Pair)
-                      currentVotes[1] +
-                          if (voteType) 0 else 1 // Dislikes (second element of the Pair)
-                      )
+                  when(vote) {
+                      VOTE_TYPE.POSITIVE -> listOf(currentVotes[0] + vote.value, currentVotes[1])
+                      VOTE_TYPE.NEGATIVE -> listOf(currentVotes[0], currentVotes[1] + vote.value)
+                  }
 
-              // Return the updated image with new votes
               image.toMutableMap().apply { put("votes", updatedVotes) }
             } else {
               image // No change for this image

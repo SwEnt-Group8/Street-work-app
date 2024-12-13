@@ -58,26 +58,26 @@ open class ImageViewModel(private val imageRepository: ImageRepository) : ViewMo
     }
   }
 
-  open fun imageVote(imageCollectionId: String, imageHash: String, voteType: Boolean) {
-    viewModelScope.launch { imageRepository.imageVote(imageCollectionId, imageHash, voteType) }
+  open fun imageVote(imageCollectionId: String, imageHash: String, vote: VOTE_TYPE) {
+    viewModelScope.launch { imageRepository.imageVote(imageCollectionId, imageHash, vote) }
   }
 
   /**
    * Deletes the image associated with the hash
    *
    * @param imageCollectionId The document id that the images is in.
-   * @param imageHash The hash of the base64 representation of the image.
+   * @param imageUrl The url of the image.
    * @param onImageDeleteSuccess Callback for deletion success.
    * @param onImageDeleteFailure Callback for deletion failure.
    */
   open fun deleteImage(
       imageCollectionId: String,
-      imageHash: String,
+      imageUrl: String,
       onImageDeleteSuccess: () -> Unit,
       onImageDeleteFailure: () -> Unit
   ) {
     viewModelScope.launch {
-      if (imageRepository.deleteImage(imageCollectionId, imageHash)) onImageDeleteSuccess()
+      if (imageRepository.deleteImage(imageCollectionId, imageUrl)) onImageDeleteSuccess()
       else onImageDeleteFailure()
     }
   }
