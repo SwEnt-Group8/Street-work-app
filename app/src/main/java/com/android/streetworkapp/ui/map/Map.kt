@@ -70,8 +70,14 @@ fun MapManager(
   LaunchedEffect(hasLocationPermission) {
     if (hasLocationPermission) {
       locationService.startLocationUpdates(locationCallback)
+      Log.d("Localisation", "activated location update")
     }
   }
   // Stop location updates
-  DisposableEffect(Unit) { onDispose { locationService.stopLocationUpdates(locationCallback) } }
+  DisposableEffect(Unit) {
+    onDispose {
+      locationService.stopLocationUpdates(locationCallback)
+      Log.d("Localisation", "close location update")
+    }
+  }
 }

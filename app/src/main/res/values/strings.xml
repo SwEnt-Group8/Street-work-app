@@ -121,4 +121,8 @@
     <string name="coach_comments_title">Add some comments or tips</string>
     <string name="no_comments">No comments available.</string>
 
+    //Event statuses
+    <string name="event_soon">Starting soon!</string>
+    <string name="event_started">Event has begun!</string>
+    <string name="event_ended">Event has ended</string>
 </resources>

@@ -1,5 +1,9 @@
 package com.android.streetworkapp.utils
 
+import android.content.Context
+import com.android.sample.R
+import com.android.streetworkapp.model.event.Event
+import com.android.streetworkapp.model.event.EventStatus
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.time.Duration
@@ -57,13 +61,16 @@ fun String.toEpochTimestamp(): Long {
 }
 
 /**
- * Calculate the difference between the current time and a given timestamp.
+ * Calculate the difference between the current time and a given timestamp and return a text
+ * according to event status
  *
- * @param endTimestamp The end timestamp as a string.
+ * @param event the event to calculate the difference for.
  * @return The difference in days or hours.
  */
-fun dateDifference(endTimestamp: String): String {
+fun dateDifference(context: Context, event: Event): String {
   val formatter = DateTimeFormatter.ofPattern(DATE_TIME_PATTERN)
+
+  val endTimestamp = event.date.toFormattedString()
 
   val end = LocalDateTime.parse(endTimestamp, formatter)
 
@@ -73,13 +80,18 @@ fun dateDifference(endTimestamp: String): String {
 
   val hours = duration.toHours() % 24
 
+  val statusText =
+      when (event.status) {
+        EventStatus.STARTED -> R.string.event_started
+        EventStatus.ENDED -> R.string.event_ended
+        EventStatus.CREATED -> R.string.event_soon
+      }
+
   return if (days > 0) {
     "in $days day(s)"
   } else {
-    if (hours == 0L) {
-      "in less than an hour"
-    } else if (hours < 0) {
-      "expired"
+    if (hours <= 0) {
+      context.getString(statusText)
     } else {
       "in $hours hour(s)"
     }

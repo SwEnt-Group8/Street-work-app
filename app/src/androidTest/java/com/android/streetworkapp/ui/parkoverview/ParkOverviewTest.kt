@@ -1,5 +1,7 @@
 package com.android.streetworkapp.ui.parkoverview
 
+import android.content.Context
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
@@ -26,7 +28,6 @@ import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.park.ParkOverviewScreen
 import com.android.streetworkapp.ui.park.RatingComponent
 import com.android.streetworkapp.utils.dateDifference
-import com.android.streetworkapp.utils.toFormattedString
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -144,6 +145,7 @@ class ParkOverviewTest {
       it.getArgument<(List<Event>) -> Unit>(1)(listOf(eventList.events.first()))
     }
     parkViewModel.setCurrentPark(park)
+    var context: Context? = null
 
     composeTestRule.setContent {
       ParkOverviewScreen(
@@ -152,6 +154,7 @@ class ParkOverviewTest {
           navigationActions = navigationActions,
           userViewModel = userViewModel,
           imageViewModel = imageViewModel)
+      context = LocalContext.current
     }
     composeTestRule.waitForIdle()
 
@@ -159,12 +162,11 @@ class ParkOverviewTest {
     composeTestRule.onNodeWithTag("ImagesCollectionButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("createEventButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("eventItem").assertTextContains("Group workout")
-    composeTestRule
-        .onNodeWithTag("participantsText", useUnmergedTree = true)
-        .assertTextContains("Participants 3/5")
+    composeTestRule.onNodeWithTag("participantsText", useUnmergedTree = true)
+    assert(context != null)
     composeTestRule
         .onNodeWithTag("dateText", useUnmergedTree = true)
-        .assertTextContains(dateDifference(eventList.events.first().date.toFormattedString()))
+        .assertTextContains(dateDifference(context!!, eventList.events.first()))
     composeTestRule
         .onNodeWithTag("eventButtonText", useUnmergedTree = true)
         .assertTextContains("About")

@@ -52,7 +52,8 @@ class ProgressionTest {
           email = "john.doe@example.com",
           score = Ranks.BRONZE.score + (Ranks.SILVER.score - Ranks.BRONZE.score) / 2,
           friends = listOf("friend_1", "friend_2", "friend_3"),
-          picture = "")
+          picture = "",
+          parks = listOf(""))
 
   val uid = "testUid"
   private val sessionId = "testSessionId"
