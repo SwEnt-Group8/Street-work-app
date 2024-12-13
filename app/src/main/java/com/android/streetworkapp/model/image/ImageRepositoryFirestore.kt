@@ -151,28 +151,28 @@ class ImageRepositoryFirestore(
       vote: VOTE_TYPE
   ): Boolean {
     require(imageCollectionId.isNotEmpty()) { "Empty imageCollectionId." }
-    require(imageUrl.isNotEmpty()) { "Empty imageHash." }
+    require(imageUrl.isNotEmpty()) { "Empty imageUrl." }
 
     try {
       val docRef =
           db.collection(ImageRepositoryFirestore.COLLECTION_PATH).document(imageCollectionId)
       val document = docRef.get().await()
-      val images = document.get("images") as? List<Map<String, Any>> ?: return false
+      val images = document["images"] as? List<Map<*, *>> ?: return false
 
-      // pretty inefficient to go through the whole list but whatever
+      // pretty inefficient to go through the whole list but the data will be pretty small anyways
       val updatedImages =
           images.map { image ->
-            if (image["imageUrl"] == imageUrl) {
-              val currentVotes = image["ratings"] as? List<Int> ?: listOf(0, 0)
+            if (image["imageUrl"] == imageUrl) { //identifying the images by their url
+              val currentVotes = image["rating"] as? ArrayList<Long> ?: return@map image //if something goes wrong just return the image as is.
               val updatedVotes =
                   when (vote) {
                     VOTE_TYPE.POSITIVE -> listOf(currentVotes[0] + vote.value, currentVotes[1])
                     VOTE_TYPE.NEGATIVE -> listOf(currentVotes[0], currentVotes[1] + vote.value)
                   }
 
-              image.toMutableMap().apply { put("votes", updatedVotes) }
+              image.toMutableMap().apply { put("rating", updatedVotes) }
             } else {
-              image // No change for this image
+              return@map image // No change for this image
             }
           }
 
@@ -238,9 +238,9 @@ class ImageRepositoryFirestore(
             val imageUrl = imageMap["imageUrl"] as? String ?: return@mapNotNull null
             val userId = imageMap["userId"] as? String ?: return@mapNotNull null
             val username = imageMap["username"] as? String ?: return@mapNotNull null
-            val ratingMap = imageMap["rating"] as? Map<*, *> ?: return@mapNotNull null
-            val first = (ratingMap["first"] as? Number)?.toInt() ?: return@mapNotNull null
-            val second = (ratingMap["second"] as? Number)?.toInt() ?: return@mapNotNull null
+            val ratingList = imageMap["rating"] as? ArrayList<*> ?: return@mapNotNull null
+            val positiveVotes = (ratingList[0] as? Long)?.toInt() ?: return@mapNotNull null //need to cast to Long before to Int for some reason
+            val negativeVotes = (ratingList[1] as? Long)?.toInt() ?: return@mapNotNull null
             val uploadDate = imageMap["uploadDate"] as? Timestamp ?: return@mapNotNull null
 
             // Create the ParkImage object if all fields are valid
@@ -248,7 +248,7 @@ class ImageRepositoryFirestore(
                 imageUrl = imageUrl,
                 userId = userId,
                 username = username,
-                rating = Pair(first, second),
+                rating = Pair(positiveVotes, negativeVotes),
                 uploadDate = uploadDate)
           }
           .getOrNull()

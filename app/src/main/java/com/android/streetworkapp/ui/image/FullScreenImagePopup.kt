@@ -43,6 +43,7 @@ import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
 import com.android.streetworkapp.model.image.ImageViewModel
 import com.android.streetworkapp.model.image.ParkImage
+import com.android.streetworkapp.model.image.VOTE_TYPE
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.theme.ColorPalette
@@ -117,11 +118,12 @@ fun FullScreenImagePopup(
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center) {
-                      if (currentUser?.uid != currentImage.userId) {
+                    //TODO: revert the if
+                      if (currentUser?.uid == currentImage.userId) {
                         Box(modifier = Modifier.padding(horizontal = 15.dp)) {
                           // Like Button
                           IconButton(
-                              onClick = {},
+                              onClick = { imageViewModel.imageVote(park.imagesCollectionId, currentImage.imageUrl, VOTE_TYPE.POSITIVE)},
                               modifier =
                                   Modifier.size(60.dp)
                                       .clip(CircleShape)
@@ -136,7 +138,7 @@ fun FullScreenImagePopup(
                         Box(modifier = Modifier.padding(horizontal = 15.dp)) {
                           // Dislike Button
                           IconButton(
-                              onClick = {},
+                              onClick = { imageViewModel.imageVote(park.imagesCollectionId, currentImage.imageUrl, VOTE_TYPE.NEGATIVE) },
                               modifier =
                                   Modifier.size(60.dp)
                                       .clip(CircleShape)
@@ -150,7 +152,7 @@ fun FullScreenImagePopup(
                       } else { // The user who uploaded the picture should only be able to delete
                         // it, not vote on it
                         Box(modifier = Modifier.padding(horizontal = 15.dp)) {
-                          // Dislike Button
+                            //Delete Button
                           IconButton(
                               onClick = {
                                 imageViewModel.deleteImage(
