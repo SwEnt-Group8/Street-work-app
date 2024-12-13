@@ -2,13 +2,34 @@ package com.android.streetworkapp.ui.train
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,6 +45,7 @@ import com.android.streetworkapp.model.workout.WorkoutViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.theme.ColorPalette.BORDER_COLOR
 import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_DARK
+import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_LIGHT
 
 @Composable
 fun TrainHubScreen(
@@ -32,107 +54,136 @@ fun TrainHubScreen(
     userViewModel: UserViewModel,
     paddingValues: PaddingValues = PaddingValues(0.dp)
 ) {
-  var selectedType by remember { mutableStateOf<String?>(null) }
-  var selectedActivity by remember { mutableStateOf<Pair<String, Boolean>?>(null) }
+    var selectedType by remember { mutableStateOf<String?>(null) }
+    var selectedActivity by remember { mutableStateOf<Pair<String, Boolean>?>(null) }
 
-  val currentUser by userViewModel.currentUser.collectAsState()
-  currentUser?.uid?.let { workoutViewModel.getOrAddWorkoutData(it) }
+    val currentUser by userViewModel.currentUser.collectAsState()
+    currentUser?.uid?.let { workoutViewModel.getOrAddWorkoutData(it) }
 
-  BoxWithConstraints {
-    val screenWidth = maxWidth
-    val screenHeight = maxHeight
+    // Button size
+    val buttonSize = remember {
+        ButtonSize(width = 100.dp, height = 100.dp, spacing = 8.dp)
+    }
 
-    val buttonSize =
-        ButtonSize(
-            width = if (screenWidth < 360.dp) 80.dp else 100.dp,
-            height = if (screenHeight < 600.dp) 70.dp else 100.dp,
-            spacing = if (screenWidth < 360.dp) 4.dp else 8.dp)
-
-    Column(
-        modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp),
-        verticalArrangement = Arrangement.SpaceBetween) {
-          Column(modifier = Modifier.fillMaxWidth()) {
-            // Role selection
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)
+            .padding(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        // Training Type Section
+        item {
             SelectionTitle(title = "Choose your training type", testTag = "RoleSelectionTitle")
-            SelectionGrid(
-                items = listOf("Solo", "Coach", "Challenge"),
-                buttonSize = buttonSize,
-                onItemSelected = { selectedType = it },
-                getItemImageRes = { role ->
-                  when (role) {
-                    "Solo" -> R.drawable.training_solo
-                    "Coach" -> R.drawable.training_coach
-                    "Challenge" -> R.drawable.training_challenge
-                    else -> R.drawable.pushup_orig
-                  }
-                },
-                isSelected = { it == selectedType },
-                testTagPrefix = "Role_")
-
-            Spacer(modifier = Modifier.height(16.dp))
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 16.dp).testTag("Divider"),
-                thickness = 1.dp,
-                color = BORDER_COLOR)
-
-            // Activity selection
-            SelectionTitle(title = "Choose your activity", testTag = "ActivitySelectionTitle")
-            SelectionGrid(
-                items =
-                    listOf(
-                            "Push-ups" to false,
-                            "Dips" to false,
-                            "Burpee" to false,
-                            "Lunge" to false,
-                            "Planks" to true,
-                            "Handstand" to true,
-                            "Front lever" to true,
-                            "Flag" to true,
-                            "Muscle-up" to false)
-                        .map { it.first },
-                buttonSize = buttonSize,
-                onItemSelected = { activity ->
-                  selectedActivity =
-                      listOf(
-                              "Push-ups" to false,
-                              "Dips" to false,
-                              "Burpee" to false,
-                              "Lunge" to false,
-                              "Planks" to true,
-                              "Handstand" to true,
-                              "Front lever" to true,
-                              "Flag" to true,
-                              "Muscle-up" to false)
-                          .first { it.first == activity }
-                },
-                getItemImageRes = { role ->
-                  when (role) {
-                    // source of icone :
-                    // https://www.shutterstock.com/image-vector/bundle-set-sport-pictogram-gym-fitness-2519719005
-                    // https://www.amazon.in/T%C3%BCnde-K%C3%A1tai-Burpee-Challenge/dp/B07HRTGM1K
-                    // edited in GIMP
-                    "Push-ups" -> R.drawable.train_pushup
-                    "Dips" -> R.drawable.train_dips
-                    "Burpee" -> R.drawable.train_burpee
-                    "Lunge" -> R.drawable.train_lunge
-                    "Planks" -> R.drawable.train_planks
-                    "Handstand" -> R.drawable.train_hand_stand
-                    "Front lever" -> R.drawable.train_front_lever
-                    "Flag" -> R.drawable.train_flag
-                    "Muscle-up" -> R.drawable.train_muscle_up
-                    else -> R.drawable.handstand_org
-                  }
-                },
-                isSelected = { selectedActivity?.first == it },
-                testTagPrefix = "Activity_")
-          }
-
-          ConfirmButtonSection(
-              selectedType = selectedType,
-              selectedActivity = selectedActivity,
-              navigationActions = navigationActions)
         }
-  }
+        item {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                SelectionButton(
+                    text = "Solo",
+                    imageResId = R.drawable.training_solo,
+                    buttonSize = buttonSize,
+                    onClick = { selectedType = "Solo" },
+                    isSelected = selectedType == "Solo",
+                    testTag = "Role_Solo"
+                )
+                Spacer(modifier = Modifier.width(buttonSize.spacing))
+                SelectionButton(
+                    text = "Coach",
+                    imageResId = R.drawable.training_coach,
+                    buttonSize = buttonSize,
+                    onClick = { selectedType = "Coach" },
+                    isSelected = selectedType == "Coach",
+                    testTag = "Role_Coach"
+                )
+            }
+        }
+
+        // Divider
+        item {
+            Spacer(modifier = Modifier.height(5.dp))
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 5.dp),
+                thickness = 1.dp,
+                color = BORDER_COLOR
+            )
+        }
+
+        // Activity Selection Section Title
+        item {
+            SelectionTitle(title = "Choose your activity", testTag = "ActivitySelectionTitle")
+        }
+
+        // Activity Grid
+        items(
+            listOf(
+                "Push-ups", "Dips", "Burpee", "Lunge", "Planks",
+                "Handstand", "Front lever", "Flag", "Muscle-up"
+            ).chunked(3) // Chunk activities into pairs for layout
+        ) { rowItems ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(buttonSize.spacing, Alignment.CenterHorizontally)
+            ) {
+                rowItems.forEach { activity ->
+                    SelectionButton(
+                        text = activity,
+                        imageResId = getActivityIcon(activity),
+                        buttonSize = buttonSize,
+                        onClick = {
+                            selectedActivity = when (activity) {
+                                "Push-ups" -> activity to false
+                                "Dips" -> activity to false
+                                "Burpee" -> activity to false
+                                "Lunge" -> activity to false
+                                "Planks" -> activity to true
+                                "Handstand" -> activity to true
+                                "Front lever" -> activity to true
+                                "Flag" -> activity to true
+                                "Muscle-up" -> activity to true
+                                else -> activity to false
+                            }
+                        },
+                        isSelected = selectedActivity?.first == activity,
+                        testTag = "Activity_$activity"
+                    )
+                }
+            }
+        }
+
+        // Confirm Button Section
+        item {
+            Spacer(modifier = Modifier.height(8.dp))
+            ConfirmButtonSection(
+                selectedType = selectedType,
+                selectedActivity = selectedActivity,
+                navigationActions = navigationActions
+            )
+        }
+    }
+}
+
+// Utility to fetch activity icon
+@Composable
+fun getActivityIcon(activity: String): Int {
+    return when (activity) {
+        "Push-ups" -> R.drawable.train_pushup
+        "Dips" -> R.drawable.train_dips
+        "Burpee" -> R.drawable.train_burpee
+        "Lunge" -> R.drawable.train_lunge
+        "Planks" -> R.drawable.train_planks
+        "Handstand" -> R.drawable.train_hand_stand
+        "Front lever" -> R.drawable.train_front_lever
+        "Flag" -> R.drawable.train_flag
+        "Muscle-up" -> R.drawable.train_muscle_up
+        else -> R.drawable.handstand_org
+    }
 }
 
 @Composable
@@ -141,33 +192,7 @@ fun SelectionTitle(title: String, testTag: String) {
       text = title,
       fontSize = 16.sp,
       fontWeight = FontWeight.Bold,
-      modifier = Modifier.padding(bottom = 16.dp).testTag(testTag))
-}
-
-@Composable
-fun SelectionGrid(
-    items: List<String>,
-    buttonSize: ButtonSize,
-    onItemSelected: (String) -> Unit,
-    getItemImageRes: (String) -> Int,
-    isSelected: (String) -> Boolean,
-    testTagPrefix: String
-) {
-  LazyVerticalGrid(
-      columns = GridCells.Adaptive(buttonSize.width + buttonSize.spacing),
-      modifier = Modifier.fillMaxWidth().testTag("${testTagPrefix}Grid"),
-      horizontalArrangement = Arrangement.spacedBy(buttonSize.spacing),
-      verticalArrangement = Arrangement.spacedBy(buttonSize.spacing)) {
-        items(items) { item ->
-          SelectionButton(
-              text = item,
-              imageResId = getItemImageRes(item),
-              buttonSize = buttonSize,
-              onClick = { onItemSelected(item) },
-              isSelected = isSelected(item),
-              testTag = "$testTagPrefix$item")
-        }
-      }
+      modifier = Modifier.padding(bottom = 8.dp).testTag(testTag))
 }
 
 @Composable
@@ -179,28 +204,40 @@ fun SelectionButton(
     isSelected: Boolean,
     testTag: String
 ) {
-  Column(
-      horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = Modifier.width(buttonSize.width)) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .width(buttonSize.width)
+    ) {
         Button(
+
             onClick = onClick,
-            modifier =
-                Modifier.size(buttonSize.width, buttonSize.height)
-                    .border(
-                        width = if (isSelected) 2.dp else 1.dp,
-                        color = if (isSelected) INTERACTION_COLOR_DARK else Color.Gray,
-                        shape = RoundedCornerShape(20.dp))
-                    .testTag(testTag),
+            modifier = Modifier
+                .size(buttonSize.width, buttonSize.height)
+                .border(
+                    width = if (isSelected) 2.dp else 1.dp,
+                    color = if (isSelected) INTERACTION_COLOR_DARK else Color.Gray,
+                    shape = RoundedCornerShape(20.dp)
+                )
+                .testTag(testTag),
             shape = RoundedCornerShape(20.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)) {
-              Image(
-                  painter = painterResource(id = imageResId),
-                  contentDescription = text,
-                  modifier = Modifier.fillMaxSize())
-            }
+            colors = ButtonDefaults.buttonColors(
+                containerColor =  INTERACTION_COLOR_LIGHT
+            )
+        ) {
+            Image(
+                painter = painterResource(id = imageResId),
+                contentDescription = text,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
         Spacer(modifier = Modifier.height(8.dp))
-        Text(text = text, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-      }
+        Text(
+            text = text,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium
+        )
+    }
 }
 
 @Composable
@@ -209,18 +246,18 @@ fun ConfirmButtonSection(
     selectedActivity: Pair<String, Boolean>?,
     navigationActions: NavigationActions
 ) {
-  Box(modifier = Modifier.fillMaxWidth()) {
-    ConfirmButton(
-        modifier = Modifier.align(Alignment.Center),
-        onClick = {
-          selectedType?.let { type ->
-            selectedActivity?.let { (activity, isTimeDependent) ->
-              // Navigate to TrainParamScreen with the selected parameters
-              navigationActions.navigateToTrainParam(activity, isTimeDependent, type)
+    Box(modifier = Modifier.fillMaxWidth()) {
+        ConfirmButton(
+            modifier = Modifier.align(Alignment.Center),
+            onClick = {
+                selectedType?.let { type ->
+                    selectedActivity?.let { (activity, isTimeDependent) ->
+                        navigationActions.navigateToTrainParam(activity, isTimeDependent, type)
+                    }
+                }
             }
-          }
-        })
-  }
+        )
+    }
 }
 
 @Composable
