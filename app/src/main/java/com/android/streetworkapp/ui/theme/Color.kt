@@ -59,7 +59,7 @@ object ColorPalette {
   val TUTORIAL_INTERACTION_1 = Color.Red
   val TUTORIAL_INTERACTION_2 = Color.Green
 
-    //LOGO gradient
-    val LOGO_BLUE = Color(0xFF0228FF)
-    val LOGO_RED = Color(0xFFFD00FF)
+  // LOGO gradient
+  val LOGO_BLUE = Color(0xFF0228FF)
+  val LOGO_RED = Color(0xFFFD00FF)
 }
