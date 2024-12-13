@@ -123,7 +123,7 @@ fun FullScreenImagePopup(
                         Box(modifier = Modifier.padding(horizontal = 15.dp)) {
                           // Like Button
                           IconButton(
-                              onClick = { imageViewModel.imageVote(park.imagesCollectionId, currentImage.imageUrl, VOTE_TYPE.POSITIVE)},
+                              onClick = { imageViewModel.imageVote(park.imagesCollectionId, currentImage.imageUrl, currentUser.uid, VOTE_TYPE.POSITIVE)},
                               modifier =
                                   Modifier.size(60.dp)
                                       .clip(CircleShape)
@@ -138,7 +138,7 @@ fun FullScreenImagePopup(
                         Box(modifier = Modifier.padding(horizontal = 15.dp)) {
                           // Dislike Button
                           IconButton(
-                              onClick = { imageViewModel.imageVote(park.imagesCollectionId, currentImage.imageUrl, VOTE_TYPE.NEGATIVE) },
+                              onClick = { imageViewModel.imageVote(park.imagesCollectionId, currentImage.imageUrl, currentUser.uid, VOTE_TYPE.NEGATIVE) },
                               modifier =
                                   Modifier.size(60.dp)
                                       .clip(CircleShape)
@@ -192,11 +192,11 @@ fun FullScreenImagePopup(
                           color = FullScreenImagePopUpSetting.fontColor,
                           fontWeight = FullScreenImagePopUpSetting.imageInfoFontWeight)
                       Text(
-                          "${currentImages[pagerState.currentPage].rating.first} user(s) liked this picture",
+                          "${currentImages[pagerState.currentPage].rating.positiveVotes} user(s) liked this picture",
                           color = FullScreenImagePopUpSetting.fontColor,
                           fontWeight = FullScreenImagePopUpSetting.imageInfoFontWeight)
                       Text(
-                          "${currentImages[pagerState.currentPage].rating.second} user(s) disliked this picture",
+                          "${currentImages[pagerState.currentPage].rating.negativeVotes} user(s) disliked this picture",
                           color = FullScreenImagePopUpSetting.fontColor,
                           fontWeight = FullScreenImagePopUpSetting.imageInfoFontWeight)
                     }

@@ -25,14 +25,15 @@ interface ImageRepository {
   /** Deletes the image corresponding to the imageUrl */
   suspend fun deleteImage(imageCollectionId: String, imageUrl: String): Boolean
 
-  /**
-   * Updates the score of the image with hash imageHash in document imageCollectionId
-   *
-   * @param imageCollectionId The collection the image belongs to.
-   * @param imageUrl The url of the image of whom to register the vote to.
-   * @param vote The vote type. True if a positive vote, false if a negative vote.
-   */
-  suspend fun imageVote(imageCollectionId: String, imageUrl: String, vote: VOTE_TYPE): Boolean
+    /**
+     * Updates the score of the image with hash imageHash in document imageCollectionId
+     *
+     * @param imageCollectionId The collection the image belongs to.
+     * @param imageUrl The url of the image of whom to register the vote to.
+     * @param voterUID The uid of the voter.
+     * @param vote The vote type. True if a positive vote, false if a negative vote.
+     */
+  suspend fun imageVote(imageCollectionId: String, imageUrl: String, voterUID: String, vote: VOTE_TYPE): Boolean
 
   /**
    * Deletes all the images related to a user

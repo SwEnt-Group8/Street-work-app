@@ -5,8 +5,6 @@ import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.storage.S3StorageClient
 import com.android.streetworkapp.model.user.UserRepository
-import com.android.streetworkapp.utils.toDataClass
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -151,11 +149,13 @@ class ImageRepositoryFirestore(
      *
      * @param imageCollectionId The collection the image belongs to.
      * @param imageUrl The url of the image of whom to register the vote to.
+     * @param voterUID The uid of the voter.
      * @param vote The vote type. True if a positive vote, false if a negative vote.
      */
     override suspend fun imageVote(
         imageCollectionId: String,
         imageUrl: String,
+        voterUID: String,
         vote: VOTE_TYPE
     ): Boolean {
         require(imageCollectionId.isNotEmpty()) { "Empty imageCollectionId." }
@@ -172,10 +172,13 @@ class ImageRepositoryFirestore(
                 val updatedImages =
                     it.map { image ->
                         if (image.imageUrl == imageUrl) { //identifying the images by their url
+                            if (image.rating.positiveVotesUids.contains(voterUID) || image.rating.negativeVotesUids.contains(voterUID))
+                                return@map image
+
                             val updatedRating =
                                 when (vote) {
-                                    VOTE_TYPE.POSITIVE -> image.rating.copy(positiveVotes = image.rating.positiveVotes + vote.value)
-                                    VOTE_TYPE.NEGATIVE -> image.rating.copy(negativeVotes = image.rating.negativeVotes + vote.value)
+                                    VOTE_TYPE.POSITIVE -> image.rating.copy(positiveVotes = image.rating.positiveVotes + vote.value, positiveVotesUids = image.rating.positiveVotesUids + voterUID)
+                                    VOTE_TYPE.NEGATIVE -> image.rating.copy(negativeVotes = image.rating.negativeVotes + vote.value, negativeVotesUids = image.rating.negativeVotesUids + voterUID)
                                 }
 
                             return@map image.copy(rating = updatedRating)
