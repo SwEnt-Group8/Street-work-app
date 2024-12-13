@@ -1,5 +1,6 @@
 package com.android.streetworkapp.model.image
 
+import android.media.Image
 import android.util.Log
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkRepository
@@ -180,6 +181,52 @@ class ImageRepositoryFirestore(
                                     VOTE_TYPE.POSITIVE -> image.rating.copy(positiveVotes = image.rating.positiveVotes + vote.value, positiveVotesUids = image.rating.positiveVotesUids + voterUID)
                                     VOTE_TYPE.NEGATIVE -> image.rating.copy(negativeVotes = image.rating.negativeVotes + vote.value, negativeVotesUids = image.rating.negativeVotesUids + voterUID)
                                 }
+
+                            return@map image.copy(rating = updatedRating)
+                        } else {
+                            return@map image // No change for this image
+                        }
+                    }
+
+                docRef.update("images", updatedImages).await()
+                return true
+            } ?: return false
+        } catch (e: Exception) {
+            Log.d(
+                DEBUG_PREFIX,
+                e.message
+                    ?: "An exception occurred but the message associated with it couldn't be retrieved."
+            )
+            return false
+        }
+    }
+
+    /**
+     * Removes the user's vote from the image
+     * @param imageCollectionId The collection id the image is part of.
+     * @param imageUrl The url of the image.
+     * @param userId The userId of the vote to remove.
+     */
+    override suspend fun retractImageVote(imageCollectionId: String, imageUrl: String, userId: String): Boolean {
+        try {
+            val docRef =
+                db.collection(ImageRepositoryFirestore.COLLECTION_PATH).document(imageCollectionId)
+            val document = docRef.get().await()
+            val imageCollection = document.toObject(ParkImageCollection::class.java)
+
+            // pretty inefficient to go through the whole list but the data will be pretty small anyways
+            imageCollection?.images?.let {
+                val updatedImages =
+                    it.map { image ->
+                        if (image.imageUrl == imageUrl) { //identifying the images by their url
+                            val updatedRating: ImageRating?
+                            if (image.rating.positiveVotesUids.contains(userId)) {
+                                updatedRating = image.rating.copy(positiveVotes = image.rating.positiveVotes - 1, positiveVotesUids = image.rating.positiveVotesUids - userId)
+                            } else if (image.rating.negativeVotesUids.contains(userId)) {
+                                updatedRating = image.rating.copy(negativeVotes = image.rating.negativeVotes - 1, negativeVotesUids = image.rating.positiveVotesUids - userId)
+                            } else {
+                                return false //userId was not in the list, return false
+                            }
 
                             return@map image.copy(rating = updatedRating)
                         } else {

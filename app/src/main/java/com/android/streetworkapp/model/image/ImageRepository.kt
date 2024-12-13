@@ -35,6 +35,14 @@ interface ImageRepository {
      */
   suspend fun imageVote(imageCollectionId: String, imageUrl: String, voterUID: String, vote: VOTE_TYPE): Boolean
 
+/**
+ * Removes the user's vote from the image
+ * @param imageCollectionId The collection id the image is part of.
+ * @param imageUrl The url of the image.
+ * @param userId The userId of the vote to remove.
+ */
+  suspend fun retractImageVote(imageCollectionId: String, imageUrl: String, userId: String): Boolean
+
   /**
    * Deletes all the images related to a user
    *

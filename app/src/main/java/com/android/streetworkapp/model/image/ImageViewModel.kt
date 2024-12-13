@@ -62,6 +62,12 @@ open class ImageViewModel(private val imageRepository: ImageRepository) : ViewMo
     viewModelScope.launch { imageRepository.imageVote(imageCollectionId, imageUrl, voterUid, vote) }
   }
 
+  open fun retractImageVote(imageCollectionId: String, imageUrl: String, userId: String) {
+    viewModelScope.launch {
+      imageRepository.retractImageVote(imageCollectionId, imageUrl, userId)
+    }
+  }
+
   /**
    * Deletes the image associated with the hash
    *

@@ -17,6 +17,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ThumbDown
@@ -56,6 +57,7 @@ private object FullScreenImagePopUpSetting {
       ColorPalette.PRIMARY_TEXT_COLOR // also used for the close pop up icon color (top right)
   val imageInfoFontWeight = FontWeight.Medium
   val dislikeButtonColor = Color(0xffba0d00) // also used for the delete image icon color.
+  val undoButtonColor = Color(0xff595858)
 }
 
 /** Fullscreen PopUp: it will display all the ParKImageLocal in the list in a HorizontalPager * */
@@ -120,35 +122,79 @@ fun FullScreenImagePopup(
                     horizontalArrangement = Arrangement.Center) {
                     //TODO: revert the if
                       if (currentUser?.uid == currentImage.userId) {
-                        Box(modifier = Modifier.padding(horizontal = 15.dp)) {
-                          // Like Button
-                          IconButton(
-                              onClick = { imageViewModel.imageVote(park.imagesCollectionId, currentImage.imageUrl, currentUser.uid, VOTE_TYPE.POSITIVE)},
-                              modifier =
-                                  Modifier.size(60.dp)
-                                      .clip(CircleShape)
-                                      .background(ColorPalette.INTERACTION_COLOR_DARK)) {
-                                Icon(
-                                    imageVector = Icons.Filled.ThumbUp,
-                                    contentDescription = "Like",
-                                    tint = Color.White)
+                          if (currentImage.rating.positiveVotesUids.contains(currentUser.uid) || currentImage.rating.negativeVotesUids.contains(currentUser.uid)) {
+                              Box(modifier = Modifier.padding(horizontal = 15.dp)) {
+                                  // Like Button
+                                  IconButton(
+                                      onClick = {
+                                          imageViewModel.retractImageVote(
+                                              park.imagesCollectionId,
+                                              currentImage.imageUrl,
+                                              currentUser.uid,
+                                          )
+                                      },
+                                      modifier =
+                                      Modifier.size(60.dp)
+                                          .clip(CircleShape)
+                                          .background(FullScreenImagePopUpSetting.undoButtonColor)
+                                  ) {
+                                      Icon(
+                                          imageVector = Icons.AutoMirrored.Filled.Undo,
+                                          contentDescription = "Like",
+                                          tint = Color.White
+                                      )
+                                  }
                               }
-                        }
+                          }
+                          else {
+                              Box(modifier = Modifier.padding(horizontal = 15.dp)) {
+                                  // Like Button
+                                  IconButton(
+                                      onClick = {
+                                          imageViewModel.imageVote(
+                                              park.imagesCollectionId,
+                                              currentImage.imageUrl,
+                                              currentUser.uid,
+                                              VOTE_TYPE.POSITIVE
+                                          )
+                                      },
+                                      modifier =
+                                      Modifier.size(60.dp)
+                                          .clip(CircleShape)
+                                          .background(ColorPalette.INTERACTION_COLOR_DARK)
+                                  ) {
+                                      Icon(
+                                          imageVector = Icons.Filled.ThumbUp,
+                                          contentDescription = "Like",
+                                          tint = Color.White
+                                      )
+                                  }
+                              }
 
-                        Box(modifier = Modifier.padding(horizontal = 15.dp)) {
-                          // Dislike Button
-                          IconButton(
-                              onClick = { imageViewModel.imageVote(park.imagesCollectionId, currentImage.imageUrl, currentUser.uid, VOTE_TYPE.NEGATIVE) },
-                              modifier =
-                                  Modifier.size(60.dp)
-                                      .clip(CircleShape)
-                                      .background(FullScreenImagePopUpSetting.dislikeButtonColor)) {
-                                Icon(
-                                    imageVector = Icons.Filled.ThumbDown,
-                                    contentDescription = "Dislike",
-                                    tint = Color.White)
+                              Box(modifier = Modifier.padding(horizontal = 15.dp)) {
+                                  // Dislike Button
+                                  IconButton(
+                                      onClick = {
+                                          imageViewModel.imageVote(
+                                              park.imagesCollectionId,
+                                              currentImage.imageUrl,
+                                              currentUser.uid,
+                                              VOTE_TYPE.NEGATIVE
+                                          )
+                                      },
+                                      modifier =
+                                      Modifier.size(60.dp)
+                                          .clip(CircleShape)
+                                          .background(FullScreenImagePopUpSetting.dislikeButtonColor)
+                                  ) {
+                                      Icon(
+                                          imageVector = Icons.Filled.ThumbDown,
+                                          contentDescription = "Dislike",
+                                          tint = Color.White
+                                      )
+                                  }
                               }
-                        }
+                          }
                       } else { // The user who uploaded the picture should only be able to delete
                         // it, not vote on it
                         Box(modifier = Modifier.padding(horizontal = 15.dp)) {
