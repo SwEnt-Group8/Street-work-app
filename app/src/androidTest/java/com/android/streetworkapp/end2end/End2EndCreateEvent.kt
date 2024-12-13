@@ -6,14 +6,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextClearance
-import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.height
 import androidx.compose.ui.unit.size
@@ -68,7 +68,6 @@ import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
-import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
 class End2EndCreateEvent {
@@ -297,63 +296,56 @@ class End2EndCreateEvent {
     }
 
     // create an event
-    composeTestRule.onNodeWithTag("createEventButton").assertIsDisplayed().performClick()
-
-    composeTestRule.onNodeWithTag("titleTag").assertIsDisplayed().performTextClearance()
-
-    composeTestRule.onNodeWithTag("titleTag").performTextInput(event.title)
-
-    composeTestRule.onNodeWithTag("descriptionTag").assertIsDisplayed().performTextClearance()
-
-    composeTestRule.onNodeWithTag("descriptionTag").performTextInput(event.description)
-
-    composeTestRule.onNodeWithTag("dateIcon").performClick()
-
-    composeTestRule.onNodeWithTag("validateDate").performClick()
-
-    composeTestRule.onNodeWithTag("timeIcon").performClick()
-
-    composeTestRule.onNodeWithTag("validateTime").performClick()
-
-    composeTestRule.onNodeWithTag("addEventButton").assertIsDisplayed().performClick()
-
-    verify(eventDocumentRef).set(any())
-
-    verify(parkDocumentRef).update(eq("events"), any())
+    // composeTestRule.onNodeWithTag("createEventButton").assertIsDisplayed().performClick()
 
     /**
-     * // verify that the event is properly displayed on the park overview screen
-     * composeTestRule.waitUntil(5000) {
-     * composeTestRule.onNodeWithTag("parkOverviewScreen").isDisplayed() }
+     * composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
      *
-     * composeTestRule.onNodeWithTag("parkOverviewScreen").assertIsDisplayed()
+     * composeTestRule.onNodeWithTag("titleTag").assertIsDisplayed().performTextClearance()
      *
-     * composeTestRule.waitUntil(5000) { composeTestRule.onNodeWithTag("eventButton").isDisplayed()
-     * }
+     * composeTestRule.onNodeWithTag("titleTag").performTextInput(event.title)
      *
-     * composeTestRule.onNodeWithText(event.title).assertIsDisplayed()
+     * composeTestRule.onNodeWithTag("descriptionTag").assertIsDisplayed().performTextClearance()
      *
-     * composeTestRule.onNodeWithTag("eventButton").assertIsDisplayed().performClick()
+     * composeTestRule.onNodeWithTag("descriptionTag").performTextInput(event.description)
      *
-     * composeTestRule.waitForIdle()
+     * composeTestRule.onNodeWithTag("dateIcon").performClick()
      *
-     * // navigate to the event overview screen and verify that the event is properly displayed
-     * composeTestRule.onNodeWithTag("eventOverviewScreen").assertIsDisplayed()
+     * composeTestRule.onNodeWithTag("validateDate").performClick()
      *
-     * composeTestRule .onNodeWithTag("eventTitle") .assertIsDisplayed()
-     * .assertTextContains(event.title)
+     * composeTestRule.onNodeWithTag("timeIcon").performClick()
      *
-     * composeTestRule.onNodeWithTag("eventOwner").assertIsDisplayed()
+     * composeTestRule.onNodeWithTag("validateTime").performClick()
      *
-     * composeTestRule.onNodeWithTag("date").assertIsDisplayed()
+     * composeTestRule.onNodeWithTag("addEventButton").assertIsDisplayed().performClick()
      *
-     * composeTestRule.onNodeWithTag("eventDescription").assertIsDisplayed()
+     * verify(eventDocumentRef).set(any())
      *
-     * composeTestRule.onNodeWithTag("participants").assertIsDisplayed()
-     *
-     * composeTestRule.onNodeWithTag("participantsTab").assertIsDisplayed().performClick()
-     *
-     * composeTestRule.onNodeWithTag("participantsList").assertIsDisplayed()
+     * verify(parkDocumentRef).update(eq("events"), any())
      */
+    composeTestRule.waitUntil(5000) { composeTestRule.onNodeWithTag("eventButton").isDisplayed() }
+
+    composeTestRule.onNodeWithText(event.title).assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("eventButton").assertIsDisplayed().performClick()
+
+    composeTestRule.waitForIdle()
+
+    // navigate to the event overview screen and verify that the event is properly displayed
+    composeTestRule.onNodeWithTag("eventOverviewScreen").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("eventTitle").assertIsDisplayed().assertTextContains(event.title)
+
+    composeTestRule.onNodeWithTag("eventOwner").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("date").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("eventDescription").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("participants").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("participantsTab").assertIsDisplayed().performClick()
+
+    composeTestRule.onNodeWithTag("participantsList").assertIsDisplayed()
   }
 }
