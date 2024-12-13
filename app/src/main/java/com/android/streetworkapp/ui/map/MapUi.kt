@@ -122,9 +122,9 @@ fun MapScreen(
   val endColor = ColorPalette.LOGO_RED
 
   // variable for each park color
-  var image: Bitmap  // set default image
-  var interpolatedColor: Color  // set default color
-  var interpolatedHue: Float  // set default hue
+  var image: Bitmap // set default image
+  var interpolatedColor: Color // set default color
+  var interpolatedHue: Float // set default hue
 
   // Handling user MVVM
   val currentUser = userViewModel.currentUser.collectAsState().value
