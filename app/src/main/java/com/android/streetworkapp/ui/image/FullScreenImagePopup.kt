@@ -153,7 +153,11 @@ fun FullScreenImagePopup(
                         Box(modifier = Modifier.padding(horizontal = 15.dp)) {
                           // Dislike Button
                           IconButton(
-                              onClick = { imageViewModel.deleteImage(park.imagesCollectionId, currentImage.imageUrl, { coroutineScope.launch { pagerState.scrollToPage(pagerState.currentPage -1 )}}, {})},
+                              onClick = { imageViewModel.deleteImage(park.imagesCollectionId, currentImage.imageUrl, { coroutineScope.launch {
+                                  if (pagerState.currentPage == currentImages.size)
+                                    pagerState.scrollToPage(pagerState.currentPage - 1)
+
+                              }}, {})},
                               modifier =
                                   Modifier.size(60.dp)
                                       .clip(CircleShape)
@@ -188,7 +192,7 @@ fun FullScreenImagePopup(
                           color = FullScreenImagePopUpSetting.fontColor,
                           fontWeight = FullScreenImagePopUpSetting.imageInfoFontWeight)
                     }
-              } else {
+              } else if (currentImages.isEmpty()) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
