@@ -15,8 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -54,43 +52,31 @@ fun TrainHubScreen(
     userViewModel: UserViewModel,
     paddingValues: PaddingValues = PaddingValues(0.dp)
 ) {
-    var selectedType by remember { mutableStateOf<String?>(null) }
-    var selectedActivity by remember { mutableStateOf<Pair<String, Boolean>?>(null) }
+  var selectedType by remember { mutableStateOf<String?>(null) }
+  var selectedActivity by remember { mutableStateOf<Pair<String, Boolean>?>(null) }
 
-    val currentUser by userViewModel.currentUser.collectAsState()
-    currentUser?.uid?.let { workoutViewModel.getOrAddWorkoutData(it) }
+  val currentUser by userViewModel.currentUser.collectAsState()
+  currentUser?.uid?.let { workoutViewModel.getOrAddWorkoutData(it) }
 
-    // Button size
-    val buttonSize = remember {
-        ButtonSize(width = 100.dp, height = 100.dp, spacing = 8.dp)
-    }
+  // Button size
+  val buttonSize = remember { ButtonSize(width = 100.dp, height = 100.dp, spacing = 8.dp) }
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues)
-            .padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
+  LazyColumn(
+      modifier = Modifier.fillMaxSize().padding(paddingValues).padding(8.dp),
+      verticalArrangement = Arrangement.spacedBy(8.dp)) {
         // Training Type Section
+        item { SelectionTitle(title = "Choose your training type", testTag = "RoleSelectionTitle") }
         item {
-            SelectionTitle(title = "Choose your training type", testTag = "RoleSelectionTitle")
-        }
-        item {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                horizontalArrangement = Arrangement.Center
-            ) {
+          Row(
+              modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+              horizontalArrangement = Arrangement.Center) {
                 SelectionButton(
                     text = "Solo",
                     imageResId = R.drawable.training_solo,
                     buttonSize = buttonSize,
                     onClick = { selectedType = "Solo" },
                     isSelected = selectedType == "Solo",
-                    testTag = "Role_Solo"
-                )
+                    testTag = "Role_Solo")
                 Spacer(modifier = Modifier.width(buttonSize.spacing))
                 SelectionButton(
                     text = "Coach",
@@ -98,92 +84,92 @@ fun TrainHubScreen(
                     buttonSize = buttonSize,
                     onClick = { selectedType = "Coach" },
                     isSelected = selectedType == "Coach",
-                    testTag = "Role_Coach"
-                )
-            }
+                    testTag = "Role_Coach")
+              }
         }
 
         // Divider
         item {
-            Spacer(modifier = Modifier.height(5.dp))
-            HorizontalDivider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 5.dp),
-                thickness = 1.dp,
-                color = BORDER_COLOR
-            )
+          Spacer(modifier = Modifier.height(5.dp))
+          HorizontalDivider(
+              modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
+              thickness = 1.dp,
+              color = BORDER_COLOR)
         }
 
         // Activity Selection Section Title
-        item {
-            SelectionTitle(title = "Choose your activity", testTag = "ActivitySelectionTitle")
-        }
+        item { SelectionTitle(title = "Choose your activity", testTag = "ActivitySelectionTitle") }
 
         // Activity Grid
         items(
             listOf(
-                "Push-ups", "Dips", "Burpee", "Lunge", "Planks",
-                "Handstand", "Front lever", "Flag", "Muscle-up"
-            ).chunked(3) // Chunk activities into pairs for layout
-        ) { rowItems ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(buttonSize.spacing, Alignment.CenterHorizontally)
-            ) {
-                rowItems.forEach { activity ->
-                    SelectionButton(
-                        text = activity,
-                        imageResId = getActivityIcon(activity),
-                        buttonSize = buttonSize,
-                        onClick = {
-                            selectedActivity = when (activity) {
-                                "Push-ups" -> activity to false
-                                "Dips" -> activity to false
-                                "Burpee" -> activity to false
-                                "Lunge" -> activity to false
-                                "Planks" -> activity to true
-                                "Handstand" -> activity to true
-                                "Front lever" -> activity to true
-                                "Flag" -> activity to true
-                                "Muscle-up" -> activity to true
-                                else -> activity to false
-                            }
-                        },
-                        isSelected = selectedActivity?.first == activity,
-                        testTag = "Activity_$activity"
-                    )
-                }
+                    "Push-ups",
+                    "Dips",
+                    "Burpee",
+                    "Lunge",
+                    "Planks",
+                    "Handstand",
+                    "Front lever",
+                    "Flag",
+                    "Muscle-up")
+                .chunked(3) // Chunk activities into pairs for layout
+            ) { rowItems ->
+              Row(
+                  modifier = Modifier.fillMaxWidth(),
+                  horizontalArrangement =
+                      Arrangement.spacedBy(buttonSize.spacing, Alignment.CenterHorizontally)) {
+                    rowItems.forEach { activity ->
+                      SelectionButton(
+                          text = activity,
+                          imageResId = getActivityIcon(activity),
+                          buttonSize = buttonSize,
+                          onClick = {
+                            selectedActivity =
+                                when (activity) {
+                                  "Push-ups" -> activity to false
+                                  "Dips" -> activity to false
+                                  "Burpee" -> activity to false
+                                  "Lunge" -> activity to false
+                                  "Planks" -> activity to true
+                                  "Handstand" -> activity to true
+                                  "Front lever" -> activity to true
+                                  "Flag" -> activity to true
+                                  "Muscle-up" -> activity to true
+                                  else -> activity to false
+                                }
+                          },
+                          isSelected = selectedActivity?.first == activity,
+                          testTag = "Activity_$activity")
+                    }
+                  }
             }
-        }
 
         // Confirm Button Section
         item {
-            Spacer(modifier = Modifier.height(8.dp))
-            ConfirmButtonSection(
-                selectedType = selectedType,
-                selectedActivity = selectedActivity,
-                navigationActions = navigationActions
-            )
+          Spacer(modifier = Modifier.height(8.dp))
+          ConfirmButtonSection(
+              selectedType = selectedType,
+              selectedActivity = selectedActivity,
+              navigationActions = navigationActions)
         }
-    }
+      }
 }
 
 // Utility to fetch activity icon
 @Composable
 fun getActivityIcon(activity: String): Int {
-    return when (activity) {
-        "Push-ups" -> R.drawable.train_pushup
-        "Dips" -> R.drawable.train_dips
-        "Burpee" -> R.drawable.train_burpee
-        "Lunge" -> R.drawable.train_lunge
-        "Planks" -> R.drawable.train_planks
-        "Handstand" -> R.drawable.train_hand_stand
-        "Front lever" -> R.drawable.train_front_lever
-        "Flag" -> R.drawable.train_flag
-        "Muscle-up" -> R.drawable.train_muscle_up
-        else -> R.drawable.handstand_org
-    }
+  return when (activity) {
+    "Push-ups" -> R.drawable.train_pushup
+    "Dips" -> R.drawable.train_dips
+    "Burpee" -> R.drawable.train_burpee
+    "Lunge" -> R.drawable.train_lunge
+    "Planks" -> R.drawable.train_planks
+    "Handstand" -> R.drawable.train_hand_stand
+    "Front lever" -> R.drawable.train_front_lever
+    "Flag" -> R.drawable.train_flag
+    "Muscle-up" -> R.drawable.train_muscle_up
+    else -> R.drawable.handstand_org
+  }
 }
 
 @Composable
@@ -204,40 +190,28 @@ fun SelectionButton(
     isSelected: Boolean,
     testTag: String
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .width(buttonSize.width)
-    ) {
+  Column(
+      horizontalAlignment = Alignment.CenterHorizontally,
+      modifier = Modifier.width(buttonSize.width)) {
         Button(
-
             onClick = onClick,
-            modifier = Modifier
-                .size(buttonSize.width, buttonSize.height)
-                .border(
-                    width = if (isSelected) 2.dp else 1.dp,
-                    color = if (isSelected) INTERACTION_COLOR_DARK else Color.Gray,
-                    shape = RoundedCornerShape(20.dp)
-                )
-                .testTag(testTag),
+            modifier =
+                Modifier.size(buttonSize.width, buttonSize.height)
+                    .border(
+                        width = if (isSelected) 2.dp else 1.dp,
+                        color = if (isSelected) INTERACTION_COLOR_DARK else Color.Gray,
+                        shape = RoundedCornerShape(20.dp))
+                    .testTag(testTag),
             shape = RoundedCornerShape(20.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor =  INTERACTION_COLOR_LIGHT
-            )
-        ) {
-            Image(
-                painter = painterResource(id = imageResId),
-                contentDescription = text,
-                modifier = Modifier.fillMaxSize()
-            )
-        }
+            colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_LIGHT)) {
+              Image(
+                  painter = painterResource(id = imageResId),
+                  contentDescription = text,
+                  modifier = Modifier.fillMaxSize())
+            }
         Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = text,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium
-        )
-    }
+        Text(text = text, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+      }
 }
 
 @Composable
@@ -246,18 +220,17 @@ fun ConfirmButtonSection(
     selectedActivity: Pair<String, Boolean>?,
     navigationActions: NavigationActions
 ) {
-    Box(modifier = Modifier.fillMaxWidth()) {
-        ConfirmButton(
-            modifier = Modifier.align(Alignment.Center),
-            onClick = {
-                selectedType?.let { type ->
-                    selectedActivity?.let { (activity, isTimeDependent) ->
-                        navigationActions.navigateToTrainParam(activity, isTimeDependent, type)
-                    }
-                }
+  Box(modifier = Modifier.fillMaxWidth()) {
+    ConfirmButton(
+        modifier = Modifier.align(Alignment.Center),
+        onClick = {
+          selectedType?.let { type ->
+            selectedActivity?.let { (activity, isTimeDependent) ->
+              navigationActions.navigateToTrainParam(activity, isTimeDependent, type)
             }
-        )
-    }
+          }
+        })
+  }
 }
 
 @Composable

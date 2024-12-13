@@ -468,6 +468,7 @@ fun StreetWorkApp(
                       activity,
                       isTimeDependent,
                       reps,
+                      time,
                       workoutViewModel,
                       userViewModel,
                       innerPadding)

@@ -89,6 +89,7 @@ fun TrainCoachDialog(onRoleSelected: (Boolean) -> Unit, onDismiss: () -> Unit) {
 @Composable
 fun WaitingDialog(
     workoutViewModel: WorkoutViewModel,
+    userViewModel: UserViewModel,
     currentUserUid: String,
     onDismiss: () -> Unit
 ) {
@@ -135,7 +136,8 @@ fun WaitingDialog(
                           onReject = {
                             workoutViewModel.respondToPairingRequest(
                                 request.requestId, false, currentUserUid, request.fromUid)
-                          })
+                          },
+                          userViewModel)
                     }
               }
         }
@@ -143,16 +145,20 @@ fun WaitingDialog(
 }
 
 @Composable
-fun PairingRequestItem(request: PairingRequest, onAccept: () -> Unit, onReject: () -> Unit) {
+fun PairingRequestItem(
+    request: PairingRequest,
+    onAccept: () -> Unit,
+    onReject: () -> Unit,
+    userViewModel: UserViewModel
+) {
+  userViewModel.getUserByUid(request.fromUid)
+  val username = userViewModel.user.collectAsState().value?.username
   Column(
       modifier = Modifier.fillMaxWidth().padding(8.dp).testTag("RequestItem"),
       verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(
-            text = stringResource(id = R.string.request_from, request.fromUid),
+            text = stringResource(id = R.string.request_from, username ?: ""),
             modifier = Modifier.testTag("RequestFrom"))
-        Text(
-            text = stringResource(id = R.string.timestamp, request.timestamp),
-            modifier = Modifier.testTag("RequestTimestamp"))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
           Button(
               onClick = onAccept,
