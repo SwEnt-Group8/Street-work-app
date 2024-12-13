@@ -57,14 +57,15 @@ fun ImagesCollectionButton(
           imageViewModel.retrieveImages(context, park) {
             parkImages = it
             showImagesCollection = true
-            }
-
-            if (park.imagesCollectionId.isNotEmpty()) //register a collection listener if the park has an image collection setup
-                imageViewModel.registerCollectionListener(park.imagesCollectionId) {
-                    imageViewModel.retrieveImages(context, park) { parkImages = it }
-                }
-
           }
+
+          if (park.imagesCollectionId
+              .isNotEmpty()) // register a collection listener if the park has an image collection
+                             // setup
+              imageViewModel.registerCollectionListener(park.imagesCollectionId) {
+                imageViewModel.retrieveImages(context, park) { parkImages = it }
+              }
+        }
       },
       modifier = Modifier.testTag("ImagesCollectionButton")) {
         Box(

@@ -43,5 +43,5 @@ interface ParkRepository {
    * @param parkId The id of the document to listen to.
    * @param onDocumentChange The callback to be called each time the document changes
    */
-   fun registerCollectionListener(parkId: String, onDocumentChange: () -> Unit)
+  fun registerCollectionListener(parkId: String, onDocumentChange: () -> Unit)
 }

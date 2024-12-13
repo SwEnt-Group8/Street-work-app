@@ -1,8 +1,6 @@
 package com.android.streetworkapp.model.park
 
 import android.util.Log
-import com.android.streetworkapp.model.image.ImageRepositoryFirestore
-import com.android.streetworkapp.model.image.ImageRepositoryFirestore.Companion.DEBUG_PREFIX
 import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
@@ -399,8 +397,7 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore, testing: Boolea
   override fun registerCollectionListener(parkId: String, onDocumentChange: () -> Unit) {
     require(parkId.isNotEmpty()) { "Empty imageCollectionId." }
     try {
-      val docRef =
-        db.collection(this.COLLECTION_PATH).document(parkId)
+      val docRef = db.collection(this.COLLECTION_PATH).document(parkId)
       docRef.addSnapshotListener { snapshot, e ->
         if (e != null) {
           Log.d("FirestoreError: ", "Error listening for changes: $e")
@@ -413,9 +410,9 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore, testing: Boolea
       }
     } catch (e: Exception) {
       Log.d(
-        "FirestoreError: ",
-        e.message
-          ?: "An exception occurred but the message associated with it couldn't be retrieved.")
+          "FirestoreError: ",
+          e.message
+              ?: "An exception occurred but the message associated with it couldn't be retrieved.")
     }
   }
 }

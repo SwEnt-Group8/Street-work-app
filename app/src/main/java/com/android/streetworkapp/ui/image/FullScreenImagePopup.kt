@@ -71,8 +71,7 @@ fun FullScreenImagePopup(
   val currentImages by rememberUpdatedState(images)
   // State for the pager to keep track of the current image
   val pagerState = rememberPagerState(pageCount = { currentImages.size })
-  val coroutineScope =
-      rememberCoroutineScope() // Creates a coroutine scope for use inside composable
+  val coroutineScope = rememberCoroutineScope()
 
   val currentImage = currentImages.getOrNull(pagerState.currentPage)
 
@@ -149,15 +148,22 @@ fun FullScreenImagePopup(
                               }
                         }
                       } else { // The user who uploaded the picture should only be able to delete
-                               // it, not vote on it
+                        // it, not vote on it
                         Box(modifier = Modifier.padding(horizontal = 15.dp)) {
                           // Dislike Button
                           IconButton(
-                              onClick = { imageViewModel.deleteImage(park.imagesCollectionId, currentImage.imageUrl, { coroutineScope.launch {
-                                  if (pagerState.currentPage == currentImages.size)
-                                    pagerState.scrollToPage(pagerState.currentPage - 1)
-
-                              }}, {})},
+                              onClick = {
+                                imageViewModel.deleteImage(
+                                    park.imagesCollectionId,
+                                    currentImage.imageUrl,
+                                    {
+                                      coroutineScope.launch {
+                                        if (pagerState.currentPage == currentImages.size)
+                                            pagerState.scrollToPage(pagerState.currentPage - 1)
+                                      }
+                                    },
+                                    {})
+                              },
                               modifier =
                                   Modifier.size(60.dp)
                                       .clip(CircleShape)

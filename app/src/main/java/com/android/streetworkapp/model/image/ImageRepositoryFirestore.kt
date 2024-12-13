@@ -124,8 +124,8 @@ class ImageRepositoryFirestore(
       fileKey?.let {
         this.storageClient.deleteObjectFromKey(
             it) // there's an edge case where the image is deleted from firestore but not the db,
-                // won't handle this case. Would probably need a proper backend with some logging
-                // for this
+        // won't handle this case. Would probably need a proper backend with some logging
+        // for this
       }
 
       return true
@@ -138,12 +138,13 @@ class ImageRepositoryFirestore(
     }
   }
 
-    /**
-     * Updates the score of the image with hash imageHash in document imageCollectionId
-     * @param imageCollectionId The collection the image belongs to.
-     * @param imageUrl The url of the image of whom to register the vote to.
-     * @param vote The vote type. True if a positive vote, false if a negative vote.
-     */
+  /**
+   * Updates the score of the image with hash imageHash in document imageCollectionId
+   *
+   * @param imageCollectionId The collection the image belongs to.
+   * @param imageUrl The url of the image of whom to register the vote to.
+   * @param vote The vote type. True if a positive vote, false if a negative vote.
+   */
   override suspend fun imageVote(
       imageCollectionId: String,
       imageUrl: String,
@@ -158,15 +159,15 @@ class ImageRepositoryFirestore(
       val document = docRef.get().await()
       val images = document.get("images") as? List<Map<String, Any>> ?: return false
 
-        //pretty inefficient to go through the whole list but whatever
+      // pretty inefficient to go through the whole list but whatever
       val updatedImages =
           images.map { image ->
             if (image["imageUrl"] == imageUrl) {
               val currentVotes = image["ratings"] as? List<Int> ?: listOf(0, 0)
               val updatedVotes =
-                  when(vote) {
-                      VOTE_TYPE.POSITIVE -> listOf(currentVotes[0] + vote.value, currentVotes[1])
-                      VOTE_TYPE.NEGATIVE -> listOf(currentVotes[0], currentVotes[1] + vote.value)
+                  when (vote) {
+                    VOTE_TYPE.POSITIVE -> listOf(currentVotes[0] + vote.value, currentVotes[1])
+                    VOTE_TYPE.NEGATIVE -> listOf(currentVotes[0], currentVotes[1] + vote.value)
                   }
 
               image.toMutableMap().apply { put("votes", updatedVotes) }
@@ -194,8 +195,6 @@ class ImageRepositoryFirestore(
   override suspend fun deleteAllImagesFromUser(userId: String) {
     TODO("Not yet implemented")
   }
-
-
 
   /**
    * Register a listener to a specific imageCollectionId
@@ -256,5 +255,3 @@ class ImageRepositoryFirestore(
     } ?: return emptyList()
   }
 }
-
-

@@ -27,6 +27,7 @@ interface ImageRepository {
 
   /**
    * Updates the score of the image with hash imageHash in document imageCollectionId
+   *
    * @param imageCollectionId The collection the image belongs to.
    * @param imageUrl The url of the image of whom to register the vote to.
    * @param vote The vote type. True if a positive vote, false if a negative vote.

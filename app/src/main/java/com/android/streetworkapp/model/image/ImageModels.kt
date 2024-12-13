@@ -34,7 +34,7 @@ data class ParkImage(
     val uploadDate: Timestamp = Timestamp.now()
 )
 
-
 enum class VOTE_TYPE(val value: Int) {
-    POSITIVE(1), NEGATIVE(1)
+  POSITIVE(1),
+  NEGATIVE(1)
 }
