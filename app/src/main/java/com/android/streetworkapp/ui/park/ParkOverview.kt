@@ -120,8 +120,7 @@ fun ParkOverviewScreen(
           Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
               ParkDetails(park = currentPark.value, showRatingDialog, currentUser)
               Row(
-                  modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
-                  horizontalArrangement = Arrangement.End
+                  modifier = Modifier.fillMaxWidth(),
               ) {
                   ImagesCollectionButton(imageViewModel, userViewModel, currentPark.value)
                   AddImageButton(imageViewModel, currentPark.value, currentUser)
@@ -432,7 +431,7 @@ fun CreateEventButton(navigationActions: NavigationActions) {
             modifier =
             Modifier.size(38.dp)
                 .background(color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape)
-                .padding(2.dp)
+                .padding(1.dp)
                 .testTag("createEventButton")
         )
         {

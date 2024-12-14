@@ -72,7 +72,7 @@ fun ImagesCollectionButton(
             modifier =
                 Modifier.size(38.dp)
                     .background(color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape)
-                    .padding(2.dp)) {
+                    .padding(1.dp)) {
               Icon(
                   painter = painterResource(id = R.drawable.photo_library_24px),
                   contentDescription = "Add Image",
