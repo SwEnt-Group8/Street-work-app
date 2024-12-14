@@ -6,5 +6,6 @@ data class User(
     val email: String,
     val score: Int,
     val friends: List<String>,
-    val picture: String
+    val picture: String,
+    val parks: List<String> = emptyList()
 )

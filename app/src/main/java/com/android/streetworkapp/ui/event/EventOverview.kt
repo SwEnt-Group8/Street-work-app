@@ -23,6 +23,7 @@ import androidx.compose.material.icons.twotone.Face
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.SnackbarHostState
@@ -37,10 +38,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.streetworkapp.model.event.Event
+import com.android.streetworkapp.model.event.EventStatus
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.progression.ScoreIncrease
@@ -114,7 +117,8 @@ fun EventDetails(event: Event, userViewModel: UserViewModel) {
           event.title,
           modifier = Modifier.testTag("eventTitle"),
           fontSize = 24.sp,
-          style = TextStyle(textDecoration = TextDecoration.Underline))
+          style = TextStyle(textDecoration = TextDecoration.Underline),
+          textAlign = TextAlign.Center)
     }
 
     Row(
@@ -307,6 +311,67 @@ fun LeaveEventButton(
       modifier = Modifier.testTag("leaveEventButton"),
       colors = ColorPalette.BUTTON_COLOR.copy(containerColor = Color.Red)) {
         Text("Leave this event")
+      }
+}
+
+@Composable
+fun EditEventButton(
+    event: Event,
+    eventViewModel: EventViewModel,
+    navigationActions: NavigationActions
+) {
+  Button(
+      onClick = {
+        eventViewModel.setCurrentEvent(event)
+        navigationActions.navigateTo(Screen.EDIT_EVENT)
+      },
+      enabled = true,
+      modifier = Modifier.testTag("editEventButton"),
+      colors = ColorPalette.BUTTON_COLOR) {
+        Text("Edit this event")
+      }
+}
+
+@Composable
+fun StatusButton(
+    event: Event,
+    eventViewModel: EventViewModel,
+    parkViewModel: ParkViewModel,
+    navigationActions: NavigationActions
+) {
+  val context = LocalContext.current
+  val (nextStatus, buttonText) =
+      when (event.status) {
+        EventStatus.CREATED -> Pair(EventStatus.STARTED, "Start Event")
+        EventStatus.STARTED -> Pair(EventStatus.ENDED, "End Event")
+        EventStatus.ENDED -> Pair(EventStatus.ENDED, "Event Ended")
+      }
+
+  val buttonColor =
+      when (event.status) {
+        EventStatus.CREATED ->
+            ColorPalette.BUTTON_COLOR.copy(containerColor = ColorPalette.DARK_GREEN)
+        EventStatus.STARTED ->
+            ColorPalette.BUTTON_COLOR.copy(containerColor = MaterialTheme.colorScheme.error)
+        EventStatus.ENDED -> ColorPalette.BUTTON_COLOR.copy(containerColor = Color.Gray)
+      }
+
+  Button(
+      onClick = {
+        if (nextStatus == EventStatus.ENDED) {
+          eventViewModel.deleteEvent(event)
+          parkViewModel.deleteEventFromPark(event.parkId, event.eid)
+          Toast.makeText(context, "Event ended", Toast.LENGTH_LONG).show()
+        } else {
+          eventViewModel.updateStatus(event.eid, nextStatus)
+          Toast.makeText(context, "Event started!", Toast.LENGTH_LONG).show()
+        }
+        navigationActions.navigateTo(Screen.PARK_OVERVIEW)
+      },
+      enabled = event.status != EventStatus.ENDED,
+      modifier = Modifier.testTag("statusButton"),
+      colors = buttonColor) {
+        Text(buttonText)
       }
 }
 

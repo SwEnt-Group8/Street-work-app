@@ -2,7 +2,6 @@ package com.android.streetworkapp.ui.park
 
 // Portions of this code were generated with the help of GitHub Copilot.
 
-import android.Manifest
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
@@ -22,13 +21,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.automirrored.filled.DirectionsRun
+import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Timelapse
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -36,6 +39,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -46,17 +50,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.android.sample.R
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventOverviewUiState
+import com.android.streetworkapp.model.event.EventStatus
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.image.ImageViewModel
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkViewModel
+import com.android.streetworkapp.model.progression.ScoreIncrease
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepositoryFirestore
 import com.android.streetworkapp.model.user.UserViewModel
@@ -64,11 +69,12 @@ import com.android.streetworkapp.ui.image.AddImageButton
 import com.android.streetworkapp.ui.image.ImagesCollectionButton
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
+import com.android.streetworkapp.ui.progress.updateAndDisplayPoints
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.ui.utils.CustomDialog
 import com.android.streetworkapp.utils.dateDifference
-import com.android.streetworkapp.utils.toFormattedString
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * Display the overview of a park, including park details and a list of events.
@@ -88,6 +94,8 @@ fun ParkOverviewScreen(
     userViewModel: UserViewModel =
         UserViewModel(UserRepositoryFirestore(FirebaseFirestore.getInstance())),
     imageViewModel: ImageViewModel,
+    scope: CoroutineScope = rememberCoroutineScope(),
+    host: SnackbarHostState? = null
 ) {
 
   // MVVM calls for park state :
@@ -111,42 +119,47 @@ fun ParkOverviewScreen(
   val context = LocalContext.current
 
   Box(modifier = Modifier.padding(innerPadding).fillMaxSize().testTag("parkOverviewScreen")) {
-      Column {
-          ImageTitle(
-              image = null,
-              park = currentPark.value
-          )
+    Column {
+      ImageTitle(image = null, park = currentPark.value)
 
-          Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-              ParkDetails(park = currentPark.value, showRatingDialog, currentUser)
-              Row(
-                  modifier = Modifier.fillMaxWidth(),
-              ) {
-                  ImagesCollectionButton(imageViewModel, userViewModel, currentPark.value)
-                  AddImageButton(imageViewModel, currentPark.value, currentUser)
-                  CreateEventButton(navigationActions)
-              }
-          }
-
-          val starRating = remember { mutableIntStateOf(3) } // Stores the "live" rating value
-
-          CustomDialog(
-              showRatingDialog,
-              tag = "Rating",
-              Content = { InteractiveRatingComponent(starRating) },
-              onSubmit = {
-                  Log.d("ParkOverview", "RatingDialog: Submitting rating")
-                  handleRating(
-                      context, currentPark.value, currentUser, starRating.intValue, parkViewModel
-                  )
-              },
-              onDismiss = { starRating.intValue = 3 })
-
-          HorizontalDivider(modifier = Modifier.fillMaxWidth())
-          EventItemList(eventViewModel, navigationActions)
+      Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        ParkDetails(park = currentPark.value, showRatingDialog, currentUser)
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(end = 10.dp),
+            horizontalArrangement = Arrangement.End,
+        ) {
+          ImagesCollectionButton(imageViewModel, userViewModel, currentPark.value)
+          AddImageButton(imageViewModel, currentPark.value, currentUser)
+          CreateEventButton(navigationActions)
+        }
       }
+
+      val starRating = remember { mutableIntStateOf(3) } // Stores the "live" rating value
+
+      CustomDialog(
+          showRatingDialog,
+          tag = "Rating",
+          Content = { InteractiveRatingComponent(starRating) },
+          onSubmit = {
+            Log.d("ParkOverview", "RatingDialog: Submitting rating")
+            handleRating(
+                context,
+                currentPark.value,
+                currentUser,
+                starRating.intValue,
+                parkViewModel,
+                userViewModel,
+                navigationActions,
+                scope,
+                host)
+          },
+          onDismiss = { starRating.intValue = 3 })
+
+      HorizontalDivider(modifier = Modifier.fillMaxWidth())
+      EventItemList(eventViewModel, navigationActions)
+    }
   }
-  }
+}
 
 /**
  * Display an image with a title overlay, if no image is provided, an AI generated default image is
@@ -256,20 +269,25 @@ fun RatingButton(showRatingDialog: MutableState<Boolean>) {
 }
 
 /**
- * Verifies that the current state is correct and then rates the park.
+ * Verifies that the current state is correct and then rates the park and add 10p to user
  *
  * @param context The context of the application.
  * @param park The park to rate.
  * @param user The user who is rating the park.
  * @param starRating The rating value.
  * @param parkViewModel The park view model.
+ * @param userViewModel The user view model
  */
 fun handleRating(
     context: Context?,
     park: Park?,
     user: User?,
     starRating: Int,
-    parkViewModel: ParkViewModel?
+    parkViewModel: ParkViewModel?,
+    userViewModel: UserViewModel,
+    navigationActions: NavigationActions,
+    scope: CoroutineScope,
+    snackbarHostState: SnackbarHostState? = null
 ) {
   Log.d("ParkOverview", "handleRating: {park=$park ; user=$user ; rating=$starRating")
 
@@ -296,6 +314,14 @@ fun handleRating(
       Log.d("ParkOverview", "handleRating: Adding rating to park")
       if (context != null) Toast.makeText(context, "Rating submitted", Toast.LENGTH_SHORT).show()
       parkViewModel.addRating(park.pid, user.uid, starRating.toFloat())
+      if (snackbarHostState != null) {
+        updateAndDisplayPoints(
+            userViewModel,
+            navigationActions,
+            ScoreIncrease.ADD_RATING.points,
+            scope,
+            snackbarHostState)
+      }
     }
   }
 }
@@ -385,26 +411,41 @@ fun EventItemList(eventViewModel: EventViewModel, navigationActions: NavigationA
  */
 @Composable
 fun EventItem(event: Event, eventViewModel: EventViewModel, navigationActions: NavigationActions) {
+  val (statusColor, statusIcon) =
+      when (event.status) {
+        EventStatus.CREATED -> Pair(MaterialTheme.colorScheme.error, Icons.Default.Timelapse)
+        EventStatus.STARTED ->
+            Pair(ColorPalette.DARK_GREEN, Icons.AutoMirrored.Filled.DirectionsRun)
+        EventStatus.ENDED -> Pair(Color.Gray, Icons.Default.QuestionMark)
+      }
+
   ListItem(
       modifier = Modifier.padding(0.dp).testTag("eventItem"),
       headlineContent = { Text(text = event.title) },
       supportingContent = {
         Text(
-            "Participants ${event.listParticipants.size}/${event.maxParticipants}",
+            "Participants: ${event.listParticipants.size}/${event.maxParticipants}",
             fontWeight = FontWeight.Light,
             modifier = Modifier.testTag("participantsText"))
       },
       overlineContent = {
         Text(
-            text = dateDifference(event.date.toFormattedString()),
+            text = dateDifference(LocalContext.current, event),
             fontWeight = FontWeight.Bold,
             modifier = Modifier.testTag("dateText"))
       },
       leadingContent = {
-        Icon(
-            imageVector = Icons.Default.AccountCircle,
-            contentDescription = "Profile Icon",
-            modifier = Modifier.size(56.dp).testTag("profileIcon"))
+        Box(
+            modifier =
+                Modifier.size(56.dp)
+                    .background(color = statusColor, shape = CircleShape)
+                    .padding(2.dp)) {
+              Icon(
+                  imageVector = statusIcon,
+                  contentDescription = "Add Image",
+                  tint = Color.White,
+                  modifier = Modifier.align(Alignment.Center).fillMaxSize(0.75f))
+            }
       },
       trailingContent = {
         Button(
@@ -423,26 +464,20 @@ fun EventItem(event: Event, eventViewModel: EventViewModel, navigationActions: N
 
 @Composable
 fun CreateEventButton(navigationActions: NavigationActions) {
-    IconButton(
-        onClick = {
-            navigationActions.navigateTo(Screen.ADD_EVENT)
-        }) {
-        Box(
-            modifier =
+  IconButton(onClick = { navigationActions.navigateTo(Screen.ADD_EVENT) }) {
+    Box(
+        modifier =
             Modifier.size(38.dp)
                 .background(color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape)
                 .padding(1.dp)
-                .testTag("createEventButton")
-        )
-        {
-            Icon(
-                painter = painterResource(id = R.drawable.calendar_add_on_24px),
-                contentDescription = "Add Event",
-                tint = Color.White,
-                modifier = Modifier.align(Alignment.Center).fillMaxSize(0.75f)
-            )
+                .testTag("createEventButton")) {
+          Icon(
+              painter = painterResource(id = R.drawable.calendar_add_on_24px),
+              contentDescription = "Add Event",
+              tint = Color.White,
+              modifier = Modifier.align(Alignment.Center).fillMaxSize(0.75f))
         }
-    }
+  }
 }
 
 /**

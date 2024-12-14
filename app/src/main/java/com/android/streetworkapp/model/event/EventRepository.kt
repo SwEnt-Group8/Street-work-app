@@ -20,4 +20,8 @@ interface EventRepository {
   suspend fun removeParticipantFromEvent(eid: String, uid: String)
 
   suspend fun addEvent(event: Event)
+
+  suspend fun deleteEvent(event: Event)
+
+  suspend fun updateStatus(eid: String, status: EventStatus)
 }

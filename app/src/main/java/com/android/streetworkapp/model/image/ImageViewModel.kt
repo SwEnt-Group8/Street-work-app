@@ -58,14 +58,17 @@ open class ImageViewModel(private val imageRepository: ImageRepository) : ViewMo
     }
   }
 
-  open fun imageVote(imageCollectionId: String, imageUrl: String, voterUid: String, vote: VOTE_TYPE) {
+  open fun imageVote(
+      imageCollectionId: String,
+      imageUrl: String,
+      voterUid: String,
+      vote: VOTE_TYPE
+  ) {
     viewModelScope.launch { imageRepository.imageVote(imageCollectionId, imageUrl, voterUid, vote) }
   }
 
   open fun retractImageVote(imageCollectionId: String, imageUrl: String, userId: String) {
-    viewModelScope.launch {
-      imageRepository.retractImageVote(imageCollectionId, imageUrl, userId)
-    }
+    viewModelScope.launch { imageRepository.retractImageVote(imageCollectionId, imageUrl, userId) }
   }
 
   /**

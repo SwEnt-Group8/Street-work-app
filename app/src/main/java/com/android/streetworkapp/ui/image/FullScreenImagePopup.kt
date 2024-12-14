@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -28,7 +27,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -40,7 +38,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -75,7 +72,7 @@ fun FullScreenImagePopup(
     onDismiss: () -> Unit
 ) {
   val currentUser = userViewModel.currentUser.collectAsState().value
-  val currentImages by rememberUpdatedState(images.sortedByDescending {it.rating.getImageScore()})
+  val currentImages by rememberUpdatedState(images.sortedByDescending { it.rating.getImageScore() })
   // State for the pager to keep track of the current image
   val pagerState = rememberPagerState(pageCount = { currentImages.size })
   val coroutineScope = rememberCoroutineScope()
@@ -88,205 +85,193 @@ fun FullScreenImagePopup(
           DialogProperties(
               usePlatformDefaultWidth = false // Allow the dialog to take full screen width
               )) {
-      BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
           Column(
               horizontalAlignment = Alignment.CenterHorizontally,
               modifier =
-              Modifier.fillMaxSize()
-                  .background(FullScreenImagePopUpSetting.popUpBackgroundColor)
-                  .let {
-                      if (currentImages.isNotEmpty()) it.verticalScroll(rememberScrollState())
-                      else it
-                  } // only have a vertical scroll if we have images, otherwise can't center the no image text to the middle of screen,
-                  //shouldn't even be needed since the whole thing should fit in the screen but doesn't hurt to add in the case we have some slight overflow
-                  .testTag("fullscreenImagePopUp")) {
-              Row(modifier = Modifier.fillMaxWidth().heightIn(max = this@BoxWithConstraints.maxHeight *
-                      0.1f), horizontalArrangement = Arrangement.End) {
-                  IconButton(
-                      onClick = onDismiss,
-                      modifier = Modifier.size(60.dp).testTag("fullscreenImagePopUpCloseButton")
-                  ) {
-                      Icon(
-                          imageVector = Icons.Default.Close,
-                          contentDescription = "Close",
-                          tint = FullScreenImagePopUpSetting.fontColor
-                      )
-                  }
-              }
-              if (currentImages.isNotEmpty() && currentImage != null) {
-                  Column(modifier = Modifier.heightIn(max = this@BoxWithConstraints.maxHeight *
-                          0.6f),
-                       horizontalAlignment = Alignment.CenterHorizontally
-                      ) {
-                      Text(
-                          " #${pagerState.currentPage + 1}/${currentImages.size}",
-                          color = FullScreenImagePopUpSetting.fontColor,
-                          fontWeight = FontWeight.SemiBold,
-                          fontSize = 18.sp,
-                      )
-                      // HorizontalPager to swipe between images
-                      HorizontalPager(
-                          state = pagerState,
+                  Modifier.fillMaxSize()
+                      .background(FullScreenImagePopUpSetting.popUpBackgroundColor)
+                      .let {
+                        if (currentImages.isNotEmpty()) it.verticalScroll(rememberScrollState())
+                        else it
+                      } // only have a vertical scroll if we have images, otherwise can't center the
+                        // no image text to the middle of screen,
+                      // shouldn't even be needed since the whole thing should fit in the screen but
+                      // doesn't hurt to add in the case we have some slight overflow
+                      .testTag("fullscreenImagePopUp")) {
+                Row(
+                    modifier =
+                        Modifier.fillMaxWidth()
+                            .heightIn(max = this@BoxWithConstraints.maxHeight * 0.1f),
+                    horizontalArrangement = Arrangement.End) {
+                      IconButton(
+                          onClick = onDismiss,
                           modifier =
-                          Modifier.fillMaxWidth().padding(vertical = 20.dp)
-                      ) {
-                          ImageItem(imageUri = currentImage.imageUrl)
-                      }
-                  }
-                  Row(
-                      modifier = Modifier.fillMaxWidth().heightIn(max = this@BoxWithConstraints.maxHeight * 0.1f),
-                      horizontalArrangement = Arrangement.Center
-                  ) {
-                      if (currentUser != null && currentUser.uid != currentImage.userId) {
-                          if (currentImage.rating.positiveVotesUids.contains(currentUser.uid) || currentImage.rating.negativeVotesUids.contains(
-                                  currentUser.uid
-                              )
-                          ) {
-                              Box(modifier = Modifier.padding(horizontal = 15.dp)) {
-                                  // Retract Vote Button
-                                  IconButton(
-                                      onClick = {
-                                          imageViewModel.retractImageVote(
-                                              park.imagesCollectionId,
-                                              currentImage.imageUrl,
-                                              currentUser.uid,
-                                          )
-                                      },
-                                      modifier =
-                                      Modifier.size(60.dp)
-                                          .clip(CircleShape)
-                                          .background(FullScreenImagePopUpSetting.undoButtonColor)
-                                  ) {
-                                      Icon(
-                                          imageVector = Icons.AutoMirrored.Filled.Undo,
-                                          contentDescription = "Retract Vote",
-                                          tint = Color.White
-                                      )
-                                  }
-                              }
-                          } else {
-                              Box(modifier = Modifier.padding(horizontal = 15.dp)) {
-                                  // Like Button
-                                  IconButton(
-                                      onClick = {
-                                          imageViewModel.imageVote(
-                                              park.imagesCollectionId,
-                                              currentImage.imageUrl,
-                                              currentUser.uid,
-                                              VOTE_TYPE.POSITIVE
-                                          )
-                                      },
-                                      modifier =
-                                      Modifier.size(60.dp)
-                                          .clip(CircleShape)
-                                          .background(ColorPalette.INTERACTION_COLOR_DARK)
-                                  ) {
-                                      Icon(
-                                          imageVector = Icons.Filled.ThumbUp,
-                                          contentDescription = "Like",
-                                          tint = Color.White
-                                      )
-                                  }
-                              }
-
-                              Box(modifier = Modifier.padding(horizontal = 15.dp)) {
-                                  // Dislike Button
-                                  IconButton(
-                                      onClick = {
-                                          imageViewModel.imageVote(
-                                              park.imagesCollectionId,
-                                              currentImage.imageUrl,
-                                              currentUser.uid,
-                                              VOTE_TYPE.NEGATIVE
-                                          )
-                                      },
-                                      modifier =
-                                      Modifier.size(60.dp)
-                                          .clip(CircleShape)
-                                          .background(FullScreenImagePopUpSetting.dislikeButtonColor)
-                                  ) {
-                                      Icon(
-                                          imageVector = Icons.Filled.ThumbDown,
-                                          contentDescription = "Dislike",
-                                          tint = Color.White
-                                      )
-                                  }
-                              }
+                              Modifier.size(60.dp).testTag("fullscreenImagePopUpCloseButton")) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Close",
+                                tint = FullScreenImagePopUpSetting.fontColor)
                           }
-                      } else { // The user who uploaded the picture should only be able to delete
-                          // it, not vote on it
-                          Box(modifier = Modifier.padding(horizontal = 15.dp)) {
-                              //Delete Button
+                    }
+                if (currentImages.isNotEmpty() && currentImage != null) {
+                  Column(
+                      modifier = Modifier.heightIn(max = this@BoxWithConstraints.maxHeight * 0.6f),
+                      horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            " #${pagerState.currentPage + 1}/${currentImages.size}",
+                            color = FullScreenImagePopUpSetting.fontColor,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 18.sp,
+                        )
+                        // HorizontalPager to swipe between images
+                        HorizontalPager(
+                            state = pagerState,
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 20.dp)) {
+                              ImageItem(imageUri = currentImage.imageUrl)
+                            }
+                      }
+                  Row(
+                      modifier =
+                          Modifier.fillMaxWidth()
+                              .heightIn(max = this@BoxWithConstraints.maxHeight * 0.1f),
+                      horizontalArrangement = Arrangement.Center) {
+                        if (currentUser != null && currentUser.uid != currentImage.userId) {
+                          if (currentImage.rating.positiveVotesUids.contains(currentUser.uid) ||
+                              currentImage.rating.negativeVotesUids.contains(currentUser.uid)) {
+                            Box(modifier = Modifier.padding(horizontal = 15.dp)) {
+                              // Retract Vote Button
                               IconButton(
                                   onClick = {
-                                      imageViewModel.deleteImage(
-                                          park.imagesCollectionId,
-                                          currentImage.imageUrl,
-                                          {
-                                              coroutineScope.launch {
-                                                  if (pagerState.currentPage == currentImages.size)
-                                                      pagerState.scrollToPage(pagerState.currentPage - 1)
-                                              }
-                                          },
-                                          {})
+                                    imageViewModel.retractImageVote(
+                                        park.imagesCollectionId,
+                                        currentImage.imageUrl,
+                                        currentUser.uid,
+                                    )
                                   },
                                   modifier =
-                                  Modifier.size(60.dp)
-                                      .clip(CircleShape)
-                                      .background(FullScreenImagePopUpSetting.dislikeButtonColor)
-                              ) {
+                                      Modifier.size(60.dp)
+                                          .clip(CircleShape)
+                                          .background(
+                                              FullScreenImagePopUpSetting.undoButtonColor)) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.Undo,
+                                        contentDescription = "Retract Vote",
+                                        tint = Color.White)
+                                  }
+                            }
+                          } else {
+                            Box(modifier = Modifier.padding(horizontal = 15.dp)) {
+                              // Like Button
+                              IconButton(
+                                  onClick = {
+                                    imageViewModel.imageVote(
+                                        park.imagesCollectionId,
+                                        currentImage.imageUrl,
+                                        currentUser.uid,
+                                        VOTE_TYPE.POSITIVE)
+                                  },
+                                  modifier =
+                                      Modifier.size(60.dp)
+                                          .clip(CircleShape)
+                                          .background(ColorPalette.INTERACTION_COLOR_DARK)) {
+                                    Icon(
+                                        imageVector = Icons.Filled.ThumbUp,
+                                        contentDescription = "Like",
+                                        tint = Color.White)
+                                  }
+                            }
+
+                            Box(modifier = Modifier.padding(horizontal = 15.dp)) {
+                              // Dislike Button
+                              IconButton(
+                                  onClick = {
+                                    imageViewModel.imageVote(
+                                        park.imagesCollectionId,
+                                        currentImage.imageUrl,
+                                        currentUser.uid,
+                                        VOTE_TYPE.NEGATIVE)
+                                  },
+                                  modifier =
+                                      Modifier.size(60.dp)
+                                          .clip(CircleShape)
+                                          .background(
+                                              FullScreenImagePopUpSetting.dislikeButtonColor)) {
+                                    Icon(
+                                        imageVector = Icons.Filled.ThumbDown,
+                                        contentDescription = "Dislike",
+                                        tint = Color.White)
+                                  }
+                            }
+                          }
+                        } else { // The user who uploaded the picture should only be able to delete
+                          // it, not vote on it
+                          Box(modifier = Modifier.padding(horizontal = 15.dp)) {
+                            // Delete Button
+                            IconButton(
+                                onClick = {
+                                  imageViewModel.deleteImage(
+                                      park.imagesCollectionId,
+                                      currentImage.imageUrl,
+                                      {
+                                        coroutineScope.launch {
+                                          if (pagerState.currentPage == currentImages.size)
+                                              pagerState.scrollToPage(pagerState.currentPage - 1)
+                                        }
+                                      },
+                                      {})
+                                },
+                                modifier =
+                                    Modifier.size(60.dp)
+                                        .clip(CircleShape)
+                                        .background(
+                                            FullScreenImagePopUpSetting.dislikeButtonColor)) {
                                   Icon(
                                       imageVector = Icons.Filled.Delete,
                                       contentDescription = "Dislike",
-                                      tint = Color.White
-                                  )
-                              }
+                                      tint = Color.White)
+                                }
                           }
+                        }
                       }
-                  }
 
                   Column(
                       horizontalAlignment = Alignment.CenterHorizontally,
                       verticalArrangement = Arrangement.spacedBy(5.dp),
-                      modifier = Modifier.padding(vertical = 25.dp).heightIn(max = this@BoxWithConstraints.maxHeight * 0.2f)
-                  ) {
-                      Text(
-                          "Uploaded by ${currentImage.username}",
-                          color = FullScreenImagePopUpSetting.fontColor,
-                          fontWeight = FullScreenImagePopUpSetting.imageInfoFontWeight
-                      )
-                      Text(
-                          "The ${currentImage.uploadDate.toFormattedString()}",
-                          color = FullScreenImagePopUpSetting.fontColor,
-                          fontWeight = FullScreenImagePopUpSetting.imageInfoFontWeight
-                      )
-                      Text(
-                          "${currentImage.rating.positiveVotes} user(s) liked this picture",
-                          color = FullScreenImagePopUpSetting.fontColor,
-                          fontWeight = FullScreenImagePopUpSetting.imageInfoFontWeight
-                      )
-                      Text(
-                          "${currentImage.rating.negativeVotes} user(s) disliked this picture",
-                          color = FullScreenImagePopUpSetting.fontColor,
-                          fontWeight = FullScreenImagePopUpSetting.imageInfoFontWeight
-                      )
-                  }
-              } else if (currentImages.isEmpty()) {
+                      modifier =
+                          Modifier.padding(vertical = 25.dp)
+                              .heightIn(max = this@BoxWithConstraints.maxHeight * 0.2f)) {
+                        Text(
+                            "Uploaded by ${currentImage.username}",
+                            color = FullScreenImagePopUpSetting.fontColor,
+                            fontWeight = FullScreenImagePopUpSetting.imageInfoFontWeight)
+                        Text(
+                            "The ${currentImage.uploadDate.toFormattedString()}",
+                            color = FullScreenImagePopUpSetting.fontColor,
+                            fontWeight = FullScreenImagePopUpSetting.imageInfoFontWeight)
+                        Text(
+                            "${currentImage.rating.positiveVotes} user(s) liked this picture",
+                            color = FullScreenImagePopUpSetting.fontColor,
+                            fontWeight = FullScreenImagePopUpSetting.imageInfoFontWeight)
+                        Text(
+                            "${currentImage.rating.negativeVotes} user(s) disliked this picture",
+                            color = FullScreenImagePopUpSetting.fontColor,
+                            fontWeight = FullScreenImagePopUpSetting.imageInfoFontWeight)
+                      }
+                } else if (currentImages.isEmpty()) {
                   Column(
                       modifier = Modifier.fillMaxSize(),
                       verticalArrangement = Arrangement.Center,
-                      horizontalAlignment = Alignment.CenterHorizontally
-                  ) {
-                      Text(
-                          text = "No image(s) are uploaded for this park.",
-                          color = FullScreenImagePopUpSetting.fontColor,
-                          fontWeight = FullScreenImagePopUpSetting.imageInfoFontWeight
-                      )
-                  }
+                      horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = "No image(s) are uploaded for this park.",
+                            color = FullScreenImagePopUpSetting.fontColor,
+                            fontWeight = FullScreenImagePopUpSetting.imageInfoFontWeight)
+                      }
+                }
               }
-          }
+        }
       }
-  }
 }
 
 @Composable

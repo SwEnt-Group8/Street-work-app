@@ -62,7 +62,8 @@ class ImageViewModelTest {
   fun `retrieveImages saves images in the cache by their hash name`() = runTest {
     val mockCacheFolder = temporaryFolder.newFolder()
     val park = Park(pid = "parkId")
-    val userWhoUploadedImage = User("userId", "name", "mail", 10, emptyList(), "")
+    val userWhoUploadedImage =
+        User("userId", "name", "mail", 10, emptyList(), "", parks = emptyList())
     // 1x1 jpg format pixel in base64, note: the images should all be in jpeg format for this test.
     val dummiesBase64 =
         listOf(

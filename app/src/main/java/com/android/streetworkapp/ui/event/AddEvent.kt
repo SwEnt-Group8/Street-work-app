@@ -1,5 +1,7 @@
 package com.android.streetworkapp.ui.event
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,7 +19,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -45,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -59,6 +61,7 @@ import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.progression.ScoreIncrease
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
+import com.android.streetworkapp.ui.navigation.Screen
 import com.android.streetworkapp.ui.progress.updateAndDisplayPoints
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.google.firebase.Timestamp
@@ -101,25 +104,33 @@ fun AddEventScreen(
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     snackBarHostState: SnackbarHostState? = null,
     paddingValues: PaddingValues = PaddingValues(0.dp),
+    editEvent: Boolean = false
 ) {
 
-  val eid = eventViewModel.getNewEid()
+  val eventToEdit = if (editEvent) eventViewModel.currentEvent.collectAsState() else null
 
+  val context = LocalContext.current
+
+  val eid = eventViewModel.getNewEid()
   val event by remember {
     mutableStateOf(
-        Event(
-            eid,
-            "",
-            "",
-            1, // set to one by default, because the owner is also a participant
-            EventConstants.MIN_NUMBER_PARTICIPANTS,
-            Timestamp(
-                Calendar.getInstance()
-                    .apply {
-                      add(Calendar.HOUR_OF_DAY, AddEventParams.EVENT_INIT_TIME_CREATION_OFFSET)
-                    }
-                    .time), // this is the time that's used as default in time selection as well
-            "unknown"))
+        if (editEvent) {
+          eventToEdit?.value!!.copy()
+        } else {
+          Event(
+              eid,
+              "",
+              "",
+              1, // set to one by default, because the owner is also a participant
+              EventConstants.MIN_NUMBER_PARTICIPANTS,
+              Timestamp(
+                  Calendar.getInstance()
+                      .apply {
+                        add(Calendar.HOUR_OF_DAY, AddEventParams.EVENT_INIT_TIME_CREATION_OFFSET)
+                      }
+                      .time), // this is the time that's used as default in time selection as well
+              "unknown")
+        })
   }
 
   val owner = userViewModel.currentUser.collectAsState().value?.uid
@@ -161,7 +172,8 @@ fun AddEventScreen(
           Modifier.fillMaxSize()
               .testTag("addEventScreen")
               .padding(paddingValues)
-              .background(MaterialTheme.colorScheme.background)) {
+              .background(MaterialTheme.colorScheme.background),
+      contentAlignment = Alignment.Center) {
         Column(
             modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(18.dp),
@@ -199,26 +211,52 @@ fun AddEventScreen(
                 isTextEvaluationError.value = false
               }
 
-              Button(
-                  colors = ColorPalette.BUTTON_COLOR,
-                  modifier = Modifier.testTag("addEventButton"),
-                  onClick = {
-                    onAddEventClickHandler(
-                        event,
-                        navigationActions,
-                        eventViewModel,
-                        userViewModel,
-                        parkViewModel,
-                        textModerationViewModel,
-                        snackBarHostState,
-                        coroutineScope,
-                        isDateBackInTimeError,
-                        isTitleEmptyError,
-                        isTextEvaluationOverThresholdsError,
-                        isTextEvaluationError,
-                        formErrorMessage)
-                  }) {
-                    Text("Add new event")
+              Row(
+                  modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
+                  horizontalArrangement = Arrangement.SpaceEvenly) {
+                    Button(
+                        colors = ColorPalette.BUTTON_COLOR,
+                        modifier = Modifier.testTag("addEventButton"),
+                        onClick = {
+                          onAddEventClickHandler(
+                              event,
+                              navigationActions,
+                              eventViewModel,
+                              userViewModel,
+                              parkViewModel,
+                              textModerationViewModel,
+                              snackBarHostState,
+                              coroutineScope,
+                              isDateBackInTimeError,
+                              isTitleEmptyError,
+                              isTextEvaluationOverThresholdsError,
+                              isTextEvaluationError,
+                              formErrorMessage,
+                              editEvent,
+                              context)
+                        }) {
+                          if (editEvent) {
+                            Text("Edit event")
+                          } else {
+                            Text("Add new event")
+                          }
+                        }
+
+                    if (editEvent) {
+                      Button(
+                          colors =
+                              ColorPalette.BUTTON_COLOR.copy(
+                                  containerColor = MaterialTheme.colorScheme.error),
+                          modifier = Modifier.testTag("deleteEventButton"),
+                          onClick = {
+                            Toast.makeText(context, "Event deleted", Toast.LENGTH_LONG).show()
+                            eventViewModel.deleteEvent(event)
+                            parkViewModel.deleteEventFromPark(event.parkId, event.eid)
+                            navigationActions.navigateTo(Screen.PARK_OVERVIEW)
+                          }) {
+                            Text("Delete event")
+                          }
+                    }
                   }
             }
       }
@@ -235,7 +273,7 @@ fun EventTitleSelection(
     isTitleEmptyError: MutableState<Boolean>,
     isTextEvaluationError: MutableState<Boolean>
 ) {
-  var title by remember { mutableStateOf("") }
+  var title by remember { mutableStateOf(event.title) }
 
   OutlinedTextField(
       value = title,
@@ -258,7 +296,7 @@ fun EventTitleSelection(
  */
 @Composable
 fun EventDescriptionSelection(event: Event, isTextEvaluationError: MutableState<Boolean>) {
-  var description by remember { mutableStateOf("") }
+  var description by remember { mutableStateOf(event.description) }
 
   OutlinedTextField(
       value = description,
@@ -279,9 +317,7 @@ fun EventDescriptionSelection(event: Event, isTextEvaluationError: MutableState<
  */
 @Composable
 fun ParticipantNumberSelection(event: Event) {
-  var sliderPosition by remember {
-    mutableFloatStateOf(EventConstants.MIN_NUMBER_PARTICIPANTS.toFloat())
-  }
+  var sliderPosition by remember { mutableFloatStateOf(event.maxParticipants.toFloat()) }
 
   Column(
       verticalArrangement = Arrangement.Center,
@@ -384,7 +420,7 @@ fun TimeSelection(event: Event, isDateError: MutableState<Boolean>) {
                     DatePicker(state = datePickerState, showModeToggle = false)
                     Button(
                         modifier = Modifier.testTag("validateDate"),
-                        colors = ButtonColors(Color.Blue, Color.White, Color.Blue, Color.White),
+                        colors = ColorPalette.BUTTON_COLOR,
                         onClick = {
                           showDatePicker = false
 
@@ -413,7 +449,7 @@ fun TimeSelection(event: Event, isDateError: MutableState<Boolean>) {
 
               Button(
                   modifier = Modifier.testTag("validateTime"),
-                  colors = ButtonColors(Color.Blue, Color.White, Color.Blue, Color.White),
+                  colors = ColorPalette.BUTTON_COLOR,
                   onClick = {
                     showTimePicker = false
                     isDateError.value = false // reset the field error
@@ -443,14 +479,18 @@ private fun createEvent(
     userViewModel: UserViewModel,
     parkViewModel: ParkViewModel,
     coroutineScope: CoroutineScope,
-    host: SnackbarHostState?
+    host: SnackbarHostState?,
+    editEvent: Boolean,
+    context: Context
 ) {
   eventViewModel.addEvent(event)
   parkViewModel.addEventToPark(event.parkId, event.eid)
 
-  if (host != null) {
+  if (host != null && !editEvent) {
     updateAndDisplayPoints(
         userViewModel, navigationActions, ScoreIncrease.ADD_EVENT.points, coroutineScope, host)
+  } else {
+    Toast.makeText(context, "Event updated", Toast.LENGTH_LONG).show()
   }
 }
 
@@ -494,6 +534,8 @@ fun onAddEventClickHandler(
     isTextEvaluationOverThresholdsError: MutableState<Boolean>,
     isTextEvaluationError: MutableState<Boolean>,
     formErrorMessage: MutableState<String>,
+    editEvent: Boolean,
+    context: Context
 ) {
   // Check if the event date is in the past
   if (event.date.seconds < Timestamp(Calendar.getInstance(TimeZone.getDefault()).time).seconds) {
@@ -521,8 +563,10 @@ fun onAddEventClickHandler(
                 userViewModel,
                 parkViewModel,
                 coroutineScope,
-                snackBarHostState)
-            navigationActions.goBack()
+                snackBarHostState,
+                editEvent,
+                context)
+            navigationActions.navigateTo(Screen.PARK_OVERVIEW)
           } else {
             // If text exceeds thresholds, set the error flag and message
             isTextEvaluationOverThresholdsError.value = true

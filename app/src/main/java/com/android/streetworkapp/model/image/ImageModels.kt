@@ -17,15 +17,22 @@ data class ParkImageCollection(
 ) // note: if images field were to be changed, make sure to match the field name change in
 // ImageRepositoryFirestore::uploadImage
 
-data class ImageRating(val positiveVotes: Int = 0, val negativeVotes: Int = 0, val positiveVotesUids: List<String> = emptyList(), val negativeVotesUids: List<String> = emptyList()) {
-    /**
-     * Returns a computed value from the [Pair<Int, Int>] of the score.
-     * It's a weighted score slowly increasing for the total number of votes, prioritizing the ratio of positive to negative reviews.
-     */
-    @Exclude //we don't want this to get serialized
-    fun getImageScore(): Double {
-        return log((this.positiveVotes + this.negativeVotes + 2).toDouble().pow(0.4), 2.0)*(this.positiveVotes+1)/(this.negativeVotes+1)
-    }
+data class ImageRating(
+    val positiveVotes: Int = 0,
+    val negativeVotes: Int = 0,
+    val positiveVotesUids: List<String> = emptyList(),
+    val negativeVotesUids: List<String> = emptyList()
+) {
+  /**
+   * Returns a computed value from the [Pair<Int, Int>] of the score. It's a weighted score slowly
+   * increasing for the total number of votes, prioritizing the ratio of positive to negative
+   * reviews.
+   */
+  @Exclude // we don't want this to get serialized
+  fun getImageScore(): Double {
+    return log((this.positiveVotes + this.negativeVotes + 2).toDouble().pow(0.4), 2.0) *
+        (this.positiveVotes + 1) / (this.negativeVotes + 1)
+  }
 }
 
 /**
@@ -52,4 +59,3 @@ enum class VOTE_TYPE(val value: Int) {
   POSITIVE(1),
   NEGATIVE(1)
 }
-

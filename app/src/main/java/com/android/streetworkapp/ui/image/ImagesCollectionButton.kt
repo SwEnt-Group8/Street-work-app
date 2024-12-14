@@ -61,8 +61,8 @@ fun ImagesCollectionButton(
 
           if (park.imagesCollectionId
               .isNotEmpty()) // register a collection listener if the park has an image collection
-                             // setup
-              imageViewModel.registerCollectionListener(park.imagesCollectionId) {
+          // setup
+          imageViewModel.registerCollectionListener(park.imagesCollectionId) {
                 imageViewModel.retrieveImages(context, park) { parkImages = it }
               }
         }
