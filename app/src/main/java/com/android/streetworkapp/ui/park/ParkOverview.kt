@@ -464,20 +464,21 @@ fun EventItem(event: Event, eventViewModel: EventViewModel, navigationActions: N
 
 @Composable
 fun CreateEventButton(navigationActions: NavigationActions) {
-  IconButton(onClick = { navigationActions.navigateTo(Screen.ADD_EVENT) }) {
-    Box(
-        modifier =
-            Modifier.size(38.dp)
-                .background(color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape)
-                .padding(1.dp)
-                .testTag("createEventButton")) {
-          Icon(
-              painter = painterResource(id = R.drawable.calendar_add_on_24px),
-              contentDescription = "Add Event",
-              tint = Color.White,
-              modifier = Modifier.align(Alignment.Center).fillMaxSize(0.75f))
-        }
-  }
+  IconButton(
+      onClick = { navigationActions.navigateTo(Screen.ADD_EVENT) },
+      modifier = Modifier.testTag("createEventButton")) {
+        Box(
+            modifier =
+                Modifier.size(38.dp)
+                    .background(color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape)
+                    .padding(1.dp)) {
+              Icon(
+                  painter = painterResource(id = R.drawable.calendar_add_on_24px),
+                  contentDescription = "Add Event",
+                  tint = Color.White,
+                  modifier = Modifier.align(Alignment.Center).fillMaxSize(0.75f))
+            }
+      }
 }
 
 /**

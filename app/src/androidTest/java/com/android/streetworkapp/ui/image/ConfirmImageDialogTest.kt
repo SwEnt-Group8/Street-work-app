@@ -102,7 +102,7 @@ class ConfirmImageDialogTest {
 
     composeTestRule.setContent {
       ConfirmImageDialogWrapper(
-        mock(), testImageFile, testImageFile.toUri(), showDialogState, imageViewModel, park, user)
+          mock(), testImageFile, testImageFile.toUri(), showDialogState, imageViewModel, park, user)
     }
 
     composeTestRule.waitForIdle()
