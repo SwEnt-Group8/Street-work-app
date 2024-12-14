@@ -1,13 +1,14 @@
 package com.android.streetworkapp.model.image
 
-import android.media.Image
 import android.util.Log
+import androidx.core.graphics.convertTo
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.storage.S3StorageClient
 import com.android.streetworkapp.model.user.UserRepository
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.tasks.await
 
 class ImageRepositoryFirestore(
@@ -250,10 +251,31 @@ class ImageRepositoryFirestore(
     /**
      * Deletes all the images related to a user
      *
-     * @param userId The user id to whom we delete all the related pictures
+     * @param userId The user id to whom we delete all the data from. (pictures uploaded and ratings)
      */
-    override suspend fun deleteAllImagesFromUser(userId: String) {
-        TODO("Not yet implemented")
+    //TODO: to be tested
+    override suspend fun deleteAllDataFromUser(userId: String) {
+        require(userId.isNotEmpty()) {"Empty userId."}
+
+        try {
+            val documents = db.collection(ImageRepositoryFirestore.COLLECTION_PATH).get()
+                .await() //get all documents from collection
+            for (document in documents) {
+                val collection = document.toObject(ParkImageCollection::class.java)
+                for (image in collection.images) {
+                    if (image.userId == userId) {
+                        document.reference.update("images", collection.images - image)
+                    } else if (image.rating.positiveVotesUids.contains(userId) || image.rating.negativeVotesUids.contains(userId))
+                        this.retractImageVote(collection.id, image.imageUrl, userId) //there's a bit of duplicate code reusing this function here but the overhead will be small anyways
+                }
+            }
+        } catch (e: Exception) {
+            Log.d(
+                DEBUG_PREFIX,
+                e.message
+                    ?: "An exception occurred but the message associated with it couldn't be retrieved."
+            )
+        }
     }
 
     /**

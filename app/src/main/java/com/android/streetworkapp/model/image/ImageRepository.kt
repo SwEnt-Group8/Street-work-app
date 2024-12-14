@@ -43,12 +43,12 @@ interface ImageRepository {
  */
   suspend fun retractImageVote(imageCollectionId: String, imageUrl: String, userId: String): Boolean
 
-  /**
-   * Deletes all the images related to a user
-   *
-   * @param userId The user id to whom we delete all the related pictures
-   */
-  suspend fun deleteAllImagesFromUser(userId: String)
+    /**
+     * Deletes all the images related to a user
+     *
+     * @param userId The user id to whom we delete all the data from. (pictures uploaded and ratings)
+     */
+  suspend fun deleteAllDataFromUser(userId: String)
 
   /**
    * Register a listener to a specific imageCollectionId
