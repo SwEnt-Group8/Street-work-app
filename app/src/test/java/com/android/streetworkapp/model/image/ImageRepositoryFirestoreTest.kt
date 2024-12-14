@@ -2,6 +2,7 @@ package com.android.streetworkapp.model.image
 
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkRepository
+import com.android.streetworkapp.model.storage.S3StorageClient
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepository
 import com.google.android.gms.tasks.Task
@@ -10,6 +11,8 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
@@ -17,11 +20,11 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers.any
 import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 import org.robolectric.RobolectricTestRunner
@@ -31,26 +34,30 @@ class ImageRepositoryFirestoreTest {
   @Mock private lateinit var fireStoreDB: FirebaseFirestore
   @Mock private lateinit var parkRepository: ParkRepository
   @Mock private lateinit var userRepository: UserRepository
+  @Mock private lateinit var storageClient: S3StorageClient
 
   private lateinit var imageRepositoryFirestore: ImageRepositoryFirestore
 
   @Before
   fun setUp() {
     MockitoAnnotations.openMocks(this)
-    imageRepositoryFirestore = ImageRepositoryFirestore(fireStoreDB, parkRepository, userRepository)
+    imageRepositoryFirestore =
+        ImageRepositoryFirestore(fireStoreDB, storageClient, parkRepository, userRepository)
   }
 
   @Test
-  fun `uploadImage throws IllegalArgumentException when imageB64 is empty`() {
+  fun `uploadImage throws IllegalArgumentException when uniqueImageIdentifier is empty`() {
     assertThrows(IllegalArgumentException::class.java) {
-      runBlocking { imageRepositoryFirestore.uploadImage("", "validParkId", "validUserId") }
+      runBlocking { imageRepositoryFirestore.uploadImage("", ByteArray(10), "parkId", "userId") }
     }
   }
 
   @Test
   fun `uploadImage throws IllegalArgumentException when parkId is empty`() {
     assertThrows(IllegalArgumentException::class.java) {
-      runBlocking { imageRepositoryFirestore.uploadImage("validBase64", "", "validUserId") }
+      runBlocking {
+        imageRepositoryFirestore.uploadImage("validIdentifier", ByteArray(10), "", "userId")
+      }
     }
   }
 
@@ -60,7 +67,8 @@ class ImageRepositoryFirestoreTest {
 
     assertThrows(IllegalArgumentException::class.java) {
       runBlocking {
-        imageRepositoryFirestore.uploadImage("validBase64", "validParkId", "invalidUserId")
+        imageRepositoryFirestore.uploadImage(
+            "validIdentifier", ByteArray(10), "validParkId", "invalidUserId")
       }
     }
   }
@@ -71,7 +79,8 @@ class ImageRepositoryFirestoreTest {
 
     assertThrows(IllegalArgumentException::class.java) {
       runBlocking {
-        imageRepositoryFirestore.uploadImage("validBase64", "invalidParkId", "validUserId")
+        imageRepositoryFirestore.uploadImage(
+            "validIdentifier", ByteArray(10), "invalidParkId", "validUserId")
       }
     }
   }
@@ -79,14 +88,15 @@ class ImageRepositoryFirestoreTest {
   @Test
   fun `uploadImage creates a new image collection if none exists`() = runBlocking {
     val park = Park(pid = "validParkId", imagesCollectionId = "")
-    val mockUser = mock(User::class.java)
+    val user = User(uid = "validUserId", "name", "", 20, emptyList(), "")
     val mockDocument = mock(DocumentReference::class.java)
     val mockCollection = mock(CollectionReference::class.java)
     val mockTask = mock(Task::class.java) as Task<Void>
 
     whenever(mockTask.isComplete).thenReturn(true)
     whenever(parkRepository.getParkByPid("validParkId")).thenReturn(park)
-    whenever(userRepository.getUserByUid("validUserId")).thenReturn(mockUser)
+    whenever(userRepository.getUserByUid("validUserId")).thenReturn(user)
+    whenever(storageClient.uploadFile(any(), any())).thenReturn("http://dummyurl.com")
     whenever(fireStoreDB.collection(ImageRepositoryFirestore.COLLECTION_PATH))
         .thenReturn(mockCollection)
     whenever(mockCollection.document()).thenReturn(mockDocument)
@@ -94,7 +104,7 @@ class ImageRepositoryFirestoreTest {
     whenever(mockDocument.set(any())).thenReturn(mockTask)
     whenever(mockDocument.id).thenReturn("newCollectionId")
 
-    imageRepositoryFirestore.uploadImage("validBase64", "validParkId", "validUserId")
+    imageRepositoryFirestore.uploadImage("validIdentifier", ByteArray(10), park.pid, user.uid)
 
     verify(mockCollection).document()
     verify(mockDocument).set(any())
@@ -135,19 +145,33 @@ class ImageRepositoryFirestoreTest {
   }
 
   @Test
-  fun `retrieveImages returns list of ParkImageDatabase when valid data exists`() = runBlocking {
-    val mockImagesReply =
+  fun `retrieveImages returns list of ParkImage when valid data exists`() = runBlocking {
+    val parkImages =
         listOf(
-            mapOf(
-                "imageB64" to "imageData1",
-                "userId" to "user1",
-                "rating" to mapOf("first" to 5, "second" to 10),
-                "uploadDate" to Timestamp.now()),
-            mapOf(
-                "imageB64" to "imageData2",
-                "userId" to "user2",
-                "rating" to mapOf("first" to 8, "second" to 12),
-                "uploadDate" to Timestamp.now()))
+            ParkImage(
+                imageUrl = "https://example.com/image1.jpg",
+                userId = "user123",
+                username = "parklover",
+                rating =
+                    ImageRating(
+                        positiveVotes = 10,
+                        negativeVotes = 2,
+                        positiveVotesUids = listOf("userA", "userB", "userC"),
+                        negativeVotesUids = listOf("userX", "userY")),
+                uploadDate = Timestamp.now()),
+            ParkImage(
+                imageUrl = "https://example.com/image2.jpg",
+                userId = "user456",
+                username = "naturefan",
+                rating =
+                    ImageRating(
+                        positiveVotes = 5,
+                        negativeVotes = 1,
+                        positiveVotesUids = listOf("userD", "userE"),
+                        negativeVotesUids = listOf("userZ")),
+                uploadDate = Timestamp.now()))
+
+    val parkImageCollection = ParkImageCollection(id = "collection123", images = parkImages)
 
     val park = Park(pid = "validParkId", imagesCollectionId = "validNonEmptyCollectionId")
 
@@ -164,19 +188,13 @@ class ImageRepositoryFirestoreTest {
     whenever(mockCollection.document(park.imagesCollectionId)).thenReturn(mockDocument)
     whenever(mockDocument.get()).thenReturn(mockTask)
     whenever(mockDocumentSnapshot.exists()).thenReturn(true)
-    whenever(mockDocumentSnapshot.get("images")).thenReturn(mockImagesReply)
+    whenever(mockDocumentSnapshot.toObject(ParkImageCollection::class.java))
+        .thenReturn(parkImageCollection)
 
     val result = imageRepositoryFirestore.retrieveImages(park)
 
-    assertEquals(mockImagesReply.size, result.size)
+    assertEquals(parkImages.size, result.size)
 
-    for ((index, image) in mockImagesReply.withIndex()) {
-      val first = (image["rating"] as? Map<*, *>)?.get("first") as? Int
-      val second = (image["rating"] as? Map<*, *>)?.get("second") as? Int
-
-      assertEquals(image["imageB64"], result[index].imageB64)
-      assertEquals(image["userId"], result[index].userId)
-      assertEquals(Pair(first, second), result[index].rating)
-    }
+    for ((index, image) in parkImages.withIndex()) assert(image == result[index])
   }
 }
