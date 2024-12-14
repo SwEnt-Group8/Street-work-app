@@ -86,7 +86,7 @@ class ConfirmImageDialogTest {
     val user = User("", "", "", 0, emptyList(), "", parks = emptyList())
     composeTestRule.setContent {
       ConfirmImageDialogWrapper(
-          mock(), showDialogState, mock(), mock(), testImageFile.toUri(), Park(), user)
+          mock(), testImageFile, testImageFile.toUri(), showDialogState, mock(), Park(), user)
     }
 
     composeTestRule.waitForIdle()
@@ -102,12 +102,12 @@ class ConfirmImageDialogTest {
 
     composeTestRule.setContent {
       ConfirmImageDialogWrapper(
-          mock(), showDialogState, imageViewModel, mock(), testImageFile.toUri(), park, user)
+        mock(), testImageFile, testImageFile.toUri(), showDialogState, imageViewModel, park, user)
     }
 
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("uploadButton").performClick()
     verify(imageViewModel)
-        .uploadImage(any(), eq(testImageFile.toUri()), eq(park.pid), eq(user.uid), any(), any())
+        .uploadImage(any(), eq(testImageFile), eq(park.pid), eq(user.uid), any(), any())
   }
 }
