@@ -2,12 +2,10 @@ package com.android.streetworkapp.model.image
 
 import android.content.Context
 import android.net.Uri
-import android.util.Base64
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.streetworkapp.model.park.Park
 import java.io.File
-import java.security.MessageDigest
 import java.util.UUID
 import kotlinx.coroutines.launch
 
@@ -89,29 +87,6 @@ open class ImageViewModel(private val imageRepository: ImageRepository) : ViewMo
       if (imageRepository.deleteImage(imageCollectionId, imageUrl)) onImageDeleteSuccess()
       else onImageDeleteFailure()
     }
-  }
-
-  /**
-   * Takes an URI and returns its base64 encoding.
-   *
-   * @param context The current context.
-   * @param imageUri The [Uri] of the image to encode.
-   */
-  open fun uriToBase64(context: Context, imageUri: Uri): String? {
-    return context.contentResolver.openInputStream(imageUri)?.use { inputStream ->
-      Base64.encodeToString(inputStream.readBytes(), Base64.DEFAULT)
-    }
-  }
-
-  /**
-   * Takes a string and returns its SHA-256 hash
-   *
-   * @param string The [String to be hashed]
-   */
-  open fun sha256(string: String): String {
-    val digest = MessageDigest.getInstance("SHA-256")
-    val hashedBytes = digest.digest(string.toByteArray(Charsets.UTF_8))
-    return hashedBytes.joinToString("") { "%02x".format(it) }
   }
 
   /**
