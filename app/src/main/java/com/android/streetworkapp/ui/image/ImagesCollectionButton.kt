@@ -70,7 +70,7 @@ fun ImagesCollectionButton(
       modifier = Modifier.testTag("ImagesCollectionButton")) {
         Box(
             modifier =
-                Modifier.size(36.dp)
+                Modifier.size(38.dp)
                     .background(color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape)
                     .padding(2.dp)) {
               Icon(

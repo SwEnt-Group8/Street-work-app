@@ -2,6 +2,7 @@ package com.android.streetworkapp.ui.park
 
 // Portions of this code were generated with the help of GitHub Copilot.
 
+import android.Manifest
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Star
@@ -109,45 +111,43 @@ fun ParkOverviewScreen(
   val context = LocalContext.current
 
   Box(modifier = Modifier.padding(innerPadding).fillMaxSize().testTag("parkOverviewScreen")) {
-    Column {
-      ImageTitle(
-          imageViewModel = imageViewModel,
-          userViewModel = userViewModel,
-          image = null,
-          park = currentPark.value,
-          user = currentUser)
-      Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        ParkDetails(park = currentPark.value, showRatingDialog, currentUser)
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
-            horizontalArrangement = Arrangement.End) {
-              Button(
-                  onClick = { navigationActions.navigateTo(Screen.ADD_EVENT) },
-                  modifier = Modifier.testTag("createEventButton"),
-                  colors = ColorPalette.BUTTON_COLOR) {
-                    Text("Add an event", textAlign = TextAlign.Center)
-                  }
-            }
+      Column {
+          ImageTitle(
+              image = null,
+              park = currentPark.value
+          )
+
+          Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+              ParkDetails(park = currentPark.value, showRatingDialog, currentUser)
+              Row(
+                  modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
+                  horizontalArrangement = Arrangement.End
+              ) {
+                  ImagesCollectionButton(imageViewModel, userViewModel, currentPark.value)
+                  AddImageButton(imageViewModel, currentPark.value, currentUser)
+                  CreateEventButton(navigationActions)
+              }
+          }
+
+          val starRating = remember { mutableIntStateOf(3) } // Stores the "live" rating value
+
+          CustomDialog(
+              showRatingDialog,
+              tag = "Rating",
+              Content = { InteractiveRatingComponent(starRating) },
+              onSubmit = {
+                  Log.d("ParkOverview", "RatingDialog: Submitting rating")
+                  handleRating(
+                      context, currentPark.value, currentUser, starRating.intValue, parkViewModel
+                  )
+              },
+              onDismiss = { starRating.intValue = 3 })
+
+          HorizontalDivider(modifier = Modifier.fillMaxWidth())
+          EventItemList(eventViewModel, navigationActions)
       }
-
-      val starRating = remember { mutableIntStateOf(3) } // Stores the "live" rating value
-
-      CustomDialog(
-          showRatingDialog,
-          tag = "Rating",
-          Content = { InteractiveRatingComponent(starRating) },
-          onSubmit = {
-            Log.d("ParkOverview", "RatingDialog: Submitting rating")
-            handleRating(
-                context, currentPark.value, currentUser, starRating.intValue, parkViewModel)
-          },
-          onDismiss = { starRating.intValue = 3 })
-
-      HorizontalDivider(modifier = Modifier.fillMaxWidth())
-      EventItemList(eventViewModel, navigationActions)
-    }
   }
-}
+  }
 
 /**
  * Display an image with a title overlay, if no image is provided, an AI generated default image is
@@ -158,11 +158,8 @@ fun ParkOverviewScreen(
  */
 @Composable
 fun ImageTitle(
-    imageViewModel: ImageViewModel,
-    userViewModel: UserViewModel,
     image: Painter?,
     park: Park?,
-    user: User?
 ) {
   Box(modifier = Modifier.fillMaxWidth().height(220.dp).testTag("imageTitle")) {
     Image(
@@ -186,12 +183,6 @@ fun ImageTitle(
         color = Color.White,
         fontSize = 24.sp,
         modifier = Modifier.align(Alignment.BottomStart).padding(16.dp).testTag("title"))
-    Row(
-        modifier = Modifier.align(Alignment.BottomEnd).padding(5.dp),
-        horizontalArrangement = Arrangement.spacedBy((-5).dp)) {
-          ImagesCollectionButton(imageViewModel, userViewModel, park)
-          AddImageButton(imageViewModel, park, user)
-        }
   }
 }
 
@@ -429,6 +420,30 @@ fun EventItem(event: Event, eventViewModel: EventViewModel, navigationActions: N
             }
       })
   HorizontalDivider()
+}
+
+@Composable
+fun CreateEventButton(navigationActions: NavigationActions) {
+    IconButton(
+        onClick = {
+            navigationActions.navigateTo(Screen.ADD_EVENT)
+        }) {
+        Box(
+            modifier =
+            Modifier.size(38.dp)
+                .background(color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape)
+                .padding(2.dp)
+                .testTag("createEventButton")
+        )
+        {
+            Icon(
+                painter = painterResource(id = R.drawable.calendar_add_on_24px),
+                contentDescription = "Add Event",
+                tint = Color.White,
+                modifier = Modifier.align(Alignment.Center).fillMaxSize(0.75f)
+            )
+        }
+    }
 }
 
 /**

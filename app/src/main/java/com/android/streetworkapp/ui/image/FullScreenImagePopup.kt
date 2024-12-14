@@ -78,6 +78,7 @@ fun FullScreenImagePopup(
 
   val currentImage = currentImages.getOrNull(pagerState.currentPage)
 
+
   Dialog(
       onDismissRequest = onDismiss,
       properties =
@@ -120,11 +121,10 @@ fun FullScreenImagePopup(
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center) {
-                    //TODO: revert the if
-                      if (currentUser?.uid == currentImage.userId) {
+                      if (currentUser != null && currentUser.uid != currentImage.userId) {
                           if (currentImage.rating.positiveVotesUids.contains(currentUser.uid) || currentImage.rating.negativeVotesUids.contains(currentUser.uid)) {
                               Box(modifier = Modifier.padding(horizontal = 15.dp)) {
-                                  // Like Button
+                                  // Retract Vote Button
                                   IconButton(
                                       onClick = {
                                           imageViewModel.retractImageVote(
@@ -140,7 +140,7 @@ fun FullScreenImagePopup(
                                   ) {
                                       Icon(
                                           imageVector = Icons.AutoMirrored.Filled.Undo,
-                                          contentDescription = "Like",
+                                          contentDescription = "Retract Vote",
                                           tint = Color.White
                                       )
                                   }
