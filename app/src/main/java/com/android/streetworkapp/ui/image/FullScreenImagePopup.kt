@@ -28,6 +28,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -97,7 +98,8 @@ fun FullScreenImagePopup(
                   .let {
                       if (currentImages.isNotEmpty()) it.verticalScroll(rememberScrollState())
                       else it
-                  } // only have a vertical scroll if we have images, otherwise can't center the no image text to the middle of screen
+                  } // only have a vertical scroll if we have images, otherwise can't center the no image text to the middle of screen,
+                  //shouldn't even be needed since the whole thing should fit in the screen but doesn't hurt to add in the case we have some slight overflow
                   .testTag("fullscreenImagePopUp")) {
               Row(modifier = Modifier.fillMaxWidth().heightIn(max = this@BoxWithConstraints.maxHeight *
                       0.1f), horizontalArrangement = Arrangement.End) {
@@ -250,22 +252,22 @@ fun FullScreenImagePopup(
                       modifier = Modifier.padding(vertical = 25.dp).heightIn(max = this@BoxWithConstraints.maxHeight * 0.2f)
                   ) {
                       Text(
-                          "Uploaded by ${currentImages[pagerState.currentPage].username}",
+                          "Uploaded by ${currentImage.username}",
                           color = FullScreenImagePopUpSetting.fontColor,
                           fontWeight = FullScreenImagePopUpSetting.imageInfoFontWeight
                       )
                       Text(
-                          "The ${currentImages[pagerState.currentPage].uploadDate.toFormattedString()}",
+                          "The ${currentImage.uploadDate.toFormattedString()}",
                           color = FullScreenImagePopUpSetting.fontColor,
                           fontWeight = FullScreenImagePopUpSetting.imageInfoFontWeight
                       )
                       Text(
-                          "${currentImages[pagerState.currentPage].rating.positiveVotes} user(s) liked this picture",
+                          "${currentImage.rating.positiveVotes} user(s) liked this picture",
                           color = FullScreenImagePopUpSetting.fontColor,
                           fontWeight = FullScreenImagePopUpSetting.imageInfoFontWeight
                       )
                       Text(
-                          "${currentImages[pagerState.currentPage].rating.negativeVotes} user(s) disliked this picture",
+                          "${currentImage.rating.negativeVotes} user(s) disliked this picture",
                           color = FullScreenImagePopUpSetting.fontColor,
                           fontWeight = FullScreenImagePopUpSetting.imageInfoFontWeight
                       )
