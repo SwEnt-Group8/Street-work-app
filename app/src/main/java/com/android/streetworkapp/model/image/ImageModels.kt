@@ -24,7 +24,7 @@ data class ImageRating(val positiveVotes: Int = 0, val negativeVotes: Int = 0, v
      */
     @Exclude //we don't want this to get serialized
     fun getImageScore(): Double {
-        return log((this.positiveVotes + this.negativeVotes).toDouble().pow(0.4), 2.0)*this.positiveVotes/this.negativeVotes
+        return log((this.positiveVotes + this.negativeVotes + 2).toDouble().pow(0.4), 2.0)*(this.positiveVotes+1)/(this.negativeVotes+1)
     }
 }
 
