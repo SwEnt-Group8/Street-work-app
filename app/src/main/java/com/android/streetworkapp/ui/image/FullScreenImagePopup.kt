@@ -95,7 +95,7 @@ fun FullScreenImagePopup(
                         if (currentImages.isNotEmpty()) it.verticalScroll(rememberScrollState())
                         else it
                       } // only have a vertical scroll if we have images, otherwise can't center the
-                        // no image text to the middle of screen,
+                      // no image text to the middle of screen,
                       // shouldn't even be needed since the whole thing should fit in the screen but
                       // doesn't hurt to add in the case we have some slight overflow
                       .testTag("fullscreenImagePopUp")) {

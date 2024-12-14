@@ -281,7 +281,7 @@ class ImageRepositoryFirestore(
                   collection.id,
                   image.imageUrl,
                   userId) // there's a bit of duplicate code reusing this function here but the
-                          // overhead will be small anyways
+          // overhead will be small anyways
         }
       }
     } catch (e: Exception) {
