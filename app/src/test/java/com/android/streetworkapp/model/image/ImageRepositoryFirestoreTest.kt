@@ -11,20 +11,20 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.toObject
-import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentCaptor
+import org.mockito.Captor
 import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 import org.robolectric.RobolectricTestRunner
@@ -36,13 +36,47 @@ class ImageRepositoryFirestoreTest {
   @Mock private lateinit var userRepository: UserRepository
   @Mock private lateinit var storageClient: S3StorageClient
 
+  @Captor
+  private lateinit var parkImagesCaptor:
+      ArgumentCaptor<List<ParkImage>> // for capturing firebase updates etc...
+
+  private lateinit var parkImageCollection: ParkImageCollection
+
   private lateinit var imageRepositoryFirestore: ImageRepositoryFirestore
+  private lateinit var parkImages: List<ParkImage>
 
   @Before
   fun setUp() {
     MockitoAnnotations.openMocks(this)
     imageRepositoryFirestore =
         ImageRepositoryFirestore(fireStoreDB, storageClient, parkRepository, userRepository)
+
+    parkImages =
+        listOf(
+            ParkImage(
+                imageUrl = "https://example.com/image1.jpg",
+                userId = "user123",
+                username = "parklover",
+                rating =
+                    ImageRating(
+                        positiveVotes = 10,
+                        negativeVotes = 2,
+                        positiveVotesUids = listOf("userA", "userB", "userC"),
+                        negativeVotesUids = listOf("userX", "userY")),
+                uploadDate = Timestamp.now()),
+            ParkImage(
+                imageUrl = "https://example.com/image2.jpg",
+                userId = "user456",
+                username = "naturefan",
+                rating =
+                    ImageRating(
+                        positiveVotes = 5,
+                        negativeVotes = 1,
+                        positiveVotesUids = listOf("userD", "userE"),
+                        negativeVotesUids = listOf("userZ")),
+                uploadDate = Timestamp.now()))
+
+    parkImageCollection = ParkImageCollection(id = "collection123", images = parkImages)
   }
 
   @Test
@@ -146,33 +180,6 @@ class ImageRepositoryFirestoreTest {
 
   @Test
   fun `retrieveImages returns list of ParkImage when valid data exists`() = runBlocking {
-    val parkImages =
-        listOf(
-            ParkImage(
-                imageUrl = "https://example.com/image1.jpg",
-                userId = "user123",
-                username = "parklover",
-                rating =
-                    ImageRating(
-                        positiveVotes = 10,
-                        negativeVotes = 2,
-                        positiveVotesUids = listOf("userA", "userB", "userC"),
-                        negativeVotesUids = listOf("userX", "userY")),
-                uploadDate = Timestamp.now()),
-            ParkImage(
-                imageUrl = "https://example.com/image2.jpg",
-                userId = "user456",
-                username = "naturefan",
-                rating =
-                    ImageRating(
-                        positiveVotes = 5,
-                        negativeVotes = 1,
-                        positiveVotesUids = listOf("userD", "userE"),
-                        negativeVotesUids = listOf("userZ")),
-                uploadDate = Timestamp.now()))
-
-    val parkImageCollection = ParkImageCollection(id = "collection123", images = parkImages)
-
     val park = Park(pid = "validParkId", imagesCollectionId = "validNonEmptyCollectionId")
 
     val mockCollection = mock(CollectionReference::class.java)
@@ -193,8 +200,46 @@ class ImageRepositoryFirestoreTest {
 
     val result = imageRepositoryFirestore.retrieveImages(park)
 
-    assertEquals(parkImages.size, result.size)
+    assert(parkImages == result)
+  }
 
-    for ((index, image) in parkImages.withIndex()) assert(image == result[index])
+  @Test
+  fun `imageVote sends correct updated ParkImage list to firebase`() = runBlocking {
+    val votingUserUid = "votingUserUid"
+    val mockCollection = mock(CollectionReference::class.java)
+    val mockDocumentRef = mock(DocumentReference::class.java)
+    val mockSnapshot = mock(DocumentSnapshot::class.java)
+    val mockTask = mock(Task::class.java) as Task<DocumentSnapshot>
+    whenever(fireStoreDB.collection(ImageRepositoryFirestore.COLLECTION_PATH))
+        .thenReturn(mockCollection)
+    whenever(mockCollection.document(parkImageCollection.id)).thenReturn(mockDocumentRef)
+    whenever(mockDocumentRef.get()).thenReturn(mockTask)
+    whenever(mockTask.isComplete).thenReturn(true)
+    whenever(mockTask.isSuccessful).thenReturn(true)
+    whenever(mockTask.result).thenReturn(mockSnapshot)
+    whenever(mockSnapshot.toObject(ParkImageCollection::class.java)).thenReturn(parkImageCollection)
+    whenever(mockDocumentRef.update(eq("images"), any())).then { Unit }
+
+    imageRepositoryFirestore.imageVote(
+        parkImageCollection.id,
+        parkImageCollection.images[parkImageCollection.images.size - 1].imageUrl,
+        votingUserUid,
+        VOTE_TYPE.POSITIVE)
+
+    verify(mockDocumentRef).update(eq("images"), parkImagesCaptor.capture())
+    val capturedUpdatedImages = parkImagesCaptor.value
+
+    val expectedParkImages =
+        parkImageCollection.images.mapIndexed { index, parkImage ->
+          if (index != parkImageCollection.images.size - 1) return@mapIndexed parkImage
+
+          parkImage.copy(
+              rating =
+                  parkImage.rating.copy(
+                      positiveVotes = parkImage.rating.positiveVotes + VOTE_TYPE.POSITIVE.value,
+                      positiveVotesUids = parkImage.rating.positiveVotesUids + votingUserUid))
+        }
+
+    assert(capturedUpdatedImages == expectedParkImages)
   }
 }
