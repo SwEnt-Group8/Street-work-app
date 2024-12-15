@@ -60,9 +60,9 @@ class ImageRepositoryFirestoreTest {
                 username = "parklover",
                 rating =
                     ImageRating(
-                        positiveVotes = 10,
+                        positiveVotes = 5,
                         negativeVotes = 2,
-                        positiveVotesUids = listOf("userA", "userB", "userC"),
+                        positiveVotesUids = listOf("userA", "userB", "userC", "userD", "userE"),
                         negativeVotesUids = listOf("userX", "userY")),
                 uploadDate = Timestamp.now()),
             ParkImage(
@@ -71,9 +71,9 @@ class ImageRepositoryFirestoreTest {
                 username = "naturefan",
                 rating =
                     ImageRating(
-                        positiveVotes = 5,
+                        positiveVotes = 3,
                         negativeVotes = 1,
-                        positiveVotesUids = listOf("userD", "userE"),
+                        positiveVotesUids = listOf("userD", "userE", "userF"),
                         negativeVotesUids = listOf("userZ")),
                 uploadDate = Timestamp.now()))
 
@@ -266,5 +266,48 @@ class ImageRepositoryFirestoreTest {
         }
 
     assert(capturedUpdatedImagesNegativeVote == expectedParkImagesNegativeVote)
+  }
+
+  @Test
+  fun `retractImage vote sends correct updated ParkImage list to firebase`() = runBlocking {
+    val votingUserUid =
+        parkImageCollection.images[parkImageCollection.images.size - 1]
+            .rating
+            .positiveVotesUids[0] // pick the first user id from the list
+    val mockCollection = mock(CollectionReference::class.java)
+    val mockDocumentRef = mock(DocumentReference::class.java)
+    val mockSnapshot = mock(DocumentSnapshot::class.java)
+    val mockTask = mock(Task::class.java) as Task<DocumentSnapshot>
+    whenever(fireStoreDB.collection(ImageRepositoryFirestore.COLLECTION_PATH))
+        .thenReturn(mockCollection)
+    whenever(mockCollection.document(parkImageCollection.id)).thenReturn(mockDocumentRef)
+    whenever(mockDocumentRef.get()).thenReturn(mockTask)
+    whenever(mockTask.isComplete).thenReturn(true)
+    whenever(mockTask.isSuccessful).thenReturn(true)
+    whenever(mockTask.result).thenReturn(mockSnapshot)
+    whenever(mockSnapshot.toObject(ParkImageCollection::class.java)).thenReturn(parkImageCollection)
+    whenever(mockDocumentRef.update(eq("images"), any())).then { Unit }
+
+    // retract positive vote
+    imageRepositoryFirestore.retractImageVote(
+        parkImageCollection.id,
+        parkImageCollection.images[parkImageCollection.images.size - 1].imageUrl,
+        votingUserUid)
+
+    verify(mockDocumentRef).update(eq("images"), parkImagesCaptor.capture())
+    val capturedUpdatedImagesPositiveVote = parkImagesCaptor.value
+
+    val expectedParkImagesAfterRetract =
+        parkImageCollection.images.mapIndexed { index, parkImage ->
+          if (index != parkImageCollection.images.size - 1) return@mapIndexed parkImage
+
+          parkImage.copy(
+              rating =
+                  parkImage.rating.copy(
+                      positiveVotes = parkImage.rating.positiveVotes - VOTE_TYPE.POSITIVE.value,
+                      positiveVotesUids = parkImage.rating.positiveVotesUids - votingUserUid))
+        }
+
+    assert(capturedUpdatedImagesPositiveVote == expectedParkImagesAfterRetract)
   }
 }
