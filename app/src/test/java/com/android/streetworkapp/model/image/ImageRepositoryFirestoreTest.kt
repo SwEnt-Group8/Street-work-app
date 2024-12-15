@@ -21,6 +21,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Captor
 import org.mockito.Mock
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
@@ -220,6 +221,7 @@ class ImageRepositoryFirestoreTest {
     whenever(mockSnapshot.toObject(ParkImageCollection::class.java)).thenReturn(parkImageCollection)
     whenever(mockDocumentRef.update(eq("images"), any())).then { Unit }
 
+    // positive vote
     imageRepositoryFirestore.imageVote(
         parkImageCollection.id,
         parkImageCollection.images[parkImageCollection.images.size - 1].imageUrl,
@@ -227,9 +229,9 @@ class ImageRepositoryFirestoreTest {
         VOTE_TYPE.POSITIVE)
 
     verify(mockDocumentRef).update(eq("images"), parkImagesCaptor.capture())
-    val capturedUpdatedImages = parkImagesCaptor.value
+    val capturedUpdatedImagesPositiveVote = parkImagesCaptor.value
 
-    val expectedParkImages =
+    val expectedParkImagesPositiveVote =
         parkImageCollection.images.mapIndexed { index, parkImage ->
           if (index != parkImageCollection.images.size - 1) return@mapIndexed parkImage
 
@@ -240,6 +242,29 @@ class ImageRepositoryFirestoreTest {
                       positiveVotesUids = parkImage.rating.positiveVotesUids + votingUserUid))
         }
 
-    assert(capturedUpdatedImages == expectedParkImages)
+    assert(capturedUpdatedImagesPositiveVote == expectedParkImagesPositiveVote)
+
+    // negative vote
+    imageRepositoryFirestore.imageVote(
+        parkImageCollection.id,
+        parkImageCollection.images[parkImageCollection.images.size - 1].imageUrl,
+        votingUserUid,
+        VOTE_TYPE.NEGATIVE)
+
+    verify(mockDocumentRef, times(2)).update(eq("images"), parkImagesCaptor.capture())
+    val capturedUpdatedImagesNegativeVote = parkImagesCaptor.value
+
+    val expectedParkImagesNegativeVote =
+        parkImageCollection.images.mapIndexed { index, parkImage ->
+          if (index != parkImageCollection.images.size - 1) return@mapIndexed parkImage
+
+          parkImage.copy(
+              rating =
+                  parkImage.rating.copy(
+                      negativeVotes = parkImage.rating.negativeVotes + VOTE_TYPE.NEGATIVE.value,
+                      negativeVotesUids = parkImage.rating.negativeVotesUids + votingUserUid))
+        }
+
+    assert(capturedUpdatedImagesNegativeVote == expectedParkImagesNegativeVote)
   }
 }
