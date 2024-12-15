@@ -45,8 +45,6 @@ data class ImageRating(
  *   all the positive ratings and the second the negative ones.
  * @property uploadDate The date the image was uploaded
  */
-// * Note: for the rating I would have used an unsigned int but there isn't a built in serializer
-// for it and I can't be bothered
 data class ParkImage(
     val imageUrl: String = "",
     val userId: String = "",

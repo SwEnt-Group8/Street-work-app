@@ -114,9 +114,9 @@ class ImageRepositoryFirestore(
       val docRef =
           db.collection(ImageRepositoryFirestore.COLLECTION_PATH).document(imageCollectionId)
       val document = docRef.get().await()
-      val images = document.get("images") as? List<Map<String, Any>> ?: return false
-      val imageToRemove = images.firstOrNull { it["imageUrl"] == imageUrl } ?: return false
-
+      val imageCollection = document.toObject(ParkImageCollection::class.java) ?: return false
+      val imageToRemove =
+          imageCollection.images.firstOrNull { it.imageUrl == imageUrl } ?: return false
       docRef.update("images", FieldValue.arrayRemove(imageToRemove)).await()
 
       val fileKey = this.storageClient.extractKeyFromUrl(imageUrl)

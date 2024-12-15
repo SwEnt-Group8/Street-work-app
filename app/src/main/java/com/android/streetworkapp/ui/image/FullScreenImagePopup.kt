@@ -320,7 +320,7 @@ fun ImageItem(imageUri: String) {
 @Composable
 fun NoImagesDisplay() {
   Column(
-      modifier = Modifier.fillMaxSize(),
+      modifier = Modifier.fillMaxSize().testTag("noImagesDisplay"),
       verticalArrangement = Arrangement.Center,
       horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
