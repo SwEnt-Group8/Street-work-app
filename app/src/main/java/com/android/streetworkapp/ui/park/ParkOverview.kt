@@ -10,6 +10,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -85,6 +87,7 @@ import kotlinx.coroutines.CoroutineScope
  * @param eventViewModel The view model for the events.
  * @param userViewModel The view model for the user.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ParkOverviewScreen(
     parkViewModel: ParkViewModel,
@@ -124,7 +127,7 @@ fun ParkOverviewScreen(
 
       Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         ParkDetails(park = currentPark.value, showRatingDialog, currentUser)
-        Row(
+        FlowRow(
             modifier = Modifier.fillMaxWidth().padding(end = 10.dp),
             horizontalArrangement = Arrangement.End,
         ) {
@@ -471,7 +474,7 @@ fun CreateEventButton(navigationActions: NavigationActions) {
             modifier =
                 Modifier.size(38.dp)
                     .background(color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape)
-                    .padding(1.dp)) {
+                    .padding(2.dp)) {
               Icon(
                   painter = painterResource(id = R.drawable.calendar_add_on_24px),
                   contentDescription = "Add Event",
