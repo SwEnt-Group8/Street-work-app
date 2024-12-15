@@ -132,7 +132,7 @@ fun FullScreenImagePopup(
 @Composable
 fun DismissPopUp(onDismiss: () -> Unit, maxHeight: Dp) {
   Row(
-      modifier = Modifier.fillMaxWidth().heightIn(max = maxHeight * 0.1f),
+      modifier = Modifier.fillMaxWidth().heightIn(max = maxHeight * 0.075f),
       horizontalArrangement = Arrangement.End) {
         IconButton(
             onClick = onDismiss,
@@ -285,7 +285,7 @@ fun ImageInformation(currentImage: ParkImage, maxHeight: Dp) {
   Column(
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.spacedBy(5.dp),
-      modifier = Modifier.padding(vertical = 25.dp).heightIn(max = maxHeight * 0.2f)) {
+      modifier = Modifier.padding(top = 25.dp).heightIn(max = maxHeight * 0.2f)) {
         Text(
             "Uploaded by ${currentImage.username}",
             color = FullScreenImagePopUpSetting.fontColor,
