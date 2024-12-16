@@ -108,7 +108,7 @@ fun MapScreen(
   }
 
   // Define how many event is considered a Hot place
-  val manyEvent = 3.0f
+  val hotPlace = 5.0f
 
   // Define the start and end colors for the gradient
   val startColor = ColorPalette.LOGO_BLUE
@@ -173,7 +173,7 @@ fun MapScreen(
 
                 // Interpolate color based on number of event (make the gradient)
                 interpolatedColor =
-                    gradientColor(startColor, endColor, (park.events.size) / manyEvent)
+                    gradientColor(startColor, endColor, (park.events.size) / hotPlace)
 
                 markerIcon = BitmapDescriptorFactory.defaultMarker(colorToHue(interpolatedColor))
 
