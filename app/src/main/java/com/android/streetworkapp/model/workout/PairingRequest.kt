@@ -14,6 +14,8 @@ data class PairingRequest(
     val fromUid: String = "",
     val toUid: String = "",
     val sessionId: String? = null,
+    val counter: String? = null,
+    val timerStatus: TimerStatus = TimerStatus.STOPPED,
     val status: RequestStatus = RequestStatus.PENDING,
     val timestamp: Long = System.currentTimeMillis()
 )
@@ -24,4 +26,10 @@ enum class RequestStatus {
   ACCEPTED, // The request has been accepted
   REJECTED, // The request has been rejected
   OLD // The request is no longer valid
+}
+
+/** An enum class representing the status of a timer. */
+enum class TimerStatus {
+  RUNNING, // Running timer
+  STOPPED // Timer has been stopped
 }
