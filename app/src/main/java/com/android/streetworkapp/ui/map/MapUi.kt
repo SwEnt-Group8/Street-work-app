@@ -121,8 +121,6 @@ fun MapScreen(
   // Handling user MVVM
   val currentUser = userViewModel.currentUser.collectAsState().value
 
-  val userParkList = userViewModel.parks.collectAsState().value
-
   if (currentUser != null) {
     userViewModel.getParksByUid(currentUser.uid)
   }
@@ -253,6 +251,14 @@ fun MarkerInfoWindowContent(park: Park) {
       }
 }
 
+/**
+ * Returns a color that is a gradient between two colors based on a fraction.
+ *
+ * @param startColor The starting color of the gradient
+ * @param endColor The ending color of the gradient
+ * @param fraction A value between 0 and 1 indicating the position between the start and end colors
+ * @return A Color that represents the gradient at the given fraction
+ */
 fun gradientColor(startColor: Color, endColor: Color, fraction: Float): Color {
   val startR = startColor.red
   val startG = startColor.green
@@ -272,6 +278,12 @@ fun gradientColor(startColor: Color, endColor: Color, fraction: Float): Color {
   return Color(r, g, b, a)
 }
 
+/**
+ * Converts a color to its hue value needed for BitMap
+ *
+ * @param color The color to be converted
+ * @return The hue value of the color, in degrees (0-360)
+ */
 fun colorToHue(color: Color): Float {
   // Convert the Color to ARGB values (0-255)
   val r = (color.red * 255).toInt()
