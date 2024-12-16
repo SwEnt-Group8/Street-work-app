@@ -3,119 +3,131 @@ package com.android.streetworkapp.utils
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import com.android.streetworkapp.model.event.Event
+import androidx.compose.runtime.toMutableStateList
 import com.android.streetworkapp.model.park.Park
-import com.google.firebase.Timestamp
 
+/**
+ * This class add filtering capabilities to a list of parks.
+ *
+ * @param filterSettings The filter settings.
+ */
 class ParkFilter(private val filterSettings: FilterSettings) {
 
-  fun filter(eventList: List<Event>, park: Park): Boolean {
+  /**
+   * Filters a park based on the set filter settings.
+   *
+   * @param park The park to filter.
+   * @return True if the park passes the filter, false otherwise.
+   */
+  fun filter(park: Park): Boolean {
     // Log.d("ParkFilter", "Filtering park ${park.name}")
 
-    return filterRating(park) &&
-        filterEventsDensity(park) &&
-        filterEventStatus(eventList) &&
-        filterFullEvent(eventList)
+    return filterRating(park) && filterEventsDensity(park)
   }
 
+  /**
+   * Filters a park according to the required minimal rating (filter settings).
+   *
+   * @param park The park to filter.
+   * @return True if the park passes the filter, false otherwise.
+   */
   private fun filterRating(park: Park): Boolean {
     return park.rating >= filterSettings.minRating.value
   }
 
+  /**
+   * Filters a park according to its event density (filter settings).
+   *
+   * @param park The park to filter.
+   * @return The filtered list of parks.
+   */
   private fun filterEventsDensity(park: Park): Boolean {
-    return filterSettings.minEvents.value.isIncluded(park.events.size)
+    return filterSettings.eventDensity.any { it.isIncluded(park.events.size) }
+  }
+}
+
+/**
+ * Represents the filter settings.
+ *
+ * @property minRating The minimum rating required.
+ * @property eventDensity The required event density.
+ */
+class FilterSettings {
+  val minRating: MutableState<Int> = mutableIntStateOf(DEFAULT_RATING)
+  val eventDensity: SnapshotStateList<EventDensity> = DEFAULT_EVENT_DENSITY.toMutableStateList()
+
+  /** The default filter settings. */
+  companion object {
+    val DEFAULT_RATING = 1
+    val DEFAULT_EVENT_DENSITY = listOf(EventDensity.LOW, EventDensity.MEDIUM, EventDensity.HIGH)
   }
 
   /**
-   * Filter the events based on the status. There should be at least one event that matches the
-   * desired status.
+   * Sets the filter settings.
    *
-   * @param eventList The list of events of the park.
+   * @param minRating The minimum rating required.
+   * @param eventDensity The required event density.
    */
-  private fun filterEventStatus(eventList: List<Event>): Boolean {
-
-    when (eventList.isEmpty()) {
-      true -> return true
-      false ->
-          return eventList.any { event ->
-            Log.d(
-                "ParkFilter",
-                "Filtering events with status ${filterSettings.eventStatus} for event $event")
-            filterSettings.eventStatus.any { it.isStatus(event.date) }
-          }
+  fun set(
+      minRating: Int? = null,
+      eventDensity: List<EventDensity> = emptyList(),
+  ) {
+    minRating?.let { if (minRating in 1..5) this.minRating.value = it }
+    eventDensity.let {
+      this.eventDensity.clear()
+      this.eventDensity.addAll(it)
     }
   }
 
   /**
-   * Filter the events based on the full status. If a spot is desired, there should be at least one
-   * event that is not full.
+   * Sets the filter settings.
    *
-   * @param eventList The list of events of the park.
+   * @param filterSettings The filter settings.
    */
-  private fun filterFullEvent(eventList: List<Event>): Boolean {
-    // Log.d(
-    //    "ParkFilter",
-    //   "Filtering fullness of events with rule shouldNotBeFull =
-    // ${filterSettings.shouldNotBeFull.value}")
-    if (!filterSettings.shouldNotBeFull.value) return true
-    else {
-      Log.d("ParkFilter", "Searching non-full events {$eventList}")
-      return when (eventList.isEmpty()) {
-        true -> false // No events => no event with remaining spots
-        false -> eventList.any { it.participants < it.maxParticipants }
+  fun set(filterSettings: FilterSettings) {
+    minRating.value = filterSettings.minRating.value
+    this.eventDensity.clear()
+    this.eventDensity.addAll(filterSettings.eventDensity)
+  }
+
+  /**
+   * Updates event density from the filter settings (FilterChips UI).
+   *
+   * @param density The event density to add or remove.
+   */
+  fun updateDensity(density: EventDensity) {
+    when (density in eventDensity) {
+      true -> {
+        Log.d("FilterSettings", "Removing $density from list $eventDensity")
+        eventDensity.remove(density)
+      }
+      false -> {
+        Log.d("FilterSettings", "Adding $density from list $eventDensity")
+        eventDensity.add(density)
       }
     }
   }
-}
 
-class FilterSettings {
-  val minRating: MutableState<Int> = mutableIntStateOf(1)
-  val minEvents: MutableState<EventDensity> = mutableStateOf(EventDensity.LOW)
-  val eventStatus: SnapshotStateList<EventStatus> =
-      mutableStateListOf(EventStatus.CREATED, EventStatus.ONGOING, EventStatus.FINISHED)
-  val shouldNotBeFull: MutableState<Boolean> = mutableStateOf(false)
-
-  fun set(
-      minRating: Int? = null,
-      minEvents: EventDensity? = null,
-      eventStatus: List<EventStatus>? = null,
-      shouldNotBeFull: Boolean? = null
-  ) {
-    minRating?.let { if (minRating in 1..5) this.minRating.value = it }
-    minEvents?.let { this.minEvents.value = it }
-    eventStatus?.let {
-      this.eventStatus.clear()
-      this.eventStatus.addAll(it)
-    }
-    shouldNotBeFull?.let { this.shouldNotBeFull.value = it }
-  }
-
-  fun set(filterSettings: FilterSettings) {
-    minRating.value = filterSettings.minRating.value
-    minEvents.value = filterSettings.minEvents.value
-    eventStatus.clear()
-    eventStatus.addAll(filterSettings.eventStatus)
-    shouldNotBeFull.value = filterSettings.shouldNotBeFull.value
-  }
-
+  /** Resets the filter settings to their default values (fewest restrictions). */
   fun reset() {
-    minRating.value = 1
-    minEvents.value = EventDensity.LOW
-    eventStatus.clear()
-    eventStatus.addAll(listOf(EventStatus.CREATED, EventStatus.ONGOING, EventStatus.FINISHED))
-    shouldNotBeFull.value = false
+    minRating.value = DEFAULT_RATING
+    this.eventDensity.clear()
+    this.eventDensity.addAll(DEFAULT_EVENT_DENSITY)
   }
 }
 
-// TODO : Need to define these thresholds
+/**
+ * Represents the density of events in a park.
+ *
+ * Low: 0-2 events. Medium: 3-6 events. High: 7+ events.
+ */
 enum class EventDensity {
   LOW,
   MEDIUM,
   HIGH;
 
+  /** Returns the threshold for the event density. */
   fun getThreshold(): Int {
     return when (this) {
       LOW -> 3
@@ -124,42 +136,16 @@ enum class EventDensity {
     }
   }
 
+  /**
+   * Checks if the event count is included in the density.
+   *
+   * @param eventCount The number of events.
+   */
   fun isIncluded(eventCount: Int): Boolean {
     return when (this) {
       LOW -> eventCount in 0..2
       MEDIUM -> eventCount in 3..6
       HIGH -> eventCount > 7
-    }
-  }
-}
-
-// TODO : This is a placeholder waiting for EVENT-side implementation
-enum class EventStatus {
-  CREATED,
-  ONGOING,
-  FINISHED;
-
-  fun isStatus(eventDate: Timestamp): Boolean {
-    return when (this) {
-      CREATED -> eventDate.seconds > Timestamp.now().seconds
-      ONGOING -> eventDate.seconds == Timestamp.now().seconds
-      FINISHED -> eventDate.seconds < Timestamp.now().seconds
-    }
-  }
-
-  companion object {
-    fun addOrRemove(statusList: SnapshotStateList<EventStatus>, status: EventStatus) {
-
-      when (statusList.contains(status)) {
-        true -> {
-          Log.d("ParkFilter", "Removing $status from list $statusList when called with $status")
-          statusList.remove(status)
-        }
-        false -> {
-          Log.d("ParkFilter", "Adding $status from list $statusList when called with $status")
-          statusList.add(status)
-        }
-      }
     }
   }
 }

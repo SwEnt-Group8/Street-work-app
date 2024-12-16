@@ -23,11 +23,8 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
-import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -48,7 +45,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
-import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkViewModel
@@ -63,7 +59,6 @@ import com.android.streetworkapp.ui.theme.Typography as Type
 import com.android.streetworkapp.ui.utils.CustomDialog
 import com.android.streetworkapp.ui.utils.DialogType
 import com.android.streetworkapp.utils.EventDensity
-import com.android.streetworkapp.utils.EventStatus
 import com.android.streetworkapp.utils.FilterSettings
 import com.android.streetworkapp.utils.LocationService
 import com.android.streetworkapp.utils.ParkFilter
@@ -91,7 +86,6 @@ fun MapScreen(
     parkLocationViewModel: ParkLocationViewModel,
     parkViewModel: ParkViewModel,
     userViewModel: UserViewModel,
-    eventViewModel: EventViewModel,
     navigationActions: NavigationActions = NavigationActions(rememberNavController()),
     searchQuery: MutableState<String>,
     callbackOnMapLoaded: () -> Unit = {},
@@ -133,24 +127,6 @@ fun MapScreen(
 
   LaunchedEffect(parks) { parkViewModel.getOrCreateAllParksByLocation(parks) }
 
-  // Fetching all events :
-  LaunchedEffect(parkList) { eventViewModel.getEventsByParkList(parkList.value.filterNotNull()) }
-  val eventMap = eventViewModel.eventList.collectAsState().value
-
-  fun fetchEventMap(park: Park): List<Event> {
-    // Log.d("ParkFilter", "Fetching event map for park ${park.name}")
-    val eventList: MutableList<Event> = mutableListOf()
-    park.events.forEach() {
-      val event = eventMap[it]
-      if (event != null) eventList.add(event)
-    }
-    if (eventList.isNotEmpty()) {
-      Log.d("ParkFilter", "Event list for park ${park.name} fetched : $eventList")
-    }
-
-    return eventList
-  }
-
   // Set values for park filtering :
   val filter = FilterSettings()
   val parkFilter = ParkFilter(filter)
@@ -184,13 +160,7 @@ fun MapScreen(
           parkList.value
               .filterNotNull()
               .filter { it.name.contains(searchQuery.value, ignoreCase = true) }
-              .filter {
-                // Log.d("ParkFilter", "Filtering park ${it.name} with event list ${it.events}")
-
-                val eventList = fetchEventMap(it)
-
-                parkFilter.filter(eventList, it)
-              }
+              .filter { parkFilter.filter(it) }
               .forEach { park ->
                 ++markerIndex
 
@@ -246,74 +216,38 @@ fun ParkFilterSettings(userFilterInput: FilterSettings) {
         "Minimum park rating : ${userFilterInput.minRating.value} stars",
         fontSize = Type.bodyLarge.fontSize)
     InteractiveRatingComponent(userFilterInput.minRating)
+
     HorizontalDivider()
 
     // Event quantity filter :
     Text(
-        "Minimum density of events : ${userFilterInput.minEvents.value.name}",
+        "Minimum density of events :",
         fontSize = Type.bodyLarge.fontSize)
 
-    Row(modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth(0.9f)) {
-      Slider(
-          value = userFilterInput.minEvents.value.ordinal.toFloat(),
-          onValueChange = {
-            userFilterInput.minEvents.value = EventDensity.entries.toTypedArray()[it.toInt()]
-          },
-          valueRange = 0f..2f,
-          steps = 1,
-          colors =
-              SliderDefaults.colors(
-                  thumbColor = MaterialTheme.colorScheme.secondary,
-                  activeTrackColor = ColorPalette.INTERACTION_COLOR_DARK,
-                  inactiveTrackColor = ColorPalette.INTERACTION_COLOR_LIGHT,
-              ),
-          modifier = Modifier.padding(8.dp))
+    Row(modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth(0.825f)) {
+      FilterChip(
+          selected = userFilterInput.eventDensity.contains(EventDensity.LOW),
+          onClick = { userFilterInput.updateDensity(EventDensity.LOW) },
+          label = { Text(EventDensity.LOW.name) },
+          colors = filterChipColors,
+          modifier = Modifier.padding(end = 2.dp))
+
+      FilterChip(
+          selected = userFilterInput.eventDensity.contains(EventDensity.MEDIUM),
+          onClick = { userFilterInput.updateDensity(EventDensity.MEDIUM) },
+          label = { Text(EventDensity.MEDIUM.name) },
+          colors = filterChipColors,
+          modifier = Modifier.padding(end = 2.dp))
+
+      FilterChip(
+          selected = userFilterInput.eventDensity.contains(EventDensity.HIGH),
+          onClick = { userFilterInput.updateDensity(EventDensity.HIGH) },
+          label = { Text(EventDensity.HIGH.name) },
+          colors = filterChipColors,
+          modifier = Modifier.padding(end = 2.dp))
     }
+
     HorizontalDivider()
-
-    // Event status filter :
-    Text("Event status :", fontSize = Type.bodyLarge.fontSize)
-    Row(modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth(0.9f)) {
-      FilterChip(
-          selected = EventStatus.CREATED in userFilterInput.eventStatus,
-          onClick = { EventStatus.addOrRemove(userFilterInput.eventStatus, EventStatus.CREATED) },
-          label = { Text("Created") },
-          colors = filterChipColors,
-          modifier = Modifier.padding(end = 2.dp))
-
-      FilterChip(
-          selected = EventStatus.ONGOING in userFilterInput.eventStatus,
-          onClick = { EventStatus.addOrRemove(userFilterInput.eventStatus, EventStatus.ONGOING) },
-          label = { Text("Ongoing") },
-          colors = filterChipColors,
-          modifier = Modifier.padding(end = 2.dp))
-
-      FilterChip(
-          selected = EventStatus.FINISHED in userFilterInput.eventStatus,
-          onClick = { EventStatus.addOrRemove(userFilterInput.eventStatus, EventStatus.FINISHED) },
-          label = { Text("Ended") },
-          colors = filterChipColors,
-          modifier = Modifier.padding(end = 2.dp))
-    }
-    HorizontalDivider()
-
-    Text(
-        "Should the park have joinable events : ${if (userFilterInput.shouldNotBeFull.value) "yes" else "no"}",
-        fontSize = Type.bodyLarge.fontSize)
-    Row(modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth(0.8f)) {
-      FilterChip(
-          selected = userFilterInput.shouldNotBeFull.value,
-          onClick = { userFilterInput.shouldNotBeFull.value = true },
-          label = { Text("has places") },
-          colors = filterChipColors,
-          modifier = Modifier.padding(end = 8.dp))
-
-      FilterChip(
-          selected = !userFilterInput.shouldNotBeFull.value,
-          onClick = { userFilterInput.shouldNotBeFull.value = false },
-          label = { Text("can be full") },
-          colors = filterChipColors)
-    }
 
     Button(
         onClick = { userFilterInput.reset() },
