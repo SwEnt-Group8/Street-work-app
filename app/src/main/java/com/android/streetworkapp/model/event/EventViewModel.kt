@@ -109,6 +109,7 @@ open class EventViewModel(private val repository: EventRepository) : ViewModel()
    * deleted events ID list value.
    *
    * @param uid The user ID.
+   * @return The list of deleted event IDs.
    */
   suspend fun removeParticipantFromAllEvents(uid: String): List<String>? {
     return repository.removeParticipantFromAllEvents(uid)
