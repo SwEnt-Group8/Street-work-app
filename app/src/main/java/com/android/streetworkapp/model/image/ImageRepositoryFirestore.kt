@@ -8,7 +8,6 @@ import com.android.streetworkapp.model.user.UserRepository
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
-import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.tasks.await
 
 class ImageRepositoryFirestore(
@@ -50,9 +49,7 @@ class ImageRepositoryFirestore(
       val park = this.parkRepository.getParkByPid(parkId)
       require(park != null) { "Invalid parkId." }
 
-      // TODO: get image file type, for now hardcoded
-      val imageUrl =
-          this.storageClient.uploadFile("${parkId}/${uniqueImageIdentifier}.jpg", imageData)
+      val imageUrl = this.storageClient.uploadFile("${parkId}/${uniqueImageIdentifier}", imageData)
       require(imageUrl != null) { "Failed to upload image to s3 provider." }
 
       val parkImage = ParkImage(imageUrl = imageUrl, userId = userId, username = user.username)
