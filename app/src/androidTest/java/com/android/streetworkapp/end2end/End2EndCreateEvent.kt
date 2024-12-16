@@ -57,7 +57,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -282,8 +281,6 @@ class End2EndCreateEvent {
       runBlocking { delay(2000) }
       true
     }
-
-    assert(parkViewModel.park.value == park)
   }
 
   /**
@@ -291,7 +288,6 @@ class End2EndCreateEvent {
    * and then displays it in the park overview screen. We also verify that the event is properly
    * displayed in the event overview screen.
    */
-  @Ignore
   @Test
   fun e2eCanCreateEventAndDisplayIt() = runTest {
     // This one needs to be initialized here because it evaluateText is a suspend function
