@@ -38,7 +38,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
@@ -59,6 +58,7 @@ import com.android.streetworkapp.ui.park.RatingComponent
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.utils.LocationService
 import com.android.streetworkapp.utils.PermissionManager
+import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -122,9 +122,8 @@ fun MapScreen(
   val endColor = ColorPalette.LOGO_RED
 
   // variable for each park color
-  var image: Bitmap // set default image
   var interpolatedColor: Color // set default color
-  var interpolatedHue: Float // set default hue
+  var markerIcon: BitmapDescriptor
 
   // Handling user MVVM
   val currentUser = userViewModel.currentUser.collectAsState().value
@@ -183,58 +182,36 @@ fun MapScreen(
                 interpolatedColor =
                     gradientColor(startColor, endColor, (park.events.size) / manyEvent)
 
-                // Convert the interpolated color to a hue value for BitmapDescriptorFactory
-                interpolatedHue = colorToHue(interpolatedColor)
+                // Create appropriate icon
+                markerIcon =
+                    if (userParkList.contains(park.pid)) {
+                      BitmapDescriptorFactory.defaultMarker(colorToHue(interpolatedColor))
+                    } else {
+                      BitmapDescriptorFactory.fromBitmap(
+                          drawableToBitmap(
+                              changeImageColor(
+                                  context, R.drawable.question_mark_alpha, interpolatedColor)))
+                    }
 
-                if (userParkList.contains(park.location.id)) {
-                  // default marker for discovered park
-                  MarkerInfoWindow(
-                      tag = "Marker$markerIndex",
-                      state = markerState,
-                      icon = BitmapDescriptorFactory.defaultMarker(interpolatedHue),
-                      onClick = {
-                        markerState.showInfoWindow()
-                        if (selectedPark == park) {
-                          selectedPark = Park()
-                          markerState.hideInfoWindow()
-                          parkViewModel.getOrCreateParkByLocation(park.location)
-                          parkViewModel.setParkLocation(park.location)
-                          navigationActions.navigateTo(Screen.PARK_OVERVIEW)
-                        }
-                        selectedPark = park
-                        true
-                      }) {
-                        MarkerInfoWindowContent(park)
+                // default marker for discovered park
+                MarkerInfoWindow(
+                    tag = "Marker$markerIndex",
+                    state = markerState,
+                    icon = markerIcon,
+                    onClick = {
+                      markerState.showInfoWindow()
+                      if (selectedPark == park) {
+                        selectedPark = Park()
+                        markerState.hideInfoWindow()
+                        parkViewModel.getOrCreateParkByLocation(park.location)
+                        parkViewModel.setParkLocation(park.location)
+                        navigationActions.navigateTo(Screen.PARK_OVERVIEW)
                       }
-                } else {
-                  // Question_mark icon for undiscovered park
-
-                  // transform drawable to Bitmap
-                  image =
-                      drawableToBitmap(
-                          changeImageColor(
-                              context, R.drawable.question_mark_alpha, interpolatedColor))
-
-                  MarkerInfoWindow(
-                      tag = "Marker$markerIndex",
-                      state = markerState,
-                      icon = BitmapDescriptorFactory.fromBitmap(image),
-                      anchor = Offset(0.5f, 0.5f),
-                      onClick = {
-                        markerState.showInfoWindow()
-                        if (selectedPark == park) {
-                          selectedPark = Park()
-                          markerState.hideInfoWindow()
-                          parkViewModel.getOrCreateParkByLocation(park.location)
-                          parkViewModel.setParkLocation(park.location)
-                          navigationActions.navigateTo(Screen.PARK_OVERVIEW)
-                        }
-                        selectedPark = park
-                        true
-                      }) {
-                        MarkerInfoWindowContent(park)
-                      }
-                }
+                      selectedPark = park
+                      true
+                    }) {
+                      MarkerInfoWindowContent(park)
+                    }
               }
         }
   }
