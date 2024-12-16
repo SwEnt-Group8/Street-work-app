@@ -71,12 +71,14 @@ class FilterSettings {
    */
   fun set(
       minRating: Int? = null,
-      eventDensity: List<EventDensity> = emptyList(),
+      eventDensity: List<EventDensity>? = null,
   ) {
     minRating?.let { if (minRating in 1..5) this.minRating.value = it }
     eventDensity.let {
-      this.eventDensity.clear()
-      this.eventDensity.addAll(it)
+      if (it != null) {
+        this.eventDensity.clear()
+        this.eventDensity.addAll(it)
+      }
     }
   }
 
