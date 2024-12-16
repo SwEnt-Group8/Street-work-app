@@ -184,7 +184,7 @@ class EventRepositoryFirestoreTest {
     // Mock documents in the query snapshot
     whenever(query.documents).thenReturn(listOf(document))
 
-    // Mock event details
+    // Mock event details for owned event
     whenever(document.exists()).thenReturn(true)
     whenever(document.id).thenReturn(event.eid)
     whenever(document.get("owner")).thenReturn("user123")
@@ -203,6 +203,17 @@ class EventRepositoryFirestoreTest {
 
     // Verify update is not called (since the event is owned and deleted)
     verify(documentRef, timeout(1000).times(0))
+        .update(eq("participants"), any(), eq("listParticipants"), any())
+
+    // Mock event details for non-owned event
+    whenever(document.get("owner")).thenReturn("user456")
+    whenever(document.get("listParticipants")).thenReturn(listOf("user123", "user456"))
+
+    // Call the method under test again
+    eventRepository.removeParticipantFromAllEvents("user123")
+
+    // Verify update is called for the non-owned event
+    verify(documentRef, timeout(1000))
         .update(eq("participants"), any(), eq("listParticipants"), any())
   }
 }
