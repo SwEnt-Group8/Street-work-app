@@ -221,7 +221,7 @@ fun ParkFilterSettings(userFilterInput: FilterSettings) {
 
     // Event quantity filter :
     Text(
-        "Minimum density of events :",
+        "Required density of events :",
         fontSize = Type.bodyLarge.fontSize)
 
     Row(modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth(0.825f)) {

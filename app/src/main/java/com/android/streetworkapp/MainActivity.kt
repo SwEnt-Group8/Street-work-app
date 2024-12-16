@@ -346,7 +346,6 @@ fun StreetWorkApp(
                   parkLocationViewModel,
                   parkViewModel,
                   userViewModel,
-                  eventViewModel,
                   navigationActions,
                   searchQuery,
                   mapCallbackOnMapLoaded,
