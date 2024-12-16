@@ -1,7 +1,11 @@
 package com.android.streetworkapp.ui.map
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -35,12 +39,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.navigation.compose.rememberNavController
+import com.android.sample.R
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
@@ -51,6 +58,7 @@ import com.android.streetworkapp.ui.park.RatingComponent
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.utils.LocationService
 import com.android.streetworkapp.utils.PermissionManager
+import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -106,6 +114,27 @@ fun MapScreen(
         userViewModel.currentUser.value, initialLatLng.value, parkLocationViewModel.parks.value)
   }
 
+  // Define how many event is considered a Hot place
+  val manyEvent = 3.0f
+
+  // Define the start and end colors for the gradient
+  val startColor = ColorPalette.LOGO_BLUE
+  val endColor = ColorPalette.LOGO_RED
+
+  // variable for each park color
+  var interpolatedColor: Color // set default color
+  var markerIcon: BitmapDescriptor
+
+  // Handling user MVVM
+  val currentUser = userViewModel.currentUser.collectAsState().value
+
+  val userParkList = userViewModel.parks.collectAsState().value
+
+  if (currentUser != null) {
+    userViewModel.getParksByUid(currentUser.uid)
+  }
+
+  // Handle parks MVVM
   val parks = parkLocationViewModel.parks.collectAsState().value
 
   val parkList = parkViewModel.parkList.collectAsState()
@@ -145,13 +174,30 @@ fun MapScreen(
               .forEach { park ->
                 ++markerIndex
 
+                // define park location
                 val markerState =
                     rememberMarkerState(position = LatLng(park.location.lat, park.location.lon))
 
+                // Interpolate color based on number of event (make the gradient)
+                interpolatedColor =
+                    gradientColor(startColor, endColor, (park.events.size) / manyEvent)
+
+                // Create appropriate icon
+                markerIcon =
+                    if (userParkList.contains(park.pid)) {
+                      BitmapDescriptorFactory.defaultMarker(colorToHue(interpolatedColor))
+                    } else {
+                      BitmapDescriptorFactory.fromBitmap(
+                          drawableToBitmap(
+                              changeImageColor(
+                                  context, R.drawable.question_mark_alpha, interpolatedColor)))
+                    }
+
+                // default marker for discovered park
                 MarkerInfoWindow(
                     tag = "Marker$markerIndex",
                     state = markerState,
-                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE),
+                    icon = markerIcon,
                     onClick = {
                       markerState.showInfoWindow()
                       if (selectedPark == park) {
@@ -221,4 +267,67 @@ fun MarkerInfoWindowContent(park: Park) {
               modifier = Modifier.testTag("eventsPlanned"))
         }
       }
+}
+
+fun gradientColor(startColor: Color, endColor: Color, fraction: Float): Color {
+  val startR = startColor.red
+  val startG = startColor.green
+  val startB = startColor.blue
+  val startA = startColor.alpha
+
+  val endR = endColor.red
+  val endG = endColor.green
+  val endB = endColor.blue
+  val endA = endColor.alpha
+
+  val r = startR + fraction * (endR - startR)
+  val g = startG + fraction * (endG - startG)
+  val b = startB + fraction * (endB - startB)
+  val a = startA + fraction * (endA - startA)
+
+  return Color(r, g, b, a)
+}
+
+fun colorToHue(color: Color): Float {
+  // Convert the Color to ARGB values (0-255)
+  val r = (color.red * 255).toInt()
+  val g = (color.green * 255).toInt()
+  val b = (color.blue * 255).toInt()
+
+  // Use the Android Color class to convert to HSV
+  val hsv = FloatArray(3)
+  android.graphics.Color.RGBToHSV(r, g, b, hsv)
+
+  // Return the hue value (0-360 degrees)
+  return hsv[0]
+}
+
+fun changeImageColor(
+    context: Context,
+    drawableId: Int,
+    interpolatedColor: Color,
+): Drawable {
+  val drawable =
+      ContextCompat.getDrawable(context, drawableId)
+          ?: throw IllegalArgumentException("Drawable not found")
+
+  // Wrap the drawable to ensure compatibility
+  val wrappedDrawable = DrawableCompat.wrap(drawable).mutate()
+
+  // Apply the tint color
+  DrawableCompat.setTint(wrappedDrawable, interpolatedColor.toArgb())
+
+  return wrappedDrawable
+}
+
+fun drawableToBitmap(drawable: Drawable): Bitmap {
+  // Create a bitmap
+  val bitmap = Bitmap.createBitmap(70, 70, Bitmap.Config.ARGB_8888)
+  val canvas = Canvas(bitmap)
+
+  // Set bounds and draw the drawable onto the canvas
+  drawable.setBounds(0, 0, canvas.width, canvas.height)
+  drawable.draw(canvas)
+
+  return bitmap
 }
