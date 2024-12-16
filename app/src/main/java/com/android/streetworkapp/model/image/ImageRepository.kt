@@ -17,7 +17,7 @@ interface ImageRepository {
       imageData: ByteArray,
       parkId: String,
       userId: String
-  )
+  ): Boolean
 
   /** Retrieves all the images linked from the park. */
   suspend fun retrieveImages(park: Park): List<ParkImage>

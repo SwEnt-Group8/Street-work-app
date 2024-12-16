@@ -392,4 +392,26 @@ class ImageRepositoryFirestoreTest {
             .retractImageVote(
                 parkImagesCollections[1].id, imageWhereVoteHasToBeRemoved.imageUrl, baseUser.uid)
       }
+
+  @Test
+  fun `deleteImage returns false on handled exception`() = runTest {
+    assert(!imageRepositoryFirestore.deleteImage("nonEmptyId", "https.//dummyurl.com"))
+  }
+
+  @Test
+  fun `imageVote returns false on handled exception`() = runTest {
+    assert(
+        !imageRepositoryFirestore.imageVote(
+            "nonEmptyId", "https://dummyurl.com", "dummyVoterUID", VOTE_TYPE.POSITIVE))
+  }
+
+  @Test
+  fun `deleteAllDataFromUser returns false on handled exception`() = runTest {
+    assert(!imageRepositoryFirestore.deleteAllDataFromUser("nonEmptyId"))
+  }
+
+  @Test
+  fun `registerCollectionListener with non empty collection id doesn't crash on exception`() {
+    imageRepositoryFirestore.registerCollectionListener("nonEmptyId") {}
+  }
 }

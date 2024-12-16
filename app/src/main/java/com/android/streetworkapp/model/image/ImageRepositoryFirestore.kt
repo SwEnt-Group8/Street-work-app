@@ -35,10 +35,9 @@ class ImageRepositoryFirestore(
       imageData: ByteArray,
       parkId: String,
       userId: String
-  ) {
+  ): Boolean {
     require(uniqueImageIdentifier.isNotEmpty()) { "uniqueImageIdentifier should not be empty." }
     require(parkId.isNotEmpty()) { "parkId cannot be empty." }
-
     require(userId.isNotEmpty()) { "userId cannot be empty." }
 
     val user = this.userRepository.getUserByUid(userId)
@@ -69,11 +68,14 @@ class ImageRepositoryFirestore(
         val imagesCollection = db.collection(COLLECTION_PATH).document(collectionId)
         imagesCollection.update("images", FieldValue.arrayUnion(parkImage)).await()
       }
+
+      return true
     } catch (e: Exception) {
       Log.d(
           DEBUG_PREFIX,
           e.message
               ?: "An exception occurred but the message associated with couldn't be retrieved.")
+      return false
     }
   }
 
