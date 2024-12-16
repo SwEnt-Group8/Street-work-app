@@ -261,34 +261,41 @@ class ImageRepositoryFirestore(
    *
    * @param userId The user id to whom we delete all the data from. (pictures uploaded and ratings)
    */
-  // TODO: to be tested
-  override suspend fun deleteAllDataFromUser(userId: String) {
+  override suspend fun deleteAllDataFromUser(userId: String): Boolean {
     require(userId.isNotEmpty()) { "Empty userId." }
 
     try {
-      val documents =
+      val querySnapshot =
           db.collection(ImageRepositoryFirestore.COLLECTION_PATH)
               .get()
               .await() // get all documents from collection
-      for (document in documents) {
+
+      for (document in querySnapshot.documents) {
         val collection = document.toObject(ParkImageCollection::class.java)
-        for (image in collection.images) {
-          if (image.userId == userId) {
-            document.reference.update("images", collection.images - image)
-          } else if (image.rating.positiveVotesUids.contains(userId) ||
-              image.rating.negativeVotesUids.contains(userId))
-              this.retractImageVote(
-                  collection.id,
-                  image.imageUrl,
-                  userId) // there's a bit of duplicate code reusing this function here but the
-          // overhead will be small anyways
+        collection?.let {
+          for (image in collection.images) {
+            if (image.userId == userId) {
+              document.reference.update("images", FieldValue.arrayRemove(image)).await()
+              val imageKey = storageClient.extractKeyFromUrl(image.imageUrl) ?: return false
+              if (!this.storageClient.deleteObjectFromKey(imageKey)) return false
+            } else if (image.rating.positiveVotesUids.contains(userId) ||
+                image.rating.negativeVotesUids.contains(userId)) {
+              if (!this.retractImageVote(collection.id, image.imageUrl, userId)) {
+                return false
+              } // there's a bit of duplicate code reusing this function here but the
+              // overhead will be small anyways
+            }
+          }
         }
       }
+      return true
     } catch (e: Exception) {
       Log.d(
           DEBUG_PREFIX,
           e.message
               ?: "An exception occurred but the message associated with it couldn't be retrieved.")
+
+      return false
     }
   }
 

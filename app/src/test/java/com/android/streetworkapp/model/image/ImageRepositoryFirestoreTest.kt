@@ -13,8 +13,10 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import kotlin.reflect.jvm.isAccessible
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -24,6 +26,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Captor
 import org.mockito.Mock
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.spy
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
@@ -51,7 +54,11 @@ class ImageRepositoryFirestoreTest {
   private lateinit var parkImageCollection: ParkImageCollection
 
   private lateinit var imageRepositoryFirestore: ImageRepositoryFirestore
+  private lateinit var spyImageRepositoryFirestore: ImageRepositoryFirestore
   private lateinit var parkImages: List<ParkImage>
+
+  private val baseUser =
+      User(uid = "baseUserUid", username = "baseUsername", "", 10, emptyList(), "", emptyList())
 
   @Before
   fun setUp() {
@@ -59,12 +66,14 @@ class ImageRepositoryFirestoreTest {
     imageRepositoryFirestore =
         ImageRepositoryFirestore(fireStoreDB, storageClient, parkRepository, userRepository)
 
+    spyImageRepositoryFirestore = spy(imageRepositoryFirestore)
+
     parkImages =
         listOf(
             ParkImage(
                 imageUrl = "https://example.com/image1.jpg",
-                userId = "user123",
-                username = "parklover",
+                userId = baseUser.uid,
+                username = baseUser.username,
                 rating =
                     ImageRating(
                         positiveVotes = 5,
@@ -80,7 +89,7 @@ class ImageRepositoryFirestoreTest {
                     ImageRating(
                         positiveVotes = 3,
                         negativeVotes = 1,
-                        positiveVotesUids = listOf("userD", "userE", "userF"),
+                        positiveVotesUids = listOf("userD", baseUser.uid, "userF"),
                         negativeVotesUids = listOf("userZ")),
                 uploadDate = Timestamp.now()))
 
@@ -345,4 +354,66 @@ class ImageRepositoryFirestoreTest {
 
     assert(capturedUpdatedImagesPositiveVote == expectedParkImagesAfterRetract)
   }
+
+  @Test
+  fun `deleteAllDataFromUser correctly removes images across collections and removes user votes`() =
+      runTest {
+        val imageToDeleteKey = "dummyKey"
+        val imageToBeDeleted = parkImages[0] // image containing baseUser as owner
+        val imageWhereVoteHasToBeRemoved = parkImages[1]
+        val mockQuerySnapshot = mock(QuerySnapshot::class.java)
+        val mockDocumentSnapshotList =
+            listOf(mock(DocumentSnapshot::class.java), mock(DocumentSnapshot::class.java))
+        val mockDocumentRefList =
+            listOf(mock(DocumentReference::class.java), mock(DocumentReference::class.java))
+
+        val parkImagesCollections =
+            listOf(
+                ParkImageCollection(id = "collection1", images = listOf(imageToBeDeleted)),
+                ParkImageCollection("collection2", images = listOf(imageWhereVoteHasToBeRemoved)))
+
+        whenever(fireStoreDB.collection(ImageRepositoryFirestore.COLLECTION_PATH))
+            .thenReturn(mockCollection)
+
+        whenever(mockCollection.get()).thenReturn(Tasks.forResult(mockQuerySnapshot))
+        whenever(mockQuerySnapshot.documents).thenReturn(mockDocumentSnapshotList)
+
+        for ((index, docSnapshot) in mockDocumentSnapshotList.withIndex()) {
+          whenever(docSnapshot.toObject(ParkImageCollection::class.java))
+              .thenReturn(parkImagesCollections[index])
+
+          whenever(docSnapshot.reference).thenReturn(mockDocumentRefList[index])
+        }
+
+        whenever(storageClient.extractKeyFromUrl(imageToBeDeleted.imageUrl))
+            .thenReturn(imageToDeleteKey)
+        whenever(storageClient.deleteObjectFromKey(imageToDeleteKey)).thenReturn(true)
+        whenever(mockDocumentRefList[0].update(eq("images"), any()))
+            .thenReturn(Tasks.forResult(null))
+        whenever(
+                spyImageRepositoryFirestore.retractImageVote(
+                    parkImagesCollections[1].id,
+                    imageWhereVoteHasToBeRemoved.imageUrl,
+                    baseUser.uid))
+            .thenReturn(
+                true) // I'm not remocking the whole thing for retract vote, it's already tested
+                      // above
+
+        spyImageRepositoryFirestore.deleteAllDataFromUser(
+            baseUser.uid) // call the function to be tested
+
+        verify(mockDocumentRefList[0]).update(eq("images"), anyCaptor.capture())
+
+        val capturedValue = anyCaptor.value
+        val elementsField =
+            capturedValue.javaClass.getDeclaredField("elements").apply { isAccessible = true }
+        elementsField.isAccessible = true
+        val elements = elementsField.get(capturedValue) as List<ParkImage>
+        assert(elements[0] == imageToBeDeleted)
+
+        verify(storageClient).deleteObjectFromKey(imageToDeleteKey)
+        verify(spyImageRepositoryFirestore)
+            .retractImageVote(
+                parkImagesCollections[1].id, imageWhereVoteHasToBeRemoved.imageUrl, baseUser.uid)
+      }
 }

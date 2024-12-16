@@ -54,7 +54,7 @@ interface ImageRepository {
    *
    * @param userId The user id to whom we delete all the data from. (pictures uploaded and ratings)
    */
-  suspend fun deleteAllDataFromUser(userId: String)
+  suspend fun deleteAllDataFromUser(userId: String): Boolean
 
   /**
    * Register a listener to a specific imageCollectionId

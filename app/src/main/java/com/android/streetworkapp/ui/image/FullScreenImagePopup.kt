@@ -1,6 +1,5 @@
 package com.android.streetworkapp.ui.image
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -66,7 +65,6 @@ private object FullScreenImagePopUpSetting {
 }
 
 /** Fullscreen PopUp: it will display all the ParKImageLocal in the list in a HorizontalPager * */
-@SuppressLint("AutoboxingStateCreation")
 @Composable
 fun FullScreenImagePopup(
     images: List<ParkImage>,

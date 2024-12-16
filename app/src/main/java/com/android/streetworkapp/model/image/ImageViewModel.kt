@@ -90,6 +90,22 @@ open class ImageViewModel(private val imageRepository: ImageRepository) : ViewMo
   }
 
   /**
+   * Deletes all the images related to a user
+   *
+   * @param userId The user id to whom we delete all the data from. (pictures uploaded and ratings)
+   */
+  open fun deleteAllDataFromUser(
+      userId: String,
+      onDataDeletionSuccess: () -> Unit,
+      onDataDeletionFailure: () -> Unit
+  ) {
+    viewModelScope.launch {
+      if (imageRepository.deleteAllDataFromUser(userId)) onDataDeletionSuccess()
+      else onDataDeletionFailure()
+    }
+  }
+
+  /**
    * Registers a callback that gets called each time the document gets updated
    *
    * @param imageCollectionId The id of the document to listen to.
