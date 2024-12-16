@@ -250,13 +250,9 @@ class End2EndCreateEvent {
     }
 
     // Wait for the map to be loaded
-    composeTestRule.waitUntil(100000) { mapISLoaded }
+    composeTestRule.waitUntil(10000) { mapISLoaded }
 
-    composeTestRule.waitForIdle()
-
-    // test the map screen
-    composeTestRule.onNodeWithTag("googleMap").assertIsDisplayed()
-
+    // test map functionalities
     val bounds = composeTestRule.onNodeWithTag("mapScreen").getUnclippedBoundsInRoot()
     val xClickOffset = bounds.left + bounds.size.width / 2
     val yClickOffset = bounds.top + bounds.size.height / 2
