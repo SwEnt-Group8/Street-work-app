@@ -160,6 +160,7 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
    * Remove a participant from all events and delete events where the user is the owner.
    *
    * @param uid The user ID.
+   * @return A list of event IDs that were deleted.
    */
   override suspend fun removeParticipantFromAllEvents(uid: String): List<String>? {
     require(uid.isNotEmpty())
