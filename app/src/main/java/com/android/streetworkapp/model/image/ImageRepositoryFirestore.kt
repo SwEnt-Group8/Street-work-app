@@ -27,7 +27,7 @@ class ImageRepositoryFirestore(
    * Uploads an image into our s3 provider and stores the url with relevant infos in our firebase
    * db.
    *
-   * @param uniqueImageIdentifier The hash of the base64 representation of our image.
+   * @param uniqueImageIdentifier The unique identifier of our image
    * @param imageData The data of the image.
    * @param parkId The parkId the image will be linked to.
    * @param userId The id of the image uploader.
