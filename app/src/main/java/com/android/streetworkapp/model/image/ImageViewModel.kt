@@ -1,7 +1,6 @@
 package com.android.streetworkapp.model.image
 
 import android.content.Context
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.streetworkapp.model.park.Park
@@ -11,10 +10,9 @@ import kotlinx.coroutines.launch
 
 open class ImageViewModel(private val imageRepository: ImageRepository) : ViewModel() {
   /**
-   * Uploads an image in b64 format into our database.
+   * Uploads an image to our s3 storage and saves an entry with the url in our firebase db.
    *
    * @param context The current context.
-   * @param imageUri The [Uri] of the image to be uploaded.
    * @param parkId The parkId the image will be linked to.
    * @param userId The id of the image uploader.
    * @param onImageUploadSuccess Callback to be called on upload success.
@@ -29,25 +27,22 @@ open class ImageViewModel(private val imageRepository: ImageRepository) : ViewMo
       onImageUploadFailure: () -> Unit
   ) {
     viewModelScope.launch {
-      // I'm just going to assume the imageUri is valid, would need to use contentResolver etc...
-
       try {
         val uniqueIdentifier = UUID.randomUUID().toString()
         imageRepository.uploadImage(uniqueIdentifier, image.readBytes(), parkId, userId)
         onImageUploadSuccess()
       } catch (e: Exception) {
-        onImageUploadFailure() // Not going to bother explaining the exception in the UI
+        onImageUploadFailure()
       }
     }
   }
 
   /**
-   * Retrieves all the images from the park, the images will be saved into in to the apps cache.
+   * Retrieves all the images from the park.
    *
    * @param context The current context.
    * @param park The [Park] which to retrieve images from.
-   * @param imagesCallback A function that gets called once all the images have been decoded and
-   *   saved to disk. It takes the decoded list as parameter.
+   * @param imagesCallback A function that gets called with all the images as param.
    */
   open fun retrieveImages(context: Context, park: Park, imagesCallback: (List<ParkImage>) -> Unit) {
     viewModelScope.launch {
