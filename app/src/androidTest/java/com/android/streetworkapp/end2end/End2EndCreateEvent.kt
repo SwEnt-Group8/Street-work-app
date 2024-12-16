@@ -229,7 +229,6 @@ class End2EndCreateEvent {
    * First part of the end to end test, simulates login and navigating to the park overview screen
    * by clicking on a marker on the map
    */
-  // @Ignore("Test does not seem to pass on CI")
   @Test
   fun e2eLoginAndNavigateToParkOverview() = runTest {
     composeTestRule.setContent {
