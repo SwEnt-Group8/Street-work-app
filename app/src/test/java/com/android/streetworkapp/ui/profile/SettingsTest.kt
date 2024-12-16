@@ -63,7 +63,6 @@ class SettingsTest {
     verify(userViewModel).deleteUserByUid("uid-alice")
     verify(userViewModel).removeUserFromAllFriendsLists("uid-alice")
     verify(parkViewModel).deleteRatingFromAllParks("uid-alice")
-    verify(eventViewModel).removeParticipantFromAllEvents("uid-alice")
     verify(progressionViewModel).deleteProgressionByUid("uid-alice")
     verify(workoutViewModel).deleteWorkoutDataByUid("uid-alice")
   }
@@ -84,7 +83,6 @@ class SettingsTest {
     verify(userViewModel, never()).deleteUserByUid(anyString())
     verify(userViewModel, never()).removeUserFromAllFriendsLists(anyString())
     verify(parkViewModel, never()).deleteRatingFromAllParks(anyString())
-    verify(eventViewModel, never()).removeParticipantFromAllEvents(anyString())
     verify(progressionViewModel, never()).deleteProgressionByUid(anyString())
     verify(workoutViewModel, never()).deleteWorkoutDataByUid(anyString())
   }
@@ -107,7 +105,6 @@ class SettingsTest {
     verify(userViewModel, never()).deleteUserByUid(anyString())
     verify(userViewModel, never()).removeUserFromAllFriendsLists(anyString())
     verify(parkViewModel, never()).deleteRatingFromAllParks(anyString())
-    verify(eventViewModel, never()).removeParticipantFromAllEvents(anyString())
     verify(progressionViewModel, never()).deleteProgressionByUid(anyString())
     verify(workoutViewModel, never()).deleteWorkoutDataByUid(anyString())
   }
