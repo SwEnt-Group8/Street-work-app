@@ -41,11 +41,12 @@ class SettingsTest {
     progressionViewModel = mock(ProgressionViewModel::class.java)
     workoutViewModel = mock(WorkoutViewModel::class.java)
     currentUser = User("uid-alice", "Alice", "alice@gmail.com", 42, emptyList(), "")
+
+    whenever(userViewModel.currentUser).thenReturn(MutableStateFlow(currentUser))
   }
 
   @Test
   fun testDeleteAccountSuccess() {
-    whenever(userViewModel.currentUser).thenReturn(MutableStateFlow(currentUser))
     whenever(authService.getCurrentUser()).thenReturn(mock(FirebaseUser::class.java))
 
     val result =
@@ -69,8 +70,6 @@ class SettingsTest {
 
   @Test
   fun testDeleteAccountFailsDueToEmptyUid() {
-    whenever(userViewModel.currentUser).thenReturn(MutableStateFlow(currentUser))
-
     val result =
         deleteAccount(
             authService,
@@ -92,7 +91,6 @@ class SettingsTest {
 
   @Test
   fun testDeleteAccountFailsDueToNullFirebaseUser() {
-    whenever(userViewModel.currentUser).thenReturn(MutableStateFlow(currentUser))
     whenever(authService.getCurrentUser()).thenReturn(null)
 
     val result =
