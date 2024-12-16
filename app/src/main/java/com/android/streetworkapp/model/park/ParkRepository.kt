@@ -31,6 +31,8 @@ interface ParkRepository {
 
   suspend fun deleteEventFromPark(pid: String, eid: String)
 
+  suspend fun deleteEventsFromAllParks(eventsIdsList: List<String>)
+
   suspend fun addRating(pid: String, uid: String, rating: Float)
 
   suspend fun deleteRatingFromAllParks(uid: String)
