@@ -251,12 +251,10 @@ class End2EndCreateEvent {
 
     // Wait for the map to be loaded
     composeTestRule.waitUntil(100000) { mapISLoaded }
+
     composeTestRule.waitForIdle()
 
     // test the map screen
-    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
-
-    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("googleMap").assertIsDisplayed()
 
     val bounds = composeTestRule.onNodeWithTag("mapScreen").getUnclippedBoundsInRoot()
@@ -283,9 +281,9 @@ class End2EndCreateEvent {
       click(Offset(xClickOffset.toPx(), yClickOffset.toPx() - yOffsetCorr.toPx() - 3))
     }
 
-    //    composeTestRule.waitUntil(5000) {
-    //      composeTestRule.onNodeWithTag("parkOverviewScreen").isDisplayed()
-    //    }
+    composeTestRule.waitUntil(5000) {
+      composeTestRule.onNodeWithTag("parkOverviewScreen").isDisplayed()
+    }
     //
     //    composeTestRule.onNodeWithTag("parkOverviewScreen").assertIsDisplayed()
   }
