@@ -230,6 +230,7 @@ class End2EndCreateEvent {
    * First part of the end to end test, simulates login and navigating to the park overview screen
    * by clicking on a marker on the map
    */
+  @Ignore
   @Test
   fun e2eLoginAndNavigateToParkOverview() = runTest {
     composeTestRule.setContent {
@@ -301,7 +302,6 @@ class End2EndCreateEvent {
    * and then displays it in the park overview screen. We also verify that the event is properly
    * displayed in the event overview screen.
    */
-  @Ignore
   @Test
   fun e2eCanCreateEventAndDisplayIt() = runTest {
     // This one needs to be initialized here because it evaluateText is a suspend function
