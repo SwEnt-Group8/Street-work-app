@@ -186,7 +186,7 @@ fun UserImageActions(
         if (currentUser != null && currentUser.uid != currentImage.userId) {
           if (currentImage.rating.positiveVotesUids.contains(currentUser.uid) ||
               currentImage.rating.negativeVotesUids.contains(currentUser.uid)) {
-            Box(modifier = Modifier.padding(horizontal = 15.dp)) {
+            Box(modifier = Modifier.padding(horizontal = 15.dp).testTag("retractVoteButton")) {
               // Retract Vote Button
               IconButton(
                   onClick = {
@@ -207,7 +207,7 @@ fun UserImageActions(
                   }
             }
           } else {
-            Box(modifier = Modifier.padding(horizontal = 15.dp)) {
+            Box(modifier = Modifier.padding(horizontal = 15.dp).testTag("likeImageButton")) {
               // Like Button
               IconButton(
                   onClick = {
@@ -228,7 +228,7 @@ fun UserImageActions(
                   }
             }
 
-            Box(modifier = Modifier.padding(horizontal = 15.dp)) {
+            Box(modifier = Modifier.padding(horizontal = 15.dp).testTag("dislikeImageButton")) {
               // Dislike Button
               IconButton(
                   onClick = {
@@ -251,7 +251,7 @@ fun UserImageActions(
           }
         } else { // The user who uploaded the picture should only be able to delete
           // it, not vote on it
-          Box(modifier = Modifier.padding(horizontal = 15.dp)) {
+          Box(modifier = Modifier.padding(horizontal = 15.dp).testTag("deleteImageButton")) {
             // Delete Button
             IconButton(
                 onClick = {
@@ -272,7 +272,7 @@ fun UserImageActions(
                         .background(FullScreenImagePopUpSetting.dislikeButtonColor)) {
                   Icon(
                       imageVector = Icons.Filled.Delete,
-                      contentDescription = "Dislike",
+                      contentDescription = "Delete button",
                       tint = Color.White)
                 }
           }
