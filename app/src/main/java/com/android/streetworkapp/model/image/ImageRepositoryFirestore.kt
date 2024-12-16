@@ -7,6 +7,7 @@ import com.android.streetworkapp.model.storage.S3StorageClient
 import com.android.streetworkapp.model.user.UserRepository
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.tasks.await
 
@@ -20,6 +21,8 @@ class ImageRepositoryFirestore(
     const val DEBUG_PREFIX = "ImageRepositoryFirestore:"
     const val COLLECTION_PATH = "parkImages"
   }
+
+  private var firebaseImageCollectionListener: ListenerRegistration? = null
 
   /**
    * Uploads an image into our s3 provider and stores the url with relevant infos in our firebase
@@ -312,16 +315,20 @@ class ImageRepositoryFirestore(
     try {
       val docRef =
           db.collection(ImageRepositoryFirestore.COLLECTION_PATH).document(imageCollectionId)
-      docRef.addSnapshotListener { snapshot, e ->
-        if (e != null) {
-          Log.d(ImageRepositoryFirestore.DEBUG_PREFIX, "Error listening for changes: $e")
-          return@addSnapshotListener
-        }
 
-        if (snapshot != null && snapshot.exists()) {
-          onDocumentChange()
-        }
-      }
+      this.firebaseImageCollectionListener?.remove() // remove old listener if one was setup
+      this.firebaseImageCollectionListener = null
+      this.firebaseImageCollectionListener =
+          docRef.addSnapshotListener { snapshot, e ->
+            if (e != null) {
+              Log.d(ImageRepositoryFirestore.DEBUG_PREFIX, "Error listening for changes: $e")
+              return@addSnapshotListener
+            }
+
+            if (snapshot != null && snapshot.exists()) {
+              onDocumentChange()
+            }
+          }
     } catch (e: Exception) {
       Log.d(
           DEBUG_PREFIX,

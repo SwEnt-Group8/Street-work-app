@@ -5,6 +5,7 @@ import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.tasks.await
 
 /** A repository interface using Firestore for park data. */
@@ -12,6 +13,7 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore, testing: Boolea
     ParkRepository {
 
   private val COLLECTION_PATH: String = if (testing) "testParks" else "parks"
+  private var firebaseImageCollectionListener: ListenerRegistration? = null
 
   companion object {
     private const val INVALID_RATING_MESSAGE = "Rating must be between 1 and 5."
@@ -398,16 +400,19 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore, testing: Boolea
     require(parkId.isNotEmpty()) { "Empty imageCollectionId." }
     try {
       val docRef = db.collection(this.COLLECTION_PATH).document(parkId)
-      docRef.addSnapshotListener { snapshot, e ->
-        if (e != null) {
-          Log.d("FirestoreError: ", "Error listening for changes: $e")
-          return@addSnapshotListener
-        }
+      this.firebaseImageCollectionListener?.remove() // remove old listener if one was setup
+      this.firebaseImageCollectionListener = null
+      this.firebaseImageCollectionListener =
+          docRef.addSnapshotListener { snapshot, e ->
+            if (e != null) {
+              Log.d("FirestoreError: ", "Error listening for changes: $e")
+              return@addSnapshotListener
+            }
 
-        if (snapshot != null && snapshot.exists()) {
-          onDocumentChange()
-        }
-      }
+            if (snapshot != null && snapshot.exists()) {
+              onDocumentChange()
+            }
+          }
     } catch (e: Exception) {
       Log.d(
           "FirestoreError: ",
