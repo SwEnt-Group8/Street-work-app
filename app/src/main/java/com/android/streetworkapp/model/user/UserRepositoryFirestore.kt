@@ -304,13 +304,13 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     require(uid.isNotEmpty()) { UID_EMPTY }
     try {
       // Get all users that have the user in their friends list
-      val querySnapshot = db.collection("users").whereArrayContains("friends", uid).get().await()
+      val userSnapshot = db.collection("users").whereArrayContains("friends", uid).get().await()
 
       // Start a Firestore batch operation for all updates
       val batch = db.batch()
 
       // Remove the user from all friends lists
-      querySnapshot.documents.forEach { doc ->
+      userSnapshot.documents.forEach { doc ->
         val friendRef = db.collection("users").document(doc.id)
         batch.update(friendRef, "friends", FieldValue.arrayRemove(uid))
       }
