@@ -34,6 +34,7 @@ import com.android.streetworkapp.ui.utils.DialogType
 import com.android.streetworkapp.utils.GoogleAuthService
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun SettingsContent(
@@ -201,8 +202,13 @@ fun deleteAccount(
   userViewModel.removeUserFromAllFriendsLists(currentUserUid)
 
   // Delete the user data from the other viewmodels
+  val deletedEventsIds = runBlocking {
+    eventViewModel.removeParticipantFromAllEvents(currentUserUid)
+  }
+  if (!deletedEventsIds.isNullOrEmpty()) {
+    parkViewModel.deleteEventsFromAllParks(deletedEventsIds)
+  }
   parkViewModel.deleteRatingFromAllParks(currentUserUid)
-  eventViewModel.removeParticipantFromAllEvents(currentUserUid)
   progressionViewModel.deleteProgressionByUid(currentUserUid)
   workoutViewModel.deleteWorkoutDataByUid(currentUserUid)
 
