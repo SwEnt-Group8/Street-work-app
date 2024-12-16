@@ -161,8 +161,9 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
    *
    * @param uid The user ID.
    */
-  override suspend fun removeParticipantFromAllEvents(uid: String) {
+  override suspend fun removeParticipantFromAllEvents(uid: String): List<String>? {
     require(uid.isNotEmpty())
+    val deletedEventIds = mutableListOf<String>()
     try {
       val events =
           db.collection(COLLECTION_PATH)
@@ -175,6 +176,7 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
         if (event != null) {
           if (event.owner == uid) {
             db.collection(COLLECTION_PATH).document(event.eid).delete().await()
+            deletedEventIds.add(event.eid)
           } else {
             db.collection(COLLECTION_PATH)
                 .document(event.eid)
@@ -190,6 +192,7 @@ class EventRepositoryFirestore(private val db: FirebaseFirestore) : EventReposit
     } catch (e: Exception) {
       Log.e("FirestoreError", "Error removing participant from all events: ${e.message}")
     }
+    return deletedEventIds
   }
 
   fun documentToEvent(document: DocumentSnapshot): Event? {
