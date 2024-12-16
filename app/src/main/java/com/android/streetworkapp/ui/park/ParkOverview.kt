@@ -22,7 +22,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsRun
-import androidx.compose.material.icons.filled.DirectionsRun
 import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Timelapse
@@ -446,7 +445,7 @@ fun EventItem(event: Event, eventViewModel: EventViewModel, navigationActions: N
       },
       overlineContent = {
         Text(
-            text = dateDifference(event),
+            text = dateDifference(LocalContext.current, event),
             fontWeight = FontWeight.Bold,
             modifier = Modifier.testTag("dateText"))
       },

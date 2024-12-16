@@ -1,5 +1,6 @@
 package com.android.streetworkapp.utils
 
+import android.content.Context
 import com.android.sample.R
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventStatus
@@ -66,7 +67,7 @@ fun String.toEpochTimestamp(): Long {
  * @param event the event to calculate the difference for.
  * @return The difference in days or hours.
  */
-fun dateDifference(event: Event): String {
+fun dateDifference(context: Context, event: Event): String {
   val formatter = DateTimeFormatter.ofPattern(DATE_TIME_PATTERN)
 
   val endTimestamp = event.date.toFormattedString()
@@ -81,16 +82,16 @@ fun dateDifference(event: Event): String {
 
   val statusText =
       when (event.status) {
-        EventStatus.STARTED -> R.string.event_started.toString()
-        EventStatus.ENDED -> R.string.event_ended.toString()
-        EventStatus.CREATED -> R.string.event_soon.toString()
+        EventStatus.STARTED -> R.string.event_started
+        EventStatus.ENDED -> R.string.event_ended
+        EventStatus.CREATED -> R.string.event_soon
       }
 
   return if (days > 0) {
     "in $days day(s)"
   } else {
     if (hours <= 0) {
-      statusText
+      context.getString(statusText)
     } else {
       "in $hours hour(s)"
     }
