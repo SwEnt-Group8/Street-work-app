@@ -5,7 +5,6 @@ import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.storage.S3StorageClient
 import com.android.streetworkapp.model.user.User
 import com.android.streetworkapp.model.user.UserRepository
-import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.CollectionReference
@@ -140,10 +139,7 @@ class ImageRepositoryFirestoreTest {
   fun `uploadImage creates a new image collection if none exists`() = runBlocking {
     val park = Park(pid = "validParkId", imagesCollectionId = "")
     val user = User(uid = "validUserId", "name", "", 20, emptyList(), "")
-    val mockCollection = mock(CollectionReference::class.java)
-    val mockTask = mock(Task::class.java) as Task<Void>
 
-    whenever(mockTask.isComplete).thenReturn(true)
     whenever(parkRepository.getParkByPid("validParkId")).thenReturn(park)
     whenever(userRepository.getUserByUid("validUserId")).thenReturn(user)
     whenever(storageClient.uploadFile(any(), any())).thenReturn("http://dummyurl.com")
@@ -151,7 +147,7 @@ class ImageRepositoryFirestoreTest {
         .thenReturn(mockCollection)
     whenever(mockCollection.document()).thenReturn(mockDocumentRef)
     whenever(mockCollection.document(any())).thenReturn(mockDocumentRef)
-    whenever(mockDocumentRef.set(any())).thenReturn(mockTask)
+    whenever(mockDocumentRef.set(any())).thenReturn(Tasks.forResult(null))
     whenever(mockDocumentRef.id).thenReturn("newCollectionId")
 
     imageRepositoryFirestore.uploadImage("validIdentifier", ByteArray(10), park.pid, user.uid)
@@ -175,16 +171,13 @@ class ImageRepositoryFirestoreTest {
   fun `retrieveImages returns empty list when images collection does not exist`() = runBlocking {
     val park = Park(pid = "validParkId", imagesCollectionId = "missingCollectionId")
 
-    val mockTask = mock(Task::class.java) as Task<DocumentSnapshot>
     val mockDocumentSnapshot = mock(DocumentSnapshot::class.java)
 
     whenever(parkRepository.getParkByPid(park.pid)).thenReturn(park)
-    whenever(mockTask.isComplete).thenReturn(true)
-    whenever(mockTask.result).thenReturn(mockDocumentSnapshot)
     whenever(fireStoreDB.collection(ImageRepositoryFirestore.COLLECTION_PATH))
         .thenReturn(mockCollection)
     whenever(mockCollection.document(park.imagesCollectionId)).thenReturn(mockDocumentRef)
-    whenever(mockDocumentRef.get()).thenReturn(mockTask)
+    whenever(mockDocumentRef.get()).thenReturn(Tasks.forResult(mockDocumentSnapshot))
     whenever(mockDocumentSnapshot.exists()).thenReturn(false)
 
     val result = imageRepositoryFirestore.retrieveImages(park)
@@ -196,15 +189,11 @@ class ImageRepositoryFirestoreTest {
   fun `retrieveImages returns list of ParkImage when valid data exists`() = runBlocking {
     val park = Park(pid = "validParkId", imagesCollectionId = "validNonEmptyCollectionId")
 
-    val mockTask = mock(Task::class.java) as Task<DocumentSnapshot>
-
     whenever(parkRepository.getParkByPid(park.pid)).thenReturn(park)
-    whenever(mockTask.isComplete).thenReturn(true)
-    whenever(mockTask.result).thenReturn(mockDocumentSnapshot)
     whenever(fireStoreDB.collection(ImageRepositoryFirestore.COLLECTION_PATH))
         .thenReturn(mockCollection)
     whenever(mockCollection.document(park.imagesCollectionId)).thenReturn(mockDocumentRef)
-    whenever(mockDocumentRef.get()).thenReturn(mockTask)
+    whenever(mockDocumentRef.get()).thenReturn(Tasks.forResult(mockDocumentSnapshot))
     whenever(mockDocumentSnapshot.exists()).thenReturn(true)
     whenever(mockDocumentSnapshot.toObject(ParkImageCollection::class.java))
         .thenReturn(parkImageCollection)
@@ -216,16 +205,12 @@ class ImageRepositoryFirestoreTest {
 
   @Test
   fun `deleteImage deletes correct image from s3 storage and firebase entry`() = runBlocking {
-    val mockTask = mock(Task::class.java) as Task<DocumentSnapshot>
     val dummyKeyExtractResult = "dummyKey"
 
     whenever(fireStoreDB.collection(ImageRepositoryFirestore.COLLECTION_PATH))
         .thenReturn(mockCollection)
     whenever(mockCollection.document(parkImageCollection.id)).thenReturn(mockDocumentRef)
-    whenever(mockDocumentRef.get()).thenReturn(mockTask)
-    whenever(mockTask.isComplete).thenReturn(true)
-    whenever(mockTask.isSuccessful).thenReturn(true)
-    whenever(mockTask.result).thenReturn(mockDocumentSnapshot)
+    whenever(mockDocumentRef.get()).thenReturn(Tasks.forResult(mockDocumentSnapshot))
     whenever(mockDocumentSnapshot.toObject(ParkImageCollection::class.java))
         .thenReturn(parkImageCollection)
     whenever(mockDocumentRef.update(eq("images"), any())).thenReturn(Tasks.forResult(null))
@@ -253,17 +238,13 @@ class ImageRepositoryFirestoreTest {
   fun `imageVote sends correct updated ParkImage list to firebase`() = runBlocking {
     val votingUserUid = "votingUserUid"
 
-    val mockTask = mock(Task::class.java) as Task<DocumentSnapshot>
     whenever(fireStoreDB.collection(ImageRepositoryFirestore.COLLECTION_PATH))
         .thenReturn(mockCollection)
     whenever(mockCollection.document(parkImageCollection.id)).thenReturn(mockDocumentRef)
-    whenever(mockDocumentRef.get()).thenReturn(mockTask)
-    whenever(mockTask.isComplete).thenReturn(true)
-    whenever(mockTask.isSuccessful).thenReturn(true)
-    whenever(mockTask.result).thenReturn(mockDocumentSnapshot)
+    whenever(mockDocumentRef.get()).thenReturn(Tasks.forResult(mockDocumentSnapshot))
     whenever(mockDocumentSnapshot.toObject(ParkImageCollection::class.java))
         .thenReturn(parkImageCollection)
-    whenever(mockDocumentRef.update(eq("images"), any())).then { Unit }
+    whenever(mockDocumentRef.update(eq("images"), any())).then { Tasks.forResult(null) }
 
     // positive vote
     imageRepositoryFirestore.imageVote(
@@ -318,18 +299,13 @@ class ImageRepositoryFirestoreTest {
         parkImageCollection.images[parkImageCollection.images.size - 1]
             .rating
             .positiveVotesUids[0] // pick the first user id from the list
-    val mockCollection = mock(CollectionReference::class.java)
-    val mockDocumentRef = mock(DocumentReference::class.java)
-    val mockSnapshot = mock(DocumentSnapshot::class.java)
-    val mockTask = mock(Task::class.java) as Task<DocumentSnapshot>
+
     whenever(fireStoreDB.collection(ImageRepositoryFirestore.COLLECTION_PATH))
         .thenReturn(mockCollection)
     whenever(mockCollection.document(parkImageCollection.id)).thenReturn(mockDocumentRef)
-    whenever(mockDocumentRef.get()).thenReturn(mockTask)
-    whenever(mockTask.isComplete).thenReturn(true)
-    whenever(mockTask.isSuccessful).thenReturn(true)
-    whenever(mockTask.result).thenReturn(mockSnapshot)
-    whenever(mockSnapshot.toObject(ParkImageCollection::class.java)).thenReturn(parkImageCollection)
+    whenever(mockDocumentRef.get()).thenReturn(Tasks.forResult(mockDocumentSnapshot))
+    whenever(mockDocumentSnapshot.toObject(ParkImageCollection::class.java))
+        .thenReturn(parkImageCollection)
     whenever(mockDocumentRef.update(eq("images"), any())).then { Unit }
 
     // retract positive vote
@@ -397,7 +373,7 @@ class ImageRepositoryFirestoreTest {
                     baseUser.uid))
             .thenReturn(
                 true) // I'm not remocking the whole thing for retract vote, it's already tested
-                      // above
+        // above
 
         spyImageRepositoryFirestore.deleteAllDataFromUser(
             baseUser.uid) // call the function to be tested
