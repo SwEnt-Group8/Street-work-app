@@ -257,6 +257,28 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore, testing: Boolea
   }
 
   /**
+   * Delete events from all parks.
+   *
+   * @param eventsIdsList The list of event IDs to delete.
+   */
+  override suspend fun deleteEventsFromAllParks(eventsIdsList: List<String>) {
+    require(eventsIdsList.isNotEmpty()) { "Events IDs list cannot be empty." }
+    try {
+      val parks = db.collection(COLLECTION_PATH).get().await()
+      for (document in parks.documents) {
+        val park = document.toObject(Park::class.java)
+        if (park != null) {
+          val updatedEvents = park.events.toMutableList()
+          updatedEvents.removeAll(eventsIdsList)
+          db.collection(COLLECTION_PATH).document(park.pid).update("events", updatedEvents).await()
+        }
+      }
+    } catch (e: Exception) {
+      Log.e("FirestoreError", "Error deleting events from all parks: ${e.message}")
+    }
+  }
+
+  /**
    * Delete a park by its ID.
    *
    * @param pid The park ID.
