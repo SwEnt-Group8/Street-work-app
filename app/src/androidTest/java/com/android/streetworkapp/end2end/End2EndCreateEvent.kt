@@ -57,7 +57,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -228,7 +227,6 @@ class End2EndCreateEvent {
    * First part of the end to end test, simulates login and navigating to the park overview screen
    * by clicking on a marker on the map
    */
-  @Ignore
   @Test
   fun e2eLoginAndNavigateToParkOverview() = runTest {
     composeTestRule.setContent {
