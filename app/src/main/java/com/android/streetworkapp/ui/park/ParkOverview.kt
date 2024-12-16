@@ -210,7 +210,7 @@ fun ImageTitle(
  */
 @Composable
 fun ParkDetails(park: Park?, showRatingDialog: MutableState<Boolean>, user: User?) {
-  Column(modifier = Modifier.testTag("parkDetails").padding(bottom = 16.dp, end = 48.dp)) {
+  Column(modifier = Modifier.testTag("parkDetails").padding(bottom = 16.dp, end = 15.dp)) {
     Text(
         text = "Park rating",
         fontSize = 24.sp,
