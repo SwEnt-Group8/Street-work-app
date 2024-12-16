@@ -238,6 +238,29 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
       }
     }
   }
+  /**
+   * Updates the training status for a pairing request.
+   *
+   * @param requestId The ID of the pairing request.
+   * @param status The new status of the request.
+   * @param counter The current counter value for the request.
+   * @param timerStatus The status of the timer for the request.
+   */
+  fun updatePairingRequest(
+      requestId: String,
+      status: RequestStatus? = null,
+      counter: Int? = null,
+      timerStatus: TimerStatus? = null
+  ) {
+    viewModelScope.launch {
+      val updates = mutableMapOf<String, Any?>()
+      if (status != null) updates["status"] = status.name
+      if (counter != null) updates["counter"] = counter
+      if (timerStatus != null) updates["timerStatus"] = timerStatus.name
+
+      repository.updatePairingRequest(requestId, updates)
+    }
+  }
 
   /**
    * Updates the status of a pairing request.

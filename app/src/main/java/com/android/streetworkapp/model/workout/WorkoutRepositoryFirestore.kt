@@ -463,6 +463,23 @@ class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRep
   }
 
   /**
+   * Updates the training status in the PairingRequest.
+   *
+   * @param requestId The ID of the pairing request.
+   * @param newStatus The new status of the pairing request.
+   * @param updates Additional fields to update in the PairingRequest (optional).
+   */
+  override suspend fun updatePairingRequest(requestId: String, updates: Map<String, Any?>) {
+    require(requestId.isNotEmpty()) { "The request ID must not be empty." }
+
+    try {
+      db.collection(PAIRING_REQUESTS).document(requestId).update(updates).await()
+    } catch (e: Exception) {
+      Log.e(ERROR_TAG, "Error updating pairing request: ${e.message}")
+    }
+  }
+
+  /**
    * Converts a list of exercise maps to a list of Exercise objects.
    *
    * @param exerciseMaps The list of exercise maps to convert.
