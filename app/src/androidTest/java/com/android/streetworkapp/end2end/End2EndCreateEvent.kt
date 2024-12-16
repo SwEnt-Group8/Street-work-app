@@ -1,7 +1,5 @@
 package com.android.streetworkapp.end2end
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
@@ -284,12 +282,6 @@ class End2EndCreateEvent {
 
     composeTestRule.onNodeWithTag("mapScreen").performTouchInput {
       click(Offset(xClickOffset.toPx(), yClickOffset.toPx() - yOffsetCorr.toPx() - 3))
-    }
-
-    // need to wait before clicking again else the click is considered as a double click
-    composeTestRule.waitUntil(3000) {
-      runBlocking { delay(2000) }
-      true
     }
 
     composeTestRule.waitUntil(5000) {
