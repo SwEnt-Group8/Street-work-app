@@ -1,7 +1,6 @@
 package com.android.streetworkapp.end2end
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
@@ -144,9 +143,6 @@ class End2EndCreateEvent {
           occupancy = 5,
           events = listOf(event.eid))
 
-  // Define a state variable to hold the current screen
-  private var currentScreen by mutableStateOf(Screen.MAP)
-
   @Before
   fun setUp() {
     MockitoAnnotations.openMocks(this)
@@ -230,22 +226,16 @@ class End2EndCreateEvent {
   }
 
   /**
-   * This end to end test simulates a user flow where the user creates an event and then displays it
-   * in the park overview screen. We also verify that the event is properly displayed in the event
-   * overview screen. Warning: this test fails between 00:00 and 01:00 UTC time because of the date
-   * comparison
+   * First part of the end to end test, simulates login and navigating to the park overview screen
+   * by clicking on a marker on the map
    */
   // @Ignore("Test does not seem to pass on CI")
   @Test
-  fun e2eCanCreateEventAndDisplayIt() = runTest {
-    // This one needs to be initialized here because it evaluateText is a suspend function
-    `when`(textModerationRepository.evaluateText(any(), any()))
-        .thenReturn(TextEvaluation.Result(true))
-
+  fun e2eLoginAndNavigateToParkOverview() = runTest {
     composeTestRule.setContent {
       StreetWorkApp(
           parkLocationViewModel,
-          { navigateTo(currentScreen) },
+          { navigateTo(Screen.MAP) },
           { mapISLoaded = true },
           userViewModel,
           parkViewModel,
@@ -258,8 +248,7 @@ class End2EndCreateEvent {
           GoogleAuthService(
               "abc",
               mock(FirebaseAuth::class.java, RETURNS_DEFAULTS),
-              context = LocalContext.current),
-          navTestInvokationOnEachRecompose = true)
+              context = LocalContext.current))
     }
 
     // Wait for the map to be loaded
@@ -302,7 +291,42 @@ class End2EndCreateEvent {
       true
     }
 
-    currentScreen = Screen.PARK_OVERVIEW
+    composeTestRule.waitUntil(5000) {
+      composeTestRule.onNodeWithTag("parkOverviewScreen").isDisplayed()
+    }
+  }
+
+  /**
+   * Second part of the end to end test that simulates a user flow where the user creates an event
+   * and then displays it in the park overview screen. We also verify that the event is properly
+   * displayed in the event overview screen.
+   */
+  @Test
+  fun e2eCanCreateEventAndDisplayIt() = runTest {
+    // This one needs to be initialized here because it evaluateText is a suspend function
+    `when`(textModerationRepository.evaluateText(any(), any()))
+        .thenReturn(TextEvaluation.Result(true))
+
+    parkViewModel.setPark(park)
+
+    composeTestRule.setContent {
+      StreetWorkApp(
+          parkLocationViewModel,
+          { navigateTo(Screen.PARK_OVERVIEW) },
+          { mapISLoaded = true },
+          userViewModel,
+          parkViewModel,
+          eventViewModel,
+          mock(ProgressionViewModel::class.java),
+          mock(WorkoutViewModel::class.java),
+          textModerationViewModel,
+          mock(ImageViewModel::class.java),
+          mock(PreferencesViewModel::class.java),
+          GoogleAuthService(
+              "abc",
+              mock(FirebaseAuth::class.java, RETURNS_DEFAULTS),
+              context = LocalContext.current))
+    }
 
     composeTestRule.waitUntil(5000) {
       composeTestRule.onNodeWithTag("parkOverviewScreen").isDisplayed()
@@ -310,8 +334,6 @@ class End2EndCreateEvent {
 
     // create an event
     composeTestRule.onNodeWithTag("createEventButton").assertIsDisplayed().performClick()
-
-    currentScreen = Screen.ADD_EVENT
 
     composeTestRule.onNodeWithTag("addEventScreen").assertIsDisplayed()
 
@@ -337,15 +359,11 @@ class End2EndCreateEvent {
 
     verify(parkDocumentRef).update(eq("events"), any())
 
-    currentScreen = Screen.PARK_OVERVIEW
-
     composeTestRule.waitUntil(5000) { composeTestRule.onNodeWithTag("eventButton").isDisplayed() }
 
     composeTestRule.onNodeWithText(event.title).assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("eventButton").assertIsDisplayed().performClick()
-
-    currentScreen = Screen.EVENT_OVERVIEW
 
     composeTestRule.waitForIdle()
 
