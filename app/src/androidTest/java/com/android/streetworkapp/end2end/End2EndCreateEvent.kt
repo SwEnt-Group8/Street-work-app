@@ -281,11 +281,13 @@ class End2EndCreateEvent {
       click(Offset(xClickOffset.toPx(), yClickOffset.toPx() - yOffsetCorr.toPx() - 3))
     }
 
-    composeTestRule.waitUntil(5000) {
-      composeTestRule.onNodeWithTag("parkOverviewScreen").isDisplayed()
+    // need to wait before clicking again else the click is considered as a double click
+    composeTestRule.waitUntil(3000) {
+      runBlocking { delay(2000) }
+      true
     }
-    //
-    //    composeTestRule.onNodeWithTag("parkOverviewScreen").assertIsDisplayed()
+
+    assert(parkViewModel.park.value == park)
   }
 
   /**
