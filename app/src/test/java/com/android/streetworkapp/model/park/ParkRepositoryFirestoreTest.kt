@@ -542,4 +542,9 @@ class ParkRepositoryFirestoreTest {
     parkRepository.addImagesCollection(parkId, collectionId)
     verify(documentRef).update("imagesCollectionId", collectionId)
   }
+
+  @Test
+  fun `registerCollectionListener with non empty park id doesn't crash on exception`() {
+    parkRepository.registerCollectionListener("nonEmptyId") {}
+  }
 }

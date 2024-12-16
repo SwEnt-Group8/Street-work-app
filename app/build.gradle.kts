@@ -263,7 +263,7 @@ dependencies {
 
     //Online storage
     implementation(libs.awsSdkKotlinS3)
-    
+
     implementation(kotlin("reflect"))
 }
 
