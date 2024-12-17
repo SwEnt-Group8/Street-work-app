@@ -384,8 +384,8 @@ class ImageRepositoryFirestoreTest {
         val elementsField =
             capturedValue.javaClass.getDeclaredField("elements").apply { isAccessible = true }
         elementsField.isAccessible = true
-        val elements = elementsField.get(capturedValue) as List<ParkImage>
-        assert(elements[0] == imageToBeDeleted)
+        val elements = elementsField.get(capturedValue) as List<List<ParkImage>>
+        assert(elements[0][0] == imageToBeDeleted)
 
         verify(storageClient).deleteObjectFromKey(imageToDeleteKey)
         verify(spyImageRepositoryFirestore)

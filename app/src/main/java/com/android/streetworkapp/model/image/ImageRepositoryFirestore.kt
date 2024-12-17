@@ -272,15 +272,19 @@ class ImageRepositoryFirestore(
         collection?.let {
           val (imagesUploadedByUser, imagesNotUploadedByUser) =
               collection.images.partition { it.userId == userId }
-          document.reference.update("images", FieldValue.arrayRemove(imagesUploadedByUser)).await()
+          if (imagesUploadedByUser.isNotEmpty())
+              document.reference
+                  .update("images", FieldValue.arrayRemove(imagesUploadedByUser))
+                  .await()
+
+          imagesUploadedByUser.forEach {
+            val imageKey = this.storageClient.extractKeyFromUrl(it.imageUrl) ?: return false
+            if (!this.storageClient.deleteObjectFromKey(imageKey)) return false
+          }
 
           // remove any potential votes the user has done
           for (image in imagesNotUploadedByUser) {
-            if (image.userId == userId) {
-              document.reference.update("images", FieldValue.arrayRemove(image)).await()
-              val imageKey = storageClient.extractKeyFromUrl(image.imageUrl) ?: return false
-              if (!this.storageClient.deleteObjectFromKey(imageKey)) return false
-            } else if (image.rating.positiveVotesUids.contains(userId) ||
+            if (image.rating.positiveVotesUids.contains(userId) ||
                 image.rating.negativeVotesUids.contains(userId)) {
               if (!this.retractImageVote(collection.id, image.imageUrl, userId)) {
                 return false
