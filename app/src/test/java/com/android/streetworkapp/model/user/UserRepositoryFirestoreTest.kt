@@ -921,4 +921,30 @@ class UserRepositoryFirestoreTest {
 
     verify(documentRef, times(2)).get()
   }
+
+  @Test
+  fun removeUserFromAllFriendsListsWithValidUidCallsUpdate() = runTest {
+    // Mock Firestore interactions
+    val userSnapshot = mock<QuerySnapshot>()
+    val friendDocument = mock<DocumentSnapshot>()
+    val friendRef = mock<DocumentReference>()
+
+    whenever(db.collection("users")).thenReturn(collection)
+    whenever(collection.whereArrayContains("friends", "user123")).thenReturn(mock())
+    whenever(collection.whereArrayContains("friends", "user123").get())
+        .thenReturn(Tasks.forResult(userSnapshot))
+    whenever(userSnapshot.documents).thenReturn(listOf(friendDocument))
+    whenever(friendDocument.id).thenReturn("friend1")
+    whenever(db.collection("users").document("friend1")).thenReturn(friendRef)
+    whenever(db.batch()).thenReturn(batch)
+    whenever(batch.update(any<DocumentReference>(), any<String>(), any<Any>())).thenReturn(batch)
+    whenever(batch.commit()).thenReturn(Tasks.forResult(null))
+
+    // Call the repository method
+    userRepository.removeUserFromAllFriendsLists("user123")
+
+    // Verify the update method is called
+    verify(batch).update(eq(friendRef), eq("friends"), any<Any>())
+    verify(batch).commit()
+  }
 }

@@ -205,6 +205,14 @@ open class ParkViewModel(
       viewModelScope.launch { repository.deleteEventFromPark(pid, eid) }
 
   /**
+   * Delete events from all parks.
+   *
+   * @param eventsIdsList The list of event IDs to delete.
+   */
+  fun deleteEventsFromAllParks(eventsIdsList: List<String>) =
+      viewModelScope.launch { repository.deleteEventsFromAllParks(eventsIdsList) }
+
+  /**
    * Add a rating to a park, ensuring that the user has not already rated it.
    *
    * @param pid The park ID.
@@ -217,6 +225,14 @@ open class ParkViewModel(
         val updatedPark = repository.getParkByPid(pid)
         _currentPark.value = updatedPark
       }
+
+  /**
+   * Delete rating of an user from all parks.
+   *
+   * @param uid The user ID.
+   */
+  fun deleteRatingFromAllParks(uid: String) =
+      viewModelScope.launch { repository.deleteRatingFromAllParks(uid) }
 
   /**
    * Delete a park by its ID.

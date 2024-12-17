@@ -19,6 +19,8 @@ interface EventRepository {
 
   suspend fun removeParticipantFromEvent(eid: String, uid: String)
 
+  suspend fun removeParticipantFromAllEvents(uid: String): List<String>?
+
   suspend fun addEvent(event: Event)
 
   suspend fun deleteEvent(event: Event)
