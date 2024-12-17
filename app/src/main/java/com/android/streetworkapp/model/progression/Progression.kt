@@ -50,38 +50,29 @@ enum class MedalsAchievement(val achievement: Achievement, val rank: Ranks) {
 
   BRONZE(
       Achievement(
-          R.drawable.bronze_achievement_icon,
+          R.drawable.bronze_icon_final,
           "Bronze Medal",
           listOf("Bronze"),
           "You obtained 100 Points!"),
       Ranks.BRONZE),
   SILVER(
       Achievement(
-          R.drawable.silver_achievement_icon,
+          R.drawable.silver_icon_final,
           "Silver Medal",
           listOf("Silver"),
           "You obtained 1000 Points!"),
       Ranks.SILVER),
   GOLD(
       Achievement(
-          R.drawable.gold_achievement_icon,
-          "Gold Medal",
-          listOf("Gold"),
-          "You obtained 10000 Points!"),
+          R.drawable.gold_icon_final, "Gold Medal", listOf("Gold"), "You obtained 10000 Points!"),
       Ranks.GOLD),
   PLATINUM(
       Achievement(
-          R.drawable.bronze_achievement_icon,
+          R.drawable.platinum_icon_final,
           "Platinum Medal",
           listOf("Platinum"),
           "You obtained 100000 Points!"),
       Ranks.PLATINUM)
-}
-
-/** Represents a type of achievement linked to the performance of the user on different exercises */
-enum class ExerciseAchievement(val achievement: Achievement) {
-  HANDSTAND(Achievement(R.drawable.train_hand_stand, "Handstand", emptyList(), "")),
-  FRONT_LEVER(Achievement(R.drawable.train_front_lever, "Front Lever", emptyList(), ""))
 }
 
 /** Represents a type of achievement linked to the social interactions of the user */
