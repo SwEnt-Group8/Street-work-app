@@ -256,8 +256,7 @@ class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRep
                 sessionType = SessionType.COACH,
                 participants = listOf(toUid, fromUid),
                 coachUid = fromUid,
-                exercises = emptyList(),
-                comments = emptyList())
+                exercises = emptyList())
 
         addOrUpdateWorkoutSession(toUid, newSession)
       }
@@ -407,23 +406,6 @@ class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRep
   }
 
   /**
-   * Adds a comment to a workout session.
-   *
-   * @param uid The UID of the user.
-   * @param sessionId The ID of the session.
-   * @param comment The comment to add.
-   */
-  override suspend fun addCommentToSession(uid: String, sessionId: String, comment: Comment) {
-    val commentsCollectionPath =
-        db.collection(COLLECTION_PATH)
-            .document(uid)
-            .collection(WORKOUT_SESSIONS)
-            .document(sessionId)
-            .collection("comments")
-    commentsCollectionPath.add(comment).await()
-  }
-
-  /**
    * Converts a Firestore document to a WorkoutData object.
    *
    * @param document The document to convert.
@@ -469,13 +451,29 @@ class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRep
    * @param newStatus The new status of the pairing request.
    * @param updates Additional fields to update in the PairingRequest (optional).
    */
-  override suspend fun updatePairingRequest(requestId: String, updates: Map<String, Any?>) {
+  override suspend fun updateCounter(requestId: String, counter: Int) {
     require(requestId.isNotEmpty()) { "The request ID must not be empty." }
 
     try {
-      db.collection(PAIRING_REQUESTS).document(requestId).update(updates).await()
+      db.collection(PAIRING_REQUESTS)
+          .document(requestId)
+          .update("counter", counter.toLong()) // Convert to Long for Firestore
+          .await()
     } catch (e: Exception) {
-      Log.e(ERROR_TAG, "Error updating pairing request: ${e.message}")
+      Log.e(ERROR_TAG, "Error updating counter: ${e.message}")
+    }
+  }
+
+  override suspend fun updateTimerStatus(requestId: String, timerStatus: TimerStatus) {
+    require(requestId.isNotEmpty()) { "The request ID must not be empty." }
+
+    try {
+      db.collection(PAIRING_REQUESTS)
+          .document(requestId)
+          .update("timerStatus", timerStatus.name) // Store as String
+          .await()
+    } catch (e: Exception) {
+      Log.e(ERROR_TAG, "Error updating timer status: ${e.message}")
     }
   }
 

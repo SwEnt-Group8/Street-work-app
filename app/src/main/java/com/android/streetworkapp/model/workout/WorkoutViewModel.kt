@@ -222,44 +222,13 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
     }
   }
 
-  /**
-   * Updates specific attributes of a workout session.
-   *
-   * @param uid The UID of the user whose session is being updated.
-   * @param sessionId The ID of the workout session.
-   * @param updates A map containing the attributes to update.
-   */
-  fun updateSessionAttributes(uid: String, sessionId: String, updates: Map<String, Any>) {
-    viewModelScope.launch {
-      try {
-        repository.updateSessionAttributes(uid, sessionId, updates)
-      } catch (e: Exception) {
-        Log.e("WorkoutViewModel", "Error updating session attributes: ${e.message}")
-      }
-    }
+  /** Updates the training status for a pairing request. #TODO */
+  fun updateCounter(requestId: String, counter: Int) {
+    viewModelScope.launch { repository.updateCounter(requestId, counter) }
   }
-  /**
-   * Updates the training status for a pairing request.
-   *
-   * @param requestId The ID of the pairing request.
-   * @param status The new status of the request.
-   * @param counter The current counter value for the request.
-   * @param timerStatus The status of the timer for the request.
-   */
-  fun updatePairingRequest(
-      requestId: String,
-      status: RequestStatus? = null,
-      counter: Int? = null,
-      timerStatus: TimerStatus? = null
-  ) {
-    viewModelScope.launch {
-      val updates = mutableMapOf<String, Any?>()
-      if (status != null) updates["status"] = status.name
-      if (counter != null) updates["counter"] = counter
-      if (timerStatus != null) updates["timerStatus"] = timerStatus.name
 
-      repository.updatePairingRequest(requestId, updates)
-    }
+  fun updateTimerStatus(requestId: String, timerStatus: TimerStatus) {
+    viewModelScope.launch { repository.updateTimerStatus(requestId, timerStatus) }
   }
 
   /**
@@ -281,17 +250,6 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
     viewModelScope.launch {
       repository.observeWorkoutSessions(uid).collect { _workoutSessions.value = it }
     }
-  }
-
-  /**
-   * Adds a comment to a specific workout session.
-   *
-   * @param uid The UID of the user.
-   * @param sessionId The ID of the session.
-   * @param comment The comment to add.
-   */
-  fun addCommentToSession(uid: String, sessionId: String, comment: Comment) {
-    viewModelScope.launch { repository.addCommentToSession(uid, sessionId, comment) }
   }
 
   /**

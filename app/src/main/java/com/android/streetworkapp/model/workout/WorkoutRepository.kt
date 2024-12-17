@@ -47,7 +47,7 @@ interface WorkoutRepository {
 
   fun observeWorkoutSessions(uid: String): Flow<List<WorkoutSession>>
 
-  suspend fun addCommentToSession(uid: String, sessionId: String, comment: Comment)
+  suspend fun updateCounter(requestId: String, counter: Int)
 
-  suspend fun updatePairingRequest(requestId: String, updates: Map<String, Any?>)
+  suspend fun updateTimerStatus(requestId: String, timerStatus: TimerStatus)
 }
