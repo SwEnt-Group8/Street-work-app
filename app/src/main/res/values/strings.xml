@@ -111,15 +111,14 @@
     <string name="timestamp">Timestamp: %1$s</string>
     <string name="select_friends">Select Friends</string>
     <string name="no_friends_available">No friends available.</string>
-
-    <string name="time_activity_in_progress">The activity is time-based and currently in progress.</string>
-    <string name="reps_activity_in_progress">The activity is repetition-based and currently in progress.</string>
-
-    <string name="comments_title">Comments</string>
-    <string name="add_comment_label">Add a comment</string>
-    <string name="send_comment">Send</string>
-    <string name="coach_comments_title">Add some comments or tips</string>
-    <string name="no_comments">No comments available.</string>
+    <string name="time_activity_in_progress">The activity is time-based and currently in progress. Your coach manage the timer.</string>
+    <string name="reps_activity_in_progress">The activity is repetition-based and currently in progress. Your coach manage the counter.</string>
+    <string name="end_session_button_text">End session</string>
+    <string name="counter_as_coach">Counter as coach</string>
+    <string name="counter_message">Sets completed so far</string>
+    <string name="save_workout_session_button">Save session</string>
+    <string name="workout_timer_status_running">Timer Status: Running</string>
+    <string name="workout_timer_status_stopped">Timer Status: Stopped</string>
 
     //Event statuses
     <string name="event_soon">Starting soon!</string>
