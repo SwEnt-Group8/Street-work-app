@@ -204,6 +204,7 @@ fun MapScreen(
 @Composable
 fun ParkFilterSettings(userFilterInput: FilterSettings) {
 
+  // Note - This is a composable and cannot be defined in the ColorPalette (Theme.kt).
   val filterChipColors =
       FilterChipDefaults.filterChipColors(
           selectedLabelColor = ColorPalette.PRINCIPLE_BACKGROUND_COLOR,
@@ -253,7 +254,10 @@ fun ParkFilterSettings(userFilterInput: FilterSettings) {
     Button(
         onClick = { userFilterInput.reset() },
         colors = ColorPalette.BUTTON_COLOR,
-        modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 4.dp).testTag("resetButton")) {
+        modifier =
+            Modifier.align(Alignment.CenterHorizontally)
+                .padding(top = 4.dp)
+                .testTag("resetButton")) {
           Text("Reset filters")
         }
   }
