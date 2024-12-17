@@ -170,7 +170,7 @@ fun ProgressScreen(
               }
               DashboardStateProgression.Training -> {
 
-                if (currentWorkout?.workoutSessions?.isEmpty() == true) {
+                if (currentWorkout?.workoutSessions.isNullOrEmpty()) {
                   Text(
                       text = LocalContext.current.getString(R.string.ProgressionEmptyTraining),
                       fontSize = 15.sp,
