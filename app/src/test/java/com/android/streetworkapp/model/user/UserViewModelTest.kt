@@ -375,4 +375,12 @@ class UserViewModelTest {
     testDispatcher.scheduler.advanceUntilIdle()
     verify(repository).getUsersByUids(any())
   }
+
+  @Test
+  fun removeUserFromAllFriendsListsCallsRepositoryWithCorrectUid() = runTest {
+    val uid = "user123"
+    userViewModel.removeUserFromAllFriendsLists(uid)
+    testDispatcher.scheduler.advanceUntilIdle()
+    verify(repository).removeUserFromAllFriendsLists(uid)
+  }
 }

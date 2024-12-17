@@ -427,6 +427,10 @@ fun StreetWorkApp(
                     SettingsContent(
                         navigationActions,
                         userViewModel,
+                        parkViewModel,
+                        eventViewModel,
+                        progressionViewModel,
+                        workoutViewModel,
                         preferencesViewModel,
                         authService,
                         showSettingsDialog)

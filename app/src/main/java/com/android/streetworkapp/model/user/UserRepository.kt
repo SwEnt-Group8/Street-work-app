@@ -30,5 +30,7 @@ interface UserRepository {
 
   suspend fun addNewPark(uid: String, parkId: String)
 
+  suspend fun removeUserFromAllFriendsLists(uid: String)
+
   suspend fun deleteUserByUid(uid: String)
 }

@@ -542,4 +542,73 @@ class ParkRepositoryFirestoreTest {
     parkRepository.addImagesCollection(parkId, collectionId)
     verify(documentRef).update("imagesCollectionId", collectionId)
   }
+
+  @Test
+  fun deleteRatingFromAllParksRemovesRatingSuccessfully() = runTest {
+    val uid = "user_001"
+    val parkId = "park_001"
+    val park =
+        Park(
+            pid = parkId,
+            name = "Sample Park",
+            location = ParkLocation(0.0, 0.0, "loc_001"),
+            imageReference = "parks/sample.png",
+            rating = 4.0f,
+            nbrRating = 1,
+            capacity = 10,
+            occupancy = 5,
+            events = listOf("event1", "event2"),
+            votersUIDs = listOf(uid))
+
+    val documentSnapshot = mock(DocumentSnapshot::class.java)
+    whenever(documentSnapshot.toObject(Park::class.java)).thenReturn(park)
+    whenever(documentSnapshot.id).thenReturn(parkId)
+    val querySnapshot = mock(QuerySnapshot::class.java)
+    whenever(querySnapshot.documents).thenReturn(listOf(documentSnapshot))
+
+    whenever(db.collection("parks")).thenReturn(collection)
+    whenever(collection.get()).thenReturn(Tasks.forResult(querySnapshot))
+    whenever(collection.document(parkId)).thenReturn(documentRef)
+    whenever(documentRef.update(any<String>(), any(), any<String>(), any()))
+        .thenReturn(Tasks.forResult(null))
+
+    parkRepository.deleteRatingFromAllParks(uid)
+
+    verify(documentRef).update(eq("votersUIDs"), any(), eq("nbrRating"), eq(0))
+  }
+
+  @Test
+  fun deleteEventsFromAllParksRemovesEventsSuccessfully() = runTest {
+    // Arrange
+    val eventsIdsList = listOf("event1", "event2")
+    val parkId = "park_001"
+    val park =
+        Park(
+            pid = parkId,
+            name = "Sample Park",
+            location = ParkLocation(0.0, 0.0, "loc_001"),
+            imageReference = "parks/sample.png",
+            rating = 4.0f,
+            nbrRating = 1,
+            capacity = 10,
+            occupancy = 5,
+            events = listOf("event1", "event2", "event3"))
+
+    val documentSnapshot = mock(DocumentSnapshot::class.java)
+    whenever(documentSnapshot.toObject(Park::class.java)).thenReturn(park)
+    whenever(documentSnapshot.id).thenReturn(parkId)
+    val querySnapshot = mock(QuerySnapshot::class.java)
+    whenever(querySnapshot.documents).thenReturn(listOf(documentSnapshot))
+
+    whenever(db.collection("parks")).thenReturn(collection)
+    whenever(collection.get()).thenReturn(Tasks.forResult(querySnapshot))
+    whenever(collection.document(parkId)).thenReturn(documentRef)
+    whenever(documentRef.update("events", listOf("event3"))).thenReturn(Tasks.forResult(null))
+
+    // Act
+    parkRepository.deleteEventsFromAllParks(eventsIdsList)
+
+    // Assert
+    verify(documentRef).update("events", listOf("event3"))
+  }
 }

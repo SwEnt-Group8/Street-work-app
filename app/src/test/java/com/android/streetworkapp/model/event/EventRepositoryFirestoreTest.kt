@@ -17,6 +17,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
+import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
@@ -167,5 +168,52 @@ class EventRepositoryFirestoreTest {
     eventRepository.deleteEvent(event)
 
     verify(documentRef, timeout(1000)).delete()
+  }
+
+  @Test
+  fun removeParticipantFromAllEventsRemovesParticipantAndDeletesEvents() = runTest {
+    // Mock the collection
+    whenever(db.collection("events")).thenReturn(collection)
+
+    // Mock the query returned by whereArrayContains
+    val query = mock<QuerySnapshot>()
+    whenever(collection.whereArrayContains("listParticipants", "user123")).thenReturn(mock())
+    whenever(collection.whereArrayContains("listParticipants", "user123").get())
+        .thenReturn(Tasks.forResult(query))
+
+    // Mock documents in the query snapshot
+    whenever(query.documents).thenReturn(listOf(document))
+
+    // Mock event details for owned event
+    whenever(document.exists()).thenReturn(true)
+    whenever(document.id).thenReturn(event.eid)
+    whenever(document.get("owner")).thenReturn("user123")
+    whenever(document.get("listParticipants")).thenReturn(listOf("user123"))
+
+    // Mock Firestore delete and update operations
+    whenever(documentRef.delete()).thenReturn(Tasks.forResult(null))
+    whenever(documentRef.update(eq("participants"), any(), eq("listParticipants"), any()))
+        .thenReturn(Tasks.forResult(null))
+
+    // Call the method under test
+    eventRepository.removeParticipantFromAllEvents("user123")
+
+    // Verify delete is called for the owned event
+    verify(documentRef, timeout(1000)).delete()
+
+    // Verify update is not called (since the event is owned and deleted)
+    verify(documentRef, timeout(1000).times(0))
+        .update(eq("participants"), any(), eq("listParticipants"), any())
+
+    // Mock event details for non-owned event
+    whenever(document.get("owner")).thenReturn("user456")
+    whenever(document.get("listParticipants")).thenReturn(listOf("user123", "user456"))
+
+    // Call the method under test again
+    eventRepository.removeParticipantFromAllEvents("user123")
+
+    // Verify update is called for the non-owned event
+    verify(documentRef, timeout(1000))
+        .update(eq("participants"), any(), eq("listParticipants"), any())
   }
 }

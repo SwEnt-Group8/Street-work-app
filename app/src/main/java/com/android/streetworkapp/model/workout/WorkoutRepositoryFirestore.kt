@@ -159,7 +159,7 @@ class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRep
    * @param workoutData The WorkoutData to save.
    */
   override suspend fun saveWorkoutData(uid: String, workoutData: WorkoutData) {
-    require(uid.isNotEmpty()) { "The user UID must not be empty." }
+    require(uid.isNotEmpty()) { ERROR_UID_EMPTY }
     try {
       db.collection(COLLECTION_PATH).document(uid).set(workoutData).await()
     } catch (e: Exception) {
@@ -249,6 +249,25 @@ class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRep
   override suspend fun addCommentToSession(sessionId: String, comment: Comment) {
     val sessionPath = "$COLLECTION_PATH/${comment.authorUid}/$WORKOUT_SESSIONS/$sessionId/comments"
     db.collection(sessionPath).add(comment).await()
+  }
+
+  /**
+   * Deletes the entire WorkoutData for a user from Firestore.
+   *
+   * @param uid The UID of the user.
+   */
+  override suspend fun deleteWorkoutDataByUid(uid: String) {
+    require(uid.isNotEmpty()) { ERROR_UID_EMPTY }
+    try {
+      val workoutDataSnapshot =
+          db.collection(COLLECTION_PATH).whereEqualTo("userUid", uid).get().await()
+
+      for (document in workoutDataSnapshot.documents) {
+        db.collection(COLLECTION_PATH).document(document.id).delete().await()
+      }
+    } catch (e: Exception) {
+      Log.e(ERROR_TAG, "Error deleting WorkoutData for UID=$uid: ${e.message}")
+    }
   }
 
   /**

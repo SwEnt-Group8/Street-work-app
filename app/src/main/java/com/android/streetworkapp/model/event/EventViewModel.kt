@@ -103,6 +103,17 @@ open class EventViewModel(private val repository: EventRepository) : ViewModel()
   fun updateStatus(eid: String, status: EventStatus) {
     viewModelScope.launch { repository.updateStatus(eid, status) }
   }
+
+  /**
+   * Remove a participant from all events and delete events where the user is the owner. Update the
+   * deleted events ID list value.
+   *
+   * @param uid The user ID.
+   * @return The list of deleted event IDs.
+   */
+  suspend fun removeParticipantFromAllEvents(uid: String): List<String>? {
+    return repository.removeParticipantFromAllEvents(uid)
+  }
 }
 
 sealed class EventOverviewUiState {
