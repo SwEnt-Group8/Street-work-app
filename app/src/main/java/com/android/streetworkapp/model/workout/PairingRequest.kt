@@ -14,7 +14,7 @@ data class PairingRequest(
     val fromUid: String = "",
     val toUid: String = "",
     val sessionId: String? = null,
-    val counter: String? = null,
+    val counter: Int? = 0,
     val timerStatus: TimerStatus = TimerStatus.STOPPED,
     val status: RequestStatus = RequestStatus.PENDING,
     val timestamp: Long = System.currentTimeMillis()
