@@ -209,6 +209,14 @@ open class ParkViewModel(
       viewModelScope.launch { repository.deleteEventFromPark(pid, eid) }
 
   /**
+   * Delete events from all parks.
+   *
+   * @param eventsIdsList The list of event IDs to delete.
+   */
+  fun deleteEventsFromAllParks(eventsIdsList: List<String>) =
+      viewModelScope.launch { repository.deleteEventsFromAllParks(eventsIdsList) }
+
+  /**
    * Add a rating to a park, ensuring that the user has not already rated it.
    *
    * @param pid The park ID.
@@ -223,9 +231,30 @@ open class ParkViewModel(
       }
 
   /**
+   * Delete rating of an user from all parks.
+   *
+   * @param uid The user ID.
+   */
+  fun deleteRatingFromAllParks(uid: String) =
+      viewModelScope.launch { repository.deleteRatingFromAllParks(uid) }
+
+  /**
    * Delete a park by its ID.
    *
    * @param pid The park ID.
    */
   fun deleteParkByPid(pid: String) = viewModelScope.launch { repository.deleteParkByPid(pid) }
+
+  /**
+   * Registers a callback that gets called each time the document gets updated
+   *
+   * @param parkId The id of the document to listen to.
+   * @param onCollectionUpdate The callback
+   */
+  open fun registerCollectionListener(parkId: String, onCollectionUpdate: () -> Unit) {
+    viewModelScope.launch {
+      require(parkId.isNotEmpty()) { "Empty parkId" }
+      repository.registerCollectionListener(parkId, onCollectionUpdate)
+    }
+  }
 }

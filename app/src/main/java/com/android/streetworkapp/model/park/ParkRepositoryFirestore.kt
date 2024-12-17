@@ -5,12 +5,15 @@ import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.tasks.await
 
 /** A repository interface using Firestore for park data. */
 class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepository {
 
+
   private val COLLECTION_PATH = "parks"
+  private var firebaseImageCollectionListener: ListenerRegistration? = null
 
   companion object {
     private const val INVALID_RATING_MESSAGE = "Rating must be between 1 and 5."
@@ -256,6 +259,28 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
   }
 
   /**
+   * Delete events from all parks.
+   *
+   * @param eventsIdsList The list of event IDs to delete.
+   */
+  override suspend fun deleteEventsFromAllParks(eventsIdsList: List<String>) {
+    require(eventsIdsList.isNotEmpty()) { "Events IDs list cannot be empty." }
+    try {
+      val parks = db.collection(COLLECTION_PATH).get().await()
+      for (document in parks.documents) {
+        val park = document.toObject(Park::class.java)
+        if (park != null) {
+          val updatedEvents = park.events.toMutableList()
+          updatedEvents.removeAll(eventsIdsList)
+          db.collection(COLLECTION_PATH).document(park.pid).update("events", updatedEvents).await()
+        }
+      }
+    } catch (e: Exception) {
+      Log.e("FirestoreError", "Error deleting events from all parks: ${e.message}")
+    }
+  }
+
+  /**
    * Delete a park by its ID.
    *
    * @param pid The park ID.
@@ -307,6 +332,30 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
       }
     } catch (e: Exception) {
       Log.e("FirestoreError", "Error adding rating to park: ${e.message}")
+    }
+  }
+
+  /**
+   * Delete rating of an user from all parks.
+   *
+   * @param uid The user ID of the person whose rating will be deleted.
+   */
+  override suspend fun deleteRatingFromAllParks(uid: String) {
+    require(uid.isNotEmpty()) { "UID cannot be empty." }
+    try {
+      val parks = db.collection(COLLECTION_PATH).get().await()
+      for (document in parks.documents) {
+        val park = document.toObject(Park::class.java)
+        if (park != null && uid in park.votersUIDs) {
+          park.nbrRating = (park.nbrRating - 1).coerceAtLeast(0)
+          db.collection(COLLECTION_PATH)
+              .document(park.pid)
+              .update("votersUIDs", FieldValue.arrayRemove(uid), "nbrRating", park.nbrRating)
+              .await()
+        }
+      }
+    } catch (e: Exception) {
+      Log.e("FirestoreError", "Error deleting rating from all parks: ${e.message}")
     }
   }
 
@@ -384,6 +433,37 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepositor
     } catch (e: Exception) {
       Log.e("FirestoreError", "Error converting document to park: ${e.message}")
       null
+    }
+  }
+
+  /**
+   * Register a listener to a specific parkId
+   *
+   * @param parkId The id of the document to listen to.
+   * @param onDocumentChange The callback to be called each time the document changes
+   */
+  override fun registerCollectionListener(parkId: String, onDocumentChange: () -> Unit) {
+    require(parkId.isNotEmpty()) { "Empty imageCollectionId." }
+    try {
+      val docRef = db.collection(this.COLLECTION_PATH).document(parkId)
+      this.firebaseImageCollectionListener?.remove() // remove old listener if one was setup
+      this.firebaseImageCollectionListener = null
+      this.firebaseImageCollectionListener =
+          docRef.addSnapshotListener { snapshot, e ->
+            if (e != null) {
+              Log.d("FirestoreError: ", "Error listening for changes: $e")
+              return@addSnapshotListener
+            }
+
+            if (snapshot != null && snapshot.exists()) {
+              onDocumentChange()
+            }
+          }
+    } catch (e: Exception) {
+      Log.d(
+          "FirestoreError: ",
+          e.message
+              ?: "An exception occurred but the message associated with it couldn't be retrieved.")
     }
   }
 }

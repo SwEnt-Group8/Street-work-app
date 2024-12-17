@@ -58,6 +58,22 @@ jobs:
           echo "::add-mask::$PERSPECTIVE_API_KEY"
           echo "PERSPECTIVE_API_KEY=${PERSPECTIVE_API_KEY}" >> local.properties
 
+      # Load the DigitalOcean S3 Access Key from GitHub Secrets
+      - name: Load DigitalOcean S3 Access Key
+        env:
+          DIGITAL_OCEAN_SPACE_ACCESS_KEY: ${{ secrets.DIGITAL_OCEAN_SPACE_ACCESS_KEY }}
+        run: |
+          echo "::add-mask::DIGITAL_OCEAN_SPACE_ACCESS_KEY"
+          echo "DIGITAL_OCEAN_SPACE_ACCESS_KEY=${DIGITAL_OCEAN_SPACE_ACCESS_KEY}" >> local.properties
+
+      # Load the DigitalOcean S3 Secret Key from GitHub Secrets
+      - name: Load DigitalOcean S3 Secret Key
+        env:
+          DIGITAL_OCEAN_SPACE_SECRET_KEY: ${{ secrets.DIGITAL_OCEAN_SPACE_SECRET_KEY }}
+        run: |
+          echo "::add-mask::DIGITAL_OCEAN_SPACE_SECRET_KEY"
+          echo "DIGITAL_OCEAN_SPACE_SECRET_KEY=${DIGITAL_OCEAN_SPACE_SECRET_KEY}" >> local.properties
+
       # Load the keystore (.jks) file from GitHub Secrets
       - name: Load Keystore file
         env:

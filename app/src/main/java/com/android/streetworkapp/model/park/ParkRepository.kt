@@ -31,9 +31,21 @@ interface ParkRepository {
 
   suspend fun deleteEventFromPark(pid: String, eid: String)
 
+  suspend fun deleteEventsFromAllParks(eventsIdsList: List<String>)
+
   suspend fun addRating(pid: String, uid: String, rating: Float)
+
+  suspend fun deleteRatingFromAllParks(uid: String)
 
   suspend fun addImagesCollection(pid: String, collectionId: String)
 
   suspend fun deleteParkByPid(pid: String)
+
+  /**
+   * Register a listener to a specific parkId
+   *
+   * @param parkId The id of the document to listen to.
+   * @param onDocumentChange The callback to be called each time the document changes
+   */
+  fun registerCollectionListener(parkId: String, onDocumentChange: () -> Unit)
 }

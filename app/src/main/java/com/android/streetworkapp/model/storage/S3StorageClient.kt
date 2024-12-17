@@ -3,6 +3,7 @@ package com.android.streetworkapp.model.storage
 import android.util.Log
 import aws.sdk.kotlin.runtime.auth.credentials.StaticCredentialsProvider
 import aws.sdk.kotlin.services.s3.S3Client
+import aws.sdk.kotlin.services.s3.model.DeleteObjectRequest
 import aws.sdk.kotlin.services.s3.model.ListObjectsRequest
 import aws.sdk.kotlin.services.s3.model.ObjectCannedAcl
 import aws.sdk.kotlin.services.s3.model.PutObjectRequest
@@ -60,16 +61,20 @@ class S3StorageClient(
    * @param key The path and name of the file, for ex: path/for/file.txt
    * @param content The content of the file
    */
-  suspend fun uploadFile(key: String, content: ByteArray) {
+  suspend fun uploadFile(key: String, content: ByteArray): String? {
+    require(key.isNotEmpty()) { "Key should not be empty string." }
     try {
       val request = PutObjectRequest {
         this.key = key
         this.body = ByteStream.fromBytes(content)
         this.acl = ObjectCannedAcl.PublicRead
       }
+
       s3Client.putObject(request)
+      return generateFileUrlFromKey(key)
     } catch (e: Exception) {
       Log.d(this.DEBUG_PREFIX, "Error uploading file: ${e.message}")
+      return null
     }
   }
 
@@ -96,5 +101,37 @@ class S3StorageClient(
       println("Error uploading file: ${e.message}")
       return null
     }
+  }
+
+  /**
+   * Deletes an object given its key
+   *
+   * @param key The key of the object.
+   */
+  suspend fun deleteObjectFromKey(key: String): Boolean {
+    require(key.isNotEmpty()) { "Key should not be empty string." }
+    try {
+      val request = DeleteObjectRequest { this.key = key }
+
+      s3Client.deleteObject(request)
+      return true
+    } catch (e: Exception) {
+      Log.d(this.DEBUG_PREFIX, "error when deleting the file: ${e.message}")
+      return false
+    }
+  }
+
+  private fun generateFileUrlFromKey(key: String): String {
+    return "$endpoint/$key"
+  }
+
+  /**
+   * Extracts the key of the file given its url
+   *
+   * @param fileUrl The url from which to extract the key.
+   */
+  fun extractKeyFromUrl(fileUrl: String): String? {
+    val res = fileUrl.removePrefix("$endpoint/")
+    return if (res == fileUrl) null else res
   }
 }

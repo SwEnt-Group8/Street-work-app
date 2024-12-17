@@ -178,10 +178,10 @@ fun ConfirmImageDialog(
 @Composable
 fun ConfirmImageDialogWrapper(
     context: Context,
+    imageFile: File,
+    imageUri: Uri,
     showConfirmationDialog: MutableState<Boolean>,
     imageViewModel: ImageViewModel,
-    tempFile: File,
-    imageUri: Uri,
     currentPark: Park,
     currentUser: User
 ) {
@@ -191,16 +191,16 @@ fun ConfirmImageDialogWrapper(
         onConfirm = {
           imageViewModel.uploadImage(
               context,
-              imageUri,
+              imageFile,
               currentPark.pid,
               currentUser.uid,
-              { onImageUploadSuccess(tempFile) },
+              { onImageUploadSuccess(imageFile) },
               { onImageUploadFailure() })
           showConfirmationDialog.value = false
         },
         onCancel = {
           showConfirmationDialog.value = false
-          if (!tempFile.delete())
+          if (!imageFile.delete())
               Log.d(AddImageButtonParams.DEBUG_PREFIX, "Failed to delete cached photo file.")
         })
   }
