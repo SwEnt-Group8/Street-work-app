@@ -51,6 +51,14 @@ open class ImageViewModel(private val imageRepository: ImageRepository) : ViewMo
     }
   }
 
+  /**
+   * Updates the ranking of the image.
+   *
+   * @param imageCollectionId The collection the image belongs to.
+   * @param imageUrl The url of the image of whom to register the vote to.
+   * @param voterUid The uid of the voter.
+   * @param vote The vote type. True if a positive vote, false if a negative vote.
+   */
   open fun imageVote(
       imageCollectionId: String,
       imageUrl: String,
@@ -60,6 +68,13 @@ open class ImageViewModel(private val imageRepository: ImageRepository) : ViewMo
     viewModelScope.launch { imageRepository.imageVote(imageCollectionId, imageUrl, voterUid, vote) }
   }
 
+  /**
+   * Removes the user's vote from the image
+   *
+   * @param imageCollectionId The collection id the image is part of.
+   * @param imageUrl The url of the image.
+   * @param userId The userId of the vote to remove.
+   */
   open fun retractImageVote(imageCollectionId: String, imageUrl: String, userId: String) {
     viewModelScope.launch { imageRepository.retractImageVote(imageCollectionId, imageUrl, userId) }
   }

@@ -39,10 +39,11 @@ object ColorPalette {
   val SHADOW_GREY = Color(0xFFC9C9C9)
   val BORDER_COLOR = Color(0xFFDDDDDD)
   val DARK_GREEN = Color(0xFF95CE67)
+  val BUTTON_ICON_COLOR = Color.White
   val BUTTON_COLOR =
       ButtonColors(
           containerColor = INTERACTION_COLOR_DARK,
-          contentColor = Color.White,
+          contentColor = BUTTON_ICON_COLOR,
           disabledContentColor = Color.White,
           disabledContainerColor = INTERACTION_COLOR_LIGHT)
   val NAVIGATION_BAR_ITEM_COLORS =

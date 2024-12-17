@@ -113,8 +113,7 @@ class ImageRepositoryFirestore(
     require(imageCollectionId.isNotEmpty()) { "Empty imageCollectionId." }
 
     try {
-      val docRef =
-          db.collection(ImageRepositoryFirestore.COLLECTION_PATH).document(imageCollectionId)
+      val docRef = db.collection(COLLECTION_PATH).document(imageCollectionId)
       val document = docRef.get().await()
       val imageCollection = document.toObject(ParkImageCollection::class.java) ?: return false
       val imageToRemove =
@@ -158,8 +157,7 @@ class ImageRepositoryFirestore(
     require(imageUrl.isNotEmpty()) { "Empty imageUrl." }
 
     try {
-      val docRef =
-          db.collection(ImageRepositoryFirestore.COLLECTION_PATH).document(imageCollectionId)
+      val docRef = db.collection(COLLECTION_PATH).document(imageCollectionId)
       val document = docRef.get().await()
       val imageCollection = document.toObject(ParkImageCollection::class.java)
 
@@ -215,8 +213,7 @@ class ImageRepositoryFirestore(
       userId: String
   ): Boolean {
     try {
-      val docRef =
-          db.collection(ImageRepositoryFirestore.COLLECTION_PATH).document(imageCollectionId)
+      val docRef = db.collection(COLLECTION_PATH).document(imageCollectionId)
       val document = docRef.get().await()
       val imageCollection = document.toObject(ParkImageCollection::class.java)
 
@@ -229,12 +226,12 @@ class ImageRepositoryFirestore(
                 if (image.rating.positiveVotesUids.contains(userId)) {
                   updatedRating =
                       image.rating.copy(
-                          positiveVotes = image.rating.positiveVotes - 1,
+                          positiveVotes = image.rating.positiveVotes - VOTE_TYPE.POSITIVE.value,
                           positiveVotesUids = image.rating.positiveVotesUids - userId)
                 } else if (image.rating.negativeVotesUids.contains(userId)) {
                   updatedRating =
                       image.rating.copy(
-                          negativeVotes = image.rating.negativeVotes - 1,
+                          negativeVotes = image.rating.negativeVotes - VOTE_TYPE.POSITIVE.value,
                           negativeVotesUids = image.rating.positiveVotesUids - userId)
                 } else {
                   return false // userId was not in the list, return false
@@ -268,14 +265,17 @@ class ImageRepositoryFirestore(
 
     try {
       val querySnapshot =
-          db.collection(ImageRepositoryFirestore.COLLECTION_PATH)
-              .get()
-              .await() // get all documents from collection
+          db.collection(COLLECTION_PATH).get().await() // get all documents from collection
 
       for (document in querySnapshot.documents) {
         val collection = document.toObject(ParkImageCollection::class.java)
         collection?.let {
-          for (image in collection.images) {
+          val (imagesUploadedByUser, imagesNotUploadedByUser) =
+              collection.images.partition { it.userId == userId }
+          document.reference.update("images", FieldValue.arrayRemove(imagesUploadedByUser)).await()
+
+          // remove any potential votes the user has done
+          for (image in imagesNotUploadedByUser) {
             if (image.userId == userId) {
               document.reference.update("images", FieldValue.arrayRemove(image)).await()
               val imageKey = storageClient.extractKeyFromUrl(image.imageUrl) ?: return false
@@ -310,15 +310,14 @@ class ImageRepositoryFirestore(
   override fun registerCollectionListener(imageCollectionId: String, onDocumentChange: () -> Unit) {
     require(imageCollectionId.isNotEmpty()) { "Empty imageCollectionId." }
     try {
-      val docRef =
-          db.collection(ImageRepositoryFirestore.COLLECTION_PATH).document(imageCollectionId)
+      val docRef = db.collection(COLLECTION_PATH).document(imageCollectionId)
 
       this.firebaseImageCollectionListener?.remove() // remove old listener if one was setup
       this.firebaseImageCollectionListener = null
       this.firebaseImageCollectionListener =
           docRef.addSnapshotListener { snapshot, e ->
             if (e != null) {
-              Log.d(ImageRepositoryFirestore.DEBUG_PREFIX, "Error listening for changes: $e")
+              Log.d(DEBUG_PREFIX, "Error listening for changes: $e")
               return@addSnapshotListener
             }
 

@@ -201,7 +201,7 @@ fun UserImageActions(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Undo,
                         contentDescription = "Retract Vote",
-                        tint = Color.White)
+                        tint = ColorPalette.BUTTON_ICON_COLOR)
                   }
             }
           } else {
@@ -222,7 +222,7 @@ fun UserImageActions(
                     Icon(
                         imageVector = Icons.Filled.ThumbUp,
                         contentDescription = "Like",
-                        tint = Color.White)
+                        tint = ColorPalette.BUTTON_ICON_COLOR)
                   }
             }
 
@@ -243,7 +243,7 @@ fun UserImageActions(
                     Icon(
                         imageVector = Icons.Filled.ThumbDown,
                         contentDescription = "Dislike",
-                        tint = Color.White)
+                        tint = ColorPalette.BUTTON_ICON_COLOR)
                   }
             }
           }
@@ -271,7 +271,7 @@ fun UserImageActions(
                   Icon(
                       imageVector = Icons.Filled.Delete,
                       contentDescription = "Delete button",
-                      tint = Color.White)
+                      tint = ColorPalette.BUTTON_ICON_COLOR)
                 }
           }
         }

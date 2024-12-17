@@ -11,7 +11,6 @@ import com.android.streetworkapp.model.image.ParkImage
 import com.android.streetworkapp.model.image.VOTE_TYPE
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.user.User
-import com.android.streetworkapp.model.user.UserRepository
 import com.android.streetworkapp.model.user.UserViewModel
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.test.runTest
@@ -27,7 +26,6 @@ import org.mockito.kotlin.whenever
 
 class FullScreenImagePopupTest {
 
-  @Mock private lateinit var userRepository: UserRepository
   @Mock private lateinit var imageRepository: ImageRepository
 
   @InjectMocks private lateinit var userViewModel: UserViewModel

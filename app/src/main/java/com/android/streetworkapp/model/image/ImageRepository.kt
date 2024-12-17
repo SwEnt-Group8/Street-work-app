@@ -19,14 +19,23 @@ interface ImageRepository {
       userId: String
   ): Boolean
 
-  /** Retrieves all the images linked from the park. */
+  /**
+   * Retrieves all the images linked from the park.
+   *
+   * @param park The park whose images are to be retrieved.
+   */
   suspend fun retrieveImages(park: Park): List<ParkImage>
 
-  /** Deletes the image corresponding to the imageUrl */
+  /**
+   * Deletes the image corresponding to the imageUrl
+   *
+   * @param imageCollectionId The collection id the image is a part of.
+   * @param imageUrl The url of the image to be deleted (url from our s3 storage).
+   */
   suspend fun deleteImage(imageCollectionId: String, imageUrl: String): Boolean
 
   /**
-   * Updates the score of the image with hash imageHash in document imageCollectionId
+   * Updates the ranking of the image.
    *
    * @param imageCollectionId The collection the image belongs to.
    * @param imageUrl The url of the image of whom to register the vote to.

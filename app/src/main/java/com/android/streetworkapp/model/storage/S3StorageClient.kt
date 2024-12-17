@@ -62,6 +62,7 @@ class S3StorageClient(
    * @param content The content of the file
    */
   suspend fun uploadFile(key: String, content: ByteArray): String? {
+    require(key.isNotEmpty()) { "Key should not be empty string." }
     try {
       val request = PutObjectRequest {
         this.key = key
@@ -108,6 +109,7 @@ class S3StorageClient(
    * @param key The key of the object.
    */
   suspend fun deleteObjectFromKey(key: String): Boolean {
+    require(key.isNotEmpty()) { "Key should not be empty string." }
     try {
       val request = DeleteObjectRequest { this.key = key }
 

@@ -478,19 +478,8 @@ fun CreateEventButton(navigationActions: NavigationActions) {
               Icon(
                   painter = painterResource(id = R.drawable.calendar_add_on_24px),
                   contentDescription = "Add Event",
-                  tint = Color.White,
+                  tint = ColorPalette.BUTTON_ICON_COLOR,
                   modifier = Modifier.align(Alignment.Center).fillMaxSize(0.75f))
             }
       }
 }
-
-/**
- * @Composable fun CreateEventButton(navigationActions: NavigationActions) { Row( modifier =
- *   Modifier.fillMaxWidth().padding(end = 32.dp), horizontalArrangement = Arrangement.End) {
- *   IconButton( onClick = { navigationActions.navigateTo(Screen.ADD_EVENT) }, modifier =
- *   Modifier.testTag("createEventButton").size(50.dp)) { Box( modifier = Modifier.fillMaxSize()
- *   .background( color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape) .padding(4.dp))
- *   { Icon( painter = painterResource(id = R.drawable.calendar_add_on), contentDescription =
- *   "Create Event", tint = Color.White, modifier =
- *   Modifier.align(Alignment.Center).size(30.dp).padding(start = 2.dp)) } } } }
- */

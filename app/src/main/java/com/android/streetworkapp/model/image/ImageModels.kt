@@ -17,6 +17,14 @@ data class ParkImageCollection(
 ) // note: if images field were to be changed, make sure to match the field name change in
 // ImageRepositoryFirestore::uploadImage
 
+/**
+ * A data class that represents a rating for an image
+ *
+ * @param positiveVotes The number of positive votes for this image.
+ * @param negativeVotes The number of negative votes for this image.
+ * @param positiveVotesUids The uids of each user that made a positive vote on this image.
+ * @param negativeVotesUids The uids of each user that made a negative vote on this image.
+ */
 data class ImageRating(
     val positiveVotes: Int = 0,
     val negativeVotes: Int = 0,
