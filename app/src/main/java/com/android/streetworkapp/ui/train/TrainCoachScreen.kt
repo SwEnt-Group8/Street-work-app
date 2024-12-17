@@ -6,14 +6,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -28,8 +27,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.android.sample.R
 import com.android.streetworkapp.model.user.UserViewModel
-import com.android.streetworkapp.model.workout.Comment
+import com.android.streetworkapp.model.workout.Exercise
 import com.android.streetworkapp.model.workout.RequestStatus
+import com.android.streetworkapp.model.workout.SessionType
+import com.android.streetworkapp.model.workout.TimerStatus
+import com.android.streetworkapp.model.workout.WorkoutSession
 import com.android.streetworkapp.model.workout.WorkoutViewModel
 import com.android.streetworkapp.ui.theme.ColorPalette.BORDER_COLOR
 import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_DARK
@@ -66,11 +68,6 @@ fun TrainCoachScreen(
 
   val sessionId = acceptedRequest?.sessionId
   val currentSession = workoutSessions?.find { it.sessionId == sessionId }
-
-  // Debugging state propagation
-  Log.d(TAG, "Workout Sessions: ${workoutSessions?.map { it.sessionId }}")
-  Log.d(TAG, "Accepted Request: $acceptedRequest")
-  Log.d(TAG, "Current Session: $currentSession")
 
   LaunchedEffect(workoutSessions) { Log.d(TAG, "WorkoutSessions Updated: $workoutSessions") }
   // Observe pairing requests for the current user
@@ -127,14 +124,7 @@ fun TrainCoachScreen(
     currentSession != null -> {
       Log.d(TAG, "Displaying Session Screen for sessionId=${currentSession.sessionId}")
       if (acceptedRequest?.fromUid == currentUserUid) {
-        CoachView(
-            workoutViewModel,
-            userViewModel,
-            sessionId ?: "",
-            activity,
-            isTimeDependent,
-            reps,
-            paddingValues)
+        CoachView(workoutViewModel, userViewModel, isTimeDependent, reps, paddingValues)
       } else {
         AthleteViewContent(
             sessionId ?: "",
@@ -168,8 +158,6 @@ fun FallbackContent() {
 fun CoachView(
     workoutViewModel: WorkoutViewModel,
     userViewModel: UserViewModel,
-    sessionId: String,
-    activity: String,
     isTimeDependent: Boolean,
     reps: Int?,
     paddingValues: PaddingValues = PaddingValues(0.dp)
@@ -178,44 +166,47 @@ fun CoachView(
   var isStopped by remember { mutableStateOf(false) }
   var durationAchieved by remember { mutableIntStateOf(0) }
   var count by remember { mutableIntStateOf(0) }
-  var isResetEnabled by remember { mutableStateOf(false) }
+  val acceptedRequest =
+      workoutViewModel.pairingRequests.collectAsState().value?.find {
+        it.fromUid == currentUserUid && it.status == RequestStatus.ACCEPTED
+      }
 
-  Text(
-      text =
-          "debug: sessionId=$sessionId, activity=$activity, isTimeDependent=$isTimeDependent, reps=$reps, currentUserUid=$currentUserUid")
+  // Initialize counter and timer status from the accepted pairing request
+  LaunchedEffect(acceptedRequest) {
+    count = acceptedRequest?.counter ?: 0
+    isStopped = acceptedRequest?.timerStatus == TimerStatus.STOPPED
+  }
 
+  // Automatically update the status to OLD when the screen is disposed
+  DisposableEffect(Unit) {
+    onDispose {
+      if (acceptedRequest != null) {
+        workoutViewModel.updatePairingRequestStatus(
+            requestId = acceptedRequest.requestId, status = RequestStatus.OLD)
+      }
+    }
+  }
   Column(
       modifier =
           Modifier.fillMaxSize().padding(paddingValues).padding(16.dp).testTag("CoachViewScreen"),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.SpaceBetween) {
-        PerformanceHistoryGraph(
-            getGraphData(
-                workoutViewModel.workoutData.collectAsState().value,
-                activity,
-                isTimeDependent,
-                reps),
-            Modifier.padding(16.dp))
-
         Column(
             modifier = Modifier.fillMaxSize().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally) {
-              // Time-based activities
               if (isTimeDependent) {
+                // Timer-based activity
+                Text("Timer Status: ${if (isStopped) "Stopped" else "Running"}")
                 if (!isStopped) {
                   CircularTimer(
                       totalTime = (reps ?: 30).toFloat(),
                       onTimeUp = {
                         isStopped = true
                         durationAchieved = reps ?: 0
-                        addExerciseToWorkout(
-                            currentUserUid,
-                            workoutViewModel,
-                            activity,
-                            durationAchieved,
-                            count,
-                            count)
+                        workoutViewModel.updateTimerStatus(
+                            requestId = acceptedRequest?.requestId ?: "",
+                            timerStatus = TimerStatus.STOPPED)
                       },
                       onTimeUpdate = { elapsedTime -> durationAchieved = elapsedTime.toInt() })
                 } else {
@@ -224,48 +215,26 @@ fun CoachView(
                       modifier = Modifier.testTag("TimeUpText"))
                 }
 
-                if (!isResetEnabled) {
-                  Button(
-                      onClick = {
-                        isStopped = true
-                        isResetEnabled = true
-                        addExerciseToWorkout(
-                            currentUserUid,
-                            workoutViewModel,
-                            activity,
-                            durationAchieved,
-                            count,
-                            count)
-                      },
-                      colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
-                      modifier = Modifier.testTag("StopButton")) {
-                        Text(
-                            stringResource(R.string.stop_button_text),
-                            color = PRINCIPLE_BACKGROUND_COLOR)
-                      }
-                } else {
-                  Button(
-                      onClick = {
-                        isStopped = false
-                        isResetEnabled = false
-                        durationAchieved = 0
-                        count = 0
-                      },
-                      colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
-                      modifier = Modifier.testTag("ResetButton")) {
-                        Text(
-                            stringResource(id = R.string.reset_button_text),
-                            color = PRINCIPLE_BACKGROUND_COLOR)
-                      }
-                }
+                Button(
+                    onClick = {
+                      isStopped = true
+                      workoutViewModel.updateCounter(
+                          requestId = acceptedRequest?.requestId ?: "", counter = durationAchieved)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
+                    modifier = Modifier.testTag("StopButton")) {
+                      Text(
+                          stringResource(R.string.stop_button_text),
+                          color = PRINCIPLE_BACKGROUND_COLOR)
+                    }
               } else {
-                // Repetition-based activities
+                // Repetition-based activity
                 Text(
-                    text = stringResource(id = R.string.counter_explanation),
+                    text = "Counter as coach",
                     style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
                     modifier =
                         Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                            .testTag("CounterExplanation"),
+                            .testTag("CounterMessage"),
                     color = PRIMARY_TEXT_COLOR)
                 AnimatedCounter(
                     count,
@@ -276,7 +245,13 @@ fun CoachView(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.CenterVertically) {
                       Button(
-                          onClick = { if (count > 0) count-- },
+                          onClick = {
+                            if (count > 0) {
+                              count--
+                              workoutViewModel.updateCounter(
+                                  requestId = acceptedRequest?.requestId ?: "", counter = count)
+                            }
+                          },
                           colors =
                               ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
                           modifier = Modifier.testTag("DecrementButton")) {
@@ -286,7 +261,11 @@ fun CoachView(
                           }
 
                       Button(
-                          onClick = { count++ },
+                          onClick = {
+                            count++
+                            workoutViewModel.updateCounter(
+                                requestId = acceptedRequest?.requestId ?: "", counter = count)
+                          },
                           colors =
                               ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
                           modifier = Modifier.testTag("IncrementButton")) {
@@ -294,23 +273,20 @@ fun CoachView(
                                 stringResource(id = R.string.increment_button_text),
                                 color = PRINCIPLE_BACKGROUND_COLOR)
                           }
-                    }
 
-                Button(
-                    onClick = {
-                      addExerciseToWorkout(
-                          currentUserUid,
-                          workoutViewModel,
-                          activity,
-                          durationAchieved,
-                          count,
-                          count)
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
-                    modifier = Modifier.testTag("AddExerciseButton")) {
-                      Text(
-                          stringResource(id = R.string.end_exercise),
-                          color = PRINCIPLE_BACKGROUND_COLOR)
+                      Button(
+                          onClick = {
+                            workoutViewModel.updatePairingRequestStatus(
+                                requestId = acceptedRequest?.requestId ?: "",
+                                status = RequestStatus.OLD)
+                          },
+                          colors =
+                              ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
+                          modifier = Modifier.testTag("EndSessionButton")) {
+                            Text(
+                                stringResource(id = R.string.end_session_button_text),
+                                color = PRINCIPLE_BACKGROUND_COLOR)
+                          }
                     }
               }
             }
@@ -333,6 +309,13 @@ fun AthleteViewContent(
   var isStopped by remember { mutableStateOf(false) }
   var durationAchieved by remember { mutableIntStateOf(0) }
   var count by remember { mutableIntStateOf(0) }
+  val pairingRequests by workoutViewModel.pairingRequests.collectAsState(initial = emptyList())
+  val currentRequest = pairingRequests?.find { it.sessionId == sessionId }
+
+  LaunchedEffect(currentRequest) {
+    count = currentRequest?.counter ?: 0
+    isStopped = currentRequest?.timerStatus == TimerStatus.STOPPED
+  }
 
   val graphData = getGraphData(workoutData, activity, isTimeDependent, reps)
   Column(
@@ -368,7 +351,7 @@ fun AthleteViewContent(
               onTimeUpdate = { elapsedTime -> durationAchieved = elapsedTime.toInt() })
         } else {
           AnimatedCounter(
-              count = reps ?: 0,
+              count = count,
               Modifier.testTag("CounterText"),
               style = androidx.compose.material3.MaterialTheme.typography.displayLarge)
         }
@@ -381,70 +364,27 @@ fun AthleteViewContent(
 
         // Display performance history graph
         PerformanceHistoryGraph(graphData, Modifier.padding(16.dp))
-      }
-}
-
-@Composable
-fun CoachCommentsSection(sessionId: String, workoutViewModel: WorkoutViewModel) {
-  val workoutSessions by workoutViewModel.workoutSessions.collectAsState(initial = emptyList())
-
-  val session = workoutSessions?.find { it.sessionId == sessionId }
-  val comments = session?.comments ?: emptyList()
-
-  Column(
-      modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("CoachCommentsSection"),
-      verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(
-            text = stringResource(id = R.string.coach_comments_title),
-            style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
-            color = PRIMARY_TEXT_COLOR)
-
-        comments.forEach { comment ->
-          Text(
-              text = "${comment.authorUid}: ${comment.text}",
-              style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
-              color = PRIMARY_TEXT_COLOR)
-        }
-      }
-}
-
-/** Composable function to display the coach message input. */
-@Composable
-fun CoachMessageInput(
-    workoutViewModel: WorkoutViewModel,
-    sessionId: String,
-    toUid: String,
-    currentUserUid: String,
-    coachName: String
-) {
-  var message by remember { mutableStateOf("") }
-
-  Column(
-      modifier = Modifier.fillMaxWidth().padding(16.dp),
-      verticalArrangement = Arrangement.spacedBy(8.dp),
-      horizontalAlignment = Alignment.Start) {
-        TextField(
-            value = message,
-            onValueChange = { message = it },
-            label = { Text(text = "Write a message as Coach ($coachName)") },
-            modifier = Modifier.fillMaxWidth())
-
+        // Save Workout Session Button
         Button(
-            colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
             onClick = {
-              if (message.isNotBlank()) {
-                // Create a comment object and send it via ViewModel
-                val comment =
-                    Comment(authorUid = currentUserUid, text = "Coach ($coachName): $message")
-                Log.d("DEBUGSWENT", "Adding comment to session: $sessionId")
-                Log.d("DEBUGSWENT", "Comment: $comment")
-                workoutViewModel.addCommentToSession(toUid, sessionId, comment)
-                message = "" // Reset the message field
-              }
+              workoutViewModel.addOrUpdateWorkoutSession(
+                  uid = currentUser?.uid ?: "",
+                  workoutSession =
+                      WorkoutSession(
+                          sessionId = sessionId,
+                          sessionType = SessionType.COACH,
+                          exercises =
+                              listOf(
+                                  Exercise(
+                                      name = activity, reps = count, duration = durationAchieved)),
+                          startTime = System.currentTimeMillis() - durationAchieved,
+                          endTime = System.currentTimeMillis()))
             },
-            modifier = Modifier.align(Alignment.End),
-            enabled = message.isNotBlank()) {
-              Text("Send")
+            colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
+            modifier = Modifier.testTag("SaveWorkoutButton")) {
+              Text(
+                  stringResource(id = R.string.save_workout_session_button),
+                  color = PRINCIPLE_BACKGROUND_COLOR)
             }
       }
 }
