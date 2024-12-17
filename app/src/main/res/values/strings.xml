@@ -10,8 +10,11 @@
     <string name="SettingsNullUserContent">You are not logged-in, please log-in to access connection settings</string>
     <string name="SettingsConnectionContent">You are logged-in as %1$s</string>
 
+    <string name="DeleteAccountTitle">Delete account</string>
     <string name="DeleteAccountConfirmationTitle">Are you sure ?</string>
-    <string name="DeleteAccountConfirmationContent">Do you really want to delete your account ? \n\nYou will loose all of your progression. \nThis action is irreversible.</string>
+    <string name="DeleteAccountConfirmationContent">Do you really want to delete your account ? \n\nYou will loose all of your progression. \n\nThis action is irreversible. \nYou may need to login again to perform this action.</string>
+    <string name="DeleteAccountSuccess">Account deleted</string>
+    <string name="DeleteAccountFailure">Error - could not delete account</string>
 
     <string name="LogoutTitle">Log-out</string>
     <string name="LogoutSuccess">You are logged out</string>

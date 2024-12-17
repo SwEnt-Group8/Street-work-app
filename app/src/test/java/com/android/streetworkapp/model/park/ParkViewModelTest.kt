@@ -280,4 +280,12 @@ class ParkViewModelTest {
     assertEquals(expectedNbrRating, parkViewModel.currentPark.first()?.nbrRating)
     assertTrue(parkViewModel.currentPark.first()?.votersUIDs?.contains(uid) ?: false)
   }
+
+  @Test
+  fun deleteRatingFromAllParksCallsRepositoryWithCorrectUid() = runTest {
+    val uid = "user123"
+    parkViewModel.deleteRatingFromAllParks(uid)
+    testDispatcher.scheduler.advanceUntilIdle()
+    verify(repository).deleteRatingFromAllParks(uid)
+  }
 }
