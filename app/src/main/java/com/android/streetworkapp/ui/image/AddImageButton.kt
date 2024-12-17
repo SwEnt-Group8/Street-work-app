@@ -21,7 +21,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -57,11 +56,11 @@ fun AddImageButton(imageViewModel: ImageViewModel, currentPark: Park?, currentUs
             PackageManager.PERMISSION_GRANTED)
   }
 
-  var showConfirmationDialog = remember { mutableStateOf(false) }
+  val showConfirmationDialog = remember { mutableStateOf(false) }
   var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
 
   // Temporary file for storing the captured image
-  val tempFile by remember {
+  val tempImageFile by remember {
     mutableStateOf(
         File(context.cacheDir, "temp_image_for_park_upload.jpg").apply {
           if (exists() && !delete()) {
@@ -71,7 +70,7 @@ fun AddImageButton(imageViewModel: ImageViewModel, currentPark: Park?, currentUs
   }
 
   capturedImageUri =
-      FileProvider.getUriForFile(context, "${context.packageName}.provider", tempFile)
+      FileProvider.getUriForFile(context, "${context.packageName}.provider", tempImageFile)
 
   val cameraLauncher =
       rememberLauncherForActivityResult(
@@ -100,13 +99,13 @@ fun AddImageButton(imageViewModel: ImageViewModel, currentPark: Park?, currentUs
       modifier = Modifier.testTag("addImageIconButton")) {
         Box(
             modifier =
-                Modifier.size(36.dp)
+                Modifier.size(38.dp)
                     .background(color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape)
                     .padding(2.dp)) {
               Icon(
                   painter = painterResource(id = R.drawable.add_a_photo_24px),
                   contentDescription = "Add Image",
-                  tint = Color.White,
+                  tint = ColorPalette.BUTTON_ICON_COLOR,
                   modifier = Modifier.align(Alignment.Center).fillMaxSize(0.75f))
             }
       }
@@ -115,7 +114,7 @@ fun AddImageButton(imageViewModel: ImageViewModel, currentPark: Park?, currentUs
     currentPark?.let { park ->
       currentUser?.let { user ->
         ConfirmImageDialogWrapper(
-            context, showConfirmationDialog, imageViewModel, tempFile, uri, park, user)
+            context, tempImageFile, uri, showConfirmationDialog, imageViewModel, park, user)
       }
     }
   }

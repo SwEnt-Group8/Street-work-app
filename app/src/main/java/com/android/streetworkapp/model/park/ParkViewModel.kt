@@ -240,4 +240,17 @@ open class ParkViewModel(
    * @param pid The park ID.
    */
   fun deleteParkByPid(pid: String) = viewModelScope.launch { repository.deleteParkByPid(pid) }
+
+  /**
+   * Registers a callback that gets called each time the document gets updated
+   *
+   * @param parkId The id of the document to listen to.
+   * @param onCollectionUpdate The callback
+   */
+  open fun registerCollectionListener(parkId: String, onCollectionUpdate: () -> Unit) {
+    viewModelScope.launch {
+      require(parkId.isNotEmpty()) { "Empty parkId" }
+      repository.registerCollectionListener(parkId, onCollectionUpdate)
+    }
+  }
 }
