@@ -147,7 +147,7 @@ enum class EventDensity {
     return when (this) {
       LOW -> eventCount in 0..2
       MEDIUM -> eventCount in 3..6
-      HIGH -> eventCount > 7
+      HIGH -> eventCount >= 7
     }
   }
 }
