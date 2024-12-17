@@ -3,6 +3,7 @@ package com.android.streetworkapp.utils
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.android.streetworkapp.utils.FilterSettings.Companion.DEFAULT_EVENT_DENSITY
+import org.junit.Before
 import org.junit.Test
 
 class ParkFilterTest {
@@ -12,10 +13,15 @@ class ParkFilterTest {
     for (elem in list1) assert(list2.contains(elem))
   }
 
+  private lateinit var filterSettings: FilterSettings
+
+  @Before
+  fun setUp() {
+    filterSettings = FilterSettings()
+  }
+
   @Test
   fun isSettingsAPICorrect() {
-    val filterSettings = FilterSettings()
-
     // Verify the default values :
     assert(filterSettings.minRating.value == FilterSettings.DEFAULT_RATING)
     verifyListEquals(filterSettings.eventDensity, DEFAULT_EVENT_DENSITY)
@@ -58,7 +64,6 @@ class ParkFilterTest {
 
   @Test
   fun isParkFilterAPICorrect() {
-    val filterSettings = FilterSettings()
     val parkFilter = ParkFilter(filterSettings)
 
     val badly_rated_park = createSimplerParks(1.0f, emptyList())
