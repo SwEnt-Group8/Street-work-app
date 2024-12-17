@@ -129,15 +129,6 @@ enum class EventDensity {
   MEDIUM,
   HIGH;
 
-  /** Returns the threshold for the event density. */
-  fun getThreshold(): Int {
-    return when (this) {
-      LOW -> 3
-      MEDIUM -> 7
-      HIGH -> 999
-    }
-  }
-
   /**
    * Checks if the event count is included in the density.
    *
