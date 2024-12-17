@@ -194,6 +194,7 @@ fun MapScreen(
   // Display the Filter component :
   CustomDialog(
       showFilterSettings,
+      tag = "Filter",
       dialogType = DialogType.CONFIRM,
       title = LocalContext.current.getString(R.string.park_filter_title),
       Content = { ParkFilterSettings(userFilterInput) },
