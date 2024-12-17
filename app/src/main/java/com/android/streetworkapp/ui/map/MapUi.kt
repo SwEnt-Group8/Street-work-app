@@ -14,11 +14,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SnackbarHostState
@@ -201,7 +200,7 @@ fun MapScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MapSearchBar(query: MutableState<String>, onCancel: () -> Unit) {
+fun MapSearchBar(query: MutableState<String>) {
   Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
     SearchBar(
         query = query.value,
@@ -211,14 +210,7 @@ fun MapSearchBar(query: MutableState<String>, onCancel: () -> Unit) {
         active = false,
         onActiveChange = {},
         onSearch = {},
-        leadingIcon = {
-          IconButton(onClick = onCancel, modifier = Modifier.testTag("cancelSearchButton")) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Search",
-            )
-          }
-        },
+        leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = "Search") },
         colors = SearchBarDefaults.colors(containerColor = ColorPalette.INTERACTION_COLOR_LIGHT)) {}
   }
 }

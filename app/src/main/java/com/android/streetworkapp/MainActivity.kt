@@ -54,7 +54,6 @@ import com.android.streetworkapp.ui.authentication.SignInScreen
 import com.android.streetworkapp.ui.event.AddEventScreen
 import com.android.streetworkapp.ui.event.EventOverviewScreen
 import com.android.streetworkapp.ui.map.MapScreen
-import com.android.streetworkapp.ui.map.MapSearchBar
 import com.android.streetworkapp.ui.miscellaneous.SplashScreen
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenu
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenuType
@@ -219,7 +218,6 @@ fun StreetWorkAppMain(
   }
 }
 
-@SuppressLint("UnrememberedMutableState")
 @Composable
 fun StreetWorkApp(
     parkLocationViewModel: ParkLocationViewModel,
@@ -271,22 +269,15 @@ fun StreetWorkApp(
   Scaffold(
       containerColor = ColorPalette.PRINCIPLE_BACKGROUND_COLOR,
       topBar = {
-        if (showSearchBar.value && screenParams?.hasSearchBar == true) {
-          MapSearchBar(searchQuery) {
-            searchQuery.value = ""
-            showSearchBar.value = false
-          }
-        } else {
-          screenParams
-              ?.isTopBarVisible
-              ?.takeIf { it }
-              ?.let {
-                TopAppBarWrapper(navigationActions, screenParams?.topAppBarManager)
-                // setup the InfoDialogManager in topBar, because it relies on the topAppBarManager.
-                Log.d("InfoDialog", "Main - Setting up the InfoDialogManager")
-                infoManager.setUp()
-              }
-        }
+        screenParams
+            ?.isTopBarVisible
+            ?.takeIf { it }
+            ?.let {
+              TopAppBarWrapper(navigationActions, screenParams?.topAppBarManager)
+              // setup the InfoDialogManager in topBar, because it relies on the topAppBarManager.
+              Log.d("InfoDialog", "Main - Setting up the InfoDialogManager")
+              infoManager.setUp()
+            }
       },
       snackbarHost = {
         SnackbarHost(
