@@ -195,38 +195,23 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
       if (isAccepted) refreshWorkoutData(currentUserUid)
     }
   }
-  /**
-   * Observes accepted pairing requests where the user is the coach.
-   *
-   * @param fromUid The UID of the coach (current user).
-   */
-  fun observeAcceptedPairingRequests(fromUid: String) {
-    viewModelScope.launch {
-      repository.observeAcceptedPairingRequests(fromUid).collect { _pairingRequests.value = it }
-    }
-  }
 
   /**
-   * Retrieves a specific workout session by its session ID.
+   * Updates the training status for a pairing request.
    *
-   * @param uid The UID of the user whose session is being retrieved.
-   * @param sessionId The ID of the workout session.
-   * @return The `WorkoutSession` if found, or null if not.
+   * @param requestId The ID of the pairing request.
+   * @param counter The current counter value.
    */
-  suspend fun getWorkoutSessionBySessionId(uid: String, sessionId: String): WorkoutSession? {
-    return try {
-      repository.getWorkoutSessionBySessionId(uid, sessionId)
-    } catch (e: Exception) {
-      Log.e("WorkoutViewModel", "Error retrieving workout session: ${e.message}")
-      null
-    }
-  }
-
-  /** Updates the training status for a pairing request. #TODO */
   fun updateCounter(requestId: String, counter: Int) {
     viewModelScope.launch { repository.updateCounter(requestId, counter) }
   }
 
+  /**
+   * Updates the timer status for a pairing request.
+   *
+   * @param requestId The ID of the pairing request.
+   * @param timerStatus The new status of the timer.
+   */
   fun updateTimerStatus(requestId: String, timerStatus: TimerStatus) {
     viewModelScope.launch { repository.updateTimerStatus(requestId, timerStatus) }
   }

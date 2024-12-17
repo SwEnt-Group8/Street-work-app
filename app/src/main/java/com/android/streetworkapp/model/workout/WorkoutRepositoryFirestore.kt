@@ -448,8 +448,7 @@ class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRep
    * Updates the training status in the PairingRequest.
    *
    * @param requestId The ID of the pairing request.
-   * @param newStatus The new status of the pairing request.
-   * @param updates Additional fields to update in the PairingRequest (optional).
+   * @param counter The counter value to update.
    */
   override suspend fun updateCounter(requestId: String, counter: Int) {
     require(requestId.isNotEmpty()) { "The request ID must not be empty." }
