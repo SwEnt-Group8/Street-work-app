@@ -54,4 +54,12 @@ class ProgressionViewModelTest {
     assertEquals(MedalsAchievement.GOLD, getMedalByScore(10000))
     assertEquals(MedalsAchievement.PLATINUM, getMedalByScore(100000))
   }
+
+  @Test
+  fun deleteProgressionByUidCallsRepository() = runTest {
+    val uid = "user123"
+    progressionViewModel.deleteProgressionByUid(uid)
+    testDispatcher.scheduler.advanceUntilIdle()
+    verify(repository).deleteProgressionByUid(uid)
+  }
 }

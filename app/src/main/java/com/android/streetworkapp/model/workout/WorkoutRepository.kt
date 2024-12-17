@@ -50,4 +50,6 @@ interface WorkoutRepository {
   suspend fun updateCounter(requestId: String, counter: Int)
 
   suspend fun updateTimerStatus(requestId: String, timerStatus: TimerStatus)
+
+  suspend fun deleteWorkoutDataByUid(uid: String)
 }
