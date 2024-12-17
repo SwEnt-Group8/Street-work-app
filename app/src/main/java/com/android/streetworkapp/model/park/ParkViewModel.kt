@@ -40,6 +40,11 @@ open class ParkViewModel(
     _currentPark.value = park
   }
 
+  /**
+   * Set the park value.
+   *
+   * @param park The park to set as the current park.
+   */
   fun setPark(park: Park?) {
     _park.value = park
   }
