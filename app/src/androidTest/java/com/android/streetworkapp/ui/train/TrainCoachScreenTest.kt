@@ -19,8 +19,7 @@ import org.mockito.kotlin.whenever
 
 class TrainCoachScreenTest {
 
-    @get:Rule
-    val composeTestRule = createComposeRule()
+    @get:Rule val composeTestRule = createComposeRule()
 
     private val mockWorkoutRepository = mock<WorkoutRepository>()
     private lateinit var workoutViewModel: WorkoutViewModel
@@ -53,8 +52,7 @@ class TrainCoachScreenTest {
                 reps = 10,
                 time = 60,
                 workoutViewModel = workoutViewModel,
-                userViewModel = userViewModel
-            )
+                userViewModel = userViewModel)
         }
 
         // Verify Role Dialog elements
@@ -70,8 +68,7 @@ class TrainCoachScreenTest {
                 isTimeDependent = false,
                 reps = 20,
                 workoutViewModel = workoutViewModel,
-                userViewModel = userViewModel
-            )
+                userViewModel = userViewModel)
         }
 
         // Verify Coach View elements
