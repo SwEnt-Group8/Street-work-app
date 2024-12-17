@@ -76,7 +76,6 @@ class ParkFilterTest {
     assert(parkFilter.filter(simple_park))
     assert(parkFilter.filter(good_park))
 
-
     filterSettings.reset()
     filterSettings.set(eventDensity = listOf(EventDensity.MEDIUM))
     assert(!parkFilter.filter(badly_rated_park))

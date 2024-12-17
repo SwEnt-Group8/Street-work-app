@@ -45,7 +45,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
-import com.android.streetworkapp.model.event.EventViewModel
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
@@ -220,9 +219,7 @@ fun ParkFilterSettings(userFilterInput: FilterSettings) {
     HorizontalDivider()
 
     // Event quantity filter :
-    Text(
-        "Required density of events :",
-        fontSize = Type.bodyLarge.fontSize)
+    Text("Required density of events :", fontSize = Type.bodyLarge.fontSize)
 
     Row(modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth(0.825f)) {
       FilterChip(
