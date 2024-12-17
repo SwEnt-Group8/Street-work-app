@@ -213,13 +213,17 @@ fun ParkFilterSettings(userFilterInput: FilterSettings) {
     // Park rating filter :
     Text(
         "Minimum park rating : ${userFilterInput.minRating.value} stars",
-        fontSize = Type.bodyLarge.fontSize)
+        fontSize = Type.bodyLarge.fontSize,
+        modifier = Modifier.testTag("ratingFilterTitle"))
     InteractiveRatingComponent(userFilterInput.minRating)
 
     HorizontalDivider()
 
     // Event quantity filter :
-    Text("Required density of events :", fontSize = Type.bodyLarge.fontSize)
+    Text(
+        "Required density of events :",
+        fontSize = Type.bodyLarge.fontSize,
+        modifier = Modifier.testTag("eventDensityFilterTitle"))
 
     Row(modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth(0.825f)) {
       FilterChip(
@@ -227,21 +231,21 @@ fun ParkFilterSettings(userFilterInput: FilterSettings) {
           onClick = { userFilterInput.updateDensity(EventDensity.LOW) },
           label = { Text(EventDensity.LOW.name) },
           colors = filterChipColors,
-          modifier = Modifier.padding(end = 2.dp))
+          modifier = Modifier.padding(end = 2.dp).testTag("lowDensityFilterChip"))
 
       FilterChip(
           selected = userFilterInput.eventDensity.contains(EventDensity.MEDIUM),
           onClick = { userFilterInput.updateDensity(EventDensity.MEDIUM) },
           label = { Text(EventDensity.MEDIUM.name) },
           colors = filterChipColors,
-          modifier = Modifier.padding(end = 2.dp))
+          modifier = Modifier.padding(end = 2.dp).testTag("mediumDensityFilterChip"))
 
       FilterChip(
           selected = userFilterInput.eventDensity.contains(EventDensity.HIGH),
           onClick = { userFilterInput.updateDensity(EventDensity.HIGH) },
           label = { Text(EventDensity.HIGH.name) },
           colors = filterChipColors,
-          modifier = Modifier.padding(end = 2.dp))
+          modifier = Modifier.padding(end = 2.dp).testTag("highDensityFilterChip"))
     }
 
     HorizontalDivider()
@@ -249,7 +253,7 @@ fun ParkFilterSettings(userFilterInput: FilterSettings) {
     Button(
         onClick = { userFilterInput.reset() },
         colors = ColorPalette.BUTTON_COLOR,
-        modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 4.dp)) {
+        modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 4.dp).testTag("resetButton")) {
           Text("Reset filters")
         }
   }
