@@ -59,7 +59,7 @@ class FilterSettings {
 
   /** The default filter settings. */
   companion object {
-    val DEFAULT_RATING = 1
+    const val DEFAULT_RATING = 1
     val DEFAULT_EVENT_DENSITY = listOf(EventDensity.LOW, EventDensity.MEDIUM, EventDensity.HIGH)
   }
 
