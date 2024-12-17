@@ -170,6 +170,14 @@ fun ProgressScreen(
               }
               DashboardStateProgression.Training -> {
 
+                if (currentWorkout?.workoutSessions?.isEmpty() == true) {
+                  Text(
+                      text = LocalContext.current.getString(R.string.ProgressionEmptyTraining),
+                      fontSize = 15.sp,
+                      fontWeight = FontWeight.Normal,
+                      color = ColorPalette.SECONDARY_TEXT_COLOR,
+                      modifier = Modifier.padding(top = 10.dp).testTag("emptyTrainingText"))
+                }
                 currentWorkout?.workoutSessions?.forEach { workout ->
                   val date = workout.startTime.toFormattedString()
                   workout.exercises.forEach {

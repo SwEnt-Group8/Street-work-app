@@ -68,6 +68,7 @@
 
     // Progression UI
     <string name="ProgressionEmptyAchievements">You do not have any achievements yet!</string>
+    <string name="ProgressionEmptyTraining">You have not trained yet!</string>
     <string name="Trained">You trained your %s !</string>
 
     <string name="Pushups">Push-ups</string>
