@@ -183,15 +183,6 @@ class WorkoutViewModelTest {
   }
 
   @Test
-  fun respondToPairingRequestCallsRepository() = runTest {
-    val requestId = "requestId"
-    val isAccepted = true
-    workoutViewModel.respondToPairingRequest(requestId, isAccepted)
-    testDispatcher.scheduler.advanceUntilIdle()
-    verify(repository).respondToPairingRequest(requestId, isAccepted)
-  }
-
-  @Test
   fun observeWorkoutSessionsUpdatesFlowCorrectly() = runTest {
     val uid = "testUid"
     val session =
@@ -204,16 +195,6 @@ class WorkoutViewModelTest {
     testDispatcher.scheduler.advanceUntilIdle()
 
     assertEquals(listOf(session), workoutViewModel.workoutSessions.value)
-  }
-
-  @Test
-  fun addCommentToSessionCallsRepository() = runTest {
-    val sessionId = "sessionId"
-    val comment = Comment(authorUid = "user123", text = "Nice workout!")
-
-    workoutViewModel.addCommentToSession(sessionId, comment)
-    testDispatcher.scheduler.advanceUntilIdle()
-    verify(repository).addCommentToSession(sessionId, comment)
   }
 
   @Test

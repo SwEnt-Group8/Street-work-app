@@ -94,7 +94,8 @@ fun WaitingDialog(
     onDismiss: () -> Unit
 ) {
   val pairingRequests by workoutViewModel.pairingRequests.collectAsState()
-
+  val pendingRequest =
+      pairingRequests?.filter { it.toUid == currentUserUid && it.status == RequestStatus.PENDING }
   LaunchedEffect(currentUserUid) { workoutViewModel.observePairingRequests(currentUserUid) }
 
   AlertDialog(
@@ -116,7 +117,7 @@ fun WaitingDialog(
             modifier = Modifier.testTag("DialogTitle"))
       },
       text = {
-        if (pairingRequests.isNullOrEmpty()) {
+        if (pendingRequest.isNullOrEmpty()) {
           Text(
               text = stringResource(id = R.string.no_pairing_requests),
               modifier = Modifier.testTag("NoRequestsText"))
@@ -272,4 +273,11 @@ fun CommentVisualizer(sessionId: String, workoutViewModel: WorkoutViewModel) {
           }
         }
       }
+fun SaveSessionDialog(onSave: () -> Unit, onDismiss: () -> Unit) {
+  AlertDialog(
+      onDismissRequest = { onDismiss() },
+      title = { Text("Save Training Session") },
+      text = { Text("Do you want to save your training session into your history?") },
+      confirmButton = { Button(onClick = { onSave() }) { Text("Save") } },
+      dismissButton = { Button(onClick = { onDismiss() }) { Text("Discard") } })
 }

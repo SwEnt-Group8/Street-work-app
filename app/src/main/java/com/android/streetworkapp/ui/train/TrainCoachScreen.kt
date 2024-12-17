@@ -12,6 +12,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -27,6 +28,11 @@ import androidx.compose.ui.unit.dp
 import com.android.sample.R
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.model.workout.RequestStatus
+import com.android.streetworkapp.model.workout.Exercise
+import com.android.streetworkapp.model.workout.RequestStatus
+import com.android.streetworkapp.model.workout.SessionType
+import com.android.streetworkapp.model.workout.TimerStatus
+import com.android.streetworkapp.model.workout.WorkoutSession
 import com.android.streetworkapp.model.workout.WorkoutViewModel
 import com.android.streetworkapp.ui.theme.ColorPalette.BORDER_COLOR
 import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_DARK
@@ -124,14 +130,7 @@ fun TrainCoachScreen(
     currentSession != null -> {
       Log.d(TAG, "Displaying Session Screen for sessionId=${currentSession.sessionId}")
       if (acceptedRequest?.fromUid == currentUserUid) {
-        CoachView(
-            workoutViewModel,
-            userViewModel,
-            sessionId ?: "",
-            activity,
-            isTimeDependent,
-            reps,
-            paddingValues)
+        CoachView(workoutViewModel, userViewModel, isTimeDependent, reps, paddingValues)
       } else {
         AthleteViewContent(
             sessionId ?: "",
@@ -320,6 +319,147 @@ fun AthleteViewContent(
     activity: String,
     isTimeDependent: Boolean,
     reps: Int?,
+    isTimeDependent: Boolean,
+    reps: Int?,
+    paddingValues: PaddingValues = PaddingValues(0.dp)
+) {
+  val currentUserUid = userViewModel.currentUser.value?.uid ?: ""
+  var isStopped by remember { mutableStateOf(false) }
+  var durationAchieved by remember { mutableIntStateOf(0) }
+  var count by remember { mutableIntStateOf(0) }
+  val acceptedRequest =
+      workoutViewModel.pairingRequests.collectAsState().value?.find {
+        it.fromUid == currentUserUid && it.status == RequestStatus.ACCEPTED
+      }
+
+  // Initialize counter and timer status from the accepted pairing request
+  LaunchedEffect(acceptedRequest) {
+    count = acceptedRequest?.counter ?: 0
+    isStopped = acceptedRequest?.timerStatus == TimerStatus.STOPPED
+  }
+
+  // Automatically update the status to OLD when the screen is disposed
+  DisposableEffect(Unit) {
+    onDispose {
+      if (acceptedRequest != null) {
+        workoutViewModel.updatePairingRequestStatus(
+            requestId = acceptedRequest.requestId, status = RequestStatus.OLD)
+      }
+    }
+  }
+  Column(
+      modifier =
+          Modifier.fillMaxSize().padding(paddingValues).padding(16.dp).testTag("CoachViewScreen"),
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.SpaceBetween) {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally) {
+              if (isTimeDependent) {
+                // Timer-based activity
+                Text("Timer Status: ${if (isStopped) "Stopped" else "Running"}")
+                if (!isStopped) {
+                  CircularTimer(
+                      totalTime = (reps ?: 30).toFloat(),
+                      onTimeUp = {
+                        isStopped = true
+                        durationAchieved = reps ?: 0
+                        workoutViewModel.updateTimerStatus(
+                            requestId = acceptedRequest?.requestId ?: "",
+                            timerStatus = TimerStatus.STOPPED)
+                      },
+                      onTimeUpdate = { elapsedTime -> durationAchieved = elapsedTime.toInt() })
+                } else {
+                  Text(
+                      stringResource(id = R.string.time_up_message),
+                      modifier = Modifier.testTag("TimeUpText"))
+                }
+
+                Button(
+                    onClick = {
+                      isStopped = true
+                      workoutViewModel.updateCounter(
+                          requestId = acceptedRequest?.requestId ?: "", counter = durationAchieved)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
+                    modifier = Modifier.testTag("StopButton")) {
+                      Text(
+                          stringResource(R.string.stop_button_text),
+                          color = PRINCIPLE_BACKGROUND_COLOR)
+                    }
+              } else {
+                // Repetition-based activity
+                Text(
+                    text = "Counter as coach",
+                    style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
+                    modifier =
+                        Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                            .testTag("CounterMessage"),
+                    color = PRIMARY_TEXT_COLOR)
+                AnimatedCounter(
+                    count,
+                    Modifier.testTag("CounterText"),
+                    androidx.compose.material3.MaterialTheme.typography.displayLarge)
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically) {
+                      Button(
+                          onClick = {
+                            if (count > 0) {
+                              count--
+                              workoutViewModel.updateCounter(
+                                  requestId = acceptedRequest?.requestId ?: "", counter = count)
+                            }
+                          },
+                          colors =
+                              ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
+                          modifier = Modifier.testTag("DecrementButton")) {
+                            Text(
+                                stringResource(id = R.string.decrement_button_text),
+                                color = PRINCIPLE_BACKGROUND_COLOR)
+                          }
+
+                      Button(
+                          onClick = {
+                            count++
+                            workoutViewModel.updateCounter(
+                                requestId = acceptedRequest?.requestId ?: "", counter = count)
+                          },
+                          colors =
+                              ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
+                          modifier = Modifier.testTag("IncrementButton")) {
+                            Text(
+                                stringResource(id = R.string.increment_button_text),
+                                color = PRINCIPLE_BACKGROUND_COLOR)
+                          }
+
+                      Button(
+                          onClick = {
+                            workoutViewModel.updatePairingRequestStatus(
+                                requestId = acceptedRequest?.requestId ?: "",
+                                status = RequestStatus.OLD)
+                          },
+                          colors =
+                              ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
+                          modifier = Modifier.testTag("EndSessionButton")) {
+                            Text(
+                                stringResource(id = R.string.end_session_button_text),
+                                color = PRINCIPLE_BACKGROUND_COLOR)
+                          }
+                    }
+              }
+            }
+      }
+}
+
+@Composable
+fun AthleteViewContent(
+    sessionId: String,
+    activity: String,
+    isTimeDependent: Boolean,
+    reps: Int?,
     time: Int?,
     workoutViewModel: WorkoutViewModel,
     userViewModel: UserViewModel,
@@ -330,6 +470,13 @@ fun AthleteViewContent(
   var isStopped by remember { mutableStateOf(false) }
   var durationAchieved by remember { mutableIntStateOf(0) }
   var count by remember { mutableIntStateOf(0) }
+  val pairingRequests by workoutViewModel.pairingRequests.collectAsState(initial = emptyList())
+  val currentRequest = pairingRequests?.find { it.sessionId == sessionId }
+
+  LaunchedEffect(currentRequest) {
+    count = currentRequest?.counter ?: 0
+    isStopped = currentRequest?.timerStatus == TimerStatus.STOPPED
+  }
 
   val graphData = getGraphData(workoutData, activity, isTimeDependent, reps)
   Column(
@@ -365,7 +512,7 @@ fun AthleteViewContent(
               onTimeUpdate = { elapsedTime -> durationAchieved = elapsedTime.toInt() })
         } else {
           AnimatedCounter(
-              count = reps ?: 0,
+              count = count,
               Modifier.testTag("CounterText"),
               style = androidx.compose.material3.MaterialTheme.typography.displayLarge)
         }
@@ -378,5 +525,27 @@ fun AthleteViewContent(
 
         // Display performance history graph
         PerformanceHistoryGraph(graphData, Modifier.padding(16.dp))
+        // Save Workout Session Button
+        Button(
+            onClick = {
+              workoutViewModel.addOrUpdateWorkoutSession(
+                  uid = currentUser?.uid ?: "",
+                  workoutSession =
+                      WorkoutSession(
+                          sessionId = sessionId,
+                          sessionType = SessionType.COACH,
+                          exercises =
+                              listOf(
+                                  Exercise(
+                                      name = activity, reps = count, duration = durationAchieved)),
+                          startTime = System.currentTimeMillis() - durationAchieved,
+                          endTime = System.currentTimeMillis()))
+            },
+            colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_DARK),
+            modifier = Modifier.testTag("SaveWorkoutButton")) {
+              Text(
+                  stringResource(id = R.string.save_workout_session_button),
+                  color = PRINCIPLE_BACKGROUND_COLOR)
+            }
       }
 }
