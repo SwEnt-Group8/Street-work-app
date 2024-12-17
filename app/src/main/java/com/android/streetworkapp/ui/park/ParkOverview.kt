@@ -102,8 +102,6 @@ fun ParkOverviewScreen(
   // MVVM calls for park state :
   val currentPark = parkViewModel.currentPark.collectAsState()
 
-  Log.d("e2eCreateEvent", "ParkOverviewScreen: currentPark=${currentPark.value}")
-
   parkViewModel.park.collectAsState().value?.pid?.let { parkViewModel.loadCurrentPark(it) }
 
   // MVVM calls for event state of the park :
