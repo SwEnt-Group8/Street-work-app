@@ -235,21 +235,21 @@ fun ParkFilterSettings(userFilterInput: FilterSettings) {
       FilterChip(
           selected = userFilterInput.eventDensity.contains(EventDensity.LOW),
           onClick = { userFilterInput.updateDensity(EventDensity.LOW) },
-          label = { Text(EventDensity.LOW.name) },
+          label = { Text("[ 0 .. 2 ]") },
           colors = filterChipColors,
           modifier = Modifier.padding(end = 2.dp).testTag("lowDensityFilterChip"))
 
       FilterChip(
           selected = userFilterInput.eventDensity.contains(EventDensity.MEDIUM),
           onClick = { userFilterInput.updateDensity(EventDensity.MEDIUM) },
-          label = { Text(EventDensity.MEDIUM.name) },
+          label = { Text("[ 3 .. 6 ]") },
           colors = filterChipColors,
           modifier = Modifier.padding(end = 2.dp).testTag("mediumDensityFilterChip"))
 
       FilterChip(
           selected = userFilterInput.eventDensity.contains(EventDensity.HIGH),
           onClick = { userFilterInput.updateDensity(EventDensity.HIGH) },
-          label = { Text(EventDensity.HIGH.name) },
+          label = { Text("[7 + ]") },
           colors = filterChipColors,
           modifier = Modifier.padding(end = 2.dp).testTag("highDensityFilterChip"))
     }
