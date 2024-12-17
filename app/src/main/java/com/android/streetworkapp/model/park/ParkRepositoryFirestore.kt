@@ -11,7 +11,6 @@ import kotlinx.coroutines.tasks.await
 /** A repository interface using Firestore for park data. */
 class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepository {
 
-
   private val COLLECTION_PATH = "parks"
   private var firebaseImageCollectionListener: ListenerRegistration? = null
 
