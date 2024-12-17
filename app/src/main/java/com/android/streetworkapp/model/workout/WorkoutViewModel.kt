@@ -182,10 +182,6 @@ class WorkoutViewModel(private val repository: WorkoutRepository) : ViewModel() 
     }
   }
 
-  fun clearPairingRequests() {
-    _pairingRequests.value = null
-  }
-
   /**
    * Responds to a pairing request by updating its status.
    *
