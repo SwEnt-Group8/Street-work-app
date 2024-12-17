@@ -51,6 +51,7 @@ import com.android.streetworkapp.ui.park.RatingComponent
 import com.android.streetworkapp.ui.theme.ColorPalette
 import com.android.streetworkapp.utils.LocationService
 import com.android.streetworkapp.utils.PermissionManager
+import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -106,6 +107,25 @@ fun MapScreen(
         userViewModel.currentUser.value, initialLatLng.value, parkLocationViewModel.parks.value)
   }
 
+  // Define how many event is considered a Hot place
+  val hotPlace = 5.0f
+
+  // Define the start and end colors for the gradient
+  val startColor = ColorPalette.LOGO_BLUE
+  val endColor = ColorPalette.LOGO_RED
+
+  // variable for each park color
+  var interpolatedColor: Color // set default color
+  var markerIcon: BitmapDescriptor
+
+  // Handling user MVVM
+  val currentUser = userViewModel.currentUser.collectAsState().value
+
+  if (currentUser != null) {
+    userViewModel.getParksByUid(currentUser.uid)
+  }
+
+  // Handle parks MVVM
   val parks = parkLocationViewModel.parks.collectAsState().value
 
   val parkList = parkViewModel.parkList.collectAsState()
@@ -145,13 +165,21 @@ fun MapScreen(
               .forEach { park ->
                 ++markerIndex
 
+                // define park location
                 val markerState =
                     rememberMarkerState(position = LatLng(park.location.lat, park.location.lon))
 
+                // Interpolate color based on number of event (make the gradient)
+                interpolatedColor =
+                    gradientColor(startColor, endColor, (park.events.size) / hotPlace)
+
+                markerIcon = BitmapDescriptorFactory.defaultMarker(colorToHue(interpolatedColor))
+
+                // default marker for discovered park
                 MarkerInfoWindow(
                     tag = "Marker$markerIndex",
                     state = markerState,
-                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE),
+                    icon = markerIcon,
                     onClick = {
                       markerState.showInfoWindow()
                       if (selectedPark == park) {
@@ -221,4 +249,51 @@ fun MarkerInfoWindowContent(park: Park) {
               modifier = Modifier.testTag("eventsPlanned"))
         }
       }
+}
+
+/**
+ * Returns a color that is a gradient between two colors based on a fraction.
+ *
+ * @param startColor The starting color of the gradient
+ * @param endColor The ending color of the gradient
+ * @param fraction A value between 0 and 1 indicating the position between the start and end colors
+ * @return A Color that represents the gradient at the given fraction
+ */
+fun gradientColor(startColor: Color, endColor: Color, fraction: Float): Color {
+  val startR = startColor.red
+  val startG = startColor.green
+  val startB = startColor.blue
+  val startA = startColor.alpha
+
+  val endR = endColor.red
+  val endG = endColor.green
+  val endB = endColor.blue
+  val endA = endColor.alpha
+
+  val r = startR + fraction * (endR - startR)
+  val g = startG + fraction * (endG - startG)
+  val b = startB + fraction * (endB - startB)
+  val a = startA + fraction * (endA - startA)
+
+  return Color(r, g, b, a)
+}
+
+/**
+ * Converts a color to its hue value needed for BitMap
+ *
+ * @param color The color to be converted
+ * @return The hue value of the color, in degrees (0-360)
+ */
+fun colorToHue(color: Color): Float {
+  // Convert the Color to ARGB values (0-255)
+  val r = (color.red * 255).toInt()
+  val g = (color.green * 255).toInt()
+  val b = (color.blue * 255).toInt()
+
+  // Use the Android Color class to convert to HSV
+  val hsv = FloatArray(3)
+  android.graphics.Color.RGBToHSV(r, g, b, hsv)
+
+  // Return the hue value (0-360 degrees)
+  return hsv[0]
 }
