@@ -24,7 +24,6 @@ import com.android.streetworkapp.model.workout.PairingRequest
 import com.android.streetworkapp.model.workout.RequestStatus
 import com.android.streetworkapp.model.workout.WorkoutViewModel
 import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_DARK
-import com.android.streetworkapp.ui.theme.ColorPalette.PRIMARY_TEXT_COLOR
 import com.android.streetworkapp.ui.theme.ColorPalette.PRINCIPLE_BACKGROUND_COLOR
 
 @Composable
@@ -246,33 +245,6 @@ fun FriendListDialog(
 }
 
 @Composable
-fun CommentVisualizer(sessionId: String, workoutViewModel: WorkoutViewModel) {
-  val workoutSessions by workoutViewModel.workoutSessions.collectAsState(initial = emptyList())
-  val session = workoutSessions?.find { it.sessionId == sessionId }
-  val comments = session?.comments ?: emptyList()
-
-  Column(
-      modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("CommentVisualizer"),
-      verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(
-            text = stringResource(id = R.string.comments_title),
-            style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
-            color = PRIMARY_TEXT_COLOR)
-
-        if (comments.isEmpty()) {
-          Text(
-              text = stringResource(id = R.string.no_comments),
-              style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
-              color = PRIMARY_TEXT_COLOR)
-        } else {
-          comments.forEach { comment ->
-            Text(
-                text = "${comment.authorUid}: ${comment.text}",
-                style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
-                color = PRIMARY_TEXT_COLOR)
-          }
-        }
-      }
 fun SaveSessionDialog(onSave: () -> Unit, onDismiss: () -> Unit) {
   AlertDialog(
       onDismissRequest = { onDismiss() },
