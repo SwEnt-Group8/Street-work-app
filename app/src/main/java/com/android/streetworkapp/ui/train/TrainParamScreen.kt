@@ -171,7 +171,7 @@ fun NumberPicker(
   LaunchedEffect(lazyListState) {
     snapshotFlow { lazyListState.firstVisibleItemIndex }
         .collect { index ->
-          val newValue = range.elementAtOrNull(index)
+          val newValue = range.elementAtOrNull(index + 1)
           newValue?.let { onValueChange(it) }
         }
   }
