@@ -100,4 +100,10 @@
     <string name="event_soon">Starting soon!</string>
     <string name="event_started">Event has begun!</string>
     <string name="event_ended">Event has ended</string>
+
+    // Park filter UI
+    <string name="park_filter_title">Filter Parks</string>
+    <string name="rating_filter_title">Minimum park rating : %s stars</string>
+    <string name="eventDensity_filter_title">Required density of events :</string>
+    <string name="reset_button">Reset</string>
 </resources>

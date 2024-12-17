@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
+import com.android.sample.R
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
@@ -194,7 +195,7 @@ fun MapScreen(
   CustomDialog(
       showFilterSettings,
       dialogType = DialogType.CONFIRM,
-      title = "Filter parks",
+      title = LocalContext.current.getString(R.string.park_filter_title),
       Content = { ParkFilterSettings(userFilterInput) },
       onSubmit = { filter.set(userFilterInput) },
       onDismiss = { userFilterInput.set(filter) })
@@ -203,6 +204,7 @@ fun MapScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ParkFilterSettings(userFilterInput: FilterSettings) {
+  val context = LocalContext.current
 
   // Note - This is a composable and cannot be defined in the ColorPalette (Theme.kt).
   val filterChipColors =
@@ -213,7 +215,9 @@ fun ParkFilterSettings(userFilterInput: FilterSettings) {
   Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
     // Park rating filter :
     Text(
-        "Minimum park rating : ${userFilterInput.minRating.value} stars",
+        text =
+            context.getString(
+                R.string.rating_filter_title, userFilterInput.minRating.value.toString()),
         fontSize = Type.bodyLarge.fontSize,
         modifier = Modifier.testTag("ratingFilterTitle"))
     InteractiveRatingComponent(userFilterInput.minRating)
@@ -222,7 +226,7 @@ fun ParkFilterSettings(userFilterInput: FilterSettings) {
 
     // Event quantity filter :
     Text(
-        "Required density of events :",
+        context.getString(R.string.eventDensity_filter_title),
         fontSize = Type.bodyLarge.fontSize,
         modifier = Modifier.testTag("eventDensityFilterTitle"))
 
@@ -258,7 +262,7 @@ fun ParkFilterSettings(userFilterInput: FilterSettings) {
             Modifier.align(Alignment.CenterHorizontally)
                 .padding(top = 4.dp)
                 .testTag("resetButton")) {
-          Text("Reset filters")
+          Text(context.getString(R.string.reset_button))
         }
   }
 }
