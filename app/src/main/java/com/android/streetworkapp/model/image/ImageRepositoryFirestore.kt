@@ -260,6 +260,11 @@ class ImageRepositoryFirestore(
    *
    * @param userId The user id to whom we delete all the data from. (pictures uploaded and ratings)
    */
+  /**
+   * Deletes all the images related to a user
+   *
+   * @param userId The user id to whom we delete all the data from. (pictures uploaded and ratings)
+   */
   override suspend fun deleteAllDataFromUser(userId: String): Boolean {
     require(userId.isNotEmpty()) { "Empty userId." }
 
@@ -270,21 +275,12 @@ class ImageRepositoryFirestore(
       for (document in querySnapshot.documents) {
         val collection = document.toObject(ParkImageCollection::class.java)
         collection?.let {
-          val (imagesUploadedByUser, imagesNotUploadedByUser) =
-              collection.images.partition { it.userId == userId }
-          if (imagesUploadedByUser.isNotEmpty())
-              document.reference
-                  .update("images", FieldValue.arrayRemove(imagesUploadedByUser))
-                  .await()
-
-          imagesUploadedByUser.forEach {
-            val imageKey = this.storageClient.extractKeyFromUrl(it.imageUrl) ?: return false
-            if (!this.storageClient.deleteObjectFromKey(imageKey)) return false
-          }
-
-          // remove any potential votes the user has done
-          for (image in imagesNotUploadedByUser) {
-            if (image.rating.positiveVotesUids.contains(userId) ||
+          for (image in collection.images) {
+            if (image.userId == userId) {
+              document.reference.update("images", FieldValue.arrayRemove(image)).await()
+              val imageKey = storageClient.extractKeyFromUrl(image.imageUrl) ?: return false
+              if (!this.storageClient.deleteObjectFromKey(imageKey)) return false
+            } else if (image.rating.positiveVotesUids.contains(userId) ||
                 image.rating.negativeVotesUids.contains(userId)) {
               if (!this.retractImageVote(collection.id, image.imageUrl, userId)) {
                 return false
