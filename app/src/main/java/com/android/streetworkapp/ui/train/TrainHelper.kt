@@ -26,6 +26,12 @@ import com.android.streetworkapp.model.workout.WorkoutViewModel
 import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_DARK
 import com.android.streetworkapp.ui.theme.ColorPalette.PRINCIPLE_BACKGROUND_COLOR
 
+/**
+ * Dialog to select the role of the user.
+ *
+ * @param onRoleSelected Callback when the role is selected.
+ * @param onDismiss Callback when the dialog is dismissed.
+ */
 @Composable
 fun TrainCoachDialog(onRoleSelected: (Boolean) -> Unit, onDismiss: () -> Unit) {
   val isCoach = remember { mutableStateOf(false) }
@@ -85,6 +91,14 @@ fun TrainCoachDialog(onRoleSelected: (Boolean) -> Unit, onDismiss: () -> Unit) {
       })
 }
 
+/**
+ * Dialog for a athlete that is waiting a request from a coach.
+ *
+ * @param workoutViewModel The ViewModel for the workout.
+ * @param userViewModel The ViewModel for the user.
+ * @param currentUserUid The UID of the current user.
+ * @param onDismiss Callback when the dialog is dismissed.
+ */
 @Composable
 fun WaitingDialog(
     workoutViewModel: WorkoutViewModel,
@@ -144,6 +158,14 @@ fun WaitingDialog(
       })
 }
 
+/**
+ * The visual representation of a pairing request in the dialog of the athlete.
+ *
+ * @param request The pairing request.
+ * @param onAccept Callback when the request is accepted.
+ * @param onReject Callback when the request is rejected.
+ * @param userViewModel The ViewModel for the user.
+ */
 @Composable
 fun PairingRequestItem(
     request: PairingRequest,
@@ -178,6 +200,14 @@ fun PairingRequestItem(
       }
 }
 
+/**
+ * Dialog to select friends to send a pairing request.
+ *
+ * @param userViewModel The ViewModel for the user.
+ * @param currentUserUid The UID of the current user.
+ * @param workoutViewModel The ViewModel for the workout.
+ * @param onDismiss Callback when the dialog is dismissed.
+ */
 @Composable
 fun FriendListDialog(
     userViewModel: UserViewModel,
@@ -242,14 +272,4 @@ fun FriendListDialog(
               modifier = Modifier.testTag("NoFriendsText"))
         }
       })
-}
-
-@Composable
-fun SaveSessionDialog(onSave: () -> Unit, onDismiss: () -> Unit) {
-  AlertDialog(
-      onDismissRequest = { onDismiss() },
-      title = { Text("Save Training Session") },
-      text = { Text("Do you want to save your training session into your history?") },
-      confirmButton = { Button(onClick = { onSave() }) { Text("Save") } },
-      dismissButton = { Button(onClick = { onDismiss() }) { Text("Discard") } })
 }
