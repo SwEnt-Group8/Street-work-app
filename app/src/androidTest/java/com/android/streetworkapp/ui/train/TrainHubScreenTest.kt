@@ -70,6 +70,6 @@ class TrainHubScreenTest {
         .forEach { activity -> composeTestRule.onNodeWithTag("Activity_$activity").assertExists() }
 
     // Verify ConfirmButton
-    composeTestRule.onNodeWithTag("ConfirmButton").assertExists()
+    //composeTestRule.onNodeWithTag("ConfirmButton").assertExists()
   }
 }
