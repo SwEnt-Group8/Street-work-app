@@ -71,5 +71,6 @@ class TrainHubScreenTest {
 
     // Verify ConfirmButton
     // composeTestRule.onNodeWithTag("ConfirmButton").assertExists()
+    // TODO check this in the E2E training debug branch
   }
 }
