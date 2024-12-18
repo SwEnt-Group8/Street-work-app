@@ -45,7 +45,7 @@ data class ScreenParams(
     val isBottomBarVisible: Boolean = true,
     val bottomBarType: BottomNavigationMenuType = BottomNavigationMenuType.DEFAULT,
     val isTopBarVisible: Boolean = true,
-    val topAppBarManager: TopAppBarManager?
+    val topAppBarManager: TopAppBarManager?,
     val hasSearchBar: Boolean = false,
 ) {
   companion object {
@@ -65,7 +65,6 @@ data class ScreenParams(
                     hasSearchBar = true,
                     actions =
                         listOf(
-                            TopAppBarManager.TopAppBarAction.SEARCH,
                             TopAppBarManager.TopAppBarAction.INFO,
                             TopAppBarManager.TopAppBarAction.FILTER)))
     val PROFILE =

@@ -115,26 +115,5 @@ class MapUiTest {
     composeTestRule.waitForIdle()
 
     composeTestRule.onNodeWithTag("searchBar").assertIsDisplayed()
-
-    composeTestRule.onNodeWithTag("cancelSearchButton").assertIsDisplayed().performClick()
-  }
-
-  @Test
-  fun mapSearchBarHasCorrectBehavior() {
-    composeTestRule.setContent {
-      StreetWorkAppMain(
-          PreferencesViewModel(mockk<PreferencesRepositoryDataStore>(relaxed = true)),
-          { navigateTo(Route.MAP) })
-    }
-
-    composeTestRule.waitForIdle()
-
-    composeTestRule.onNodeWithTag("searchButton").assertIsDisplayed().performClick()
-
-    composeTestRule.onNodeWithTag("searchBar").assertIsDisplayed()
-
-    composeTestRule.onNodeWithTag("cancelSearchButton").assertIsDisplayed().performClick()
-
-    composeTestRule.onNodeWithTag("topAppBar").assertIsDisplayed()
   }
 }

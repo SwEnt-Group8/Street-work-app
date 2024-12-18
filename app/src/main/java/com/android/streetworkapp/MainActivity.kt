@@ -255,6 +255,7 @@ fun StreetWorkApp(
   // Instantiate info manager and its components :
   val showInfoDialog = remember { mutableStateOf(false) }
   val showSearchBar = remember { mutableStateOf(false) }
+  val showFilterSettings = remember { mutableStateOf(false) }
 
   // query for the search bar
   val searchQuery = remember { mutableStateOf("") }
@@ -330,8 +331,6 @@ fun StreetWorkApp(
               route = Route.MAP,
           ) {
             composable(Screen.MAP) {
-              val showFilterSettings = mutableStateOf(false)
-
               infoManager.Display(LocalContext.current)
               MapScreen(
                   parkLocationViewModel,

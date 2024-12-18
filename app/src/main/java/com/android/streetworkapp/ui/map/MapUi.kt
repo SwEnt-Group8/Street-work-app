@@ -315,45 +315,48 @@ fun MapSearchBar(query: MutableState<String>) {
 
 @Composable
 fun MarkerInfoWindowContent(park: Park) {
-    Box{
-  Column(
-      horizontalAlignment = Alignment.CenterHorizontally,
-      modifier =
-          Modifier.background(Color.White, shape = RoundedCornerShape(10.dp))
-              .padding(10.dp)
-              .testTag("markerInfoWindow")) {
-        Text(
-            text = park.name,
-            color = Color.Black,
-            fontSize = 16.sp,
-            modifier = Modifier.padding(5.dp).testTag("parkName"))
-
-        RatingComponent(park.rating.toInt(), park.nbrRating)
-
-        Row(modifier = Modifier.padding(5.dp), verticalAlignment = Alignment.CenterVertically) {
-          Icon(
-              Icons.Filled.Event,
-              contentDescription = "eventIcon",
-              modifier = Modifier.padding(horizontal = 5.dp).testTag("eventIcon"))
+  Box {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier =
+            Modifier.background(Color.White, shape = RoundedCornerShape(10.dp))
+                .padding(10.dp)
+                .testTag("markerInfoWindow")) {
           Text(
-              text = "${park.events.size} event(s) planned",
-              modifier = Modifier.testTag("eventsPlanned").padding(end = 8.dp))
+              text = park.name,
+              color = Color.Black,
+              fontSize = 16.sp,
+              modifier = Modifier.padding(5.dp).testTag("parkName"))
+
+          RatingComponent(park.rating.toInt(), park.nbrRating)
+
+          Row(modifier = Modifier.padding(5.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                Icons.Filled.Event,
+                contentDescription = "eventIcon",
+                modifier = Modifier.padding(horizontal = 5.dp).testTag("eventIcon"))
+            Text(
+                text = "${park.events.size} event(s) planned",
+                modifier = Modifier.testTag("eventsPlanned").padding(end = 8.dp))
 
             Box(
                 modifier =
-                Modifier.size(26.dp)
-                    .background(
-                        color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape)
-                    .padding(2.dp)) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Login,
-                    contentDescription = "Add Image",
-                    tint = Color.White,
-                    modifier = Modifier.align(Alignment.Center).fillMaxSize(0.75f).testTag("enterParkIcon"))
-            }
+                    Modifier.size(26.dp)
+                        .background(
+                            color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape)
+                        .padding(2.dp)) {
+                  Icon(
+                      imageVector = Icons.AutoMirrored.Filled.Login,
+                      contentDescription = "Add Image",
+                      tint = Color.White,
+                      modifier =
+                          Modifier.align(Alignment.Center)
+                              .fillMaxSize(0.75f)
+                              .testTag("enterParkIcon"))
+                }
+          }
         }
-      }
-    }
+  }
 }
 
 /**
