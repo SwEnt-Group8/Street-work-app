@@ -330,6 +330,8 @@ fun StreetWorkApp(
               route = Route.MAP,
           ) {
             composable(Screen.MAP) {
+              val showFilterSettings = mutableStateOf(false)
+
               infoManager.Display(LocalContext.current)
               MapScreen(
                   parkLocationViewModel,
@@ -340,10 +342,17 @@ fun StreetWorkApp(
                   mapCallbackOnMapLoaded,
                   innerPadding,
                   scope,
-                  host)
+                  host,
+                  showFilterSettings)
+
               screenParams?.topAppBarManager?.setActionCallback(
                   TopAppBarManager.TopAppBarAction.SEARCH) {
                     showSearchBar.value = true
+                  }
+
+              screenParams?.topAppBarManager?.setActionCallback(
+                  TopAppBarManager.TopAppBarAction.FILTER) {
+                    showFilterSettings.value = true
                   }
             }
             composable(Screen.PARK_OVERVIEW) {

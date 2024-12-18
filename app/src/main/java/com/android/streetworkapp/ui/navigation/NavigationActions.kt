@@ -46,6 +46,7 @@ data class ScreenParams(
     val bottomBarType: BottomNavigationMenuType = BottomNavigationMenuType.DEFAULT,
     val isTopBarVisible: Boolean = true,
     val topAppBarManager: TopAppBarManager?
+    val hasSearchBar: Boolean = false,
 ) {
   companion object {
     val AUTH =
@@ -65,7 +66,8 @@ data class ScreenParams(
                     actions =
                         listOf(
                             TopAppBarManager.TopAppBarAction.SEARCH,
-                            TopAppBarManager.TopAppBarAction.INFO)))
+                            TopAppBarManager.TopAppBarAction.INFO,
+                            TopAppBarManager.TopAppBarAction.FILTER)))
     val PROFILE =
         ScreenParams(
             Screen.PROFILE,

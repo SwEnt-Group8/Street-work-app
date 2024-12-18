@@ -19,7 +19,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Login
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
@@ -41,15 +45,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
+import com.android.sample.R
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
 import com.android.streetworkapp.model.user.UserViewModel
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.Screen
+import com.android.streetworkapp.ui.park.InteractiveRatingComponent
 import com.android.streetworkapp.ui.park.RatingComponent
 import com.android.streetworkapp.ui.theme.ColorPalette
+import com.android.streetworkapp.ui.theme.Typography as Type
+import com.android.streetworkapp.ui.utils.CustomDialog
+import com.android.streetworkapp.ui.utils.DialogType
+import com.android.streetworkapp.utils.EventDensity
+import com.android.streetworkapp.utils.FilterSettings
 import com.android.streetworkapp.utils.LocationService
+import com.android.streetworkapp.utils.ParkFilter
 import com.android.streetworkapp.utils.PermissionManager
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -69,7 +81,7 @@ import kotlinx.coroutines.CoroutineScope
  * @param parkLocationViewModel The view model for park locations.
  * @param navigationActions The navigation actions to navigate to other screens.
  */
-@OptIn(MapsComposeExperimentalApi::class)
+@OptIn(MapsComposeExperimentalApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
     parkLocationViewModel: ParkLocationViewModel,
@@ -81,6 +93,7 @@ fun MapScreen(
     innerPaddingValues: PaddingValues = PaddingValues(0.dp),
     scope: CoroutineScope = rememberCoroutineScope(),
     host: SnackbarHostState? = null,
+    showFilterSettings: MutableState<Boolean> = mutableStateOf(false)
 ) {
 
   val context = LocalContext.current
@@ -132,6 +145,11 @@ fun MapScreen(
 
   LaunchedEffect(parks) { parkViewModel.getOrCreateAllParksByLocation(parks) }
 
+  // Set values for park filtering :
+  val filter = FilterSettings()
+  val parkFilter = ParkFilter(filter)
+  val userFilterInput = FilterSettings()
+
   Box(modifier = Modifier.testTag("mapScreen")) {
     // Create a CameraPositionState to control the camera position
     val cameraPositionState = rememberCameraPositionState {
@@ -159,6 +177,7 @@ fun MapScreen(
           parkList.value
               .filterNotNull()
               .filter { it.name.contains(searchQuery.value, ignoreCase = true) }
+              .filter { parkFilter.filter(it) }
               .forEach { park ->
                 ++markerIndex
 
@@ -189,6 +208,84 @@ fun MapScreen(
                       MarkerInfoWindowContent(park)
                     }
               }
+        }
+  }
+  // Settings variable defined beforehand :
+  // Affected by the filter settings => changes confirmed when confirming (onSubmit).
+
+  // Display the Filter component :
+  CustomDialog(
+      showFilterSettings,
+      tag = "Filter",
+      dialogType = DialogType.CONFIRM,
+      title = LocalContext.current.getString(R.string.park_filter_title),
+      Content = { ParkFilterSettings(userFilterInput) },
+      onSubmit = { filter.set(userFilterInput) },
+      onDismiss = { userFilterInput.set(filter) })
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ParkFilterSettings(userFilterInput: FilterSettings) {
+  val context = LocalContext.current
+
+  // Note - This is a composable and cannot be defined in the ColorPalette (Theme.kt).
+  val filterChipColors =
+      FilterChipDefaults.filterChipColors(
+          selectedLabelColor = ColorPalette.PRINCIPLE_BACKGROUND_COLOR,
+          selectedContainerColor = ColorPalette.INTERACTION_COLOR_DARK)
+
+  Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    // Park rating filter :
+    Text(
+        text =
+            context.getString(
+                R.string.rating_filter_title, userFilterInput.minRating.value.toString()),
+        fontSize = Type.bodyLarge.fontSize,
+        modifier = Modifier.testTag("ratingFilterTitle"))
+    InteractiveRatingComponent(userFilterInput.minRating)
+
+    HorizontalDivider()
+
+    // Event quantity filter :
+    Text(
+        context.getString(R.string.eventDensity_filter_title),
+        fontSize = Type.bodyLarge.fontSize,
+        modifier = Modifier.testTag("eventDensityFilterTitle"))
+
+    Row(modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth(0.825f)) {
+      FilterChip(
+          selected = userFilterInput.eventDensity.contains(EventDensity.LOW),
+          onClick = { userFilterInput.updateDensity(EventDensity.LOW) },
+          label = { Text("[ 0 .. 2 ]") },
+          colors = filterChipColors,
+          modifier = Modifier.padding(end = 2.dp).testTag("lowDensityFilterChip"))
+
+      FilterChip(
+          selected = userFilterInput.eventDensity.contains(EventDensity.MEDIUM),
+          onClick = { userFilterInput.updateDensity(EventDensity.MEDIUM) },
+          label = { Text("[ 3 .. 6 ]") },
+          colors = filterChipColors,
+          modifier = Modifier.padding(end = 2.dp).testTag("mediumDensityFilterChip"))
+
+      FilterChip(
+          selected = userFilterInput.eventDensity.contains(EventDensity.HIGH),
+          onClick = { userFilterInput.updateDensity(EventDensity.HIGH) },
+          label = { Text("[7 + ]") },
+          colors = filterChipColors,
+          modifier = Modifier.padding(end = 2.dp).testTag("highDensityFilterChip"))
+    }
+
+    HorizontalDivider()
+
+    Button(
+        onClick = { userFilterInput.reset() },
+        colors = ColorPalette.BUTTON_COLOR,
+        modifier =
+            Modifier.align(Alignment.CenterHorizontally)
+                .padding(top = 4.dp)
+                .testTag("resetButton")) {
+          Text(context.getString(R.string.reset_button))
         }
   }
 }
