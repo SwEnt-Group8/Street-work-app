@@ -76,7 +76,11 @@ fun SignInScreen(
           onAuthError = {
             firebaseUser = null
             Log.d("SignInScreen", "Sign-in failed : $it")
-            Toast.makeText(context, "Login failed! : $it", Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                    context,
+                    context.getString(R.string.SignInToastLoginFailed, it),
+                    Toast.LENGTH_LONG)
+                .show()
           })
 
   // Wait for the user to be fetched from database before setting it
@@ -88,7 +92,9 @@ fun SignInScreen(
       preferencesViewModel.setUid(it.uid)
       preferencesViewModel.setName(it.username)
       preferencesViewModel.setScore(it.score)
-      Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
+      Toast.makeText(
+              context, context.getString(R.string.SignInToastLoginSuccessful), Toast.LENGTH_LONG)
+          .show()
       navigationActions.navigateTo(Screen.MAP)
     }
   }

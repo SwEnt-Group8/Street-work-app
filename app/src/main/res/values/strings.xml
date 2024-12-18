@@ -109,4 +109,9 @@
     <string name="SignInTutorialIntroPage2Text">Track your activities and learn new skills</string>
     <string name="SignInTutorialIntroPage3Text">Make new friends, train together and share activities</string>
 
+    // SignIn
+    <string name="SignInToastLoginSuccessful">Login successful</string>
+    <string name="SignInToastLoginFailed">Login failed: %s</string>
+
+
 </resources>
