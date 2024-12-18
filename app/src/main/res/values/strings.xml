@@ -99,8 +99,14 @@
     <string name="x_axis_label_session">Session</string>
     <string name="y_axis_label_total_reps">Total reps</string>
 
-    //Event statuses
+    // Event statuses
     <string name="event_soon">Starting soon!</string>
     <string name="event_started">Event has begun!</string>
     <string name="event_ended">Event has ended</string>
+
+    // SignIn Tutorial
+    <string name="SignInTutorialIntroPage1Text">Find nearby parks and events to participate in or create</string>
+    <string name="SignInTutorialIntroPage2Text">Track your activities and learn new skills</string>
+    <string name="SignInTutorialIntroPage3Text">Make new friends, train together and share activities</string>
+
 </resources>

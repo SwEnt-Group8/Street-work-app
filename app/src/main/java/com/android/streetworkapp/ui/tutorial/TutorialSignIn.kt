@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
@@ -74,6 +75,7 @@ fun TutorialSignIn() {
 
 @Composable
 fun IntroPage1(screenHeight: Dp) {
+  val context = LocalContext.current
   Column(
       modifier = Modifier.fillMaxWidth().testTag("introColumn1"),
       verticalArrangement = Arrangement.Center,
@@ -105,13 +107,14 @@ fun IntroPage1(screenHeight: Dp) {
         IconAndTextRow(
             imageVector = Icons.Filled.LocationOn,
             contentDescription = "Location marker icon",
-            text = "Find nearby parks and events to participate in or create",
+            text = context.getString(R.string.SignInTutorialIntroPage1Text),
             testName = "loginScreenFirstRow")
       }
 }
 
 @Composable
 fun IntroPage2(screenHeight: Dp) {
+  val context = LocalContext.current
   Column(
       modifier = Modifier.fillMaxWidth().testTag("introColumn2"),
       verticalArrangement = Arrangement.Center,
@@ -143,13 +146,14 @@ fun IntroPage2(screenHeight: Dp) {
         IconAndTextRow(
             imageVector = Icons.AutoMirrored.Filled.DirectionsRun,
             contentDescription = "Running person icon",
-            text = "Track your activities and learn new skills",
+            text = context.getString(R.string.SignInTutorialIntroPage2Text),
             testName = "loginScreenSecondRow")
       }
 }
 
 @Composable
 fun IntroPage3(screenHeight: Dp) {
+  val context = LocalContext.current
   Column(
       modifier = Modifier.fillMaxWidth().testTag("introColumn3"),
       verticalArrangement = Arrangement.Center,
@@ -182,7 +186,7 @@ fun IntroPage3(screenHeight: Dp) {
         IconAndTextRow(
             imageVector = Icons.Filled.ConnectWithoutContact,
             contentDescription = "People connecting icon",
-            text = "Make new friends, train together and share activities",
+            text = context.getString(R.string.SignInTutorialIntroPage3Text),
             testName = "loginScreenThirdRow")
       }
 }
