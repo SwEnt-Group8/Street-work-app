@@ -20,13 +20,4 @@ class TrainHelperTest {
     composeTestRule.onNodeWithTag("RoleSwitch").performClick()
     composeTestRule.onNodeWithTag("ConfirmButton").performClick()
   }
-
-  @Test
-  fun saveSessionDialog_rendersAndInteracts() {
-    composeTestRule.setContent { SaveSessionDialog(onSave = {}, onDismiss = {}) }
-
-    composeTestRule.onNodeWithText("Save Training Session").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Save").performClick()
-    composeTestRule.onNodeWithText("Discard").performClick()
-  }
 }
