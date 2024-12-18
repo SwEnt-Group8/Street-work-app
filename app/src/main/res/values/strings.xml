@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">StreetWorkApp</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_second">SecondActivity</string>
@@ -119,5 +119,19 @@
     // MapUI
     <string name="MapUiSearchBarPlaceholder">Search for parks</string>
     <string name="MapUiNbrPlannedEvents">%1$d event(s) planned</string>
+
+    // Park Overview
+    <string name="ParkOverviewAddEventButton">Add an event</string>
+    <string name="ParkOverviewLoading" tools:ignore="TypographyEllipsis">Loading...</string>
+    <string name="ParkOverviewToastRatingFailUser">User not found, could not rate park</string>
+    <string name="ParkOverviewToastRatingFailPark">Park not found, could not rate park</string>
+    <string name="ParkOverviewToastRatingFailValue">Invalid rating value, could not rate park</string>
+    <string name="ParkOverviewToastRatingFailViewmodel">An error occurred, could not rate park"</string>
+    <string name="ParkOverviewToastRatingSubmitSuccessful">Rating submitted</string>
+    <string name="ParkOverviewEventTitle">Events</string>
+    <string name="ParkOverviewNoEvents">No event is planned yet</string>
+    <string name="ParkOverviewEventNbrParticipant">Participants: %1$d/%2$d</string>
+    <string name="ParkOverviewRatingTitle">Park rating</string>
+    <string name="ParkOverviewEventButton">About</string>
 
 </resources>
