@@ -11,7 +11,6 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -233,7 +232,6 @@ fun StreetWorkApp(
     preferencesViewModel: PreferencesViewModel,
     authService: GoogleAuthService,
     navTestInvokationOnEachRecompose: Boolean = false,
-    e2eEventTesting: Boolean = false,
     startDestination: String = Route.AUTH
 ) {
   val navController = rememberNavController()
@@ -425,6 +423,7 @@ fun StreetWorkApp(
                         progressionViewModel,
                         workoutViewModel,
                         preferencesViewModel,
+                        imageViewModel,
                         authService,
                         showSettingsDialog)
                   },
@@ -489,9 +488,7 @@ fun StreetWorkApp(
               }
         }
 
-        if (e2eEventTesting) {
-          LaunchedEffect(navTestInvokation) { navigationActions.apply(navTestInvokation) }
-        } else if (firstTimeLoaded || navTestInvokationOnEachRecompose) {
+        if (firstTimeLoaded || navTestInvokationOnEachRecompose) {
           firstTimeLoaded = false
           navigationActions.apply(navTestInvokation)
         }

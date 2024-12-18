@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.sample.R
 import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.image.ImageViewModel
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.preferences.PreferencesViewModel
 import com.android.streetworkapp.model.progression.ProgressionViewModel
@@ -45,6 +46,7 @@ fun SettingsContent(
     progressionViewModel: ProgressionViewModel,
     workoutViewModel: WorkoutViewModel,
     preferencesViewModel: PreferencesViewModel,
+    imageViewModel: ImageViewModel,
     authService: GoogleAuthService,
     showParentDialog: MutableState<Boolean>
 ) {
@@ -120,7 +122,8 @@ fun SettingsContent(
                 parkViewModel,
                 eventViewModel,
                 progressionViewModel,
-                workoutViewModel)
+                workoutViewModel,
+                imageViewModel)
 
         if (deletionSucceed) {
           logout(authService, userViewModel, preferencesViewModel)
@@ -181,7 +184,8 @@ fun deleteAccount(
     parkViewModel: ParkViewModel,
     eventViewModel: EventViewModel,
     progressionViewModel: ProgressionViewModel,
-    workoutViewModel: WorkoutViewModel
+    workoutViewModel: WorkoutViewModel,
+    imageViewModel: ImageViewModel
 ): Boolean {
   // Get the current UID and abort if it is empty
   val currentUserUid = userViewModel.currentUser.value?.uid ?: ""
@@ -211,6 +215,7 @@ fun deleteAccount(
   parkViewModel.deleteRatingFromAllParks(currentUserUid)
   progressionViewModel.deleteProgressionByUid(currentUserUid)
   workoutViewModel.deleteWorkoutDataByUid(currentUserUid)
+  imageViewModel.deleteAllDataFromUser(currentUserUid, {}, {})
 
   return true
 }

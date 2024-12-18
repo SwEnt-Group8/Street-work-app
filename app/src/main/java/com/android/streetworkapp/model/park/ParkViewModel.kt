@@ -41,6 +41,15 @@ open class ParkViewModel(
   }
 
   /**
+   * Set the park value.
+   *
+   * @param park The park to set as the current park.
+   */
+  fun setPark(park: Park?) {
+    _park.value = park
+  }
+
+  /**
    * Load the current park from the database using its ID.
    *
    * @param pid The park ID.
