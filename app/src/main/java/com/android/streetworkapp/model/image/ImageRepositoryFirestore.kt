@@ -256,14 +256,9 @@ class ImageRepositoryFirestore(
   }
 
   /**
-   * Deletes all the images related to a user
+   * Deletes all the images related to a user, this includes his uploaded images and ratings.
    *
-   * @param userId The user id to whom we delete all the data from. (pictures uploaded and ratings)
-   */
-  /**
-   * Deletes all the images related to a user
-   *
-   * @param userId The user id to whom we delete all the data from. (pictures uploaded and ratings)
+   * @param userId The user id to whom we delete all the data from.
    */
   override suspend fun deleteAllDataFromUser(userId: String): Boolean {
     require(userId.isNotEmpty()) { "Empty userId." }
