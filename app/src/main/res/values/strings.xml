@@ -88,6 +88,8 @@
     <string name="counter_explanation">
     The counter represents the number of sets completed. Each time you finish your target reps, increment the counter until you\'ve completed your objective.
     </string>
+    <string name="sec">sec</string>
+    <string name="reps">sec</string>
     <string name="time_up_message">Nice Work!</string>
     <string name="stop_button_text">Stop</string>
     <string name="reset_button_text">Reset</string>

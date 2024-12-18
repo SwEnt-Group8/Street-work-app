@@ -408,7 +408,7 @@ fun AthleteViewContent(
                           exercises =
                               listOf(
                                   Exercise(
-                                      name = activity, reps = count, duration = durationAchieved)),
+                                      name = activity, sets = count, duration = durationAchieved)),
                           startTime = System.currentTimeMillis() - durationAchieved,
                           endTime = System.currentTimeMillis()))
             },
