@@ -116,4 +116,8 @@
     // Google Auth Button
     <string name="GoogleAuthButtonText">Sign in with Google</string>
 
+    // MapUI
+    <string name="MapUiSearchBarPlaceholder">Search for parks</string>
+    <string name="MapUiNbrPlannedEvents">%1$d event(s) planned</string>
+
 </resources>

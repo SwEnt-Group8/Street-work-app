@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
+import com.android.sample.R
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.parklocation.ParkLocationViewModel
@@ -174,11 +175,12 @@ fun MapScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapSearchBar(query: MutableState<String>, onCancel: () -> Unit) {
+  val context = LocalContext.current
   Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
     SearchBar(
         query = query.value,
         onQueryChange = { query.value = it },
-        placeholder = { "Search for parks" },
+        placeholder = { context.getString(R.string.MapUiSearchBarPlaceholder) },
         modifier = Modifier.testTag("searchBar").padding(bottom = 8.dp).padding(horizontal = 4.dp),
         active = false,
         onActiveChange = {},
@@ -197,6 +199,7 @@ fun MapSearchBar(query: MutableState<String>, onCancel: () -> Unit) {
 
 @Composable
 fun MarkerInfoWindowContent(park: Park) {
+  val context = LocalContext.current
   Column(
       horizontalAlignment = Alignment.CenterHorizontally,
       modifier =
@@ -217,7 +220,7 @@ fun MarkerInfoWindowContent(park: Park) {
               contentDescription = "eventIcon",
               modifier = Modifier.padding(horizontal = 5.dp).testTag("eventIcon"))
           Text(
-              text = "${park.events.size} event(s) planned",
+              text = context.getString(R.string.MapUiNbrPlannedEvents, park.events.size),
               modifier = Modifier.testTag("eventsPlanned"))
         }
       }
