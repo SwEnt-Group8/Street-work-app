@@ -40,6 +40,17 @@ import com.android.streetworkapp.ui.theme.ColorPalette.PRINCIPLE_BACKGROUND_COLO
 
 private const val TAG = "TrainCoachScreen"
 
+/**
+ * Displays the Train Coach Screen based on the current session state.
+ *
+ * @param activity The activity to perform.
+ * @param isTimeDependent Flag to indicate if the activity is time-dependent.
+ * @param reps The number of repetitions for the activity.
+ * @param time The time duration for the activity.
+ * @param workoutViewModel The [WorkoutViewModel] instance.
+ * @param userViewModel The [UserViewModel] instance.
+ * @param paddingValues The padding values for the screen.
+ */
 @Composable
 fun TrainCoachScreen(
     activity: String,
@@ -143,7 +154,9 @@ fun TrainCoachScreen(
     }
   }
 }
-
+/**
+ * Fallback content to display when no session data is available.
+ */
 @Composable
 fun FallbackContent() {
   Column(
@@ -154,6 +167,15 @@ fun FallbackContent() {
       }
 }
 
+/**
+ * Displays the coach view for the current session.
+ *
+ * @param workoutViewModel The [WorkoutViewModel] instance.
+ * @param userViewModel The [UserViewModel] instance.
+ * @param isTimeDependent Flag to indicate if the activity is time-dependent.
+ * @param reps The number of repetitions for the activity.
+ * @param paddingValues The padding values for the screen.
+ */
 @Composable
 fun CoachView(
     workoutViewModel: WorkoutViewModel,
@@ -293,6 +315,18 @@ fun CoachView(
       }
 }
 
+/**
+ * Displays the athlete view for the current session.
+ *
+ * @param sessionId The session ID for the current session.
+ * @param activity The activity to perform.
+ * @param isTimeDependent Flag to indicate if the activity is time-dependent.
+ * @param reps The number of repetitions for the activity.
+ * @param time The time duration for the activity.
+ * @param workoutViewModel The [WorkoutViewModel] instance.
+ * @param userViewModel The [UserViewModel] instance.
+ * @param paddingValues The padding values for the screen.
+ */
 @Composable
 fun AthleteViewContent(
     sessionId: String,
