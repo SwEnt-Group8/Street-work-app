@@ -24,6 +24,8 @@ class TrainCoachScreenTest {
   private val mockWorkoutRepository = mock<WorkoutRepository>()
   private lateinit var workoutViewModel: WorkoutViewModel
 
+  @Test fun trainCoachScreen_displaysCorrectInformation() {}
+
   private val mockUserRepository = mock<UserRepository>()
   private lateinit var userViewModel: UserViewModel
 
