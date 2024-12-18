@@ -9,10 +9,9 @@ import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.tasks.await
 
 /** A repository interface using Firestore for park data. */
-class ParkRepositoryFirestore(private val db: FirebaseFirestore, testing: Boolean = false) :
-    ParkRepository {
+class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepository {
 
-  private val COLLECTION_PATH: String = if (testing) "testParks" else "parks"
+  private val COLLECTION_PATH = "parks"
   private var firebaseImageCollectionListener: ListenerRegistration? = null
 
   companion object {
