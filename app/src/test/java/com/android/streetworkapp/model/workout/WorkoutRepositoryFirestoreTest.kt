@@ -11,11 +11,15 @@ import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.anyMap
+import org.mockito.ArgumentMatchers.startsWith
 import org.mockito.Mock
 import org.mockito.Mockito.anyString
+import org.mockito.Mockito.atLeastOnce
 import org.mockito.Mockito.eq
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
@@ -23,6 +27,7 @@ import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
@@ -85,7 +90,7 @@ class WorkoutRepositoryFirestoreTest {
   fun getOrAddWorkoutDataReturnsExistingWorkoutData() = runTest {
     // Mock document exists
     `when`(document.exists()).thenReturn(true)
-    `when`(document.data).thenReturn(mapOf("workoutSessions" to emptyList<Map<String, Any>>()))
+    `when`(document.data).thenReturn(mapOf(WORKOUT_SESSIONS to emptyList<Map<String, Any>>()))
     `when`(document.id).thenReturn("testUid")
     `when`(documentRef.get()).thenReturn(Tasks.forResult(document))
 
@@ -109,7 +114,7 @@ class WorkoutRepositoryFirestoreTest {
 
     repository.addOrUpdateWorkoutSession(uid, workoutSession)
 
-    verify(documentRef).update(eq("workoutSessions"), eq(listOf(workoutSession)))
+    verify(documentRef).update(eq(WORKOUT_SESSIONS), eq(listOf(workoutSession)))
   }
 
   @Test
@@ -147,14 +152,14 @@ class WorkoutRepositoryFirestoreTest {
     `when`(documentRef.get()).thenReturn(Tasks.forResult(document))
     `when`(document.exists()).thenReturn(true)
     `when`(document.id).thenReturn(uid)
-    `when`(document.get("workoutSessions")).thenReturn(sessionMaps)
+    `when`(document.get(WORKOUT_SESSIONS)).thenReturn(sessionMaps)
 
     // Perform the deletion
     repository.deleteWorkoutSession(uid, sessionToDelete.sessionId)
 
     // Capture the updated sessions list
     val captor = argumentCaptor<List<WorkoutSession>>()
-    verify(documentRef).update(eq("workoutSessions"), captor.capture())
+    verify(documentRef).update(eq(WORKOUT_SESSIONS), captor.capture())
 
     println("Captured argument: ${captor.firstValue}")
 
@@ -275,5 +280,83 @@ class WorkoutRepositoryFirestoreTest {
 
     // Verify that the document was deleted
     verify(documentRef).delete()
+  }
+
+  @Test
+  fun respondToPairingRequestUpdatesStatusAndCreatesSessionIfAccepted() = runTest {
+    val requestId = "req123"
+    val isAccepted = true
+    val toUid = "toUser"
+    val fromUid = "fromUser"
+
+    whenever(documentRef.update(anyMap())).thenReturn(Tasks.forResult(null))
+    // Mock set to return a successful Task instead of doNothing()
+    whenever(documentRef.set(any())).thenReturn(Tasks.forResult(null))
+
+    repository.respondToPairingRequest(requestId, isAccepted, toUid, fromUid)
+
+    // Verify request status updated
+    verify(db.collection(PAIRING_REQUESTS).document(requestId))
+        .update(
+            argThat<Map<String, Any>> { map ->
+              map["status"] == RequestStatus.ACCEPTED.name &&
+                  (map["sessionId"] as? String)?.startsWith("session_") == true
+            })
+
+    // Since accepted, a new session is created
+    verify(documentRef, atLeastOnce()).update(eq("workoutSessions"), any<List<WorkoutSession>>())
+  }
+
+  @Test
+  fun respondToPairingRequestRejectedUpdatesStatusOnly() = runTest {
+    val requestId = "req123"
+    val isAccepted = false
+    val toUid = "toUser"
+    val fromUid = "fromUser"
+
+    whenever(documentRef.update(anyMap())).thenReturn(Tasks.forResult(null))
+    repository.respondToPairingRequest(requestId, isAccepted, toUid, fromUid)
+
+    // Verify request status updated to REJECTED
+    verify(db.collection(PAIRING_REQUESTS).document(requestId))
+        .update(
+            argThat<Map<String, Any>> { map ->
+              map["status"] == RequestStatus.REJECTED.name &&
+                  (map["sessionId"] as? String)?.startsWith("session_") == true
+            })
+    // No new session should be created
+    verify(documentRef, never()).set(any<WorkoutData>())
+  }
+
+  @Test
+  fun generateSessionIdReturnsNonEmptyString() {
+    val sessionId = repository.generateSessionId()
+    assertTrue(sessionId.isNotEmpty())
+    assertTrue(sessionId.startsWith("session_"))
+  }
+
+  @Test
+  fun updateSessionAttributesUpdatesCorrectPaths() = runTest {
+    val uid = "testUid"
+    val sessionId = "session123"
+    val updates = mapOf("winner" to "user123")
+
+    repository.updateSessionAttributes(uid, sessionId, updates)
+
+    val captor = argumentCaptor<Map<String, Any>>()
+    verify(documentRef).update(captor.capture())
+
+    // Check that "winner" is updated under "workoutSessions.session123.winner"
+    assertEquals("user123", captor.firstValue["workoutSessions.$sessionId.winner"])
+  }
+
+  @Test
+  fun updatePairingRequestStatusUpdatesFirestore() = runTest {
+    val requestId = "req123"
+    val status = RequestStatus.ACCEPTED
+
+    repository.updatePairingRequestStatus(requestId, status)
+
+    verify(db.collection(PAIRING_REQUESTS).document(requestId)).update("status", status.name)
   }
 }

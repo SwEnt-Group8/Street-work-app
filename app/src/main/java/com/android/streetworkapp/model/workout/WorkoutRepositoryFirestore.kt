@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
-private const val PAIRING_REQUESTS = "pairingRequests"
+const val PAIRING_REQUESTS = "pairingRequests"
 
 class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRepository {
 
