@@ -154,9 +154,7 @@ fun TrainCoachScreen(
     }
   }
 }
-/**
- * Fallback content to display when no session data is available.
- */
+/** Fallback content to display when no session data is available. */
 @Composable
 fun FallbackContent() {
   Column(
