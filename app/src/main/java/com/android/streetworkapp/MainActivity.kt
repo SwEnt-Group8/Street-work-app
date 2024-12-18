@@ -434,6 +434,7 @@ fun StreetWorkApp(
                         progressionViewModel,
                         workoutViewModel,
                         preferencesViewModel,
+                        imageViewModel,
                         authService,
                         showSettingsDialog)
                   },
