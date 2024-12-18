@@ -113,5 +113,7 @@
     <string name="SignInToastLoginSuccessful">Login successful</string>
     <string name="SignInToastLoginFailed">Login failed: %s</string>
 
+    // Google Auth Button
+    <string name="GoogleAuthButtonText">Sign in with Google</string>
 
 </resources>

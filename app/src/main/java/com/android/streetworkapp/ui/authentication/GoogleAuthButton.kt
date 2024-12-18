@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -35,7 +36,7 @@ fun GoogleAuthButton(
     authService: GoogleAuthService,
     launcher: ManagedActivityResultLauncher<Intent, ActivityResult>
 ) {
-
+  val context = LocalContext.current
   Button(
       onClick = {
         Log.d("SignInScreen", "Start sign-in")
@@ -62,7 +63,7 @@ fun GoogleAuthButton(
                   modifier = Modifier.size(24.dp).padding(end = 8.dp).testTag("loginButtonIcon"))
               Text(
                   modifier = Modifier.testTag("loginButtonText"),
-                  text = "Sign in with Google",
+                  text = context.getString(R.string.GoogleAuthButtonText),
                   style =
                       GoogleAuthButtonTextStyle.copy(
                           color = DarkGray, textAlign = TextAlign.Center))
