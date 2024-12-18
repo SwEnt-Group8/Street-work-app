@@ -377,7 +377,10 @@ fun InteractiveRatingComponent(rating: MutableState<Int>) {
  * @param navigationActions The navigation actions to navigate to other screens.
  */
 @Composable
-fun EventItemList(eventViewModel: EventViewModel, navigationActions: NavigationActions) {
+fun EventItemList(
+    eventViewModel: EventViewModel,
+    navigationActions: NavigationActions,
+) {
   val uiState = eventViewModel.uiState.collectAsState().value
 
   Column(modifier = Modifier.testTag("eventItemList")) {

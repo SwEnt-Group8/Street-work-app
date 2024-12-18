@@ -22,6 +22,7 @@ class TopAppBarManager(
         icon = R.drawable.settings, contentDescription = "Settings", testTag = "settingsButton"),
     INFO(icon = R.drawable.octagon_help, contentDescription = "Info", testTag = "infoButton"),
     SEARCH(icon = R.drawable.map_search, contentDescription = "Search", testTag = "searchButton"),
+    FILTER(icon = R.drawable.map_search, contentDescription = "Filter", testTag = "filterButton"),
 
     // Add more actions here
   }
