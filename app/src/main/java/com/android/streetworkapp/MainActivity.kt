@@ -271,7 +271,7 @@ fun StreetWorkApp(
             ?.isTopBarVisible
             ?.takeIf { it }
             ?.let {
-              TopAppBarWrapper(navigationActions, screenParams?.topAppBarManager)
+              TopAppBarWrapper(navigationActions, screenParams?.topAppBarManager, searchQuery)
               // setup the InfoDialogManager in topBar, because it relies on the topAppBarManager.
               Log.d("InfoDialog", "Main - Setting up the InfoDialogManager")
               infoManager.setUp()

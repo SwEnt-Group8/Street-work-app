@@ -3,7 +3,6 @@ package com.android.streetworkapp.ui.navigation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,14 +32,13 @@ fun TopAppBarWrapper(
     TopAppBar(
         modifier = Modifier.testTag("topAppBar"),
         title = {
-          Text(modifier = Modifier.testTag("topAppBarTitle"), text = it.getTopAppBarTitle())
+          if (topAppBarManager.hasSearchBar()) {
+            MapSearchBar(query)
+          } else {
+            Text(modifier = Modifier.testTag("topAppBarTitle"), text = it.getTopAppBarTitle())
+          }
         },
         actions = {
-          if (topAppBarManager.hasSearchBar()) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-              MapSearchBar(query)
-            }
-          }
           Row(
               horizontalArrangement = Arrangement.spacedBy(8.dp),
               modifier = Modifier.padding(8.dp)) {

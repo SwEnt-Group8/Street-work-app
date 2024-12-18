@@ -12,8 +12,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Login
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -193,22 +196,29 @@ fun MapScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapSearchBar(query: MutableState<String>) {
-  Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-    SearchBar(
-        query = query.value,
-        onQueryChange = { query.value = it },
-        placeholder = { "Search for parks" },
-        modifier = Modifier.testTag("searchBar").padding(bottom = 8.dp).padding(horizontal = 4.dp),
-        active = false,
-        onActiveChange = {},
-        onSearch = {},
-        leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = "Search") },
-        colors = SearchBarDefaults.colors(containerColor = ColorPalette.INTERACTION_COLOR_LIGHT)) {}
-  }
+  Row(
+      modifier = Modifier.fillMaxWidth().padding(vertical = 20.dp),
+      horizontalArrangement = Arrangement.Center) {
+        SearchBar(
+            query = query.value,
+            onQueryChange = { query.value = it },
+            placeholder = { Text("Search for parks") },
+            modifier =
+                Modifier.testTag("searchBar").padding(bottom = 8.dp).padding(horizontal = 4.dp),
+            active = false,
+            onActiveChange = {},
+            onSearch = {},
+            leadingIcon = {
+              Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
+            },
+            colors =
+                SearchBarDefaults.colors(containerColor = ColorPalette.INTERACTION_COLOR_LIGHT)) {}
+      }
 }
 
 @Composable
 fun MarkerInfoWindowContent(park: Park) {
+    Box{
   Column(
       horizontalAlignment = Alignment.CenterHorizontally,
       modifier =
@@ -230,9 +240,23 @@ fun MarkerInfoWindowContent(park: Park) {
               modifier = Modifier.padding(horizontal = 5.dp).testTag("eventIcon"))
           Text(
               text = "${park.events.size} event(s) planned",
-              modifier = Modifier.testTag("eventsPlanned"))
+              modifier = Modifier.testTag("eventsPlanned").padding(end = 8.dp))
+
+            Box(
+                modifier =
+                Modifier.size(26.dp)
+                    .background(
+                        color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape)
+                    .padding(2.dp)) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Login,
+                    contentDescription = "Add Image",
+                    tint = Color.White,
+                    modifier = Modifier.align(Alignment.Center).fillMaxSize(0.75f).testTag("enterParkIcon"))
+            }
         }
       }
+    }
 }
 
 /**

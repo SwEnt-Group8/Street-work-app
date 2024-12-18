@@ -103,22 +103,20 @@ class MapUiTest {
     composeTestRule.onNodeWithTag("eventIcon").assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("eventsPlanned").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("enterParkIcon").assertIsDisplayed()
   }
 
   @Test
   fun mapSearchBarComponentIsDisplayed() {
 
-    val logicValue = mutableStateOf(false)
-
-    composeTestRule.setContent { MapSearchBar(mutableStateOf("")) { logicValue.value = true } }
+    composeTestRule.setContent { MapSearchBar(mutableStateOf("")) }
 
     composeTestRule.waitForIdle()
 
     composeTestRule.onNodeWithTag("searchBar").assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("cancelSearchButton").assertIsDisplayed().performClick()
-
-    assert(logicValue.value)
   }
 
   @Test
