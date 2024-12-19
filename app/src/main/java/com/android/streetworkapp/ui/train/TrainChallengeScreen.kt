@@ -9,7 +9,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.android.sample.R
 import com.android.streetworkapp.model.workout.WorkoutViewModel
 
 @Composable
@@ -22,12 +24,13 @@ fun TrainChallengeScreen(
     workoutViewModel: WorkoutViewModel,
     paddingValues: PaddingValues = PaddingValues(0.dp)
 ) {
+  val context = LocalContext.current
   Column(
       modifier = Modifier.fillMaxSize().padding(16.dp),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center) {
-        Text("Train Challenge")
-        Text("Activity: $activity")
-        Text("Time Dependent: $isTimeDependent")
+        Text(context.getString(R.string.TrainingTrainChallengeText))
+        Text(context.getString(R.string.TrainingActivityText, activity))
+        Text(context.getString(R.string.TrainingTimeDependentText, isTimeDependent))
       }
 }

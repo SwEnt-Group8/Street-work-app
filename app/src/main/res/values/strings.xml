@@ -193,4 +193,11 @@
     // Bluetooth Button
     <string name="BluetoothButtonText">Send request</string>
     <string name="BluetoothButtonToastRequestSent">Friend request sent</string>
+
+    // Training
+    <string name="TrainingTimesUp">Time\'s Up!</string>
+    <string name="TrainingTrainChallengeText">Train Challenge</string>
+    <string name="TrainingTrainCoachText">Train Coach</string>
+    <string name="TrainingActivityText">Activity: %s</string>
+    <string name="TrainingTimeDependentText">Time Dependent: %b</string>
 </resources>
