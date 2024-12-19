@@ -12,17 +12,19 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Login
 import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SnackbarHostState
@@ -39,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
@@ -290,54 +293,71 @@ fun ParkFilterSettings(userFilterInput: FilterSettings) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MapSearchBar(query: MutableState<String>, onCancel: () -> Unit) {
-  Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-    SearchBar(
-        query = query.value,
-        onQueryChange = { query.value = it },
-        placeholder = { "Search for parks" },
-        modifier = Modifier.testTag("searchBar").padding(bottom = 8.dp).padding(horizontal = 4.dp),
-        active = false,
-        onActiveChange = {},
-        onSearch = {},
-        leadingIcon = {
-          IconButton(onClick = onCancel, modifier = Modifier.testTag("cancelSearchButton")) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Search",
-            )
-          }
-        },
-        colors = SearchBarDefaults.colors(containerColor = ColorPalette.INTERACTION_COLOR_LIGHT)) {}
-  }
+fun MapSearchBar(query: MutableState<String>) {
+  Row(
+      modifier = Modifier.fillMaxWidth().padding(vertical = 20.dp),
+      horizontalArrangement = Arrangement.Center) {
+        SearchBar(
+            query = query.value,
+            onQueryChange = { query.value = it },
+            placeholder = { Text(stringResource(R.string.search_bar_placeholder)) },
+            modifier =
+                Modifier.testTag("searchBar").padding(bottom = 8.dp).padding(horizontal = 4.dp),
+            active = false,
+            onActiveChange = {},
+            onSearch = {},
+            leadingIcon = {
+              Icon(imageVector = Icons.Default.Search, contentDescription = "Search")
+            },
+            colors =
+                SearchBarDefaults.colors(containerColor = ColorPalette.INTERACTION_COLOR_LIGHT)) {}
+      }
 }
 
 @Composable
 fun MarkerInfoWindowContent(park: Park) {
-  Column(
-      horizontalAlignment = Alignment.CenterHorizontally,
-      modifier =
-          Modifier.background(Color.White, shape = RoundedCornerShape(10.dp))
-              .padding(10.dp)
-              .testTag("markerInfoWindow")) {
-        Text(
-            text = park.name,
-            color = Color.Black,
-            fontSize = 16.sp,
-            modifier = Modifier.padding(5.dp).testTag("parkName"))
-
-        RatingComponent(park.rating.toInt(), park.nbrRating)
-
-        Row(modifier = Modifier.padding(5.dp), verticalAlignment = Alignment.CenterVertically) {
-          Icon(
-              Icons.Filled.Event,
-              contentDescription = "eventIcon",
-              modifier = Modifier.padding(horizontal = 5.dp).testTag("eventIcon"))
+  Box {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier =
+            Modifier.background(Color.White, shape = RoundedCornerShape(10.dp))
+                .padding(10.dp)
+                .testTag("markerInfoWindow")) {
           Text(
-              text = "${park.events.size} event(s) planned",
-              modifier = Modifier.testTag("eventsPlanned"))
+              text = park.name,
+              color = Color.Black,
+              fontSize = 16.sp,
+              modifier = Modifier.padding(5.dp).testTag("parkName"))
+
+          RatingComponent(park.rating.toInt(), park.nbrRating)
+
+          Row(modifier = Modifier.padding(5.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                Icons.Filled.Event,
+                contentDescription = "eventIcon",
+                modifier = Modifier.padding(horizontal = 5.dp).testTag("eventIcon"))
+            Text(
+                text = "${park.events.size} ${stringResource(R.string.event_info)}",
+                modifier = Modifier.testTag("eventsPlanned").padding(end = 8.dp))
+
+            Box(
+                modifier =
+                    Modifier.size(26.dp)
+                        .background(
+                            color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape)
+                        .padding(2.dp)) {
+                  Icon(
+                      imageVector = Icons.AutoMirrored.Filled.Login,
+                      contentDescription = "Add Image",
+                      tint = Color.White,
+                      modifier =
+                          Modifier.align(Alignment.Center)
+                              .fillMaxSize(0.75f)
+                              .testTag("enterParkIcon"))
+                }
+          }
         }
-      }
+  }
 }
 
 /**

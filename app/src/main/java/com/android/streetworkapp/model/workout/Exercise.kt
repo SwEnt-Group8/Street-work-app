@@ -10,7 +10,7 @@ package com.android.streetworkapp.model.workout
  * @param duration Optional duration for the exercise
  */
 data class Exercise(
-    val name: String,
+    val name: String = "",
     val reps: Int? = null,
     val sets: Int? = null,
     val weight: Float? = null,

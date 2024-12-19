@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
-private const val PAIRING_REQUESTS = "pairingRequests"
+const val PAIRING_REQUESTS = "pairingRequests"
 
 class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRepository {
 
@@ -17,6 +17,7 @@ class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRep
     private const val ERROR_UID_EMPTY = "The user UID must not be empty."
     private const val ERROR_TAG = "FirestoreError"
     private const val ERROR_SESSION_ID_EMPTY = "The session ID must not be empty."
+    private const val REQUEST_NOT_EMPTY = "The request ID must not be empty."
     private const val WORKOUT_SESSIONS = "workoutSessions"
   }
 
@@ -187,34 +188,185 @@ class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRep
    * @param uid The UID of the user.
    */
   override fun observePairingRequests(uid: String): Flow<List<PairingRequest>> = callbackFlow {
-    val subscription =
-        db.collection(PAIRING_REQUESTS).whereEqualTo("toUid", uid).addSnapshotListener { snapshot, e
-          ->
-          if (e != null) {
-            Log.e(ERROR_TAG, "Listen failed.", e)
-            close(e) // Close the flow on error
+    val collection = db.collection(PAIRING_REQUESTS)
+
+    // Use two separate queries for 'fromUid' and 'toUid' since Firestore doesn't directly support
+    // 'or' queries -_-
+    val fromUidQuery = collection.whereEqualTo("fromUid", uid)
+    val toUidQuery = collection.whereEqualTo("toUid", uid)
+
+    val fromUidListener =
+        fromUidQuery.addSnapshotListener { fromSnapshot, fromError ->
+          if (fromError != null) {
+            Log.e(ERROR_TAG, "Listen failed for 'fromUid'.", fromError)
+            close(fromError)
+            return@addSnapshotListener
           }
-          if (snapshot != null && !snapshot.isEmpty) {
-            try {
-              val requests = snapshot.toObjects(PairingRequest::class.java)
-              trySend(requests).isSuccess
-            } catch (e: Exception) {
-              Log.e(ERROR_TAG, "Error parsing documents", e)
-            }
-          }
+          val fromRequests = fromSnapshot?.toObjects(PairingRequest::class.java) ?: emptyList()
+          trySend(fromRequests).isSuccess
         }
-    awaitClose { subscription.remove() }
+
+    val toUidListener =
+        toUidQuery.addSnapshotListener { toSnapshot, toError ->
+          if (toError != null) {
+            Log.e(ERROR_TAG, "Listen failed for 'toUid'.", toError)
+            close(toError)
+            return@addSnapshotListener
+          }
+          val toRequests = toSnapshot?.toObjects(PairingRequest::class.java) ?: emptyList()
+          trySend(toRequests).isSuccess
+        }
+
+    // Combine the results when both listeners emit values
+    awaitClose {
+      fromUidListener.remove()
+      toUidListener.remove()
+    }
   }
 
   /**
-   * Responds to a pairing request by updating its status.
+   * Responds to a pairing request. If accepted, creates a new session.
    *
    * @param requestId The ID of the pairing request.
-   * @param isAccepted True if the request is accepted, false if rejected.
+   * @param isAccepted True if the request is accepted, false otherwise.
+   * @param toUid The UID of the athlete (who is responding to the request).
+   * @param fromUid The UID of the coach who created the request.
    */
-  override suspend fun respondToPairingRequest(requestId: String, isAccepted: Boolean) {
-    val status = if (isAccepted) RequestStatus.ACCEPTED else RequestStatus.REJECTED
-    db.collection(PAIRING_REQUESTS).document(requestId).update("status", status.name).await()
+  override suspend fun respondToPairingRequest(
+      requestId: String,
+      isAccepted: Boolean,
+      toUid: String,
+      fromUid: String
+  ) {
+    try {
+      val status = if (isAccepted) RequestStatus.ACCEPTED else RequestStatus.REJECTED
+
+      // Update the PairingRequest
+      val sessionId = generateSessionId()
+      db.collection(PAIRING_REQUESTS)
+          .document(requestId)
+          .update(mapOf("status" to status.name, "sessionId" to sessionId))
+          .await()
+      if (isAccepted) {
+        // Create a new workout session
+        val newSession =
+            WorkoutSession(
+                sessionId = sessionId,
+                startTime = System.currentTimeMillis(),
+                endTime = 0L,
+                sessionType = SessionType.COACH,
+                participants = listOf(toUid, fromUid),
+                coachUid = fromUid,
+                exercises = emptyList())
+
+        addOrUpdateWorkoutSession(toUid, newSession)
+      }
+    } catch (e: Exception) {
+      Log.e(ERROR_TAG, "Error responding to pairing request: ${e.message}")
+    }
+  }
+
+  /** Generates a unique session ID. */
+  internal fun generateSessionId(): String {
+    return "session_${System.currentTimeMillis()}"
+  }
+
+  /**
+   * Observes accepted pairing requests for a specific user.
+   *
+   * @param fromUid The UID of the user.
+   */
+  override fun observeAcceptedPairingRequests(fromUid: String): Flow<List<PairingRequest>> =
+      callbackFlow {
+        val subscription =
+            db.collection(PAIRING_REQUESTS)
+                .whereEqualTo("fromUid", fromUid)
+                .whereEqualTo("status", RequestStatus.ACCEPTED.name)
+                .addSnapshotListener { snapshot, e ->
+                  if (e != null) {
+                    Log.e(ERROR_TAG, "Error observing accepted pairing requests: ${e.message}")
+                    close(e) // Close the flow on error
+                  }
+                  if (snapshot != null && !snapshot.isEmpty) {
+                    try {
+                      val requests = snapshot.toObjects(PairingRequest::class.java)
+                      trySend(requests).isSuccess
+                    } catch (e: Exception) {
+                      Log.e(ERROR_TAG, "Error parsing accepted pairing requests: ${e.message}")
+                    }
+                  }
+                }
+        awaitClose { subscription.remove() }
+      }
+
+  /**
+   * Updates specific attributes of a workout session.
+   *
+   * @param uid The UID of the user (also the WorkoutData ID).
+   * @param sessionId The ID of the session to update.
+   */
+  override suspend fun getWorkoutSessionBySessionId(
+      uid: String,
+      sessionId: String
+  ): WorkoutSession? {
+    require(uid.isNotEmpty()) { ERROR_UID_EMPTY }
+    require(sessionId.isNotEmpty()) { ERROR_SESSION_ID_EMPTY }
+
+    return try {
+      val document = db.collection(COLLECTION_PATH).document(uid).get().await()
+      if (document.exists()) {
+        val workoutSessions = documentToWorkoutData(document).workoutSessions
+        workoutSessions.find { it.sessionId == sessionId }
+      } else {
+        null
+      }
+    } catch (e: Exception) {
+      Log.e(ERROR_TAG, "Error fetching WorkoutSession by sessionId: ${e.message}")
+      null
+    }
+  }
+
+  /**
+   * Updates specific attributes of a workout session.
+   *
+   * @param uid The UID of the user (also the WorkoutData ID).
+   * @param sessionId The ID of the session to update.
+   * @param updates A map of attributes to update.
+   */
+  override suspend fun updateSessionAttributes(
+      uid: String,
+      sessionId: String,
+      updates: Map<String, Any>
+  ) {
+    require(uid.isNotEmpty()) { ERROR_UID_EMPTY }
+    require(sessionId.isNotEmpty()) { ERROR_SESSION_ID_EMPTY }
+
+    try {
+      val sessionPath = "$WORKOUT_SESSIONS.$sessionId"
+      val updateMap = updates.mapKeys { "$sessionPath.${it.key}" }
+      db.collection(COLLECTION_PATH).document(uid).update(updateMap).await()
+    } catch (e: Exception) {
+      Log.e(ERROR_TAG, "Error updating session attributes for sessionId=$sessionId: ${e.message}")
+    }
+  }
+
+  /**
+   * Updates the status of a pairing request.
+   *
+   * @param requestId The ID of the pairing request.
+   * @param status The new status of the request.
+   */
+  override suspend fun updatePairingRequestStatus(requestId: String, status: RequestStatus) {
+    require(requestId.isNotEmpty()) { REQUEST_NOT_EMPTY }
+    try {
+      db.collection(PAIRING_REQUESTS)
+          .document(requestId)
+          .update("status", status.name) // Update the status field to the new value
+          .await() // Await completion of the Firestore operation
+    } catch (e: Exception) {
+      Log.e(
+          ERROR_TAG, "Error updating pairing request status for requestId=$requestId: ${e.message}")
+    }
   }
 
   /**
@@ -223,32 +375,35 @@ class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRep
    * @param uid The UID of the user.
    */
   override fun observeWorkoutSessions(uid: String): Flow<List<WorkoutSession>> = callbackFlow {
+    Log.d(ERROR_TAG, "Observing WorkoutData for userUid=$uid")
+
     val subscription =
         db.collection(COLLECTION_PATH)
-            .document(uid)
-            .collection(WORKOUT_SESSIONS)
+            .whereEqualTo(
+                "userUid", uid) // Match documents where `userUid` matches the provided UID
             .addSnapshotListener { snapshot, e ->
               if (e != null) {
-                Log.e(ERROR_TAG, "Listen failed.", e)
-                close(e) // Close the flow on error
-              }
-              if (snapshot != null) {
-                val sessions = snapshot.toObjects(WorkoutSession::class.java)
-                trySend(sessions).isSuccess
+                Log.e(ERROR_TAG, "Error fetching WorkoutData for userUid=$uid", e)
+                close(e) // Terminate the flow on error
+              } else if (snapshot != null && !snapshot.isEmpty) {
+                // Extract the first matching document
+                val workoutData =
+                    snapshot.documents.firstOrNull()?.toObject(WorkoutData::class.java)
+                if (workoutData != null) {
+                  val sessions = workoutData.workoutSessions
+                  Log.d(ERROR_TAG, "Received ${sessions.size} sessions for userUid=$uid")
+                  trySend(sessions).isSuccess
+                } else {
+                  Log.w(ERROR_TAG, "Failed to parse WorkoutData for userUid=$uid")
+                  trySend(emptyList()).isSuccess
+                }
+              } else {
+                Log.d(ERROR_TAG, "No matching WorkoutData found for userUid=$uid")
+                trySend(emptyList()).isSuccess // Emit an empty list if no data is found
               }
             }
-    awaitClose { subscription.remove() }
-  }
 
-  /**
-   * Adds a comment to a workout session.
-   *
-   * @param sessionId The ID of the session.
-   * @param comment The comment to add.
-   */
-  override suspend fun addCommentToSession(sessionId: String, comment: Comment) {
-    val sessionPath = "$COLLECTION_PATH/${comment.authorUid}/$WORKOUT_SESSIONS/$sessionId/comments"
-    db.collection(sessionPath).add(comment).await()
+    awaitClose { subscription.remove() } // Clean up the listener when the flow is closed
   }
 
   /**
@@ -307,6 +462,38 @@ class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRep
                 (sessionMap["exercises"] as? List<*>)?.filterIsInstance<Map<String, Any>>()
                     ?: emptyList()),
         winner = sessionMap["winner"] as? String)
+  }
+
+  /**
+   * Updates the training status in the PairingRequest.
+   *
+   * @param requestId The ID of the pairing request.
+   * @param counter The counter value to update.
+   */
+  override suspend fun updateCounter(requestId: String, counter: Int) {
+    require(requestId.isNotEmpty()) { REQUEST_NOT_EMPTY }
+
+    try {
+      db.collection(PAIRING_REQUESTS)
+          .document(requestId)
+          .update("counter", counter.toLong()) // Convert to Long for Firestore
+          .await()
+    } catch (e: Exception) {
+      Log.e(ERROR_TAG, "Error updating counter: ${e.message}")
+    }
+  }
+
+  override suspend fun updateTimerStatus(requestId: String, timerStatus: TimerStatus) {
+    require(requestId.isNotEmpty()) { REQUEST_NOT_EMPTY }
+
+    try {
+      db.collection(PAIRING_REQUESTS)
+          .document(requestId)
+          .update("timerStatus", timerStatus.name) // Store as String
+          .await()
+    } catch (e: Exception) {
+      Log.e(ERROR_TAG, "Error updating timer status: ${e.message}")
+    }
   }
 
   /**
