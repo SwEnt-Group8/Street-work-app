@@ -56,7 +56,7 @@ class End2EndAchievement {
   val permissionRule: GrantPermissionRule =
       GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
-  private val mockedUser =
+  private var mockedUser =
       User(
           uid = "test",
           username = "John Doe",
@@ -124,7 +124,26 @@ class End2EndAchievement {
         .onNodeWithTag("emptyAchievementsText")
         .assertExists() // the user sees that there is no achievement yet
 
-    // The user will now try to join an event, in order to win points
+    // The user will now try to add a friend, in order to win points
 
+    // User goes to profile and then to add friend
+    composeTestRule.onNodeWithTag("bottomNavigationItem${Route.PROFILE}").performClick()
+
+    composeTestRule.onNodeWithTag("profileAddButton").performClick()
+
+    composeTestRule
+        .onNodeWithTag("addFriendScreen")
+        .assertIsDisplayed() // check we are at the addFriend screen
+
+    // To simulate adding a friend through bluetooth
+    mockedUser = mockedUser.copy(friends = listOf("friendID"))
+
+    // User goes back to progression to see the achievement for adding a friend
+
+    composeTestRule.onNodeWithTag("bottomNavigationItem${Route.PROGRESSION}").performClick()
+    composeTestRule.onNodeWithTag("AchievementTab").performClick()
+    composeTestRule.waitForIdle()
+
+    // TODO check presence of "first friend" achievement
   }
 }
