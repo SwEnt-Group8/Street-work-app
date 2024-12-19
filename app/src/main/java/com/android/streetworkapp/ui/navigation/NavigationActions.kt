@@ -142,8 +142,7 @@ data class ScreenParams(
     val TRAIN_COACH =
         ScreenParams(
             screenName = Screen.TRAIN_COACH,
-            topAppBarManager =
-                TopAppBarManager("Train with a friends as coach", hasNavigationIcon = true))
+            topAppBarManager = TopAppBarManager("Train with a friend", hasNavigationIcon = true))
     val TRAIN_CHALLENGE =
         ScreenParams(
             screenName = Screen.TRAIN_CHALLENGE,
