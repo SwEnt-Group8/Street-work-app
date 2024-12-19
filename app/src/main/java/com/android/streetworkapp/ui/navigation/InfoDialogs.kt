@@ -40,6 +40,8 @@ class InfoDialogManager(
                   "ParkOverview", R.string.ParkOverviewInfoTitle, R.string.ParkOverviewInfoContent),
           screens.ADD_EVENT to
               InfoDialog("AddEvent", R.string.AddEventInfoTitle, R.string.AddEventInfoContent),
+          screens.EDIT_EVENT to
+              InfoDialog("EditEvent", R.string.EditEventInfoTitle, R.string.EditEventInfoContent),
           screens.EVENT_OVERVIEW to
               InfoDialog(
                   "EventOverview",
@@ -51,7 +53,7 @@ class InfoDialogManager(
 
           // Auth not done because unnecessary
           // Add more if needed
-          )
+      )
 
   val infoDialogs: MutableMap<String, InfoDialog>
     get() = _infoDialogs
