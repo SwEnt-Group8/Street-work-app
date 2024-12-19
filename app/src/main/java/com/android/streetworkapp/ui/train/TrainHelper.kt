@@ -37,6 +37,7 @@ fun TrainCoachDialog(onRoleSelected: (Boolean) -> Unit, onDismiss: () -> Unit) {
   val isCoach = remember { mutableStateOf(false) }
 
   AlertDialog(
+      containerColor = PRINCIPLE_BACKGROUND_COLOR,
       onDismissRequest = onDismiss,
       confirmButton = {
         Button(
@@ -68,7 +69,6 @@ fun TrainCoachDialog(onRoleSelected: (Boolean) -> Unit, onDismiss: () -> Unit) {
             modifier = Modifier.fillMaxWidth().testTag("DialogContent"),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally) {
-              Text(text = stringResource(id = R.string.role_selection_text))
               Row(
                   modifier = Modifier.fillMaxWidth(),
                   verticalAlignment = Alignment.CenterVertically,
@@ -112,6 +112,7 @@ fun WaitingDialog(
   LaunchedEffect(currentUserUid) { workoutViewModel.observePairingRequests(currentUserUid) }
 
   AlertDialog(
+      containerColor = PRINCIPLE_BACKGROUND_COLOR,
       onDismissRequest = onDismiss,
       confirmButton = {},
       dismissButton = {
@@ -219,6 +220,7 @@ fun FriendListDialog(
   userViewModel.getFriendsByUid(currentUserUid)
 
   AlertDialog(
+      containerColor = PRINCIPLE_BACKGROUND_COLOR,
       onDismissRequest = onDismiss,
       confirmButton = {},
       dismissButton = {
