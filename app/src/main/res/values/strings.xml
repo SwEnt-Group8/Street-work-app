@@ -68,6 +68,10 @@
     // Progression Info
     <string name="ProgressionInfoTitle">What is the Progression ?</string>
     <string name="ProgressionInfoContent">This is the progression screen, here you can see your progression and achievements. \n\n There is your record for each exercise in Training, click on it to see more details !</string>
+    // TrainHub Info
+    <string name="TrainHubInfoTitle">What is the Training Hub ?</string>
+    <string name="TrainHubInfoContent">This is the training hub, here you can train any of the proposed exercise. \n\nYou can choose to either train alone or in a coach session. \n\nHave fun in here !</string>
+
 
     // Progression UI
     <string name="ProgressionEmptyAchievements">You do not have any achievements yet!</string>

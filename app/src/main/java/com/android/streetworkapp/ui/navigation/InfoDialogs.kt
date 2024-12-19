@@ -49,7 +49,9 @@ class InfoDialogManager(
                   R.string.EventOverviewInfoContent),
           screens.PROGRESSION to
               InfoDialog(
-                  "Progression", R.string.ProgressionInfoTitle, R.string.ProgressionInfoContent)
+                  "Progression", R.string.ProgressionInfoTitle, R.string.ProgressionInfoContent),
+          screens.TRAIN_HUB to
+              InfoDialog("TrainHub", R.string.TrainHubInfoTitle, R.string.TrainHubInfoContent)
 
           // Auth not done because unnecessary
           // Add more if needed
