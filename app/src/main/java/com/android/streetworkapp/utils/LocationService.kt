@@ -35,6 +35,7 @@ class LocationService(
 
   // Define the FusedLocationProviderClient to get location
   private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+  private lateinit var currentParks: List<String>
 
   fun startLocationUpdates(callback: LocationCallback) {
 
@@ -69,7 +70,8 @@ class LocationService(
         user?.let {
           // add new park in user list
           userViewModel.getParksByUid(it.uid)
-          val currentParks = user.parks
+          currentParks = userViewModel.parks.value
+          Log.d("Localisation", "current user discovered park: $currentParks")
           if (!currentParks.contains(park.id)) {
             Log.d("Localisation", "park is new")
             userViewModel.addNewPark(it.uid, park.id)
