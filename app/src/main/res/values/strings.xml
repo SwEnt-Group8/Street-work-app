@@ -181,4 +181,8 @@
     // Map Manager
     <string name="MapManagerToastPermissionGranted">Permission granted.</string>
     <string name="MapManagerToastPermissionDenied">Location permission denied.</string>
+
+    // Bluetooth Button
+    <string name="BluetoothButtonText">Send request</string>
+    <string name="BluetoothButtonToastRequestSent">Friend request sent</string>
 </resources>
