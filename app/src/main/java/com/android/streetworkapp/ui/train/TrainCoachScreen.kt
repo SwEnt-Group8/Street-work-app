@@ -161,7 +161,7 @@ fun FallbackContent() {
       modifier = Modifier.fillMaxSize().padding(16.dp),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center) {
-        Text("No session data available.")
+        Text(stringResource(id = R.string.no_session))
       }
 }
 

@@ -119,11 +119,11 @@
     <string name="time_activity_in_progress">The activity is time-based and currently in progress. Your coach manage the timer.</string>
     <string name="reps_activity_in_progress">The activity is repetition-based and currently in progress. Your coach manage the counter.</string>
     <string name="end_session_button_text">End session</string>
-    <string name="counter_as_coach">Counter as coach</string>
     <string name="counter_message">Sets completed so far</string>
     <string name="save_workout_session_button">Save session</string>
     <string name="workout_timer_status_running">Timer Status: Running</string>
     <string name="workout_timer_status_stopped">Timer Status: Stopped</string>
+    <string name="no_session">No session data available.</string>
 
     //Event statuses
     <string name="event_soon">Starting soon!</string>
