@@ -29,7 +29,7 @@ class ProfileComponentsTest {
   @Test
   fun isNullUserScoreCorrectlyDisplayed() {
     val user = null
-    val UNKNOWN_SCORE_MESSAGE = "unknown score"
+    val UNKNOWN_SCORE_MESSAGE = "Unknown score"
     composeTestRule.setContent { DisplayScore(user) }
     composeTestRule.onNodeWithTag("profileScore").assertTextEquals(UNKNOWN_SCORE_MESSAGE)
   }
@@ -44,7 +44,7 @@ class ProfileComponentsTest {
   @Test
   fun isNullUsernameCorrectlyDisplayed() {
     val user = null
-    val UNKNOWN_USER_MESSAGE = "unknown user"
+    val UNKNOWN_USER_MESSAGE = "Unknown user"
     composeTestRule.setContent { DisplayUsername(user) }
     composeTestRule.onNodeWithTag("profileUsername").assertTextEquals(UNKNOWN_USER_MESSAGE)
   }
