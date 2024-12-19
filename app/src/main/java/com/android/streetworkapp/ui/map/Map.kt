@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import com.android.sample.R
 import com.android.streetworkapp.utils.LocationService
 import com.android.streetworkapp.utils.PermissionManager
 import com.google.android.gms.location.LocationCallback
@@ -39,11 +40,19 @@ fun MapManager(
             if (isGranted) {
               // Permission granted, fetch user location
               Log.d("Map", "Location permission granted")
-              Toast.makeText(context, "Permission granted.", Toast.LENGTH_SHORT).show()
+              Toast.makeText(
+                      context,
+                      context.getString(R.string.MapManagerToastPermissionGranted),
+                      Toast.LENGTH_SHORT)
+                  .show()
             } else {
               // Permission denied
               Log.d("Map", "Location permission denied")
-              Toast.makeText(context, "Location permission denied.", Toast.LENGTH_SHORT).show()
+              Toast.makeText(
+                      context,
+                      context.getString(R.string.MapManagerToastPermissionDenied),
+                      Toast.LENGTH_SHORT)
+                  .show()
             }
           })
 

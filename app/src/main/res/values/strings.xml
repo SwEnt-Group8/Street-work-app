@@ -178,4 +178,7 @@
     <string name="ImageDialogTextImageLoading" tools:ignore="TypographyEllipsis">Image is loading...</string>
     <string name="ImageDialogTextAddImageConfirm">Add this Photo to the Park?</string>
 
+    // Map Manager
+    <string name="MapManagerToastPermissionGranted">Permission granted.</string>
+    <string name="MapManagerToastPermissionDenied">Location permission denied.</string>
 </resources>
