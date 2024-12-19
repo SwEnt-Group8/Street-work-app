@@ -45,6 +45,7 @@ import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
+import com.android.sample.R
 import com.android.streetworkapp.model.image.ImageViewModel
 import com.android.streetworkapp.model.park.Park
 import com.android.streetworkapp.model.user.User
@@ -64,6 +65,7 @@ fun ConfirmImageDialog(
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
 ) {
+  val context = LocalContext.current
   var isImageLoading by remember { mutableStateOf(true) }
 
   Dialog(onDismissRequest = { onCancel() }) {
@@ -82,7 +84,7 @@ fun ConfirmImageDialog(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.padding(16.dp)) {
                   Text(
-                      text = "Add this Photo to the Park?",
+                      text = context.getString(R.string.ImageDialogTextAddImageConfirm),
                       fontSize = 18.sp,
                       color = ColorPalette.PRIMARY_TEXT_COLOR,
                       fontWeight = FontWeight.SemiBold,
@@ -113,7 +115,7 @@ fun ConfirmImageDialog(
                             )
                         if (isImageLoading) {
                           Text(
-                              "Image is loading...",
+                              context.getString(R.string.ImageDialogTextImageLoading),
                               modifier = Modifier.padding(15.dp),
                               fontWeight = FontWeight.SemiBold)
                         }
@@ -122,8 +124,7 @@ fun ConfirmImageDialog(
                   Spacer(modifier = Modifier.height(5.dp))
 
                   Text(
-                      text =
-                          "Disclaimer: Your photo will be linked to your account and visible to anyone using the app.",
+                      text = context.getString(R.string.ImageDialogTextDisclaimer),
                       color = ColorPalette.SECONDARY_TEXT_COLOR,
                       fontSize = 12.sp,
                       textAlign = TextAlign.Center,

@@ -173,4 +173,9 @@
     <string name="AddEventButtonValidate">Validate</string>
     <string name="AddEventToastEventUpdated">Event updated</string>
 
+    // Image Dialog
+    <string name="ImageDialogTextDisclaimer">Disclaimer: Your photo will be linked to your account and visible to anyone using the app.</string>
+    <string name="ImageDialogTextImageLoading" tools:ignore="TypographyEllipsis">Image is loading...</string>
+    <string name="ImageDialogTextAddImageConfirm">Add this Photo to the Park?</string>
+
 </resources>
