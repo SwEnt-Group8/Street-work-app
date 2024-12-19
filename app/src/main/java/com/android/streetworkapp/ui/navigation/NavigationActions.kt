@@ -134,7 +134,11 @@ data class ScreenParams(
     val TRAIN_HUB =
         ScreenParams(
             screenName = Screen.TRAIN_HUB,
-            topAppBarManager = TopAppBarManager("Training hub", hasNavigationIcon = false))
+            topAppBarManager =
+                TopAppBarManager(
+                    "Training hub",
+                    hasNavigationIcon = false,
+                    actions = listOf(TopAppBarManager.TopAppBarAction.INFO)))
     val TRAIN_SOLO =
         ScreenParams(
             screenName = Screen.TRAIN_SOLO,

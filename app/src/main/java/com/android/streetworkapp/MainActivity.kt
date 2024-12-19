@@ -449,6 +449,7 @@ fun StreetWorkApp(
               route = Route.TRAIN_HUB,
           ) {
             composable(Screen.TRAIN_HUB) {
+              infoManager.Display(LocalContext.current)
               TrainHubScreen(navigationActions, workoutViewModel, userViewModel, innerPadding)
             }
             trainComposable(
