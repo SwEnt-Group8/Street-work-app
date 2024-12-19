@@ -42,9 +42,10 @@ class LocationServiceTest {
     userRepository = mock(UserRepository::class.java)
     // Mock parks as a MutableStateFlow
     val parksFlow = MutableStateFlow(listOf("oldPark"))
-    userViewModel = mock(UserViewModel::class.java).apply {
-      whenever(parks).thenReturn(parksFlow) // Return the mocked flow
-    }
+    userViewModel =
+        mock(UserViewModel::class.java).apply {
+          whenever(parks).thenReturn(parksFlow) // Return the mocked flow
+        }
 
     navigationActions = mock(NavigationActions::class.java)
     scope = CoroutineScope(testDispatcher)
