@@ -80,7 +80,7 @@ fun ProgressScreen(
     workoutViewModel: WorkoutViewModel,
     paddingValues: PaddingValues = PaddingValues(0.dp)
 ) {
-
+  val context = LocalContext.current
   val currentUser by userViewModel.currentUser.collectAsState()
   val currentProgression by progressionViewModel.currentProgression.collectAsState()
 
@@ -113,7 +113,7 @@ fun ProgressScreen(
           item {
             // Title Text Above the Progress Bar
             Text(
-                text = "Progress to reach next level",
+                text = context.getString(R.string.ProgressionNextLevelText),
                 fontSize = 16.sp,
                 color = ColorPalette.SECONDARY_TEXT_COLOR)
 
@@ -135,7 +135,7 @@ fun ProgressScreen(
 
           item {
             Text(
-                text = "Metrics",
+                text = context.getString(R.string.ProgressionMetricsText),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = ColorPalette.PRIMARY_TEXT_COLOR)
@@ -144,12 +144,12 @@ fun ProgressScreen(
                 horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
             ) {
               MetricCard(
-                  label = "Total score",
+                  label = context.getString(R.string.ProgressionTotalScoreLabel),
                   value = "${currentUser?.score}",
                   testTagPrefix = "metricCardScore")
 
               MetricCard(
-                  label = "Friends added",
+                  label = context.getString(R.string.ProgressionFriendAddedLabel),
                   value = "${currentUser?.friends?.size}",
                   testTagPrefix = "metricCardFriendsAdded")
             }
@@ -288,6 +288,7 @@ fun MetricCard(label: String, value: String, testTagPrefix: String) {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AchievementItem(achievement: Achievement, navButton: Boolean) {
+  val context = LocalContext.current
   Row(
       modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp, horizontal = 16.dp),
       verticalAlignment = Alignment.CenterVertically) {
@@ -348,7 +349,7 @@ fun AchievementItem(achievement: Achievement, navButton: Boolean) {
               modifier = Modifier.padding(horizontal = 4.dp).testTag("detailButton"),
               enabled = false, // Note: it is not enable until the corresponding screen is created
               colors = ColorPalette.BUTTON_COLOR) {
-                Text(text = "Details")
+                Text(context.getString(R.string.ProgressionButtonDetails))
               }
         }
       }
@@ -356,6 +357,7 @@ fun AchievementItem(achievement: Achievement, navButton: Boolean) {
 
 @Composable
 fun DashBoardBarProgression() {
+  val context = LocalContext.current
   NavigationBar(
       modifier = Modifier.testTag("dashboard").fillMaxWidth().height(56.dp),
       containerColor = ColorPalette.PRINCIPLE_BACKGROUND_COLOR) {
@@ -363,14 +365,14 @@ fun DashBoardBarProgression() {
 
         NavigationBarItem(
             modifier = Modifier.testTag("TrainingTab"),
-            icon = { Text("Training") },
+            icon = { Text(context.getString(R.string.ProgressionTrainingIconText)) },
             selected = state == DashboardStateProgression.Training,
             onClick = { uiState.value = DashboardStateProgression.Training },
             colors = ColorPalette.NAVIGATION_BAR_ITEM_COLORS)
 
         NavigationBarItem(
             modifier = Modifier.testTag("AchievementTab"),
-            icon = { Text("Achievement") },
+            icon = { Text(context.getString(R.string.ProgressionAchievementIconText)) },
             selected = state == DashboardStateProgression.Achievement,
             onClick = { uiState.value = DashboardStateProgression.Achievement },
             colors = ColorPalette.NAVIGATION_BAR_ITEM_COLORS)

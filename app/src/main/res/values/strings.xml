@@ -77,6 +77,14 @@
     <string name="ProgressionInfoContent">This is the progression screen, here you can see your progression and achievements. \n\n There is your record for each exercise in Training, click on it to see more details !</string>
 
     // Progression UI
+    <string name="ProgressionTrainingIconText">Training</string>
+    <string name="ProgressionAchievementIconText">Achievement</string>
+    <string name="ProgressionButtonDetails">Details</string>
+    <string name="ProgressionTotalScoreLabel">Total score</string>
+    <string name="ProgressionFriendAddedLabel">Friends added</string>
+    <string name="ProgressionNextLevelText">Progress to reach next level</string>
+    <string name="ProgressionMetricsText">Metrics</string>
+
     <string name="ProgressionEmptyAchievements">You do not have any achievements yet!</string>
     <string name="Trained">You trained your %s !</string>
 
