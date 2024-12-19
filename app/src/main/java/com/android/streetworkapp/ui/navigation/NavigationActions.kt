@@ -46,7 +46,7 @@ data class ScreenParams(
     val bottomBarType: BottomNavigationMenuType = BottomNavigationMenuType.DEFAULT,
     val isTopBarVisible: Boolean = true,
     val topAppBarManager: TopAppBarManager?,
-    val hasSearchBar: Boolean = false
+    val hasSearchBar: Boolean = false,
 ) {
   companion object {
     val AUTH =
@@ -62,11 +62,11 @@ data class ScreenParams(
             topAppBarManager =
                 TopAppBarManager(
                     "Map",
+                    hasSearchBar = true,
                     actions =
                         listOf(
-                            TopAppBarManager.TopAppBarAction.SEARCH,
-                            TopAppBarManager.TopAppBarAction.INFO)),
-            hasSearchBar = true)
+                            TopAppBarManager.TopAppBarAction.INFO,
+                            TopAppBarManager.TopAppBarAction.FILTER)))
     val PROFILE =
         ScreenParams(
             Screen.PROFILE,
@@ -134,7 +134,11 @@ data class ScreenParams(
     val TRAIN_HUB =
         ScreenParams(
             screenName = Screen.TRAIN_HUB,
-            topAppBarManager = TopAppBarManager("Training hub", hasNavigationIcon = false))
+            topAppBarManager =
+                TopAppBarManager(
+                    "Training hub",
+                    hasNavigationIcon = false,
+                    actions = listOf(TopAppBarManager.TopAppBarAction.INFO)))
     val TRAIN_SOLO =
         ScreenParams(
             screenName = Screen.TRAIN_SOLO,

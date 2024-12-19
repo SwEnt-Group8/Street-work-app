@@ -11,7 +11,8 @@ import kotlinx.coroutines.launch
  *
  * @property preferencesRepository The repository for preferences data
  */
-class PreferencesViewModel(private val preferencesRepository: PreferencesRepository) : ViewModel() {
+open class PreferencesViewModel(private val preferencesRepository: PreferencesRepository) :
+    ViewModel() {
 
   /** A StateFlow of the login state of the user. */
   private val _loginState = MutableStateFlow<Boolean?>(null)

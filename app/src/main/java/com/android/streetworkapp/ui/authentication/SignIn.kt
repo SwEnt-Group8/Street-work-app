@@ -96,6 +96,7 @@ fun SignInScreen(
               context, context.getString(R.string.SignInToastLoginSuccessful), Toast.LENGTH_LONG)
           .show()
       navigationActions.navigateTo(Screen.MAP)
+      navigationActions.navigateTo(Screen.TUTO_EVENT)
     }
   }
 

@@ -2,6 +2,7 @@ package com.android.streetworkapp.ui.profile
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.image.ImageViewModel
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.progression.ProgressionViewModel
 import com.android.streetworkapp.model.user.User
@@ -30,6 +31,7 @@ class SettingsTest {
   private lateinit var eventViewModel: EventViewModel
   private lateinit var progressionViewModel: ProgressionViewModel
   private lateinit var workoutViewModel: WorkoutViewModel
+  private lateinit var imageViewModel: ImageViewModel
   private lateinit var currentUser: User
 
   @Before
@@ -40,6 +42,7 @@ class SettingsTest {
     eventViewModel = mock(EventViewModel::class.java)
     progressionViewModel = mock(ProgressionViewModel::class.java)
     workoutViewModel = mock(WorkoutViewModel::class.java)
+    imageViewModel = mock(ImageViewModel::class.java)
     currentUser = User("uid-alice", "Alice", "alice@gmail.com", 42, emptyList(), "")
 
     whenever(userViewModel.currentUser).thenReturn(MutableStateFlow(currentUser))
@@ -56,7 +59,8 @@ class SettingsTest {
             parkViewModel,
             eventViewModel,
             progressionViewModel,
-            workoutViewModel)
+            workoutViewModel,
+            imageViewModel)
 
     assertTrue(result)
     verify(authService).deleteAuthUser()
@@ -76,7 +80,8 @@ class SettingsTest {
             parkViewModel,
             eventViewModel,
             progressionViewModel,
-            workoutViewModel)
+            workoutViewModel,
+            imageViewModel)
 
     assertFalse(result)
     verify(authService, never()).deleteAuthUser()
@@ -98,7 +103,8 @@ class SettingsTest {
             parkViewModel,
             eventViewModel,
             progressionViewModel,
-            workoutViewModel)
+            workoutViewModel,
+            imageViewModel)
 
     assertFalse(result)
     verify(authService, never()).deleteAuthUser()

@@ -10,7 +10,8 @@ class TopAppBarManager(
     private var hasNavigationIcon: Boolean = false,
     private var navigationIcon: ImageVector? = null,
     private var actions: List<TopAppBarAction> = emptyList(),
-    private var actionCallbacks: MutableMap<TopAppBarAction, () -> Unit> = mutableMapOf()
+    private var actionCallbacks: MutableMap<TopAppBarAction, () -> Unit> = mutableMapOf(),
+    private var hasSearchBar: Boolean = false
 ) {
 
   companion object {
@@ -22,6 +23,7 @@ class TopAppBarManager(
         icon = R.drawable.settings, contentDescription = "Settings", testTag = "settingsButton"),
     INFO(icon = R.drawable.octagon_help, contentDescription = "Info", testTag = "infoButton"),
     SEARCH(icon = R.drawable.map_search, contentDescription = "Search", testTag = "searchButton"),
+    FILTER(icon = R.drawable.map_search, contentDescription = "Filter", testTag = "filterButton"),
 
     // Add more actions here
   }
@@ -58,9 +60,14 @@ class TopAppBarManager(
     return this.hasNavigationIcon
   }
 
+  /** returns hasSearchBar */
+  fun hasSearchBar(): Boolean {
+    return this.hasSearchBar
+  }
+
   /** Get the TopAppBar title */
   fun getNavigationIcon(): ImageVector {
-    return this.navigationIcon ?: TopAppBarManager.DEFAULT_TOP_APP_BAR_NAVIGATION_ICON
+    return this.navigationIcon ?: DEFAULT_TOP_APP_BAR_NAVIGATION_ICON
   }
 
   /** Set the actions for the Top App Bar */

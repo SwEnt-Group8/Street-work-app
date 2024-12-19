@@ -14,6 +14,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.sample.R
 import com.android.streetworkapp.model.event.EventRepository
 import com.android.streetworkapp.model.event.EventViewModel
+import com.android.streetworkapp.model.image.ImageRepository
+import com.android.streetworkapp.model.image.ImageViewModel
 import com.android.streetworkapp.model.park.ParkRepository
 import com.android.streetworkapp.model.park.ParkViewModel
 import com.android.streetworkapp.model.preferences.PreferencesRepository
@@ -30,6 +32,7 @@ import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.utils.GoogleAuthService
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,6 +40,7 @@ import org.mockito.Mockito.RETURNS_DEFAULTS
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
+import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -56,6 +60,8 @@ class SettingsTest {
   private val workoutRepository = mock(WorkoutRepository::class.java)
   private val workoutViewModel = WorkoutViewModel(workoutRepository)
   private val preferencesViewModel = PreferencesViewModel(mock(PreferencesRepository::class.java))
+  private val imageRepository = mock(ImageRepository::class.java)
+  private val imageViewModel = ImageViewModel(imageRepository)
 
   @Test
   fun isSettingsContentDisplayedForNullUser() {
@@ -75,6 +81,7 @@ class SettingsTest {
           progressionViewModel,
           workoutViewModel,
           preferencesViewModel,
+          imageViewModel,
           authService,
           showSettingDialog)
       context = LocalContext.current
@@ -121,6 +128,7 @@ class SettingsTest {
           progressionViewModel,
           workoutViewModel,
           preferencesViewModel,
+          imageViewModel,
           authService,
           showSettingDialog)
       context = LocalContext.current
@@ -161,6 +169,7 @@ class SettingsTest {
           progressionViewModel,
           workoutViewModel,
           preferencesViewModel,
+          imageViewModel,
           authService,
           showSettingDialog)
       context = LocalContext.current
@@ -175,7 +184,7 @@ class SettingsTest {
   }
 
   @Test
-  fun testDeleteAccountButtonNavigatesToAuthScreen() {
+  fun testDeleteAccountButtonNavigatesToAuthScreen() = runTest {
     val showSettingDialog = mutableStateOf(false)
     var context: Context? = null
     val alice = User("uid-alice", "Alice", "alice@gmail.com", 42, emptyList(), "")
@@ -183,6 +192,7 @@ class SettingsTest {
     val firebaseAuth = mock(FirebaseAuth::class.java, RETURNS_DEFAULTS)
     val currentUser = mock(FirebaseUser::class.java)
     whenever(firebaseAuth.currentUser).thenReturn(currentUser)
+    whenever(imageRepository.deleteAllDataFromUser(any())).thenReturn(true)
 
     composeTestRule.setContent {
       val authService =
@@ -197,6 +207,7 @@ class SettingsTest {
           progressionViewModel,
           workoutViewModel,
           preferencesViewModel,
+          imageViewModel,
           authService,
           showSettingDialog)
       context = LocalContext.current
@@ -235,6 +246,7 @@ class SettingsTest {
           progressionViewModel,
           workoutViewModel,
           preferencesViewModel,
+          imageViewModel,
           authService,
           showSettingDialog)
       context = LocalContext.current

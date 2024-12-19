@@ -10,6 +10,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -50,7 +52,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
@@ -86,6 +87,7 @@ import kotlinx.coroutines.CoroutineScope
  * @param eventViewModel The view model for the events.
  * @param userViewModel The view model for the user.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ParkOverviewScreen(
     parkViewModel: ParkViewModel,
@@ -102,7 +104,10 @@ fun ParkOverviewScreen(
   // MVVM calls for park state :
   val currentPark = parkViewModel.currentPark.collectAsState()
 
-  parkViewModel.park.collectAsState().value?.pid?.let { parkViewModel.loadCurrentPark(it) }
+  parkViewModel.park.collectAsState().value?.pid?.let {
+    parkViewModel.loadCurrentPark(it)
+    parkViewModel.registerCollectionListener(it) { parkViewModel.loadCurrentPark(it) }
+  }
 
   // MVVM calls for event state of the park :
   currentPark.value?.let { eventViewModel.getEvents(it) }
@@ -118,26 +123,18 @@ fun ParkOverviewScreen(
 
   Box(modifier = Modifier.padding(innerPadding).fillMaxSize().testTag("parkOverviewScreen")) {
     Column {
-      ImageTitle(
-          imageViewModel = imageViewModel,
-          userViewModel = userViewModel,
-          image = null,
-          park = currentPark.value,
-          user = currentUser)
+      ImageTitle(image = null, park = currentPark.value)
+
       Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         ParkDetails(park = currentPark.value, showRatingDialog, currentUser)
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
-            horizontalArrangement = Arrangement.End) {
-              Button(
-                  onClick = { navigationActions.navigateTo(Screen.ADD_EVENT) },
-                  modifier = Modifier.testTag("createEventButton"),
-                  colors = ColorPalette.BUTTON_COLOR) {
-                    Text(
-                        context.getString(R.string.ParkOverviewAddEventButton),
-                        textAlign = TextAlign.Center)
-                  }
-            }
+        FlowRow(
+            modifier = Modifier.fillMaxWidth().padding(end = 10.dp),
+            horizontalArrangement = Arrangement.End,
+        ) {
+          ImagesCollectionButton(imageViewModel, userViewModel, currentPark.value)
+          AddImageButton(imageViewModel, currentPark.value, currentUser)
+          CreateEventButton(navigationActions)
+        }
       }
 
       val starRating = remember { mutableIntStateOf(3) } // Stores the "live" rating value
@@ -176,11 +173,8 @@ fun ParkOverviewScreen(
  */
 @Composable
 fun ImageTitle(
-    imageViewModel: ImageViewModel,
-    userViewModel: UserViewModel,
     image: Painter?,
     park: Park?,
-    user: User?
 ) {
   val context = LocalContext.current
   Box(modifier = Modifier.fillMaxWidth().height(220.dp).testTag("imageTitle")) {
@@ -205,12 +199,6 @@ fun ImageTitle(
         color = Color.White,
         fontSize = 24.sp,
         modifier = Modifier.align(Alignment.BottomStart).padding(16.dp).testTag("title"))
-    Row(
-        modifier = Modifier.align(Alignment.BottomEnd).padding(5.dp),
-        horizontalArrangement = Arrangement.spacedBy((-5).dp)) {
-          ImagesCollectionButton(imageViewModel, userViewModel, park)
-          AddImageButton(imageViewModel, park, user)
-        }
   }
 }
 
@@ -223,8 +211,8 @@ fun ImageTitle(
  */
 @Composable
 fun ParkDetails(park: Park?, showRatingDialog: MutableState<Boolean>, user: User?) {
-  val context = LocalContext.current
-  Column(modifier = Modifier.testTag("parkDetails").padding(bottom = 16.dp, end = 48.dp)) {
+    val context = LocalContext.current
+  Column(modifier = Modifier.testTag("parkDetails").padding(bottom = 16.dp, end = 15.dp)) {
     Text(
         text = context.getString(R.string.ParkOverviewRatingTitle),
         fontSize = 24.sp,
@@ -410,7 +398,10 @@ fun InteractiveRatingComponent(rating: MutableState<Int>) {
  * @param navigationActions The navigation actions to navigate to other screens.
  */
 @Composable
-fun EventItemList(eventViewModel: EventViewModel, navigationActions: NavigationActions) {
+fun EventItemList(
+    eventViewModel: EventViewModel,
+    navigationActions: NavigationActions,
+) {
   val uiState = eventViewModel.uiState.collectAsState().value
   val context = LocalContext.current
 
@@ -503,4 +494,23 @@ fun EventItem(event: Event, eventViewModel: EventViewModel, navigationActions: N
             }
       })
   HorizontalDivider()
+}
+
+@Composable
+fun CreateEventButton(navigationActions: NavigationActions) {
+  IconButton(
+      onClick = { navigationActions.navigateTo(Screen.ADD_EVENT) },
+      modifier = Modifier.testTag("createEventButton")) {
+        Box(
+            modifier =
+                Modifier.size(38.dp)
+                    .background(color = ColorPalette.INTERACTION_COLOR_DARK, shape = CircleShape)
+                    .padding(2.dp)) {
+              Icon(
+                  painter = painterResource(id = R.drawable.calendar_add_on_24px),
+                  contentDescription = "Add Event",
+                  tint = ColorPalette.BUTTON_ICON_COLOR,
+                  modifier = Modifier.align(Alignment.Center).fillMaxSize(0.75f))
+            }
+      }
 }

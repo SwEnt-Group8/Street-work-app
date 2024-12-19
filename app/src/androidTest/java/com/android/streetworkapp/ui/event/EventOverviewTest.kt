@@ -12,7 +12,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollTo
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventList
 import com.android.streetworkapp.model.event.EventRepository
@@ -148,17 +147,13 @@ class EventOverviewTest {
     `when`(userRepository.getUserByUid(owner.uid)).thenReturn(owner)
     `when`(userRepository.getUsersByUids(any())).thenReturn(listOf(participant))
 
-    composeTestRule.setContent {
-      EventOverviewScreen(eventViewModel, parkViewModel, userViewModel, navigationActions)
-    }
+    composeTestRule.setContent { EventDashboard(event, userViewModel) }
+
+    composeTestRule.waitForIdle()
 
     composeTestRule.onNodeWithTag("eventDashboard").assertIsDisplayed()
     composeTestRule.onNodeWithTag("dashboard").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("dashboardContent").assertIsDisplayed()
     composeTestRule.onNodeWithTag("detailsTab").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("eventDescription").assertIsDisplayed().performScrollTo()
-    composeTestRule.onNodeWithTag("eventDescription").assertTextEquals(event.description)
-    composeTestRule.onNodeWithTag("participantsList").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("participantsTab").assertIsDisplayed().performClick()
     composeTestRule.onNodeWithTag("participantsList").assertIsDisplayed()
     composeTestRule

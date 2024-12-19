@@ -5,13 +5,14 @@ import com.android.streetworkapp.model.parklocation.ParkLocation
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.tasks.await
 
 /** A repository interface using Firestore for park data. */
-class ParkRepositoryFirestore(private val db: FirebaseFirestore, testing: Boolean = false) :
-    ParkRepository {
+class ParkRepositoryFirestore(private val db: FirebaseFirestore) : ParkRepository {
 
-  private val COLLECTION_PATH: String = if (testing) "testParks" else "parks"
+  private val COLLECTION_PATH = "parks"
+  private var firebaseImageCollectionListener: ListenerRegistration? = null
 
   companion object {
     private const val INVALID_RATING_MESSAGE = "Rating must be between 1 and 5."
@@ -431,6 +432,37 @@ class ParkRepositoryFirestore(private val db: FirebaseFirestore, testing: Boolea
     } catch (e: Exception) {
       Log.e("FirestoreError", "Error converting document to park: ${e.message}")
       null
+    }
+  }
+
+  /**
+   * Register a listener to a specific parkId
+   *
+   * @param parkId The id of the document to listen to.
+   * @param onDocumentChange The callback to be called each time the document changes
+   */
+  override fun registerCollectionListener(parkId: String, onDocumentChange: () -> Unit) {
+    require(parkId.isNotEmpty()) { "Empty imageCollectionId." }
+    try {
+      val docRef = db.collection(this.COLLECTION_PATH).document(parkId)
+      this.firebaseImageCollectionListener?.remove() // remove old listener if one was setup
+      this.firebaseImageCollectionListener = null
+      this.firebaseImageCollectionListener =
+          docRef.addSnapshotListener { snapshot, e ->
+            if (e != null) {
+              Log.d("FirestoreError: ", "Error listening for changes: $e")
+              return@addSnapshotListener
+            }
+
+            if (snapshot != null && snapshot.exists()) {
+              onDocumentChange()
+            }
+          }
+    } catch (e: Exception) {
+      Log.d(
+          "FirestoreError: ",
+          e.message
+              ?: "An exception occurred but the message associated with it couldn't be retrieved.")
     }
   }
 }

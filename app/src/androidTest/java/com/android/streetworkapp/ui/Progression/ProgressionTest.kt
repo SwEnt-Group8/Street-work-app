@@ -291,4 +291,35 @@ class ProgressionTest {
       composeTestRule.onNodeWithTag("achievementItem$name").assertIsDisplayed()
     }
   }
+
+  @Test
+  fun screenDisplayTextOnEmptyWorkoutData() {
+    val mockedProgression =
+        Progression(
+            progressionId = "prog123456",
+            uid = mockedUser.uid,
+            currentGoal = Ranks.BRONZE.score,
+            eventsCreated = 0,
+            eventsJoined = 0,
+            achievements = emptyList())
+
+    coEvery { progressionRepository.getOrAddProgression(eq(mockedUser.uid)) } answers
+        {
+          mockedProgression
+        }
+
+    // simulates empty workout data
+    coEvery { workoutRepository.getOrAddWorkoutData(any()) } answers
+        {
+          WorkoutData(userUid = uid, workoutSessions = emptyList())
+        }
+
+    composeTestRule.setContent {
+      ProgressScreen(navigationActions, userViewModel, progressionViewModel, workoutViewModel)
+    }
+
+    composeTestRule.onNodeWithTag("TrainingTab").performClick()
+
+    composeTestRule.onNodeWithTag("emptyTrainingText").assertExists()
+  }
 }

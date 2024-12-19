@@ -11,7 +11,6 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,7 +53,6 @@ import com.android.streetworkapp.ui.authentication.SignInScreen
 import com.android.streetworkapp.ui.event.AddEventScreen
 import com.android.streetworkapp.ui.event.EventOverviewScreen
 import com.android.streetworkapp.ui.map.MapScreen
-import com.android.streetworkapp.ui.map.MapSearchBar
 import com.android.streetworkapp.ui.miscellaneous.SplashScreen
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenu
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenuType
@@ -114,9 +112,6 @@ fun StreetWorkAppMain(
     testInvokation: NavigationActions.() -> Unit = {},
     internetAvailable: Boolean = false
 ) {
-  // Setup s3Client
-  val storageClient =
-      S3StorageClient(S3StorageClient.getDigitalOceanS3Client(), S3Clients.DIGITAL_OCEAN.endpoint)
 
   // repositories
   val overpassParkLocationRepo = OverpassParkLocationRepository(OkHttpClient())
@@ -151,7 +146,12 @@ fun StreetWorkAppMain(
   val textModerationViewModel = TextModerationViewModel(textModerationRepository)
 
   // Instantiate Park Images flow
-  val imageRepository = ImageRepositoryFirestore(firestoreDB, parkRepository, userRepository)
+  val storageClient =
+      S3StorageClient(
+          S3StorageClient.getDigitalOceanS3Client(),
+          S3Clients.DIGITAL_OCEAN.endpoint) // Setup the s3 client wrapper
+  val imageRepository =
+      ImageRepositoryFirestore(firestoreDB, storageClient, parkRepository, userRepository)
   val imageViewModel = ImageViewModel(imageRepository)
 
   // Instantiate Google Auth Service
@@ -217,7 +217,6 @@ fun StreetWorkAppMain(
   }
 }
 
-@SuppressLint("UnrememberedMutableState")
 @Composable
 fun StreetWorkApp(
     parkLocationViewModel: ParkLocationViewModel,
@@ -233,7 +232,6 @@ fun StreetWorkApp(
     preferencesViewModel: PreferencesViewModel,
     authService: GoogleAuthService,
     navTestInvokationOnEachRecompose: Boolean = false,
-    e2eEventTesting: Boolean = false,
     startDestination: String = Route.AUTH
 ) {
   val navController = rememberNavController()
@@ -257,11 +255,12 @@ fun StreetWorkApp(
   // Instantiate info manager and its components :
   val showInfoDialog = remember { mutableStateOf(false) }
   val showSearchBar = remember { mutableStateOf(false) }
+  val showFilterSettings = remember { mutableStateOf(false) }
 
   // query for the search bar
   val searchQuery = remember { mutableStateOf("") }
 
-  Log.d("InfoDialog", "Main - Instantiating the InfoDialogManager")
+  Log.d("MainActivity", "Main - Instantiating the InfoDialogManager")
   val infoManager =
       InfoDialogManager(
           showInfoDialog, currentScreenName, topAppBarManager = screenParams?.topAppBarManager)
@@ -269,22 +268,15 @@ fun StreetWorkApp(
   Scaffold(
       containerColor = ColorPalette.PRINCIPLE_BACKGROUND_COLOR,
       topBar = {
-        if (showSearchBar.value && screenParams?.hasSearchBar == true) {
-          MapSearchBar(searchQuery) {
-            searchQuery.value = ""
-            showSearchBar.value = false
-          }
-        } else {
-          screenParams
-              ?.isTopBarVisible
-              ?.takeIf { it }
-              ?.let {
-                TopAppBarWrapper(navigationActions, screenParams?.topAppBarManager)
-                // setup the InfoDialogManager in topBar, because it relies on the topAppBarManager.
-                Log.d("InfoDialog", "Main - Setting up the InfoDialogManager")
-                infoManager.setUp()
-              }
-        }
+        screenParams
+            ?.isTopBarVisible
+            ?.takeIf { it }
+            ?.let {
+              TopAppBarWrapper(navigationActions, screenParams?.topAppBarManager, searchQuery)
+              // setup the InfoDialogManager in topBar, because it relies on the topAppBarManager.
+              Log.d("MainActivity", "Main - Setting up the InfoDialogManager")
+              infoManager.setUp()
+            }
       },
       snackbarHost = {
         SnackbarHost(
@@ -349,10 +341,17 @@ fun StreetWorkApp(
                   mapCallbackOnMapLoaded,
                   innerPadding,
                   scope,
-                  host)
+                  host,
+                  showFilterSettings)
+
               screenParams?.topAppBarManager?.setActionCallback(
                   TopAppBarManager.TopAppBarAction.SEARCH) {
                     showSearchBar.value = true
+                  }
+
+              screenParams?.topAppBarManager?.setActionCallback(
+                  TopAppBarManager.TopAppBarAction.FILTER) {
+                    showFilterSettings.value = true
                   }
             }
             composable(Screen.PARK_OVERVIEW) {
@@ -432,6 +431,7 @@ fun StreetWorkApp(
                         progressionViewModel,
                         workoutViewModel,
                         preferencesViewModel,
+                        imageViewModel,
                         authService,
                         showSettingsDialog)
                   },
@@ -449,6 +449,7 @@ fun StreetWorkApp(
               route = Route.TRAIN_HUB,
           ) {
             composable(Screen.TRAIN_HUB) {
+              infoManager.Display(LocalContext.current)
               TrainHubScreen(navigationActions, workoutViewModel, userViewModel, innerPadding)
             }
             trainComposable(
@@ -496,9 +497,7 @@ fun StreetWorkApp(
               }
         }
 
-        if (e2eEventTesting) {
-          LaunchedEffect(navTestInvokation) { navigationActions.apply(navTestInvokation) }
-        } else if (firstTimeLoaded || navTestInvokationOnEachRecompose) {
+        if (firstTimeLoaded || navTestInvokationOnEachRecompose) {
           firstTimeLoaded = false
           navigationActions.apply(navTestInvokation)
         }

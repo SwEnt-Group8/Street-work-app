@@ -544,6 +544,11 @@ class ParkRepositoryFirestoreTest {
   }
 
   @Test
+  fun `registerCollectionListener with non empty park id doesn't crash on exception`() {
+    parkRepository.registerCollectionListener("nonEmptyId") {}
+  }
+
+  @Test
   fun deleteRatingFromAllParksRemovesRatingSuccessfully() = runTest {
     val uid = "user_001"
     val parkId = "park_001"

@@ -41,6 +41,15 @@ open class ParkViewModel(
   }
 
   /**
+   * Set the park value.
+   *
+   * @param park The park to set as the current park.
+   */
+  fun setPark(park: Park?) {
+    _park.value = park
+  }
+
+  /**
    * Load the current park from the database using its ID.
    *
    * @param pid The park ID.
@@ -240,4 +249,17 @@ open class ParkViewModel(
    * @param pid The park ID.
    */
   fun deleteParkByPid(pid: String) = viewModelScope.launch { repository.deleteParkByPid(pid) }
+
+  /**
+   * Registers a callback that gets called each time the document gets updated
+   *
+   * @param parkId The id of the document to listen to.
+   * @param onCollectionUpdate The callback
+   */
+  open fun registerCollectionListener(parkId: String, onCollectionUpdate: () -> Unit) {
+    viewModelScope.launch {
+      require(parkId.isNotEmpty()) { "Empty parkId" }
+      repository.registerCollectionListener(parkId, onCollectionUpdate)
+    }
+  }
 }
