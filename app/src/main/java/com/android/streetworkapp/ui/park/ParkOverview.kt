@@ -211,7 +211,7 @@ fun ImageTitle(
  */
 @Composable
 fun ParkDetails(park: Park?, showRatingDialog: MutableState<Boolean>, user: User?) {
-    val context = LocalContext.current
+  val context = LocalContext.current
   Column(modifier = Modifier.testTag("parkDetails").padding(bottom = 16.dp, end = 15.dp)) {
     Text(
         text = context.getString(R.string.ParkOverviewRatingTitle),
