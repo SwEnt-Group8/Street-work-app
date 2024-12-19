@@ -49,6 +49,7 @@ import io.mockk.every
 import io.mockk.mockk
 import org.junit.After
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -105,7 +106,7 @@ class End2EndParks {
     IdlingRegistry.getInstance().unregister(idlingResource)
   }
 
-  // @Ignore("google maps API can be slow sometimes, wouldn't want the CI to fail because of this")
+  @Ignore("google maps API can be slow sometimes, wouldn't want the CI to fail because of this")
   @Test
   fun E2ECanClickParkAncAccessSpecificParkOverview() {
     idlingResource.increment()
