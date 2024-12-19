@@ -40,6 +40,7 @@ import com.android.sample.R
 import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.navigation.TrainNavigationParams
 import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_DARK
+import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_LIGHT
 import com.android.streetworkapp.ui.theme.ColorPalette.PRIMARY_TEXT_COLOR
 import com.android.streetworkapp.ui.theme.ColorPalette.PRINCIPLE_BACKGROUND_COLOR
 import com.android.streetworkapp.ui.theme.GoogleAuthButtonTextStyle
@@ -170,7 +171,7 @@ fun NumberPicker(
   LaunchedEffect(lazyListState) {
     snapshotFlow { lazyListState.firstVisibleItemIndex }
         .collect { index ->
-          val newValue = range.elementAtOrNull(index)
+          val newValue = range.elementAtOrNull(index + 1)
           newValue?.let { onValueChange(it) }
         }
   }
@@ -331,7 +332,7 @@ fun SelectionButtonWithChar(
                         shape = RoundedCornerShape(20.dp))
                     .testTag(testTag),
             shape = RoundedCornerShape(20.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)) {
+            colors = ButtonDefaults.buttonColors(containerColor = INTERACTION_COLOR_LIGHT)) {
               // Display the character inside the button
               Text(
                   text = char,
