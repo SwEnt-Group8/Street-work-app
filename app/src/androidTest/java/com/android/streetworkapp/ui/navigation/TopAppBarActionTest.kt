@@ -155,21 +155,14 @@ class TopAppBarActionTest {
   }
 
   @Test
-  fun isSearchActionWorking() {
-    val searchAction = TopAppBarManager.TopAppBarAction.SEARCH
+  fun isSearchBarDisplayed() {
 
-    val topAppBarManager = TopAppBarManager("any title", actions = listOf(searchAction))
-
-    val logicValue = mutableStateOf(false)
-
-    topAppBarManager.setActionCallback(searchAction) { logicValue.value = true }
+    val topAppBarManager = TopAppBarManager("any title", hasSearchBar = true)
 
     composeTestRule.setContent { TopAppBarWrapper(NavigationActions(mockk()), topAppBarManager) }
 
-    // Verify that clicking the action triggers the callback
-    assert(!logicValue.value)
-    composeTestRule.onNodeWithTag(searchAction.testTag).performClick()
     composeTestRule.waitForIdle()
-    assert(logicValue.value)
+
+    composeTestRule.onNodeWithTag("searchBar").assertIsDisplayed()
   }
 }

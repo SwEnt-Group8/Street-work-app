@@ -62,12 +62,11 @@ data class ScreenParams(
             topAppBarManager =
                 TopAppBarManager(
                     "Map",
+                    hasSearchBar = true,
                     actions =
                         listOf(
-                            TopAppBarManager.TopAppBarAction.SEARCH,
                             TopAppBarManager.TopAppBarAction.INFO,
-                            TopAppBarManager.TopAppBarAction.FILTER)),
-            hasSearchBar = true)
+                            TopAppBarManager.TopAppBarAction.FILTER)))
     val PROFILE =
         ScreenParams(
             Screen.PROFILE,
