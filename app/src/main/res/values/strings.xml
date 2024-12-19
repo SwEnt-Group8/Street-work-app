@@ -110,4 +110,8 @@
     <string name="rating_filter_title">Minimum park rating : %s stars</string>
     <string name="eventDensity_filter_title">Required density of events :</string>
     <string name="reset_button">Reset</string>
+
+    // Map UI
+    <string name="search_bar_placeholder">Search for parks</string>
+    <string name="event_info">event(s) planned</string>
 </resources>

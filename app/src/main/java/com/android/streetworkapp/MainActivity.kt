@@ -260,7 +260,7 @@ fun StreetWorkApp(
   // query for the search bar
   val searchQuery = remember { mutableStateOf("") }
 
-  Log.d("InfoDialog", "Main - Instantiating the InfoDialogManager")
+  Log.d("MainActivity", "Main - Instantiating the InfoDialogManager")
   val infoManager =
       InfoDialogManager(
           showInfoDialog, currentScreenName, topAppBarManager = screenParams?.topAppBarManager)
@@ -274,7 +274,7 @@ fun StreetWorkApp(
             ?.let {
               TopAppBarWrapper(navigationActions, screenParams?.topAppBarManager, searchQuery)
               // setup the InfoDialogManager in topBar, because it relies on the topAppBarManager.
-              Log.d("InfoDialog", "Main - Setting up the InfoDialogManager")
+              Log.d("MainActivity", "Main - Setting up the InfoDialogManager")
               infoManager.setUp()
             }
       },

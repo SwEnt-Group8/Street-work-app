@@ -41,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
@@ -299,7 +300,7 @@ fun MapSearchBar(query: MutableState<String>) {
         SearchBar(
             query = query.value,
             onQueryChange = { query.value = it },
-            placeholder = { Text("Search for parks") },
+            placeholder = { Text(stringResource(R.string.search_bar_placeholder)) },
             modifier =
                 Modifier.testTag("searchBar").padding(bottom = 8.dp).padding(horizontal = 4.dp),
             active = false,
@@ -336,7 +337,7 @@ fun MarkerInfoWindowContent(park: Park) {
                 contentDescription = "eventIcon",
                 modifier = Modifier.padding(horizontal = 5.dp).testTag("eventIcon"))
             Text(
-                text = "${park.events.size} event(s) planned",
+                text = "${park.events.size} ${stringResource(R.string.event_info)}",
                 modifier = Modifier.testTag("eventsPlanned").padding(end = 8.dp))
 
             Box(
