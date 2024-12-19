@@ -10,16 +10,26 @@ package com.android.streetworkapp.model.workout
  * @param timestamp The time when the request was created, in epoch milliseconds.
  */
 data class PairingRequest(
-    val requestId: String = "", // Unique ID for the request
-    val fromUid: String = "", // User who sent the request
-    val toUid: String = "", // User who received the request
-    val status: RequestStatus = RequestStatus.PENDING, // Current status of the request
-    val timestamp: Long = System.currentTimeMillis() // Time of creation
+    val requestId: String = "",
+    val fromUid: String = "",
+    val toUid: String = "",
+    val sessionId: String? = null,
+    val counter: Int? = 0,
+    val timerStatus: TimerStatus = TimerStatus.STOPPED,
+    val status: RequestStatus = RequestStatus.PENDING,
+    val timestamp: Long = System.currentTimeMillis()
 )
 
 /** An enum class representing the status of a pairing request. */
 enum class RequestStatus {
   PENDING, // Waiting for the recipient's response
   ACCEPTED, // The request has been accepted
-  REJECTED // The request has been rejected
+  REJECTED, // The request has been rejected
+  OLD // The request is no longer valid
+}
+
+/** An enum class representing the status of a timer. */
+enum class TimerStatus {
+  RUNNING, // Running timer
+  STOPPED // Timer has been stopped
 }

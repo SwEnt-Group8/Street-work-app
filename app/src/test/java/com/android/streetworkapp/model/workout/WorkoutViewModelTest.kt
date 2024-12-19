@@ -183,15 +183,6 @@ class WorkoutViewModelTest {
   }
 
   @Test
-  fun respondToPairingRequestCallsRepository() = runTest {
-    val requestId = "requestId"
-    val isAccepted = true
-    workoutViewModel.respondToPairingRequest(requestId, isAccepted)
-    testDispatcher.scheduler.advanceUntilIdle()
-    verify(repository).respondToPairingRequest(requestId, isAccepted)
-  }
-
-  @Test
   fun observeWorkoutSessionsUpdatesFlowCorrectly() = runTest {
     val uid = "testUid"
     val session =
@@ -207,20 +198,58 @@ class WorkoutViewModelTest {
   }
 
   @Test
-  fun addCommentToSessionCallsRepository() = runTest {
-    val sessionId = "sessionId"
-    val comment = Comment(authorUid = "user123", text = "Nice workout!")
-
-    workoutViewModel.addCommentToSession(sessionId, comment)
-    testDispatcher.scheduler.advanceUntilIdle()
-    verify(repository).addCommentToSession(sessionId, comment)
-  }
-
-  @Test
   fun deleteWorkoutDataByUidCallsRepository() = runTest {
     val uid = "testUid"
     workoutViewModel.deleteWorkoutDataByUid(uid)
     testDispatcher.scheduler.advanceUntilIdle()
     verify(repository).deleteWorkoutDataByUid(uid)
+  }
+
+  @Test
+  fun respondToPairingRequestRejectedCallsRepositoryWithoutRefresh() = runTest {
+    val requestId = "req123"
+    val isAccepted = false
+    val currentUserUid = "user123"
+    val fromUid = "fromUser"
+
+    workoutViewModel.respondToPairingRequest(requestId, isAccepted, currentUserUid, fromUid)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    // Verify repository call
+    verify(repository).respondToPairingRequest(requestId, isAccepted, currentUserUid, fromUid)
+    // Verify no refresh
+    verify(repository, never()).getOrAddWorkoutData(currentUserUid)
+  }
+
+  @Test
+  fun respondToPairingRequestAcceptedCallsRepositoryAndRefreshWorkoutData() = runTest {
+    val requestId = "req123"
+    val isAccepted = true
+    val currentUserUid = "user123"
+    val fromUid = "fromUser"
+    val workoutData = WorkoutData(currentUserUid, emptyList())
+
+    whenever(repository.getOrAddWorkoutData(currentUserUid)).thenReturn(workoutData)
+
+    workoutViewModel.respondToPairingRequest(requestId, isAccepted, currentUserUid, fromUid)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    // Verify repository call
+    verify(repository).respondToPairingRequest(requestId, isAccepted, currentUserUid, fromUid)
+    // Verify refresh called
+    verify(repository).getOrAddWorkoutData(currentUserUid)
+    // Check that workoutData is updated
+    assertEquals(workoutData, workoutViewModel.workoutData.value)
+  }
+
+  @Test
+  fun updateTimerStatusCallsRepository() = runTest {
+    val requestId = "reqTimer"
+    val timerStatus = TimerStatus.RUNNING
+
+    workoutViewModel.updateTimerStatus(requestId, timerStatus)
+    testDispatcher.scheduler.advanceUntilIdle()
+
+    verify(repository).updateTimerStatus(requestId, timerStatus)
   }
 }

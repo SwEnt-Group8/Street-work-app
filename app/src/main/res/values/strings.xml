@@ -96,6 +96,8 @@
     <string name="counter_explanation">
     The counter represents the number of sets completed. Each time you finish your target reps, increment the counter until you\'ve completed your objective.
     </string>
+    <string name="sec">sec</string>
+    <string name="reps">sec</string>
     <string name="time_up_message">Nice Work!</string>
     <string name="stop_button_text">Stop</string>
     <string name="reset_button_text">Reset</string>
@@ -106,6 +108,29 @@
     <string name="no_performance_history">No performance history available.</string>
     <string name="x_axis_label_session">Session</string>
     <string name="y_axis_label_total_reps">Total reps</string>
+
+    <string name="alert_dialog_conf">Confirm</string>
+    <string name="alert_dialog_cancel">Cancel</string>
+    <string name="role_selection_title">Are you the Coach or the athlete?</string>
+    <string name="coach">Coach</string>
+    <string name="athlete">Athlete</string>
+    <string name="pairing_requests_title">Pairing Requests</string>
+    <string name="no_pairing_requests">No pairing requests received yet. Wait until your friend send you a coaching request.</string>
+    <string name="accept">Accept</string>
+    <string name="reject">Reject</string>
+    <string name="request_from">Request from: %1$s</string>
+    <string name="request_ask">Request</string>
+    <string name="timestamp">Timestamp: %1$s</string>
+    <string name="select_friends">Select Friends</string>
+    <string name="no_friends_available">No friends available.</string>
+    <string name="time_activity_in_progress">The activity is time-based and currently in progress. Your coach manage the timer.</string>
+    <string name="reps_activity_in_progress">The activity is repetition-based and currently in progress. Your coach manage the counter.</string>
+    <string name="end_session_button_text">End session</string>
+    <string name="counter_message">Sets completed so far</string>
+    <string name="save_workout_session_button">Save session</string>
+    <string name="workout_timer_status_running">Timer Status: Running</string>
+    <string name="workout_timer_status_stopped">Timer Status: Stopped</string>
+    <string name="no_session">No session data available.</string>
 
     //Event statuses
     <string name="event_soon">Starting soon!</string>

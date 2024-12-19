@@ -30,11 +30,26 @@ interface WorkoutRepository {
 
   fun observePairingRequests(uid: String): Flow<List<PairingRequest>>
 
-  suspend fun respondToPairingRequest(requestId: String, isAccepted: Boolean)
+  suspend fun respondToPairingRequest(
+      requestId: String,
+      isAccepted: Boolean,
+      toUid: String,
+      fromUid: String
+  )
+
+  fun observeAcceptedPairingRequests(fromUid: String): Flow<List<PairingRequest>>
+
+  suspend fun getWorkoutSessionBySessionId(uid: String, sessionId: String): WorkoutSession?
+
+  suspend fun updateSessionAttributes(uid: String, sessionId: String, updates: Map<String, Any>)
+
+  suspend fun updatePairingRequestStatus(requestId: String, status: RequestStatus)
 
   fun observeWorkoutSessions(uid: String): Flow<List<WorkoutSession>>
 
-  suspend fun addCommentToSession(sessionId: String, comment: Comment)
+  suspend fun updateCounter(requestId: String, counter: Int)
+
+  suspend fun updateTimerStatus(requestId: String, timerStatus: TimerStatus)
 
   suspend fun deleteWorkoutDataByUid(uid: String)
 }

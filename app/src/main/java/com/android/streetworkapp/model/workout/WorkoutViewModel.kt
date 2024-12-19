@@ -175,7 +175,10 @@ open class WorkoutViewModel(private val repository: WorkoutRepository) : ViewMod
    */
   fun observePairingRequests(uid: String) {
     viewModelScope.launch {
-      repository.observePairingRequests(uid).collect { _pairingRequests.value = it }
+      repository.observePairingRequests(uid).collect { pairingRequests ->
+        _pairingRequests.value = pairingRequests
+        Log.d("WorkoutViewModel", "Pairing Requests Updated: $uid")
+      }
     }
   }
 
@@ -184,9 +187,49 @@ open class WorkoutViewModel(private val repository: WorkoutRepository) : ViewMod
    *
    * @param requestId The ID of the pairing request.
    * @param isAccepted Whether the request is accepted or rejected.
+   * @param currentUserUid The UID of the user responding to the request.
+   * @param fromUid The UID of the user who sent the request.
    */
-  fun respondToPairingRequest(requestId: String, isAccepted: Boolean) {
-    viewModelScope.launch { repository.respondToPairingRequest(requestId, isAccepted) }
+  fun respondToPairingRequest(
+      requestId: String,
+      isAccepted: Boolean,
+      currentUserUid: String,
+      fromUid: String
+  ) {
+    viewModelScope.launch {
+      repository.respondToPairingRequest(requestId, isAccepted, currentUserUid, fromUid)
+      if (isAccepted) refreshWorkoutData(currentUserUid)
+    }
+  }
+
+  /**
+   * Updates the training status for a pairing request.
+   *
+   * @param requestId The ID of the pairing request.
+   * @param counter The current counter value.
+   */
+  fun updateCounter(requestId: String, counter: Int) {
+    viewModelScope.launch { repository.updateCounter(requestId, counter) }
+  }
+
+  /**
+   * Updates the timer status for a pairing request.
+   *
+   * @param requestId The ID of the pairing request.
+   * @param timerStatus The new status of the timer.
+   */
+  fun updateTimerStatus(requestId: String, timerStatus: TimerStatus) {
+    viewModelScope.launch { repository.updateTimerStatus(requestId, timerStatus) }
+  }
+
+  /**
+   * Updates the status of a pairing request.
+   *
+   * @param requestId The ID of the pairing request.
+   * @param status The new status of the request.
+   */
+  fun updatePairingRequestStatus(requestId: String, status: RequestStatus) {
+    viewModelScope.launch { repository.updatePairingRequestStatus(requestId, status) }
   }
 
   /**
@@ -198,16 +241,6 @@ open class WorkoutViewModel(private val repository: WorkoutRepository) : ViewMod
     viewModelScope.launch {
       repository.observeWorkoutSessions(uid).collect { _workoutSessions.value = it }
     }
-  }
-
-  /**
-   * Adds a comment to a specific workout session.
-   *
-   * @param sessionId The ID of the session.
-   * @param comment The comment to add.
-   */
-  fun addCommentToSession(sessionId: String, comment: Comment) {
-    viewModelScope.launch { repository.addCommentToSession(sessionId, comment) }
   }
 
   /**

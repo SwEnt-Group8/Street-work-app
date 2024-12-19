@@ -157,7 +157,7 @@ fun TrainSoloScreen(
         }
         HorizontalDivider(Modifier.padding(vertical = 16.dp).testTag("Divider"), 1.dp, BORDER_COLOR)
 
-        PerformanceHistoryGraph(graphData, Modifier.padding(16.dp))
+        PerformanceHistoryGraph(graphData, Modifier.padding(16.dp), timedependent = isTimeDependent)
       }
 }
 
@@ -173,7 +173,8 @@ fun TrainSoloScreen(
 fun PerformanceHistoryGraph(
     graphData: List<GraphData>,
     modifier: Modifier = Modifier,
-    graphHeight: Dp = 200.dp
+    graphHeight: Dp = 200.dp,
+    timedependent: Boolean = false
 ) {
   if (graphData.isNotEmpty()) {
     Text(text = stringResource(id = R.string.performance_history))
@@ -183,7 +184,10 @@ fun PerformanceHistoryGraph(
               GraphConfiguration(
                   xUnitLabel = stringResource(id = R.string.x_axis_label_session),
                   yUnitLabel = stringResource(id = R.string.y_axis_label_total_reps),
-                  dataPoints = graphData))
+                  dataPoints = graphData,
+                  hoverSecondPart =
+                      if (timedependent) stringResource(id = R.string.sec)
+                      else stringResource(id = R.string.reps)))
     }
   } else {
     Text(text = stringResource(id = R.string.no_performance_history))
