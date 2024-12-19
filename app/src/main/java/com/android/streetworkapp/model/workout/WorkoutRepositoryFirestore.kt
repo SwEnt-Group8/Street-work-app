@@ -17,6 +17,7 @@ class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRep
     private const val ERROR_UID_EMPTY = "The user UID must not be empty."
     private const val ERROR_TAG = "FirestoreError"
     private const val ERROR_SESSION_ID_EMPTY = "The session ID must not be empty."
+    private const val REQUEST_NOT_EMPTY = "The request ID must not be empty."
     private const val WORKOUT_SESSIONS = "workoutSessions"
   }
 
@@ -356,7 +357,7 @@ class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRep
    * @param status The new status of the request.
    */
   override suspend fun updatePairingRequestStatus(requestId: String, status: RequestStatus) {
-    require(requestId.isNotEmpty()) { "The request ID must not be empty." }
+    require(requestId.isNotEmpty()) { REQUEST_NOT_EMPTY }
     try {
       db.collection(PAIRING_REQUESTS)
           .document(requestId)
@@ -470,7 +471,7 @@ class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRep
    * @param counter The counter value to update.
    */
   override suspend fun updateCounter(requestId: String, counter: Int) {
-    require(requestId.isNotEmpty()) { "The request ID must not be empty." }
+    require(requestId.isNotEmpty()) { REQUEST_NOT_EMPTY }
 
     try {
       db.collection(PAIRING_REQUESTS)
@@ -483,7 +484,7 @@ class WorkoutRepositoryFirestore(private val db: FirebaseFirestore) : WorkoutRep
   }
 
   override suspend fun updateTimerStatus(requestId: String, timerStatus: TimerStatus) {
-    require(requestId.isNotEmpty()) { "The request ID must not be empty." }
+    require(requestId.isNotEmpty()) { REQUEST_NOT_EMPTY }
 
     try {
       db.collection(PAIRING_REQUESTS)
