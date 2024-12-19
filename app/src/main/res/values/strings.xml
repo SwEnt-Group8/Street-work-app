@@ -46,7 +46,7 @@
     <string name="DefaultInfoContent">Information about this screen is not available. Please explore to learn more!</string>
     // Map Info
     <string name="MapInfoTitle">How does the map work ?</string>
-    <string name="MapInfoContent">This is the map, here you can see each park that is near you. \n\n You can navigate to see more. Click on a park to see its details, such as their events !</string>
+    <string name="MapInfoContent">This is the map, here you can see each park that is near you. \n\nYou can navigate to see more. Click on a park to see its details, such as their events ! \n\nThere is an icon on top that will allow you to filter parks according to their rating or the density of evens there ! \n\nThe more an icon is pink, the higher the density of events !</string>
     // Profile Info
     <string name="ProfileInfoTitle">What is the Profile ?</string>
     <string name="ProfileInfoContent">This is your profile page, you can see your friends and your score. \n\n You can also add friends using the "'Add friend' button and you can also access your settings by clicking the gear icon on the top right.</string>
@@ -59,12 +59,19 @@
     // AddEventInfo
     <string name="AddEventInfoTitle">How to create an event ?</string>
     <string name="AddEventInfoContent">This is your firsts steps towards creating an event ! \n\n You simply have to add a cool title, then, describe your event : What are you going to do there ? \n\n Finally, set the date and time and you are good to go !</string>
+    // EditEventInfo
+    <string name="EditEventInfoTitle">How to edit an event ?</string>
+    <string name="EditEventInfoContent">This is the place to edit your event ! \n\nYou can change the title, the description, the date and the time. \n\nYou can also delete the event if you want to.</string>
     // EventOverview Info
     <string name="EventOverviewInfoTitle">What is the Event Overview ?</string>
-    <string name="EventOverviewInfoContent">This is the event overview, here you can access all of the information that you need. \n\n You are free to join the event if you want to participate !</string>
+    <string name="EventOverviewInfoContent">This is the event overview, here you can access all of the information that you need. \n\nYou are free to join the event if you want to participate !</string>
     // Progression Info
     <string name="ProgressionInfoTitle">What is the Progression ?</string>
     <string name="ProgressionInfoContent">This is the progression screen, here you can see your progression and achievements. \n\n There is your record for each exercise in Training, click on it to see more details !</string>
+    // TrainHub Info
+    <string name="TrainHubInfoTitle">What is the Training Hub ?</string>
+    <string name="TrainHubInfoContent">This is the training hub, here you can train any of the proposed exercise. \n\nYou can choose to either train alone or in a coach session. \n\nHave fun in here !</string>
+
 
     // Progression UI
     <string name="ProgressionEmptyAchievements">You do not have any achievements yet!</string>
