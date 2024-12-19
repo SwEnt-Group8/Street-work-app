@@ -19,6 +19,16 @@
     <string name="LogoutTitle">Log-out</string>
     <string name="LogoutSuccess">You are logged out</string>
 
+    // Profile
+    <string name="ProfileNoFriendMessage">You have no friends yet :(</string>
+    <string name="ProfileDefaultUserStatus">Definitely not a bot</string>
+    <string name="ProfileTextFriendScore">Score: %1$d</string>
+    <string name="ProfileTextUserScore">Score: %1$d</string>
+    <string name="ProfileTextUnknownScore">Unknown score</string>
+    <string name="ProfileTextUnknownUser">Unknown user</string>
+    <string name="ProfileButtonAddFriend">Add friend</string>
+    <string name="ProfileButtonTrain">Train</string>
+
 
     // Friend removal :
     <string name="RemoveFriendAction">Remove friend</string>

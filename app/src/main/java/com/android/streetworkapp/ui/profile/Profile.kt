@@ -61,6 +61,8 @@ fun ProfileScreen(
     userViewModel: UserViewModel = viewModel(factory = UserViewModel.Factory),
     innerPaddingValues: PaddingValues = PaddingValues(0.dp),
 ) {
+  val context = LocalContext.current
+
   // Handling the MVVM calls for user :
   val currentUser = userViewModel.currentUser.collectAsState().value
 
@@ -93,7 +95,9 @@ fun ProfileScreen(
                     onClick = { navigationActions.navigateTo(Screen.TRAIN_HUB) },
                     modifier = Modifier.padding(horizontal = 8.dp).testTag("profileTrainButton"),
                     colors = ColorPalette.BUTTON_COLOR) {
-                      Text(text = "Train", color = Color.White)
+                      Text(
+                          text = context.getString(R.string.ProfileButtonTrain),
+                          color = Color.White)
                     }
 
                 // Add Friend Button
@@ -101,7 +105,9 @@ fun ProfileScreen(
                     onClick = { navigationActions.navigateTo(Screen.ADD_FRIEND) },
                     modifier = Modifier.padding(horizontal = 4.dp).testTag("profileAddButton"),
                     colors = ColorPalette.BUTTON_COLOR) {
-                      Text(text = "Add friend", color = Color.White)
+                      Text(
+                          text = context.getString(R.string.ProfileButtonAddFriend),
+                          color = Color.White)
                     }
               }
           DisplayFriendList(friendList, userViewModel)
@@ -117,7 +123,7 @@ fun ProfileScreen(
  */
 @Composable
 fun DisplayUsername(user: User?) {
-  val UNKNOWN_USER_MESSAGE = "unknown user"
+  val UNKNOWN_USER_MESSAGE = LocalContext.current.getString(R.string.ProfileTextUnknownUser)
   if (user != null) {
     Text(
         text = user.username,
@@ -139,10 +145,11 @@ fun DisplayUsername(user: User?) {
  */
 @Composable
 fun DisplayScore(user: User?) {
-  val UNKNOWN_SCORE_MESSAGE = "unknown score"
+  val context = LocalContext.current
+  val UNKNOWN_SCORE_MESSAGE = context.getString(R.string.ProfileTextUnknownScore)
   if (user != null) {
     Text(
-        text = "Score: ${user.score}",
+        text = context.getString(R.string.ProfileTextUserScore, user.score),
         fontSize = 18.sp,
         modifier = Modifier.padding(top = 4.dp).testTag("profileScore"))
   } else {
@@ -161,7 +168,7 @@ fun DisplayScore(user: User?) {
  */
 @Composable
 fun DisplayFriendList(friends: List<User?>, userViewModel: UserViewModel) {
-  val NO_FRIENDS_MESSAGE = "You have no friends yet :("
+  val NO_FRIENDS_MESSAGE = LocalContext.current.getString(R.string.ProfileNoFriendMessage)
 
   return if (friends.isNotEmpty()) {
     LazyColumn(modifier = Modifier.fillMaxSize().testTag("friendList")) {
@@ -191,7 +198,7 @@ fun DisplayFriendList(friends: List<User?>, userViewModel: UserViewModel) {
 fun DisplayFriendItem(friend: User, userViewModel: UserViewModel) {
   val context = LocalContext.current
   val showMenu = remember { mutableStateOf(false) }
-  val DEFAULT_USER_STATUS = "Definitely not a bot"
+  val DEFAULT_USER_STATUS = context.getString(R.string.ProfileDefaultUserStatus)
 
   Row(
       modifier = Modifier.fillMaxWidth().padding(8.dp).testTag("friendItem"),
@@ -207,7 +214,7 @@ fun DisplayFriendItem(friend: User, userViewModel: UserViewModel) {
               fontWeight = FontWeight.Bold,
               modifier = Modifier.testTag("friendUsername"))
           Text(
-              text = "Score: ${friend.score}",
+              text = context.getString(R.string.ProfileTextFriendScore, friend.score),
               fontSize = 14.sp,
               color = Color.Gray,
               modifier = Modifier.testTag("friendScore"))
