@@ -12,6 +12,7 @@ import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -20,6 +21,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class LocationServiceTest {
@@ -38,7 +40,12 @@ class LocationServiceTest {
   fun setup() {
     Dispatchers.setMain(testDispatcher)
     userRepository = mock(UserRepository::class.java)
-    userViewModel = UserViewModel(userRepository)
+    // Mock parks as a MutableStateFlow
+    val parksFlow = MutableStateFlow(listOf("oldPark"))
+    userViewModel = mock(UserViewModel::class.java).apply {
+      whenever(parks).thenReturn(parksFlow) // Return the mocked flow
+    }
+
     navigationActions = mock(NavigationActions::class.java)
     scope = CoroutineScope(testDispatcher)
     context = ApplicationProvider.getApplicationContext()
@@ -64,9 +71,9 @@ class LocationServiceTest {
     testDispatcher.scheduler.advanceUntilIdle()
 
     // Ensure check of parkID was called
-    Mockito.verify(userRepository, Mockito.times(1)).getParksByUid(user.uid)
+    Mockito.verify(userViewModel, Mockito.times(1)).getParksByUid(user.uid)
     // Ensure addNewPark was called for "newPark"
-    Mockito.verify(userRepository, Mockito.times(1)).addNewPark(user.uid, "newPark")
+    Mockito.verify(userViewModel, Mockito.times(1)).addNewPark(user.uid, "newPark")
   }
 
   @Test
@@ -86,9 +93,9 @@ class LocationServiceTest {
     testDispatcher.scheduler.advanceUntilIdle()
 
     // Ensure check of parkID was called for nearby park
-    Mockito.verify(userRepository, Mockito.times(1)).getParksByUid(user.uid)
+    Mockito.verify(userViewModel, Mockito.times(1)).getParksByUid(user.uid)
     // Ensure addNewPark was not called for "oldPark"
-    Mockito.verify(userRepository, Mockito.times(0)).addNewPark(user.uid, "oldPark")
+    Mockito.verify(userViewModel, Mockito.times(0)).addNewPark(user.uid, "oldPark")
   }
 
   @Test
@@ -108,10 +115,10 @@ class LocationServiceTest {
     testDispatcher.scheduler.advanceUntilIdle()
 
     // Ensure check of parkID was not called
-    Mockito.verify(userRepository, Mockito.times(0)).getParksByUid(user.uid)
+    Mockito.verify(userViewModel, Mockito.times(0)).getParksByUid(user.uid)
     // Ensure addNewPark was not called for "farPark1"
-    Mockito.verify(userRepository, Mockito.times(0)).addNewPark(user.uid, "farPark1")
+    Mockito.verify(userViewModel, Mockito.times(0)).addNewPark(user.uid, "farPark1")
     // Ensure addNewPark was not called for "farPark2"
-    Mockito.verify(userRepository, Mockito.times(0)).addNewPark(user.uid, "farPark2")
+    Mockito.verify(userViewModel, Mockito.times(0)).addNewPark(user.uid, "farPark2")
   }
 }
