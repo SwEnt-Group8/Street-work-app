@@ -53,7 +53,7 @@ class InfoDialogManager(
 
           // Auth not done because unnecessary
           // Add more if needed
-      )
+          )
 
   val infoDialogs: MutableMap<String, InfoDialog>
     get() = _infoDialogs
