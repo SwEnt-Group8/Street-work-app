@@ -46,7 +46,7 @@ The Street Work'App is designed to connect street workout enthusiasts by recomme
     - Users can create and join events at parks to meet others and explore new workout locations.
    
 4. **Progression**
-    - The app includes an achievement and progression system where users can track their milestones, unlock badges for completing specific goals. This gamification feature motivates users by rewarding consistent effort and providing a visual representation of their progress over time.
+    - The app includes an achievement and progression system where users can track their milestones and unlock badges for completing specific goals. This gamification feature motivates users by rewarding consistent effort and providing a visual representation of their progress over time.
    
 5. **Training and Exercise Management**
     - The app allows users to choose between training solo or with a friend acting as a coach, offering a variety of exercises such as Push-ups, Dips, Burpees, Lunges, Planks, Handstands, Front Lever, Flag, and Muscle-ups, enabling a customizable workout experience.
