@@ -41,11 +41,25 @@ jobs:
 
       # Caching is a very useful part of a CI, as a workflow is executed in a clean environment every time,
       # this means that one would need to re-download and re-process gradle files for every run. Which is very time consuming.
+      #
+      # To avoid that, we cache the the gradle folder to reuse it later.
+      - name: Gradle cache
+        uses: gradle/actions/setup-gradle@v3
 
       # Create the necessary AVD directories
-      - name: Create AVD directories no cache 😅
+      - name: Create AVD directories
         run: |
           mkdir -p ~/.android/avd
+
+      # Cache the Emulator, if the cache does not hit, create the emulator
+      - name: AVD cache
+        uses: actions/cache@v4
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-34
 
       - name: create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
