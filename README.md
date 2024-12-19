@@ -7,8 +7,13 @@
 # The Street Work’App – Bringing Athletes Together
 
 ## Visual
+Example of the main application screens 
 
-To see the complete design of our app [Figma 🎨](https://www.figma.com/design/4mU3E7xxGna8ou16wqOwAO/Street-Work'App?node-id=0-1&t=1wSLdlQFebCPNyh4-1)
+<img height="400" alt="image" src="https://github.com/user-attachments/assets/160ba6c2-3e91-475d-8bd7-6a3164a59364" />
+<img height="400" alt="image" src="https://github.com/user-attachments/assets/3709649b-6034-4ed6-8988-69875f349029" />
+<img height="400" alt="image" src="https://github.com/user-attachments/assets/1facd6cf-5b20-4db7-a555-580e4b5af1f4" />
+
+To see the complete design of our app: [Figma 🎨](https://www.figma.com/design/4mU3E7xxGna8ou16wqOwAO/Street-Work'App?node-id=0-1&t=1wSLdlQFebCPNyh4-1)
 
 ## Team Members
 
@@ -27,7 +32,7 @@ To see the complete design of our app [Figma 🎨](https://www.figma.com/design/
 The Street Work'App is designed to connect street workout enthusiasts by recommending parks for workouts and facilitating real-life social interactions. Street workout is a growing physical activity that combines calisthenics and gymnastics, performed in outdoor spaces like parks. This app helps users find like-minded individuals to practice with and promotes the development of a local street workout community.
 
 ## Project architecture
-<img width="872" alt="image" src="https://github.com/user-attachments/assets/55dcd946-d8ae-48da-a5df-3b9154bca342">
+<img width="1145" alt="image" src="https://github.com/user-attachments/assets/58740466-6e98-4c77-8157-43c4baf3570d" />
 
 
 ## Core Features
