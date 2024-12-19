@@ -4,6 +4,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.test.rule.GrantPermissionRule
 import com.android.streetworkapp.StreetWorkApp
 import com.android.streetworkapp.model.event.EventRepository
@@ -114,5 +115,16 @@ class End2EndAchievement {
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
 
     // The user first goes to the progression, seeing that there is no achievement for the moment
+
+    composeTestRule.onNodeWithTag("bottomNavigationItem${Route.PROGRESSION}").performClick()
+    composeTestRule.onNodeWithTag("AchievementTab").performClick()
+    composeTestRule.waitForIdle()
+
+    composeTestRule
+        .onNodeWithTag("emptyAchievementsText")
+        .assertExists() // the user sees that there is no achievement yet
+
+    // The user will now try to join an event, in order to win points
+
   }
 }
