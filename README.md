@@ -6,8 +6,9 @@
 
 # The Street Work’App – Bringing Athletes Together
 
-## Links
-[Figma 🎨](https://www.figma.com/design/4mU3E7xxGna8ou16wqOwAO/Street-Work'App?node-id=0-1&t=1wSLdlQFebCPNyh4-1)
+## Visual
+
+To see the complete design of our app [Figma 🎨](https://www.figma.com/design/4mU3E7xxGna8ou16wqOwAO/Street-Work'App?node-id=0-1&t=1wSLdlQFebCPNyh4-1)
 
 ## Team Members
 
@@ -38,9 +39,12 @@ The Street Work'App is designed to connect street workout enthusiasts by recomme
 
 3. **Park Events:**
     - Users can create and join events at parks to meet others and explore new workout locations.
-
-4. **Account Recommendations:**
-    - The app suggests users who frequent the same or nearby parks, helping to create workout communities. Users are also encouraged to schedule joint sessions.
+   
+4. **Progression**
+    - The app includes an achievement and progression system where users can track their milestones, unlock badges for completing specific goals. This gamification feature motivates users by rewarding consistent effort and providing a visual representation of their progress over time.
+   
+5. **Training and Exercise Management**
+    - The app allows users to choose between training solo or with a friend acting as a coach, offering a variety of exercises such as Push-ups, Dips, Burpees, Lunges, Planks, Handstands, Front Lever, Flag, and Muscle-ups, enabling a customizable workout experience.
 
 ## Secondary Features
 - **Gamification:**
@@ -62,5 +66,14 @@ The Street Work'App is designed to connect street workout enthusiasts by recomme
 
 - **Offline Mode:**
     - Users can view cached maps and workout plans even without an internet connection.
+
+- **Bluetooth Integration:**
+    - Enable seamless pairing between users for friend requests and collaboration during workouts.
+      
+- **Image Uploading:**
+    - Utilize Digital Ocean via AWS S3 API for uploading and storing park images and user profile pictures efficiently.
+      
+- **Text Moderation:**
+    - Integrate the Perspective API to moderate user-generated text content, ensuring a safe and respectful community.
 
 The Street Work'App aims to not only provide workout locations but also to build lasting connections between street workout enthusiasts in their communities.
