@@ -53,7 +53,6 @@ import com.android.streetworkapp.ui.authentication.SignInScreen
 import com.android.streetworkapp.ui.event.AddEventScreen
 import com.android.streetworkapp.ui.event.EventOverviewScreen
 import com.android.streetworkapp.ui.map.MapScreen
-import com.android.streetworkapp.ui.map.MapSearchBar
 import com.android.streetworkapp.ui.miscellaneous.SplashScreen
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenu
 import com.android.streetworkapp.ui.navigation.BottomNavigationMenuType
@@ -218,7 +217,6 @@ fun StreetWorkAppMain(
   }
 }
 
-@SuppressLint("UnrememberedMutableState")
 @Composable
 fun StreetWorkApp(
     parkLocationViewModel: ParkLocationViewModel,
@@ -257,11 +255,12 @@ fun StreetWorkApp(
   // Instantiate info manager and its components :
   val showInfoDialog = remember { mutableStateOf(false) }
   val showSearchBar = remember { mutableStateOf(false) }
+  val showFilterSettings = remember { mutableStateOf(false) }
 
   // query for the search bar
   val searchQuery = remember { mutableStateOf("") }
 
-  Log.d("InfoDialog", "Main - Instantiating the InfoDialogManager")
+  Log.d("MainActivity", "Main - Instantiating the InfoDialogManager")
   val infoManager =
       InfoDialogManager(
           showInfoDialog, currentScreenName, topAppBarManager = screenParams?.topAppBarManager)
@@ -269,22 +268,15 @@ fun StreetWorkApp(
   Scaffold(
       containerColor = ColorPalette.PRINCIPLE_BACKGROUND_COLOR,
       topBar = {
-        if (showSearchBar.value && screenParams?.hasSearchBar == true) {
-          MapSearchBar(searchQuery) {
-            searchQuery.value = ""
-            showSearchBar.value = false
-          }
-        } else {
-          screenParams
-              ?.isTopBarVisible
-              ?.takeIf { it }
-              ?.let {
-                TopAppBarWrapper(navigationActions, screenParams?.topAppBarManager)
-                // setup the InfoDialogManager in topBar, because it relies on the topAppBarManager.
-                Log.d("InfoDialog", "Main - Setting up the InfoDialogManager")
-                infoManager.setUp()
-              }
-        }
+        screenParams
+            ?.isTopBarVisible
+            ?.takeIf { it }
+            ?.let {
+              TopAppBarWrapper(navigationActions, screenParams?.topAppBarManager, searchQuery)
+              // setup the InfoDialogManager in topBar, because it relies on the topAppBarManager.
+              Log.d("MainActivity", "Main - Setting up the InfoDialogManager")
+              infoManager.setUp()
+            }
       },
       snackbarHost = {
         SnackbarHost(
@@ -339,8 +331,6 @@ fun StreetWorkApp(
               route = Route.MAP,
           ) {
             composable(Screen.MAP) {
-              val showFilterSettings = mutableStateOf(false)
-
               infoManager.Display(LocalContext.current)
               MapScreen(
                   parkLocationViewModel,
@@ -459,6 +449,7 @@ fun StreetWorkApp(
               route = Route.TRAIN_HUB,
           ) {
             composable(Screen.TRAIN_HUB) {
+              infoManager.Display(LocalContext.current)
               TrainHubScreen(navigationActions, workoutViewModel, userViewModel, innerPadding)
             }
             trainComposable(
@@ -477,9 +468,15 @@ fun StreetWorkApp(
 
             trainComposable(
                 route = Screen.TRAIN_COACH,
-                content = { activity, isTimeDependent, time, sets, reps ->
+                content = { activity, isTimeDependent, time, _, reps ->
                   TrainCoachScreen(
-                      activity, isTimeDependent, time, sets, reps, workoutViewModel, innerPadding)
+                      activity,
+                      isTimeDependent,
+                      reps,
+                      time,
+                      workoutViewModel,
+                      userViewModel,
+                      innerPadding)
                 })
           }
 

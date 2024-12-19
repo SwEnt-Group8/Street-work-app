@@ -62,12 +62,11 @@ data class ScreenParams(
             topAppBarManager =
                 TopAppBarManager(
                     "Map",
+                    hasSearchBar = true,
                     actions =
                         listOf(
-                            TopAppBarManager.TopAppBarAction.SEARCH,
                             TopAppBarManager.TopAppBarAction.INFO,
-                            TopAppBarManager.TopAppBarAction.FILTER)),
-            hasSearchBar = true)
+                            TopAppBarManager.TopAppBarAction.FILTER)))
     val PROFILE =
         ScreenParams(
             Screen.PROFILE,
@@ -135,7 +134,11 @@ data class ScreenParams(
     val TRAIN_HUB =
         ScreenParams(
             screenName = Screen.TRAIN_HUB,
-            topAppBarManager = TopAppBarManager("Training hub", hasNavigationIcon = false))
+            topAppBarManager =
+                TopAppBarManager(
+                    "Training hub",
+                    hasNavigationIcon = false,
+                    actions = listOf(TopAppBarManager.TopAppBarAction.INFO)))
     val TRAIN_SOLO =
         ScreenParams(
             screenName = Screen.TRAIN_SOLO,
@@ -143,8 +146,7 @@ data class ScreenParams(
     val TRAIN_COACH =
         ScreenParams(
             screenName = Screen.TRAIN_COACH,
-            topAppBarManager =
-                TopAppBarManager("Train with a friends as coach", hasNavigationIcon = true))
+            topAppBarManager = TopAppBarManager("Train with a friend", hasNavigationIcon = true))
     val TRAIN_CHALLENGE =
         ScreenParams(
             screenName = Screen.TRAIN_CHALLENGE,
