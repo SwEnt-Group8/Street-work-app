@@ -42,6 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.sample.R
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventStatus
 import com.android.streetworkapp.model.event.EventViewModel
@@ -108,6 +109,7 @@ fun EventOverviewScreen(
  */
 @Composable
 fun EventDetails(event: Event, userViewModel: UserViewModel) {
+  val context = LocalContext.current
   userViewModel.getUserByUid(event.owner)
   val user = userViewModel.user.collectAsState().value
 
@@ -126,7 +128,9 @@ fun EventDetails(event: Event, userViewModel: UserViewModel) {
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically) {
           DisplayUserPicture(user, 48.dp, "eventOwnerPicture")
-          Text("Organized by: ${user?.username}", modifier = Modifier.testTag("eventOwner"))
+          Text(
+              context.getString(R.string.EventOverviewOrganizer, user?.username),
+              modifier = Modifier.testTag("eventOwner"))
         }
 
     Row(
@@ -143,7 +147,10 @@ fun EventDetails(event: Event, userViewModel: UserViewModel) {
               contentDescription = "participants",
               modifier = Modifier.padding(start = 64.dp).testTag("participantsIcon"))
           Text(
-              "Participants: ${event.listParticipants.size}/${event.maxParticipants}",
+              context.getString(
+                  R.string.EventOverviewNbrParticipant,
+                  event.listParticipants.size,
+                  event.maxParticipants),
               modifier = Modifier.padding(8.dp).testTag("participants"))
         }
   }
@@ -157,6 +164,7 @@ fun EventDetails(event: Event, userViewModel: UserViewModel) {
  */
 @Composable
 fun EventMap(event: Event, parkViewModel: ParkViewModel, navigationActions: NavigationActions) {
+  val context = LocalContext.current
   parkViewModel.getParkByPid(event.parkId)
   val park = parkViewModel.park.collectAsState().value
   val parkLatLng = park?.location?.let { LatLng(it.lat, it.lon) }
@@ -173,7 +181,9 @@ fun EventMap(event: Event, parkViewModel: ParkViewModel, navigationActions: Navi
             Icons.Outlined.LocationOn,
             contentDescription = "location",
             modifier = Modifier.padding(horizontal = 8.dp).testTag("locationIcon"))
-        Text("at ${park?.name}", modifier = Modifier.testTag("location"))
+        Text(
+            context.getString(R.string.EventOverviewLocation, park?.name),
+            modifier = Modifier.testTag("location"))
       }
 
   GoogleMap(
@@ -240,6 +250,7 @@ fun EventDashboard(event: Event, userViewModel: UserViewModel) {
  */
 @Composable
 fun DashBoardBar() {
+  val context = LocalContext.current
   NavigationBar(
       modifier = Modifier.testTag("dashboard").fillMaxWidth().height(56.dp),
       containerColor = ColorPalette.PRINCIPLE_BACKGROUND_COLOR) {
@@ -247,14 +258,14 @@ fun DashBoardBar() {
 
         NavigationBarItem(
             modifier = Modifier.testTag("detailsTab"),
-            icon = { Text("Details") },
+            icon = { Text(context.getString(R.string.EventOverviewNavigationBarDetails)) },
             selected = state == DashboardState.Details,
             onClick = { uiState.value = DashboardState.Details },
             colors = ColorPalette.NAVIGATION_BAR_ITEM_COLORS)
 
         NavigationBarItem(
             modifier = Modifier.testTag("participantsTab"),
-            icon = { Text("Participants") },
+            icon = { Text(context.getString(R.string.EventOverviewNavigationBarParticipants)) },
             selected = state == DashboardState.Participants,
             onClick = { uiState.value = DashboardState.Participants },
             colors = ColorPalette.NAVIGATION_BAR_ITEM_COLORS)
@@ -271,6 +282,7 @@ fun JoinEventButton(
     scope: CoroutineScope = rememberCoroutineScope(),
     snackbarHostState: SnackbarHostState? = null,
 ) {
+  val context = LocalContext.current
   Button(
       onClick = {
         if (snackbarHostState != null) {
@@ -288,7 +300,7 @@ fun JoinEventButton(
       modifier = Modifier.testTag("joinEventButton"),
       enabled = event.participants < event.maxParticipants,
       colors = ColorPalette.BUTTON_COLOR) {
-        Text("Join this event")
+        Text(context.getString(R.string.EventOverviewButtonJoinEvent))
       }
 }
 
@@ -303,14 +315,18 @@ fun LeaveEventButton(
 
   Button(
       onClick = {
-        Toast.makeText(context, "You have left this event", Toast.LENGTH_LONG).show()
+        Toast.makeText(
+                context,
+                context.getString(R.string.EventOverviewToastLeaveEvent),
+                Toast.LENGTH_LONG)
+            .show()
         eventViewModel.removeParticipantFromEvent(event.eid, user.uid)
         navigationActions.goBack()
       },
       enabled = event.owner != user.uid,
       modifier = Modifier.testTag("leaveEventButton"),
       colors = ColorPalette.BUTTON_COLOR.copy(containerColor = Color.Red)) {
-        Text("Leave this event")
+        Text(context.getString(R.string.EventOverviewButtonLeaveEvent))
       }
 }
 
@@ -320,6 +336,7 @@ fun EditEventButton(
     eventViewModel: EventViewModel,
     navigationActions: NavigationActions
 ) {
+  val context = LocalContext.current
   Button(
       onClick = {
         eventViewModel.setCurrentEvent(event)
@@ -328,7 +345,7 @@ fun EditEventButton(
       enabled = true,
       modifier = Modifier.testTag("editEventButton"),
       colors = ColorPalette.BUTTON_COLOR) {
-        Text("Edit this event")
+        Text(context.getString(R.string.EventOverviewButtonEditEvent))
       }
 }
 
@@ -342,9 +359,12 @@ fun StatusButton(
   val context = LocalContext.current
   val (nextStatus, buttonText) =
       when (event.status) {
-        EventStatus.CREATED -> Pair(EventStatus.STARTED, "Start Event")
-        EventStatus.STARTED -> Pair(EventStatus.ENDED, "End Event")
-        EventStatus.ENDED -> Pair(EventStatus.ENDED, "Event Ended")
+        EventStatus.CREATED ->
+            Pair(EventStatus.STARTED, context.getString(R.string.EventOverviewStatusButtonStart))
+        EventStatus.STARTED ->
+            Pair(EventStatus.ENDED, context.getString(R.string.EventOverviewStatusButtonEnd))
+        EventStatus.ENDED ->
+            Pair(EventStatus.ENDED, context.getString(R.string.EventOverviewStatusButtonEnded))
       }
 
   val buttonColor =
@@ -361,10 +381,18 @@ fun StatusButton(
         if (nextStatus == EventStatus.ENDED) {
           eventViewModel.deleteEvent(event)
           parkViewModel.deleteEventFromPark(event.parkId, event.eid)
-          Toast.makeText(context, "Event ended", Toast.LENGTH_LONG).show()
+          Toast.makeText(
+                  context,
+                  context.getString(R.string.EventOverviewToastEventEnded),
+                  Toast.LENGTH_LONG)
+              .show()
         } else {
           eventViewModel.updateStatus(event.eid, nextStatus)
-          Toast.makeText(context, "Event started!", Toast.LENGTH_LONG).show()
+          Toast.makeText(
+                  context,
+                  context.getString(R.string.EventOverviewToastEventStarted),
+                  Toast.LENGTH_LONG)
+              .show()
         }
         navigationActions.navigateTo(Screen.PARK_OVERVIEW)
       },

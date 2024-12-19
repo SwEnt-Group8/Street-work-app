@@ -134,4 +134,33 @@
     <string name="ParkOverviewRatingTitle">Park rating</string>
     <string name="ParkOverviewEventButton">About</string>
 
+    // Event Overview
+    <string name="EventOverviewOrganizer">Organized by: %s</string>
+    <string name="EventOverviewNbrParticipant">Participants: %1$d/%2$d</string>
+    <string name="EventOverviewLocation">at %s</string>
+    <string name="EventOverviewNavigationBarDetails">Details</string>
+    <string name="EventOverviewNavigationBarParticipants">Participants</string>
+    <string name="EventOverviewButtonJoinEvent">Join this event</string>
+    <string name="EventOverviewToastLeaveEvent">You joined the event</string>
+    <string name="EventOverviewButtonLeaveEvent">Leave this event</string>
+    <string name="EventOverviewButtonEditEvent">Edit this event</string>
+    <string name="EventOverviewStatusButtonStart">Start Event</string>
+    <string name="EventOverviewStatusButtonEnd">End Event</string>
+    <string name="EventOverviewStatusButtonEnded">Event Ended</string>
+    <string name="EventOverviewToastEventEnded">Event ended</string>
+    <string name="EventOverviewToastEventStarted">Event started!</string>
+
+    // Add Event
+    <string name="AddEventRequiredField">* Required fields</string>
+    <string name="AddEventParticipantsText">How many participants do you want?</string>
+    <string name="AddEventButtonEditEvent">Edit event</string>
+    <string name="AddEventButtonAddEvent">Add new event</string>
+    <string name="AddEventToastEventDeleted">Event deleted</string>
+    <string name="AddEventButtonDeleteEvent">Event edited</string>
+    <string name="AddEventTextEventTitle">What\'s your event\'s title?*</string>
+    <string name="AddEventTextEventDescription">Describe your event</string>
+    <string name="AddEventTextEventDate">When do you want your event to be?*</string>
+    <string name="AddEventButtonValidate">Validate</string>
+    <string name="AddEventToastEventUpdated">Event updated</string>
+
 </resources>

@@ -53,6 +53,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
+import com.android.sample.R
 import com.android.streetworkapp.model.event.Event
 import com.android.streetworkapp.model.event.EventConstants
 import com.android.streetworkapp.model.event.EventViewModel
@@ -183,14 +184,14 @@ fun AddEventScreen(
               TimeSelection(event, isDateBackInTimeError)
 
               Text(
-                  text = "* Required fields",
+                  text = context.getString(R.string.AddEventRequiredField),
                   color = ColorPalette.SECONDARY_TEXT_COLOR,
                   fontWeight = FontWeight.Normal,
                   fontSize = 12.sp,
                   textAlign = TextAlign.Left,
                   modifier = Modifier.fillMaxWidth(0.9f))
               Text(
-                  text = "How many participants do you want?",
+                  text = context.getString(R.string.AddEventParticipantsText),
                   fontSize = 18.sp,
               )
               ParticipantNumberSelection(event)
@@ -236,9 +237,9 @@ fun AddEventScreen(
                               context)
                         }) {
                           if (editEvent) {
-                            Text("Edit event")
+                            Text(context.getString(R.string.AddEventButtonEditEvent))
                           } else {
-                            Text("Add new event")
+                            Text(context.getString(R.string.AddEventButtonAddEvent))
                           }
                         }
 
@@ -249,12 +250,16 @@ fun AddEventScreen(
                                   containerColor = MaterialTheme.colorScheme.error),
                           modifier = Modifier.testTag("deleteEventButton"),
                           onClick = {
-                            Toast.makeText(context, "Event deleted", Toast.LENGTH_LONG).show()
+                            Toast.makeText(
+                                    context,
+                                    context.getString(R.string.AddEventToastEventDeleted),
+                                    Toast.LENGTH_LONG)
+                                .show()
                             eventViewModel.deleteEvent(event)
                             parkViewModel.deleteEventFromPark(event.parkId, event.eid)
                             navigationActions.navigateTo(Screen.PARK_OVERVIEW)
                           }) {
-                            Text("Delete event")
+                            Text(context.getString(R.string.AddEventButtonDeleteEvent))
                           }
                     }
                   }
@@ -273,6 +278,7 @@ fun EventTitleSelection(
     isTitleEmptyError: MutableState<Boolean>,
     isTextEvaluationError: MutableState<Boolean>
 ) {
+  val context = LocalContext.current
   var title by remember { mutableStateOf(event.title) }
 
   OutlinedTextField(
@@ -284,7 +290,7 @@ fun EventTitleSelection(
         isTitleEmptyError.value = false
         isTextEvaluationError.value = false
       },
-      label = { Text("What's your event's title?*") },
+      label = { Text(context.getString(R.string.AddEventTextEventTitle)) },
       isError = isTitleEmptyError.value || isTextEvaluationError.value,
       modifier = Modifier.testTag("titleTag").fillMaxWidth(0.9f))
 }
@@ -296,6 +302,7 @@ fun EventTitleSelection(
  */
 @Composable
 fun EventDescriptionSelection(event: Event, isTextEvaluationError: MutableState<Boolean>) {
+  val context = LocalContext.current
   var description by remember { mutableStateOf(event.description) }
 
   OutlinedTextField(
@@ -305,7 +312,7 @@ fun EventDescriptionSelection(event: Event, isTextEvaluationError: MutableState<
         event.description = description
         isTextEvaluationError.value = false // reset the field error
       },
-      label = { Text("Describe your event") },
+      label = { Text(context.getString(R.string.AddEventTextEventDescription)) },
       isError = isTextEvaluationError.value,
       modifier = Modifier.testTag("descriptionTag").fillMaxWidth(0.9f).height(128.dp))
 }
@@ -353,6 +360,7 @@ fun ParticipantNumberSelection(event: Event) {
 @ExperimentalMaterial3Api
 @Composable
 fun TimeSelection(event: Event, isDateError: MutableState<Boolean>) {
+  val context = LocalContext.current
   var showDatePicker by remember { mutableStateOf(false) }
   var showTimePicker by remember { mutableStateOf(false) }
 
@@ -386,7 +394,7 @@ fun TimeSelection(event: Event, isDateError: MutableState<Boolean>) {
         value = selectedDate,
         onValueChange = {},
         isError = isDateError.value,
-        label = { Text("When do you want your event to be?*") },
+        label = { Text(context.getString(R.string.AddEventTextEventDate)) },
         readOnly = true,
         trailingIcon = {
           Row {
@@ -429,7 +437,7 @@ fun TimeSelection(event: Event, isDateError: MutableState<Boolean>) {
                                   ?.let { TimeUnit.MILLISECONDS.toSeconds(currentTimeSelection!!) }
                                   ?.let { Timestamp(it, 0) }!!
                         }) {
-                          Text("Validate")
+                          Text(context.getString(R.string.AddEventButtonValidate))
                         }
                   }
             }
@@ -459,7 +467,7 @@ fun TimeSelection(event: Event, isDateError: MutableState<Boolean>) {
                             ?.let { TimeUnit.MILLISECONDS.toSeconds(currentTimeSelection!!) }
                             ?.let { Timestamp(it, 0) }!!
                   }) {
-                    Text("Validate")
+                    Text(context.getString(R.string.AddEventButtonValidate))
                   }
             }
       }
@@ -490,7 +498,9 @@ private fun createEvent(
     updateAndDisplayPoints(
         userViewModel, navigationActions, ScoreIncrease.ADD_EVENT.points, coroutineScope, host)
   } else {
-    Toast.makeText(context, "Event updated", Toast.LENGTH_LONG).show()
+    Toast.makeText(
+            context, context.getString(R.string.AddEventToastEventUpdated), Toast.LENGTH_LONG)
+        .show()
   }
 }
 
