@@ -89,7 +89,7 @@ fun SignInScreen(
       preferencesViewModel.setName(it.username)
       preferencesViewModel.setScore(it.score)
       Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
-      navigationActions.navigateTo(Screen.MAP)
+      navigationActions.navigateTo(Screen.TUTO_EVENT)
     }
   }
 
