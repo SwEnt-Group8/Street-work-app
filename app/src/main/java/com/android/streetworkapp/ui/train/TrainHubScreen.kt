@@ -43,6 +43,7 @@ import com.android.streetworkapp.ui.navigation.NavigationActions
 import com.android.streetworkapp.ui.theme.ColorPalette.BORDER_COLOR
 import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_DARK
 import com.android.streetworkapp.ui.theme.ColorPalette.INTERACTION_COLOR_LIGHT
+import com.android.streetworkapp.utils.exerciseNameToIcon
 
 @Composable
 fun TrainHubScreen(
@@ -120,7 +121,7 @@ fun TrainHubScreen(
                     rowItems.forEach { activity ->
                       SelectionButton(
                           text = activity,
-                          imageResId = getActivityIcon(activity),
+                          imageResId = exerciseNameToIcon(activity),
                           buttonSize = buttonSize,
                           onClick = {
                             selectedActivity =
@@ -152,23 +153,6 @@ fun TrainHubScreen(
               navigationActions = navigationActions)
         }
       }
-}
-
-// Utility to fetch activity icon
-@Composable
-fun getActivityIcon(activity: String): Int {
-  return when (activity) {
-    "Push-ups" -> R.drawable.train_pushup
-    "Dips" -> R.drawable.train_dips
-    "Burpee" -> R.drawable.train_burpee
-    "Lunge" -> R.drawable.train_lunge
-    "Planks" -> R.drawable.train_planks
-    "Handstand" -> R.drawable.train_hand_stand
-    "Front lever" -> R.drawable.train_front_lever
-    "Flag" -> R.drawable.train_flag
-    "Muscle-up" -> R.drawable.train_muscle_up
-    else -> R.drawable.handstand_org
-  }
 }
 
 @Composable
