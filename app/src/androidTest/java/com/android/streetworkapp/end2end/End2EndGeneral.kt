@@ -36,7 +36,6 @@ import com.android.streetworkapp.ui.navigation.Route
 import com.android.streetworkapp.utils.GoogleAuthService
 import com.google.firebase.auth.FirebaseAuth
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.InjectMocks
@@ -117,7 +116,6 @@ class End2EndGeneral {
   }
 
   /** Tests everything included up to M2 except for everything that involves parks */
-  @Ignore("google maps API can be slow sometimes, wouldn't want the CI to fail because of this")
   @Test
   fun e2eNavigationAndDisplaysCorrectDetailsExceptForParks() {
 
