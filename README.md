@@ -6,8 +6,14 @@
 
 # The Street Work’App – Bringing Athletes Together
 
-## Links
-[Figma 🎨](https://www.figma.com/design/4mU3E7xxGna8ou16wqOwAO/Street-Work'App?node-id=0-1&t=1wSLdlQFebCPNyh4-1)
+## Visual
+Example of the main application screens 
+
+<img height="400" alt="image" src="https://github.com/user-attachments/assets/160ba6c2-3e91-475d-8bd7-6a3164a59364" />
+<img height="400" alt="image" src="https://github.com/user-attachments/assets/3709649b-6034-4ed6-8988-69875f349029" />
+<img height="400" alt="image" src="https://github.com/user-attachments/assets/1facd6cf-5b20-4db7-a555-580e4b5af1f4" />
+
+To see the complete design of our app: [Figma 🎨](https://www.figma.com/design/4mU3E7xxGna8ou16wqOwAO/Street-Work'App?node-id=0-1&t=1wSLdlQFebCPNyh4-1)
 
 ## Team Members
 
@@ -26,7 +32,7 @@
 The Street Work'App is designed to connect street workout enthusiasts by recommending parks for workouts and facilitating real-life social interactions. Street workout is a growing physical activity that combines calisthenics and gymnastics, performed in outdoor spaces like parks. This app helps users find like-minded individuals to practice with and promotes the development of a local street workout community.
 
 ## Project architecture
-<img width="872" alt="image" src="https://github.com/user-attachments/assets/55dcd946-d8ae-48da-a5df-3b9154bca342">
+<img width="1145" alt="image" src="https://github.com/user-attachments/assets/58740466-6e98-4c77-8157-43c4baf3570d" />
 
 
 ## Core Features
@@ -38,9 +44,12 @@ The Street Work'App is designed to connect street workout enthusiasts by recomme
 
 3. **Park Events:**
     - Users can create and join events at parks to meet others and explore new workout locations.
-
-4. **Account Recommendations:**
-    - The app suggests users who frequent the same or nearby parks, helping to create workout communities. Users are also encouraged to schedule joint sessions.
+   
+4. **Progression**
+    - The app includes an achievement and progression system where users can track their milestones and unlock badges for completing specific goals. This gamification feature motivates users by rewarding consistent effort and providing a visual representation of their progress over time.
+   
+5. **Training and Exercise Management**
+    - The app allows users to choose between training solo or with a friend acting as a coach, offering a variety of exercises such as Push-ups, Dips, Burpees, Lunges, Planks, Handstands, Front Lever, Flag, and Muscle-ups, enabling a customizable workout experience.
 
 ## Secondary Features
 - **Gamification:**
@@ -62,5 +71,14 @@ The Street Work'App is designed to connect street workout enthusiasts by recomme
 
 - **Offline Mode:**
     - Users can view cached maps and workout plans even without an internet connection.
+
+- **Bluetooth Integration:**
+    - Enable seamless pairing between users for friend requests and collaboration during workouts.
+      
+- **Image Uploading:**
+    - Utilize Digital Ocean via AWS S3 API for uploading and storing park images and user profile pictures efficiently.
+      
+- **Text Moderation:**
+    - Integrate the Perspective API to moderate user-generated text content, ensuring a safe and respectful community.
 
 The Street Work'App aims to not only provide workout locations but also to build lasting connections between street workout enthusiasts in their communities.
